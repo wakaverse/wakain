@@ -114,18 +114,65 @@ class FrameAnalysis(BaseModel):
 # ── Layer 2: Scene (Phase 3: scene_merger) ─────────────────────────────────
 
 
+class SceneTextOverlay(BaseModel):
+    content: str
+    purpose: str = Field(description="e.g. hook_question, benefit, cta")
+    font_style: str = Field(description="e.g. bold_impact, elegant")
+    position: str = Field(description="Text region position, e.g. top_third")
+    dwell_time: float = Field(description="Seconds text is on screen (frames × 0.5)")
+
+
+class SceneHumanElement(BaseModel):
+    role: str = Field(description="Most common human role in scene")
+    emotion: str = Field(description="Most common emotion")
+    eye_contact: bool = Field(description="Majority eye_contact across frames")
+    gesture: str = Field(description="Most common gesture")
+
+
+class SceneEnergy(BaseModel):
+    avg_score: float
+    peak_score: float
+    peak_timestamp: float
+    section: Literal["강", "중", "정적", "클라이막스"]
+    is_climax: bool = Field(description="True if peak_score >= 0.75")
+
+
 class VisualSummary(BaseModel):
     dominant_shot: Literal[
         "closeup", "medium", "wide", "overhead", "pov", "split_screen"
     ]
-    cut_count: int
-    avg_cut_interval: float
+    shot_sequence: list[str] = Field(
+        default_factory=list,
+        description="Shot types from each frame in order",
+    )
+    composition: str = Field(
+        default="center",
+        description="Most common composition layout",
+    )
+    cut_count: int = 0
+    avg_cut_interval: float = 0.0
     motion_level: Literal["static", "slow", "moderate", "fast", "jump_cut"]
     color_consistency: float = Field(description="0.0-1.0")
     color_mood: Literal[
         "warm_cozy", "cool_professional", "vibrant_energetic",
         "muted_luxury", "natural_organic", "bold_contrast",
     ]
+    color_palette: list[str] = Field(
+        default_factory=list,
+        description="Top 3 hex colors by total ratio across frames",
+    )
+    zoom_events: list[ZoomEvent] = Field(
+        default_factory=list,
+        description="Zoom events from temporal analysis within scene time range",
+    )
+    transition_in: str = Field(
+        default="none",
+        description="Transition type at scene start (hard_cut, dissolve, fade, zoom_transition, none)",
+    )
+    transition_out: str = Field(
+        default="none",
+        description="Transition type at scene end",
+    )
 
 
 class ContentSummary(BaseModel):
@@ -134,8 +181,23 @@ class ContentSummary(BaseModel):
         "text_graphic", "lifestyle_scene", "before_after",
     ]
     product_visibility: Literal["hidden", "glimpse", "partial", "full", "in_use"]
-    text_overlays: list[str]
-    key_action: str
+    product_angle: str = Field(
+        default="front",
+        description="Most common product angle across frames",
+    )
+    product_context: str = Field(
+        default="studio",
+        description="Most common product context across frames",
+    )
+    human_element: Optional[SceneHumanElement] = Field(
+        None, description="Aggregated human element; null if no human in scene",
+    )
+    text_overlays: list[SceneTextOverlay] = Field(default_factory=list)
+    attention_elements: list[str] = Field(
+        default_factory=list,
+        description="Unique attention-grabbing element descriptions from frames",
+    )
+    key_action: str = ""
 
 
 class EffectivenessSignals(BaseModel):
@@ -157,6 +219,7 @@ class Scene(BaseModel):
     visual_summary: VisualSummary
     content_summary: ContentSummary
     effectiveness_signals: EffectivenessSignals
+    energy: Optional[SceneEnergy] = None
 
 
 # ── Layer 3: Video Recipe (Phase 5: recipe_builder) ────────────────────────

@@ -24,8 +24,12 @@ from .schemas import (
     FrameQual,
     FrameQuant,
     Scene,
+    SceneEnergy,
+    SceneHumanElement,
+    SceneTextOverlay,
     TemporalAnalysis,
     VisualSummary,
+    ZoomEvent,
 )
 
 MODEL = "gemini-2.0-flash"
@@ -120,12 +124,22 @@ def _group_frames_fallback(
 
 
 def _compute_visual_summary(
-    quants: list[FrameQuant], quals: list[FrameQual],
+    quants: list[FrameQuant],
+    quals: list[FrameQual],
+    temporal: TemporalAnalysis | None = None,
+    time_range: list[float] | None = None,
 ) -> dict:
     """Compute visual_summary fields from grouped frames (without LLM fields)."""
     # Dominant shot = most common shot_type
     shot_counts = Counter(q.shot_type for q in quals)
     dominant_shot = shot_counts.most_common(1)[0][0]
+
+    # Shot sequence: ordered list of shot_type from each frame
+    shot_sequence = [q.shot_type for q in quals]
+
+    # Composition: most common layout
+    layout_counts = Counter(q.composition.layout for q in quals)
+    composition = layout_counts.most_common(1)[0][0]
 
     # Count cuts (frames with high edge_diff)
     cut_count = sum(1 for q in quants[1:] if q.edge_diff > 30)
@@ -157,18 +171,58 @@ def _compute_visual_summary(
     mood_counts = Counter(q.color_mood for q in quals)
     color_mood = mood_counts.most_common(1)[0][0]
 
+    # Color palette: collect dominant_colors from all frames, pick top 3 by total ratio
+    color_ratios: dict[str, float] = {}
+    for q in quants:
+        for dc in q.dominant_colors:
+            color_ratios[dc.hex] = color_ratios.get(dc.hex, 0.0) + dc.ratio
+    top_colors = sorted(color_ratios.items(), key=lambda x: x[1], reverse=True)[:3]
+    color_palette = [hex_code for hex_code, _ in top_colors]
+
+    # Zoom events + transitions from temporal data
+    zoom_events: list[dict] = []
+    transition_in = "none"
+    transition_out = "none"
+
+    if temporal and time_range:
+        s_start, s_end = time_range
+
+        # Zoom events within scene time range
+        for z in temporal.zoom_events:
+            if z.time_range[0] >= s_start and z.time_range[1] <= s_end:
+                zoom_events.append(z.model_dump())
+
+        # Transition at scene start (event closest to s_start)
+        for evt in temporal.transition_texture.events:
+            if abs(evt.timestamp - s_start) <= 0.6:
+                transition_in = evt.type
+                break
+
+        # Transition at scene end (event closest to s_end)
+        for evt in reversed(temporal.transition_texture.events):
+            if abs(evt.timestamp - s_end) <= 0.6:
+                transition_out = evt.type
+                break
+
     return {
         "dominant_shot": dominant_shot,
+        "shot_sequence": shot_sequence,
+        "composition": composition,
         "cut_count": cut_count,
         "avg_cut_interval": round(avg_cut_interval, 2),
         "motion_level": motion_level,
         "color_consistency": color_consistency,
         "color_mood": color_mood,
+        "color_palette": color_palette,
+        "zoom_events": zoom_events,
+        "transition_in": transition_in,
+        "transition_out": transition_out,
     }
 
 
 def _compute_content_summary(
     quals: list[FrameQual],
+    quants: list[FrameQuant],
 ) -> dict:
     """Compute content_summary fields from grouped frames."""
     subject_counts = Counter(q.subject_type for q in quals)
@@ -177,19 +231,105 @@ def _compute_content_summary(
     vis_counts = Counter(q.product_presentation.visibility for q in quals)
     product_visibility = vis_counts.most_common(1)[0][0]
 
-    text_overlays: list[str] = []
-    seen: set[str] = set()
+    # Product angle + context: most common values
+    angle_counts = Counter(q.product_presentation.angle for q in quals)
+    product_angle = angle_counts.most_common(1)[0][0]
+
+    context_counts = Counter(q.product_presentation.context for q in quals)
+    product_context = context_counts.most_common(1)[0][0]
+
+    # Human element: aggregate most common role/emotion/gesture, majority eye_contact
+    human_frames = [q for q in quals if q.human_element.role != "none"]
+    human_element = None
+    if human_frames:
+        role_counts = Counter(q.human_element.role for q in human_frames)
+        emotion_counts = Counter(q.human_element.emotion for q in human_frames)
+        gesture_counts = Counter(q.human_element.gesture for q in human_frames)
+        eye_contact_true = sum(1 for q in human_frames if q.human_element.eye_contact)
+        human_element = {
+            "role": role_counts.most_common(1)[0][0],
+            "emotion": emotion_counts.most_common(1)[0][0],
+            "eye_contact": eye_contact_true > len(human_frames) / 2,
+            "gesture": gesture_counts.most_common(1)[0][0],
+        }
+
+    # Text overlays: enriched with purpose, font_style, position, dwell_time
+    text_overlays: list[dict] = []
+    text_frame_counts: dict[str, int] = {}
+    text_info: dict[str, dict] = {}
     for q in quals:
         if q.text_overlay and q.text_overlay.content:
             content = q.text_overlay.content.strip()
-            if content and content not in seen:
-                seen.add(content)
-                text_overlays.append(content)
+            if not content:
+                continue
+            text_frame_counts[content] = text_frame_counts.get(content, 0) + 1
+            if content not in text_info:
+                # Get text region position from corresponding quant frame
+                position = "unknown"
+                for quant in quants:
+                    if quant.timestamp == q.timestamp:
+                        position = quant.text_region.position
+                        break
+                text_info[content] = {
+                    "content": content,
+                    "purpose": q.text_overlay.purpose,
+                    "font_style": q.text_overlay.font_style,
+                    "position": position,
+                }
+
+    for content, info in text_info.items():
+        dwell_time = round(text_frame_counts[content] * 0.5, 1)
+        text_overlays.append({**info, "dwell_time": dwell_time})
+
+    # Attention elements: unique attention_element strings from all frames
+    attention_elements: list[str] = []
+    seen_attn: set[str] = set()
+    for q in quals:
+        if q.attention_element and q.attention_element not in seen_attn:
+            seen_attn.add(q.attention_element)
+            attention_elements.append(q.attention_element)
 
     return {
         "subject_type": subject_type,
         "product_visibility": product_visibility,
+        "product_angle": product_angle,
+        "product_context": product_context,
+        "human_element": human_element,
         "text_overlays": text_overlays,
+        "attention_elements": attention_elements,
+    }
+
+
+# ── Scene energy from temporal data ─────────────────────────────────────────
+
+
+def _compute_scene_energy(
+    temporal: TemporalAnalysis,
+    time_range: list[float],
+) -> dict | None:
+    """Compute energy stats for a scene from temporal energy curve."""
+    s_start, s_end = time_range
+    points = [
+        p for p in temporal.energy_curve.points
+        if s_start <= p.timestamp <= s_end
+    ]
+    if not points:
+        return None
+
+    scores = [p.score for p in points]
+    avg_score = round(sum(scores) / len(scores), 3)
+    peak_point = max(points, key=lambda p: p.score)
+    peak_score = round(peak_point.score, 3)
+    peak_timestamp = round(peak_point.timestamp, 2)
+    section = peak_point.section
+    is_climax = peak_score >= 0.75
+
+    return {
+        "avg_score": avg_score,
+        "peak_score": peak_score,
+        "peak_timestamp": peak_timestamp,
+        "section": section,
+        "is_climax": is_climax,
     }
 
 
@@ -288,8 +428,11 @@ async def merge_scenes(
         duration = round(ts_end - ts_start, 2)
         time_range = [round(ts_start, 2), round(ts_end, 2)]
 
-        visual_summary = _compute_visual_summary(grp_quants, grp_quals)
-        content_summary = _compute_content_summary(grp_quals)
+        visual_summary = _compute_visual_summary(
+            grp_quants, grp_quals,
+            temporal=temporal, time_range=time_range,
+        )
+        content_summary = _compute_content_summary(grp_quals, grp_quants)
 
         # LLM assigns role + effectiveness
         llm_result = await _assign_role_and_signals(
@@ -298,6 +441,13 @@ async def merge_scenes(
         )
 
         content_summary["key_action"] = llm_result.get("key_action", "")
+
+        # Energy from temporal data
+        energy = None
+        if temporal:
+            energy_data = _compute_scene_energy(temporal, time_range)
+            if energy_data:
+                energy = SceneEnergy(**energy_data)
 
         scene = Scene(
             scene_id=scene_idx + 1,
@@ -311,6 +461,7 @@ async def merge_scenes(
                 information_density=llm_result.get("information_density", "medium"),
                 emotional_trigger=llm_result.get("emotional_trigger", "none"),
             ),
+            energy=energy,
         )
         scenes.append(scene)
         print(f"  ✓ Scene {scene_idx+1}/{len(groups)}: {scene.role} ({time_range[0]:.1f}s-{time_range[1]:.1f}s)")

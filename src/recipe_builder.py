@@ -132,6 +132,7 @@ _BRIGHTNESS_PROFILE_MAP = {
 _TRANSITION_STYLE_MAP = {
     "hard_cut": "hard_cut", "fade": "fade", "swipe": "swipe",
     "zoom": "zoom", "mixed": "mixed",
+    "dissolve": "fade", "zoom_transition": "zoom",
 }
 
 
@@ -162,9 +163,12 @@ def _compute_visual_style(
     mood_counts = Counter(s.visual_summary.color_mood for s in scenes)
     overall_mood = mood_counts.most_common(1)[0][0]
 
-    # Color palette: collect unique dominant colors from scene data (not available
-    # directly, so we use mood as a proxy and leave palette minimal)
-    color_palette: list[str] = []
+    # Color palette: collect from scenes' enriched visual_summary
+    seen_colors: dict[str, int] = {}
+    for s in scenes:
+        for hex_code in s.visual_summary.color_palette:
+            seen_colors[hex_code] = seen_colors.get(hex_code, 0) + 1
+    color_palette = [c for c, _ in sorted(seen_colors.items(), key=lambda x: x[1], reverse=True)[:5]]
 
     # Color grading from mood
     mood_to_grading = {
@@ -187,15 +191,30 @@ def _compute_visual_style(
         total_cuts = sum(s.visual_summary.cut_count for s in scenes)
     avg_cut_interval = round(total_duration / max(total_cuts, 1), 2)
 
-    # Transition style (from motion levels)
-    motion_counts = Counter(s.visual_summary.motion_level for s in scenes)
-    dominant_motion = motion_counts.most_common(1)[0][0]
-    if dominant_motion == "jump_cut":
-        transition_style = "hard_cut"
-    elif dominant_motion in ("fast", "moderate"):
-        transition_style = "hard_cut"
+    # Transition style: prefer scene-level transition data if available
+    trans_types: list[str] = []
+    for s in scenes:
+        if s.visual_summary.transition_in != "none":
+            trans_types.append(s.visual_summary.transition_in)
+        if s.visual_summary.transition_out != "none":
+            trans_types.append(s.visual_summary.transition_out)
+
+    if trans_types:
+        trans_counts = Counter(trans_types)
+        top_trans, top_count = trans_counts.most_common(1)[0]
+        total_trans = sum(trans_counts.values())
+        raw_style = top_trans if top_count > total_trans * 0.6 else "mixed"
+        transition_style = _normalize(raw_style, _TRANSITION_STYLE_MAP, "mixed")
     else:
-        transition_style = "mixed"
+        # Fallback to motion-based heuristic
+        motion_counts = Counter(s.visual_summary.motion_level for s in scenes)
+        dominant_motion = motion_counts.most_common(1)[0][0]
+        if dominant_motion == "jump_cut":
+            transition_style = "hard_cut"
+        elif dominant_motion in ("fast", "moderate"):
+            transition_style = "hard_cut"
+        else:
+            transition_style = "mixed"
 
     # Text usage
     scenes_with_text = sum(1 for s in scenes if s.content_summary.text_overlays)
