@@ -57,6 +57,11 @@ class TextOverlay(BaseModel):
     ]
     font_style: Literal["bold_impact", "elegant", "handwritten", "minimal"]
     readability: Literal["high", "medium", "low"]
+    font_color: Optional[str] = Field(default=None, description="Hex color or name like 'white', 'yellow'")
+    outline: Optional[bool] = Field(default=None, description="Has outline/stroke")
+    shadow: Optional[bool] = Field(default=None, description="Has drop shadow")
+    background_box: Optional[bool] = Field(default=None, description="Has background box/banner")
+    font_size: Optional[Literal["large", "medium", "small"]] = Field(default=None)
 
 
 class ProductPresentation(BaseModel):
@@ -208,11 +213,18 @@ class EffectivenessSignals(BaseModel):
     ]
 
 
+class TranscriptSegment(BaseModel):
+    start: float = Field(description="Start time in seconds")
+    end: float = Field(description="End time in seconds")
+    text: str = Field(description="Spoken text in original language")
+    speaker: Optional[str] = Field(default=None, description="Speaker label if identifiable")
+
+
 class Scene(BaseModel):
     scene_id: int
     role: Literal[
         "hook", "problem", "solution", "demo", "proof",
-        "cta", "transition", "brand_intro",
+        "cta", "transition", "brand_intro", "recap",
     ]
     time_range: list[float] = Field(description="[start, end]")
     duration: float
@@ -220,6 +232,8 @@ class Scene(BaseModel):
     content_summary: ContentSummary
     effectiveness_signals: EffectivenessSignals
     energy: Optional[SceneEnergy] = None
+    transcript_segments: list[TranscriptSegment] = Field(default_factory=list)
+    text_effects: list = Field(default_factory=list)
 
 
 # ── Layer 3: Video Recipe (Phase 5: recipe_builder) ────────────────────────
@@ -287,13 +301,6 @@ class Music(BaseModel):
     bpm_range: str
     mood_match: str
     beat_sync: str
-
-
-class TranscriptSegment(BaseModel):
-    start: float = Field(description="Start time in seconds")
-    end: float = Field(description="End time in seconds")
-    text: str = Field(description="Spoken text in original language")
-    speaker: Optional[str] = Field(default=None, description="Speaker label if identifiable")
 
 
 class Voice(BaseModel):

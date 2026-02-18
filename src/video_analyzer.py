@@ -58,6 +58,15 @@ For product_strategy:
 For effectiveness_assessment:
 - Rate and explain hook, flow, message clarity, CTA, replay factor
 - List standout elements and weak points
+
+For text_effects:
+- Identify ALL text overlays that appear on screen with their timing
+- For each text: when it appears (time), the content, entrance animation, exit animation,
+  any emphasis effect, and what it syncs with (voice, beat, cut, or independent)
+
+For scene_roles:
+- Identify each scene's narrative role with start/end times
+- Roles: hook, problem, solution, demo, proof, brand_intro, transition, cta, recap
 """
 
 
@@ -200,8 +209,35 @@ _RESPONSE_SCHEMA = {
                 "cta_strength", "replay_factor", "standout_elements", "weak_points",
             ],
         },
+        "text_effects": {
+            "type": "ARRAY",
+            "items": {
+                "type": "OBJECT",
+                "properties": {
+                    "time": {"type": "NUMBER"},
+                    "content": {"type": "STRING"},
+                    "entrance": {"type": "STRING", "enum": ["fade_in", "slide_up", "slide_left", "pop", "typewriter", "cut", "none"]},
+                    "exit": {"type": "STRING", "enum": ["fade_out", "slide_down", "cut", "none"]},
+                    "emphasis": {"type": "STRING", "enum": ["color_highlight", "size_pulse", "shake", "glow", "underline", "none"]},
+                    "sync_with": {"type": "STRING", "enum": ["voice", "beat", "cut", "independent"]},
+                },
+                "required": ["time", "content", "entrance", "exit", "sync_with"],
+            },
+        },
+        "scene_roles": {
+            "type": "ARRAY",
+            "items": {
+                "type": "OBJECT",
+                "properties": {
+                    "start": {"type": "NUMBER"},
+                    "end": {"type": "NUMBER"},
+                    "role": {"type": "STRING", "enum": ["hook", "problem", "solution", "demo", "proof", "brand_intro", "transition", "cta", "recap"]},
+                },
+                "required": ["start", "end", "role"],
+            },
+        },
     },
-    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment"],
+    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles"],
 }
 
 
@@ -295,6 +331,8 @@ Return a JSON object with these sections:
 3. audio: music (genre, energy, BPM, beat_sync), voice (type, tone, script_summary, hook_line, cta_line, **transcript with timestamps**), sfx, audio_visual_sync
 4. product_strategy: reveal_timing, demonstration_method, key_benefit, pricing, social_proof, urgency, brand_visibility
 5. effectiveness_assessment: ratings for hook, flow, clarity, CTA, replay + standout elements + weak points
+6. text_effects: list every on-screen text animation (time, content, entrance, exit, emphasis, sync_with)
+7. scene_roles: list each scene's start/end time and narrative role
 
 Be specific and detailed. Use Korean for script_summary, hook_line, cta_line if the video is in Korean."""
 

@@ -4,7 +4,8 @@ Usage:
     python main.py <video_path> [--output <dir>] [--quant-only] [--phase <N>]
 
 Full pipeline: Phase 1 (quant) → Phase 2 (qual) → Phase 2.5 (temporal) →
-               Phase 3 (scene merge) → Phase 4 (video analysis) → Phase 5 (recipe build)
+               Phase 3 (scene aggregate, local) → Phase 4 (video analysis) →
+               Phase 5 (scene merge, local) → Phase 6 (recipe build)
 """
 
 from __future__ import annotations
@@ -24,7 +25,8 @@ from src.frame_extractor import extract_frames
 from src.frame_quant import analyse_frame as analyse_frame_quant
 from src.frame_qual import analyse_frames_qual
 from src.temporal_analyzer import run_temporal_analysis
-from src.scene_merger import merge_scenes, load_and_merge
+from src.scene_aggregator import aggregate_scenes
+from src.scene_merger import merge_analysis
 from src.video_analyzer import run_video_analysis
 from src.recipe_builder import build_recipe
 from src.schemas import FrameAnalysis, FrameQual, FrameQuant, Scene, TemporalAnalysis
@@ -138,8 +140,14 @@ def run_phase_3(
     video_path: str,
     temporal: TemporalAnalysis | None = None,
 ) -> list[Scene]:
-    """Run Phase 3: scene merger on existing frame data."""
+    """Run Phase 3: scene aggregator — pure local, no API calls."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
+
+    # Load frame data
+    quant_path = out / f"{video_name}_frame_quant.json"
+    qual_path = out / f"{video_name}_frame_qual.json"
+    quants = [FrameQuant.model_validate(d) for d in json.loads(quant_path.read_text())]
+    quals = [FrameQual.model_validate(d) for d in json.loads(qual_path.read_text())]
 
     # Load temporal if not provided but exists on disk
     if temporal is None:
@@ -156,12 +164,12 @@ def run_phase_3(
         sd_data = json.loads(sd_path.read_text())
         scene_boundaries = [tuple(b) for b in sd_data.get("boundaries", [])]
 
-    print(f"[Phase 3] Running scene merger ...")
+    print(f"[Phase 3] Running scene aggregator (local, no API) ...")
     t0 = time.perf_counter()
-    scenes = load_and_merge(out, video_name, temporal=temporal, scene_boundaries=scene_boundaries)
-    print(f"          → {len(scenes)} scenes merged ({time.perf_counter() - t0:.1f}s)")
+    scenes = aggregate_scenes(quants, quals, temporal=temporal, scene_boundaries=scene_boundaries)
+    print(f"          → {len(scenes)} scenes aggregated ({time.perf_counter() - t0:.1f}s)")
 
-    # Save scenes
+    # Save aggregated scenes
     scenes_path = out / f"{video_name}_scenes.json"
     scenes_data = [s.model_dump() for s in scenes]
     scenes_path.write_text(json.dumps(scenes_data, indent=2, ensure_ascii=False))
@@ -192,9 +200,50 @@ def run_phase_5(
     video_path: str,
     scenes: list[Scene] | None = None,
     video_analysis: dict | None = None,
+) -> list[Scene]:
+    """Run Phase 5: merge Phase 3 aggregated scenes + Phase 4 video analysis (local)."""
+    out, video_name = _resolve_output_dir(output_dir, video_path)
+
+    # Load aggregated scenes if not provided
+    if scenes is None:
+        scenes_path = out / f"{video_name}_scenes.json"
+        scenes_data = json.loads(scenes_path.read_text())
+        scenes = [Scene.model_validate(s) for s in scenes_data]
+
+    # Load video analysis if not provided
+    if video_analysis is None:
+        analysis_path = out / f"{video_name}_video_analysis.json"
+        video_analysis = json.loads(analysis_path.read_text())
+
+    # Load PySceneDetect boundaries if available
+    scene_boundaries = None
+    sd_path = out / f"{video_name}_scene_detect.json"
+    if sd_path.exists():
+        sd_data = json.loads(sd_path.read_text())
+        scene_boundaries = [tuple(b) for b in sd_data.get("boundaries", [])]
+
+    print(f"[Phase 5] Merging scene data + video analysis (local, no API) ...")
+    t0 = time.perf_counter()
+    merged_scenes = merge_analysis(scenes, video_analysis, scene_boundaries=scene_boundaries)
+    print(f"          → {len(merged_scenes)} scenes merged ({time.perf_counter() - t0:.1f}s)")
+
+    # Save merged scenes (overwrites Phase 3 output with enriched data)
+    scenes_path = out / f"{video_name}_scenes.json"
+    scenes_data = [s.model_dump() for s in merged_scenes]
+    scenes_path.write_text(json.dumps(scenes_data, indent=2, ensure_ascii=False))
+    print(f"          → saved to {scenes_path}")
+
+    return merged_scenes
+
+
+def run_phase_6(
+    output_dir: str,
+    video_path: str,
+    scenes: list[Scene] | None = None,
+    video_analysis: dict | None = None,
     temporal: TemporalAnalysis | None = None,
 ) -> None:
-    """Run Phase 5: recipe builder — merge Track 1 + Track 2 + temporal."""
+    """Run Phase 6: recipe builder — merge Track 1 + Track 2 + temporal."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
     # Load scenes if not provided
@@ -226,7 +275,7 @@ def run_phase_5(
                 json.loads(temporal_path.read_text())
             )
 
-    print(f"[Phase 5] Building video recipe ...")
+    print(f"[Phase 6] Building video recipe ...")
     t0 = time.perf_counter()
     recipe = build_recipe(scenes, video_analysis, quants=quants, quals=quals, temporal=temporal)
     print(f"          → done ({time.perf_counter() - t0:.1f}s)")
@@ -248,14 +297,17 @@ def run_full_pipeline(video_path: str, output_dir: str) -> None:
     # Phase 2.5: temporal analysis (local, no API)
     temporal = run_phase_2_5(output_dir, video_path)
 
-    # Phase 3: scene merger (uses temporal data for smarter boundaries)
+    # Phase 3: scene aggregator (local, no API)
     scenes = run_phase_3(output_dir, video_path, temporal=temporal)
 
-    # Phase 4: video analysis
+    # Phase 4: video analysis (Gemini)
     video_analysis = run_phase_4(video_path, output_dir)
 
-    # Phase 5: recipe builder (includes temporal profile + production guide)
-    run_phase_5(output_dir, video_path, scenes=scenes, video_analysis=video_analysis, temporal=temporal)
+    # Phase 5: scene merger — merge Phase 3 + Phase 4 (local, no API)
+    merged_scenes = run_phase_5(output_dir, video_path, scenes=scenes, video_analysis=video_analysis)
+
+    # Phase 6: recipe builder (includes temporal profile + production guide)
+    run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal)
 
 
 def main() -> None:
@@ -271,7 +323,7 @@ def main() -> None:
         help="Run only Phase 1 (OpenCV quant) — no Gemini API calls",
     )
     parser.add_argument(
-        "--phase", type=str, choices=["1", "2", "2.5", "3", "4", "5"],
+        "--phase", type=str, choices=["1", "2", "2.5", "3", "4", "5", "6"],
         help="Run only a specific phase (assumes previous phase data exists)",
     )
     args = parser.parse_args()
@@ -290,6 +342,8 @@ def main() -> None:
         run_phase_4(args.video, args.output)
     elif args.phase == "5":
         run_phase_5(args.output, args.video)
+    elif args.phase == "6":
+        run_phase_6(args.output, args.video)
     else:
         # Full pipeline
         run_full_pipeline(args.video, args.output)

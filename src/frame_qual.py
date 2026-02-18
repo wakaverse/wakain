@@ -37,6 +37,8 @@ Be precise with shot_type classification:
   - split_screen: frame is visually divided into panels
 
 For text_overlay: set to null if no text is visible in the frame.
+  For text_overlay fields also detect: font_color (hex or name like 'white'),
+  outline (bool), shadow (bool), background_box (bool), font_size (large/medium/small).
 For product_presentation: if no product is visible, use visibility="hidden".
 For human_element: if no person is visible, use role="none".
 """

@@ -24,6 +24,7 @@ from .schemas import (
     SceneTimingGuide,
     SFX,
     Structure,
+    TranscriptSegment,
     TemporalAnalysis,
     TemporalProfile,
     TextUsage,
@@ -539,6 +540,7 @@ def build_recipe(
             script_summary=raw_voice.get("script_summary", ""),
             hook_line=raw_voice.get("hook_line", ""),
             cta_line=raw_voice.get("cta_line", ""),
+            transcript=[TranscriptSegment.model_validate(seg) for seg in raw_voice.get("transcript", [])],
         ),
         sfx=SFX(
             used=raw_sfx.get("used", False),
