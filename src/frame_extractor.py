@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 
 FPS_TARGET = 2
+MAX_DIMENSION = 720  # Resize frames so longest side ≤ this
 
 
 @dataclass
@@ -48,6 +49,12 @@ def extract_frames(
 
         if frame_idx % frame_interval == 0:
             timestamp = frame_idx / video_fps
+            # Resize: longest side ≤ MAX_DIMENSION
+            h, w = frame.shape[:2]
+            if max(h, w) > MAX_DIMENSION:
+                scale = MAX_DIMENSION / max(h, w)
+                frame = cv2.resize(frame, (int(w * scale), int(h * scale)),
+                                   interpolation=cv2.INTER_AREA)
             _, jpeg = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
             frames.append(
                 ExtractedFrame(
