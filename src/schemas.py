@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -109,3 +109,187 @@ class FrameAnalysis(BaseModel):
     """Combined quant + qual result for a single frame."""
     quant: FrameQuant
     qual: Optional[FrameQual] = None
+
+
+# ── Layer 2: Scene (Phase 3: scene_merger) ─────────────────────────────────
+
+
+class VisualSummary(BaseModel):
+    dominant_shot: Literal[
+        "closeup", "medium", "wide", "overhead", "pov", "split_screen"
+    ]
+    cut_count: int
+    avg_cut_interval: float
+    motion_level: Literal["static", "slow", "moderate", "fast", "jump_cut"]
+    color_consistency: float = Field(description="0.0-1.0")
+    color_mood: Literal[
+        "warm_cozy", "cool_professional", "vibrant_energetic",
+        "muted_luxury", "natural_organic", "bold_contrast",
+    ]
+
+
+class ContentSummary(BaseModel):
+    subject_type: Literal[
+        "product_only", "person_with_product", "person_only",
+        "text_graphic", "lifestyle_scene", "before_after",
+    ]
+    product_visibility: Literal["hidden", "glimpse", "partial", "full", "in_use"]
+    text_overlays: list[str]
+    key_action: str
+
+
+class EffectivenessSignals(BaseModel):
+    hook_strength: str
+    information_density: Literal["high", "medium", "low"]
+    emotional_trigger: Literal[
+        "curiosity", "fomo", "trust", "desire", "humor", "none"
+    ]
+
+
+class Scene(BaseModel):
+    scene_id: int
+    role: Literal[
+        "hook", "problem", "solution", "demo", "proof",
+        "cta", "transition", "brand_intro",
+    ]
+    time_range: list[float] = Field(description="[start, end]")
+    duration: float
+    visual_summary: VisualSummary
+    content_summary: ContentSummary
+    effectiveness_signals: EffectivenessSignals
+
+
+# ── Layer 3: Video Recipe (Phase 5: recipe_builder) ────────────────────────
+
+
+class Meta(BaseModel):
+    platform: Literal["tiktok", "reels", "shorts", "ad"]
+    duration: float
+    aspect_ratio: Literal["9:16", "1:1", "16:9"]
+    category: Literal[
+        "beauty", "food", "tech", "fashion", "health", "home", "finance", "education"
+    ]
+    sub_category: str
+    target_audience: str
+
+
+class SceneSequenceItem(BaseModel):
+    role: str
+    duration: float
+    technique: str
+
+
+class Structure(BaseModel):
+    type: Literal[
+        "problem_solution", "before_after", "demo", "review",
+        "listicle", "story", "trend_ride",
+    ]
+    scene_sequence: list[SceneSequenceItem]
+    hook_time: float
+    product_first_appear: float
+    cta_start: float
+
+
+class TextUsage(BaseModel):
+    frequency: Literal["every_scene", "key_moments", "minimal", "none"]
+    style_consistency: Literal["high", "medium", "low"]
+    language_tone: Literal["casual", "professional", "urgent", "playful"]
+
+
+class VisualStyle(BaseModel):
+    overall_mood: str
+    color_palette: list[str]
+    color_grading: Literal[
+        "warm_filter", "natural", "high_contrast", "desaturated", "brand_color_heavy"
+    ]
+    brightness_profile: Literal[
+        "consistent", "dark_to_bright", "bright_to_dark", "varied"
+    ]
+    avg_cut_interval: float
+    total_cuts: int
+    transition_style: Literal["hard_cut", "fade", "swipe", "zoom", "mixed"]
+    text_usage: TextUsage
+    human_screen_time_ratio: float
+    product_screen_time_ratio: float
+    face_time_ratio: float
+
+
+class Music(BaseModel):
+    present: bool
+    genre: Literal[
+        "upbeat_pop", "lo_fi", "dramatic", "trending_sound",
+        "acoustic", "edm", "none",
+    ]
+    energy_profile: Literal["steady", "building", "drop", "calm_to_hype"]
+    bpm_range: str
+    mood_match: str
+    beat_sync: str
+
+
+class Voice(BaseModel):
+    type: Literal["narration", "dialogue", "voiceover", "tts", "none"]
+    tone: Literal[
+        "conversational", "professional", "excited", "asmr", "storytelling"
+    ]
+    language: str
+    script_summary: str
+    hook_line: str
+    cta_line: str
+
+
+class SFX(BaseModel):
+    used: bool
+    types: list[str]
+    frequency: Literal["heavy", "moderate", "minimal", "none"]
+
+
+class Audio(BaseModel):
+    music: Music
+    voice: Voice
+    sfx: SFX
+    audio_visual_sync: str
+
+
+class BrandVisibility(BaseModel):
+    logo_shown: bool
+    brand_color_used: bool
+    brand_mention_count: int
+
+
+class ProductStrategy(BaseModel):
+    reveal_timing: Literal["immediate", "gradual", "delayed_reveal", "teaser"]
+    demonstration_method: Literal[
+        "in_use", "comparison", "transformation", "testimonial",
+        "spec_highlight", "unboxing",
+    ]
+    key_benefit_shown: str
+    price_shown: bool
+    price_framing: Literal[
+        "discount", "per_day", "vs_competitor", "bundle", "none"
+    ]
+    offer_type: str
+    social_proof: Literal[
+        "reviews", "ugc", "numbers", "celebrity", "expert", "none"
+    ]
+    urgency_trigger: Literal["time_limit", "stock_limit", "trend", "none"]
+    brand_visibility: BrandVisibility
+
+
+class EffectivenessAssessment(BaseModel):
+    hook_rating: str
+    flow_rating: str
+    message_clarity: str
+    cta_strength: str
+    replay_factor: str
+    standout_elements: list[str]
+    weak_points: list[str]
+
+
+class VideoRecipe(BaseModel):
+    meta: Meta
+    structure: Structure
+    visual_style: VisualStyle
+    audio: Audio
+    product_strategy: ProductStrategy
+    effectiveness_assessment: EffectivenessAssessment
+    scenes: list[Scene]
