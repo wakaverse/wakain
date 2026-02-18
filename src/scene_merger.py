@@ -63,35 +63,40 @@ def _make_client() -> genai.Client:
 # ── Frame grouping ──────────────────────────────────────────────────────────
 
 
-MIN_SCENE_DURATION = 1.5  # seconds — short scenes get absorbed into neighbours
-
-def _group_frames(
-    quants: list[FrameQuant], quals: list[FrameQual],
-    temporal: TemporalAnalysis | None = None,
+def _group_frames_by_scene_boundaries(
+    quants: list[FrameQuant],
+    scene_boundaries: list[tuple[float, float]],
 ) -> list[list[int]]:
-    """Group consecutive frame indices with similar shot_type + subject_type.
+    """Group frame indices using PySceneDetect scene boundaries.
 
-    A new group starts only when BOTH shot_type AND subject_type change,
-    OR when there is a significant visual cut (high edge_diff + color_diff).
-    Relaxed criteria to avoid over-splitting short-form videos.
-
-    When temporal data is available, also split on:
-    - energy peaks (climax moments are natural scene boundaries)
-    - hard_cut transitions detected by transition texture analysis
+    Each frame is assigned to the scene whose time range contains it.
     """
+    if not quants or not scene_boundaries:
+        return [[i for i in range(len(quants))]] if quants else []
+
+    groups: list[list[int]] = [[] for _ in scene_boundaries]
+
+    for idx, q in enumerate(quants):
+        placed = False
+        for s_idx, (s_start, s_end) in enumerate(scene_boundaries):
+            if s_start <= q.timestamp < s_end:
+                groups[s_idx].append(idx)
+                placed = True
+                break
+        if not placed:
+            # Frame after last scene end — put in last group
+            groups[-1].append(idx)
+
+    # Remove empty groups
+    return [g for g in groups if g]
+
+
+def _group_frames_fallback(
+    quants: list[FrameQuant], quals: list[FrameQual],
+) -> list[list[int]]:
+    """Fallback: group by shot_type + subject_type changes (old method)."""
     if not quals:
         return []
-
-    # Build sets of timestamps where temporal analysis suggests a boundary
-    temporal_cut_timestamps: set[float] = set()
-    if temporal:
-        # Energy peaks are natural scene boundaries
-        for ts in temporal.energy_curve.peak_timestamps:
-            temporal_cut_timestamps.add(ts)
-        # Hard cuts from transition texture
-        for ev in temporal.transition_texture.events:
-            if ev.type == "hard_cut":
-                temporal_cut_timestamps.add(ev.timestamp)
 
     groups: list[list[int]] = [[0]]
     for i in range(1, len(quals)):
@@ -103,55 +108,10 @@ def _group_frames(
         subject_changed = curr.subject_type != prev.subject_type
         big_cut = quant.edge_diff > 40 and quant.color_diff > 0.8
 
-        # Temporal-informed boundary: if shot OR subject changed AND temporal
-        # analysis confirms a cut/peak at this timestamp
-        temporal_boundary = (
-            (shot_changed or subject_changed)
-            and quant.timestamp in temporal_cut_timestamps
-        )
-
-        # Only split when BOTH shot and subject change, or on a hard visual cut,
-        # or when temporal analysis confirms a boundary with at least one change
-        if (shot_changed and subject_changed) or big_cut or temporal_boundary:
+        if (shot_changed and subject_changed) or big_cut:
             groups.append([i])
         else:
             groups[-1].append(i)
-
-    return groups
-
-
-def _merge_short_scenes(
-    groups: list[list[int]], quants: list[FrameQuant],
-) -> list[list[int]]:
-    """Absorb scenes shorter than MIN_SCENE_DURATION into their neighbours."""
-    if len(groups) <= 1:
-        return groups
-
-    def _duration(group: list[int]) -> float:
-        ts_start = quants[group[0]].timestamp
-        ts_end = quants[group[-1]].timestamp + 0.5
-        return ts_end - ts_start
-
-    merged = True
-    while merged:
-        merged = False
-        new_groups: list[list[int]] = []
-        i = 0
-        while i < len(groups):
-            if _duration(groups[i]) < MIN_SCENE_DURATION and len(groups) > 1:
-                # Absorb into the neighbour with shorter duration (prefer previous)
-                if new_groups:
-                    new_groups[-1].extend(groups[i])
-                    merged = True
-                elif i + 1 < len(groups):
-                    groups[i + 1] = groups[i] + groups[i + 1]
-                    merged = True
-                else:
-                    new_groups.append(groups[i])
-            else:
-                new_groups.append(groups[i])
-            i += 1
-        groups = new_groups
 
     return groups
 
@@ -302,14 +262,19 @@ async def merge_scenes(
     quants: list[FrameQuant],
     quals: list[FrameQual],
     temporal: TemporalAnalysis | None = None,
+    scene_boundaries: list[tuple[float, float]] | None = None,
 ) -> list[Scene]:
-    """Merge frames into scenes and assign roles via Gemini."""
-    groups = _group_frames(quants, quals, temporal=temporal)
+    """Merge frames into scenes and assign roles via Gemini.
+
+    When scene_boundaries is provided (from PySceneDetect), use those
+    for frame grouping. Otherwise falls back to heuristic grouping.
+    """
+    if scene_boundaries:
+        groups = _group_frames_by_scene_boundaries(quants, scene_boundaries)
+    else:
+        groups = _group_frames_fallback(quants, quals)
     if not groups:
         return []
-
-    # Absorb short scenes into neighbours
-    groups = _merge_short_scenes(groups, quants)
 
     client = _make_client()
     scenes: list[Scene] = []
@@ -357,6 +322,7 @@ def load_and_merge(
     output_dir: str | Path,
     video_name: str,
     temporal: TemporalAnalysis | None = None,
+    scene_boundaries: list[tuple[float, float]] | None = None,
 ) -> list[Scene]:
     """Load frame data from disk and run scene merger. Convenience wrapper."""
     out = Path(output_dir)
@@ -366,4 +332,4 @@ def load_and_merge(
     quants = [FrameQuant.model_validate(d) for d in json.loads(quant_path.read_text())]
     quals = [FrameQual.model_validate(d) for d in json.loads(qual_path.read_text())]
 
-    return asyncio.run(merge_scenes(quants, quals, temporal=temporal))
+    return asyncio.run(merge_scenes(quants, quals, temporal=temporal, scene_boundaries=scene_boundaries))

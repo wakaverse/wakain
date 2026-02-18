@@ -119,12 +119,20 @@ def _analyse_energy(quants: list[FrameQuant]) -> EnergyCurve:
 # ── 2. Cut Rhythm Pattern ───────────────────────────────────────────────────
 
 
-def _analyse_cut_rhythm(quants: list[FrameQuant]) -> CutRhythm:
-    """Intervals between cuts (edge_diff > 40), classify rhythm pattern."""
-    cut_timestamps: list[float] = []
-    for q in quants:
-        if q.edge_diff > 40:
-            cut_timestamps.append(q.timestamp)
+def _analyse_cut_rhythm(
+    quants: list[FrameQuant],
+    cut_timestamps: list[float] | None = None,
+) -> CutRhythm:
+    """Intervals between cuts, classify rhythm pattern.
+
+    When cut_timestamps is provided (from PySceneDetect), use those directly.
+    Otherwise falls back to edge_diff > 40 heuristic.
+    """
+    if cut_timestamps is None:
+        cut_timestamps = []
+        for q in quants:
+            if q.edge_diff > 40:
+                cut_timestamps.append(q.timestamp)
 
     if len(cut_timestamps) < 2:
         return CutRhythm(
@@ -653,21 +661,46 @@ def _analyse_caption_pattern(quants: list[FrameQuant]) -> CaptionPattern:
 # ── 11. Scene Transition Texture ─────────────────────────────────────────────
 
 
-def _analyse_transitions(quants: list[FrameQuant]) -> TransitionTexture:
-    """Classify transitions by edge_diff + color_diff + subject_area_ratio signature."""
+def _analyse_transitions(
+    quants: list[FrameQuant],
+    scene_boundaries: list[tuple[float, float]] | None = None,
+) -> TransitionTexture:
+    """Classify transitions by edge_diff + color_diff + subject_area_ratio signature.
+
+    When scene_boundaries is provided (from PySceneDetect), only look at
+    frames near known scene cuts for transition classification. Otherwise
+    falls back to threshold-based detection.
+    """
     events: list[TransitionEvent] = []
+
+    # Build set of known cut timestamps from scene boundaries
+    cut_times: set[float] | None = None
+    if scene_boundaries and len(scene_boundaries) > 1:
+        cut_times = set()
+        for i in range(1, len(scene_boundaries)):
+            cut_times.add(scene_boundaries[i][0])
 
     for i in range(1, len(quants)):
         q = quants[i]
         prev = quants[i - 1]
 
-        # Only consider frames with some visual change
-        if q.edge_diff < 15 and q.color_diff < 0.3:
-            continue
+        if cut_times is not None:
+            # Only classify transitions at known cut points.
+            # A 2fps frame is "near" a cut if the cut falls between
+            # the previous frame's timestamp and this frame's timestamp.
+            is_near_cut = any(
+                prev.timestamp <= ct <= q.timestamp for ct in cut_times
+            )
+            if not is_near_cut:
+                continue
+        else:
+            # Fallback: only consider frames with some visual change
+            if q.edge_diff < 15 and q.color_diff < 0.3:
+                continue
 
         area_change = abs(q.subject_area_ratio - prev.subject_area_ratio)
 
-        # Classify transition type
+        # Classify transition type using frame data characteristics
         if q.edge_diff > 40 and q.color_diff > 0.6:
             t_type = "hard_cut"
         elif area_change > 0.1 and q.edge_diff > 20:
@@ -716,15 +749,19 @@ class TemporalAnalyzer:
         self,
         quants: list[FrameQuant],
         quals: list[FrameQual],
+        cut_timestamps: list[float] | None = None,
+        scene_boundaries: list[tuple[float, float]] | None = None,
     ) -> None:
         self.quants = quants
         self.quals = quals
+        self.cut_timestamps = cut_timestamps
+        self.scene_boundaries = scene_boundaries
 
     def analyse(self) -> TemporalAnalysis:
         """Run all 11 temporal analyses and return TemporalAnalysis."""
         return TemporalAnalysis(
             energy_curve=_analyse_energy(self.quants),
-            cut_rhythm=_analyse_cut_rhythm(self.quants),
+            cut_rhythm=_analyse_cut_rhythm(self.quants, self.cut_timestamps),
             playback_speed=_analyse_playback_speed(self.quants),
             text_dwell=_analyse_text_dwell(self.quals),
             visual_journey=_analyse_visual_journey(self.quals),
@@ -733,13 +770,19 @@ class TemporalAnalyzer:
             broll_segments=_detect_broll(self.quants, self.quals),
             zoom_events=_detect_zoom(self.quants),
             caption_pattern=_analyse_caption_pattern(self.quants),
-            transition_texture=_analyse_transitions(self.quants),
+            transition_texture=_analyse_transitions(self.quants, self.scene_boundaries),
         )
 
 
 def run_temporal_analysis(
     quants: list[FrameQuant],
     quals: list[FrameQual],
+    cut_timestamps: list[float] | None = None,
+    scene_boundaries: list[tuple[float, float]] | None = None,
 ) -> TemporalAnalysis:
     """Convenience function: run all temporal analyses."""
-    return TemporalAnalyzer(quants, quals).analyse()
+    return TemporalAnalyzer(
+        quants, quals,
+        cut_timestamps=cut_timestamps,
+        scene_boundaries=scene_boundaries,
+    ).analyse()
