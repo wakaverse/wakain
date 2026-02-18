@@ -289,6 +289,13 @@ class Music(BaseModel):
     beat_sync: str
 
 
+class TranscriptSegment(BaseModel):
+    start: float = Field(description="Start time in seconds")
+    end: float = Field(description="End time in seconds")
+    text: str = Field(description="Spoken text in original language")
+    speaker: Optional[str] = Field(default=None, description="Speaker label if identifiable")
+
+
 class Voice(BaseModel):
     type: Literal["narration", "dialogue", "voiceover", "tts", "none"]
     tone: Literal[
@@ -298,6 +305,7 @@ class Voice(BaseModel):
     script_summary: str
     hook_line: str
     cta_line: str
+    transcript: list[TranscriptSegment] = Field(default_factory=list, description="Timestamped speech transcript")
 
 
 class SFX(BaseModel):
