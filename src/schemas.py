@@ -285,6 +285,179 @@ class EffectivenessAssessment(BaseModel):
     weak_points: list[str]
 
 
+# ── Layer 2.5: Temporal Analysis (Phase 2.5: temporal_analyzer) ──────────────
+
+
+class EnergyPoint(BaseModel):
+    timestamp: float
+    score: float = Field(description="Energy score 0.0-1.0")
+    section: Literal["강", "중", "정적", "클라이막스"]
+
+
+class EnergyCurve(BaseModel):
+    points: list[EnergyPoint]
+    peak_timestamps: list[float] = Field(description="Timestamps of energy peaks")
+    avg_energy: float
+    energy_arc: str = Field(description="Overall energy arc description, e.g. 'building→peak→fade'")
+
+
+class CutRhythm(BaseModel):
+    cut_timestamps: list[float]
+    intervals: list[float] = Field(description="Intervals between consecutive cuts in seconds")
+    pattern: Literal["accelerating", "decelerating", "constant", "irregular"]
+    avg_interval: float
+    min_interval: float
+    max_interval: float
+    total_cuts: int
+
+
+class PlaybackSpeedSegment(BaseModel):
+    time_range: list[float] = Field(description="[start, end]")
+    type: Literal["normal", "slow_motion", "timelapse"]
+    avg_edge_diff: float
+
+
+class TextDwellItem(BaseModel):
+    content: str
+    first_appear: float
+    last_appear: float
+    duration: float
+    position: str
+
+
+class TextDwellAnalysis(BaseModel):
+    items: list[TextDwellItem]
+    texts_per_second: float = Field(description="Information delivery speed")
+    total_text_screen_time: float
+
+
+class ShotTransition(BaseModel):
+    timestamp: float
+    from_shot: str
+    to_shot: str
+
+
+class VisualJourney(BaseModel):
+    shot_sequence: list[str] = Field(description="Ordered shot_type sequence")
+    transitions: list[ShotTransition]
+    dominant_pattern: str = Field(description="e.g. 'closeup→wide→medium→closeup cycle'")
+    transition_counts: dict[str, int] = Field(description="Count per transition type, e.g. 'closeup→wide': 3")
+
+
+class ExposureSegment(BaseModel):
+    time_range: list[float]
+    human_ratio: float
+    product_ratio: float
+
+
+class ExposureCurve(BaseModel):
+    segments: list[ExposureSegment]
+    total_human_time_ratio: float
+    total_product_time_ratio: float
+    circulation_pattern: str = Field(description="e.g. '제품→사람→제품 클로즈업'")
+
+
+class ColorChangePoint(BaseModel):
+    timestamp: float
+    brightness: float
+    saturation: float
+
+
+class ColorShift(BaseModel):
+    timestamp: float
+    type: Literal["abrupt", "gradual"]
+    brightness_delta: float
+    saturation_delta: float
+
+
+class ColorChangeCurve(BaseModel):
+    points: list[ColorChangePoint]
+    shifts: list[ColorShift]
+    overall_pattern: Literal[
+        "consistent", "gradual_warm", "gradual_cool",
+        "high_variance", "dark_to_bright", "bright_to_dark",
+    ]
+
+
+class BRollSegment(BaseModel):
+    time_range: list[float]
+    frame_count: int
+    reason: str = Field(description="Why classified as B-roll")
+
+
+class ZoomEvent(BaseModel):
+    time_range: list[float]
+    direction: Literal["zoom_in", "zoom_out"]
+    scale_change: float = Field(description="Absolute change in subject_area_ratio")
+
+
+class CaptionPattern(BaseModel):
+    position_preference: Literal["top", "middle", "bottom", "mixed"]
+    avg_area_ratio: float
+    position_timeline: list[dict[str, Any]] = Field(
+        description="List of {timestamp, position, area_ratio}"
+    )
+
+
+class TransitionEvent(BaseModel):
+    timestamp: float
+    type: Literal["hard_cut", "dissolve", "fade", "zoom_transition"]
+    edge_diff: float
+    color_diff: float
+
+
+class TransitionTexture(BaseModel):
+    events: list[TransitionEvent]
+    dominant_type: Literal["hard_cut", "dissolve", "fade", "zoom_transition", "mixed"]
+    type_counts: dict[str, int]
+
+
+class TemporalAnalysis(BaseModel):
+    energy_curve: EnergyCurve
+    cut_rhythm: CutRhythm
+    playback_speed: list[PlaybackSpeedSegment]
+    text_dwell: TextDwellAnalysis
+    visual_journey: VisualJourney
+    exposure_curve: ExposureCurve
+    color_change_curve: ColorChangeCurve
+    broll_segments: list[BRollSegment]
+    zoom_events: list[ZoomEvent]
+    caption_pattern: CaptionPattern
+    transition_texture: TransitionTexture
+
+
+# ── Layer 3: Video Recipe (Phase 5: recipe_builder) — Production Guide ────
+
+
+class SceneTimingGuide(BaseModel):
+    scene_id: int
+    role: str
+    time_range: list[float]
+    duration: float
+    cut_rhythm: str = Field(description="e.g. '0.8s/cut, accelerating'")
+    text_timing: str = Field(description="e.g. 'text appears at 0.5s, stays 1.2s'")
+    energy_level: str = Field(description="e.g. 'high energy, peak at 1.2s'")
+    camera_suggestion: str = Field(description="e.g. 'closeup→wide transition'")
+    key_technique: str
+
+
+class ProductionGuide(BaseModel):
+    scene_guides: list[SceneTimingGuide]
+    recommended_cut_rhythm: str
+    text_overlay_strategy: str
+    camera_movement_notes: str
+    energy_curve_target: str
+
+
+class TemporalProfile(BaseModel):
+    total_duration: float
+    energy_arc: str
+    cut_rhythm_summary: str
+    dominant_transition: str
+    text_density: str
+    product_human_balance: str
+
+
 class VideoRecipe(BaseModel):
     meta: Meta
     structure: Structure
@@ -293,3 +466,5 @@ class VideoRecipe(BaseModel):
     product_strategy: ProductStrategy
     effectiveness_assessment: EffectivenessAssessment
     scenes: list[Scene]
+    temporal_profile: Optional[TemporalProfile] = None
+    production_guide: Optional[ProductionGuide] = None

@@ -17,11 +17,15 @@ from .schemas import (
     FrameQuant,
     Meta,
     Music,
+    ProductionGuide,
     ProductStrategy,
     Scene,
     SceneSequenceItem,
+    SceneTimingGuide,
     SFX,
     Structure,
+    TemporalAnalysis,
+    TemporalProfile,
     TextUsage,
     VideoRecipe,
     VisualStyle,
@@ -264,11 +268,187 @@ def _compute_visual_style(
     )
 
 
+def _build_temporal_profile(
+    temporal: TemporalAnalysis,
+) -> TemporalProfile:
+    """Summarise key temporal patterns into a compact profile."""
+    total_duration = 0.0
+    if temporal.energy_curve.points:
+        pts = temporal.energy_curve.points
+        total_duration = pts[-1].timestamp - pts[0].timestamp + 0.5
+
+    # Cut rhythm summary
+    cr = temporal.cut_rhythm
+    if cr.total_cuts > 0:
+        cut_summary = f"{cr.total_cuts} cuts, {cr.avg_interval:.1f}s avg interval, {cr.pattern}"
+    else:
+        cut_summary = "no significant cuts detected"
+
+    # Text density
+    td = temporal.text_dwell
+    if td.texts_per_second > 0.5:
+        text_density = "high"
+    elif td.texts_per_second > 0.2:
+        text_density = "medium"
+    elif td.items:
+        text_density = "low"
+    else:
+        text_density = "none"
+
+    # Product/human balance
+    ec = temporal.exposure_curve
+    if ec.total_product_time_ratio > 0.6:
+        balance = "product-dominant"
+    elif ec.total_human_time_ratio > 0.6:
+        balance = "human-dominant"
+    elif ec.total_product_time_ratio > 0.3 and ec.total_human_time_ratio > 0.3:
+        balance = "balanced"
+    else:
+        balance = "mixed"
+
+    return TemporalProfile(
+        total_duration=round(total_duration, 2),
+        energy_arc=temporal.energy_curve.energy_arc,
+        cut_rhythm_summary=cut_summary,
+        dominant_transition=temporal.transition_texture.dominant_type,
+        text_density=text_density,
+        product_human_balance=balance,
+    )
+
+
+def _build_production_guide(
+    scenes: list[Scene],
+    temporal: TemporalAnalysis,
+) -> ProductionGuide:
+    """Build actionable per-scene production guide from temporal data."""
+    scene_guides: list[SceneTimingGuide] = []
+
+    # Pre-index temporal data by timestamp range
+    energy_pts = {round(p.timestamp, 2): p for p in temporal.energy_curve.points}
+    cut_ts_set = set(temporal.cut_rhythm.cut_timestamps)
+
+    for scene in scenes:
+        s_start, s_end = scene.time_range
+        scene_duration = scene.duration
+
+        # Energy level for this scene
+        scene_energy_pts = [
+            p for p in temporal.energy_curve.points
+            if s_start <= p.timestamp <= s_end
+        ]
+        if scene_energy_pts:
+            avg_e = sum(p.score for p in scene_energy_pts) / len(scene_energy_pts)
+            peak_in_scene = [p for p in scene_energy_pts if p.score > 0.5]
+            if peak_in_scene:
+                peak_ts = max(peak_in_scene, key=lambda p: p.score)
+                energy_desc = f"{peak_ts.section} energy, peak at {peak_ts.timestamp:.1f}s (score {peak_ts.score:.2f})"
+            else:
+                section = scene_energy_pts[0].section
+                energy_desc = f"{section} energy, avg score {avg_e:.2f}"
+        else:
+            energy_desc = "no data"
+
+        # Cut rhythm for this scene
+        scene_cuts = [
+            ts for ts in temporal.cut_rhythm.cut_timestamps
+            if s_start <= ts <= s_end
+        ]
+        if scene_cuts:
+            n_cuts = len(scene_cuts)
+            avg_iv = scene_duration / max(n_cuts, 1)
+            cut_desc = f"{n_cuts} cuts, ~{avg_iv:.1f}s/cut"
+        else:
+            cut_desc = "no cuts"
+
+        # Text timing for this scene
+        scene_texts = [
+            t for t in temporal.text_dwell.items
+            if t.first_appear >= s_start and t.first_appear <= s_end
+        ]
+        if scene_texts:
+            first_text = min(scene_texts, key=lambda t: t.first_appear)
+            relative_appear = first_text.first_appear - s_start
+            text_desc = f"text appears at {relative_appear:.1f}s, stays {first_text.duration:.1f}s"
+        else:
+            text_desc = "no text overlay"
+
+        # Camera suggestion from visual journey
+        scene_shots = [
+            q.shot_type for q in [
+                # We don't have direct access to quals here, use visual_summary
+            ]
+        ]
+        # Use scene's visual summary for camera suggestion
+        dominant_shot = scene.visual_summary.dominant_shot
+        motion = scene.visual_summary.motion_level
+        camera_desc = f"{dominant_shot} shot, {motion} motion"
+
+        # Check zoom events in this scene
+        scene_zooms = [
+            z for z in temporal.zoom_events
+            if z.time_range[0] >= s_start and z.time_range[0] <= s_end
+        ]
+        if scene_zooms:
+            zoom_desc = ", ".join(
+                f"{z.direction} ({z.scale_change:.0%})" for z in scene_zooms
+            )
+            camera_desc += f", {zoom_desc}"
+
+        scene_guides.append(SceneTimingGuide(
+            scene_id=scene.scene_id,
+            role=scene.role,
+            time_range=scene.time_range,
+            duration=scene.duration,
+            cut_rhythm=cut_desc,
+            text_timing=text_desc,
+            energy_level=energy_desc,
+            camera_suggestion=camera_desc,
+            key_technique=scene.content_summary.key_action,
+        ))
+
+    # Overall recommendations
+    cr = temporal.cut_rhythm
+    recommended_rhythm = f"{cr.pattern} rhythm, target {cr.avg_interval:.1f}s avg interval"
+
+    td = temporal.text_dwell
+    if td.items:
+        avg_dwell = sum(t.duration for t in td.items) / len(td.items)
+        text_strategy = (
+            f"{len(td.items)} text overlays, avg dwell {avg_dwell:.1f}s, "
+            f"{td.texts_per_second:.2f} texts/sec"
+        )
+    else:
+        text_strategy = "no text overlays used"
+
+    zoom_count = len(temporal.zoom_events)
+    broll_count = len(temporal.broll_segments)
+    camera_notes = []
+    if zoom_count:
+        camera_notes.append(f"{zoom_count} zoom events")
+    if broll_count:
+        camera_notes.append(f"{broll_count} B-roll segments")
+    camera_notes_str = ", ".join(camera_notes) if camera_notes else "static camera work"
+
+    ec = temporal.energy_curve
+    energy_target = f"{ec.energy_arc}, avg energy {ec.avg_energy:.2f}"
+    if ec.peak_timestamps:
+        energy_target += f", peaks at {', '.join(f'{t:.1f}s' for t in ec.peak_timestamps)}"
+
+    return ProductionGuide(
+        scene_guides=scene_guides,
+        recommended_cut_rhythm=recommended_rhythm,
+        text_overlay_strategy=text_strategy,
+        camera_movement_notes=camera_notes_str,
+        energy_curve_target=energy_target,
+    )
+
+
 def build_recipe(
     scenes: list[Scene],
     video_analysis: dict,
     quants: list[FrameQuant] | None = None,
     quals: list[FrameQual] | None = None,
+    temporal: TemporalAnalysis | None = None,
 ) -> VideoRecipe:
     """Merge scene data (Track 1) + video analysis (Track 2) into VideoRecipe."""
 
@@ -381,6 +561,13 @@ def build_recipe(
         weak_points=raw_ea.get("weak_points", []),
     )
 
+    # ── Temporal profile + production guide (from temporal analysis) ────
+    temporal_profile = None
+    production_guide = None
+    if temporal:
+        temporal_profile = _build_temporal_profile(temporal)
+        production_guide = _build_production_guide(scenes, temporal)
+
     return VideoRecipe(
         meta=meta,
         structure=structure,
@@ -389,4 +576,6 @@ def build_recipe(
         product_strategy=product_strategy,
         effectiveness_assessment=effectiveness,
         scenes=[s for s in scenes],
+        temporal_profile=temporal_profile,
+        production_guide=production_guide,
     )
