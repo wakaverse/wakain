@@ -2,8 +2,10 @@
 
 Sends each keyframe image to Gemini with:
   - frame_quant data as context
-  - previous frame_qual result for continuity
 Returns structured FrameQual JSON.
+
+Supports parallel processing with throttling (Semaphore + delay).
+Uses GEMINI_API_KEY_PRO (Tier 3) if available, falls back to GEMINI_API_KEY.
 """
 
 from __future__ import annotations
@@ -18,6 +20,8 @@ from google.genai import types
 from .schemas import FrameQual, FrameQuant
 
 MODEL = "gemini-2.0-flash"
+MAX_CONCURRENCY = 10  # simultaneous API calls
+REQUEST_DELAY = 0.3   # seconds between requests
 
 SYSTEM_INSTRUCTION = """\
 You are a shortform marketing video analyst. You analyse individual frames
@@ -38,22 +42,14 @@ For human_element: if no person is visible, use role="none".
 """
 
 
-def _build_prompt(quant: FrameQuant, prev_qual: FrameQual | None) -> str:
-    """Build the text prompt with quant context and previous analysis."""
+def _build_prompt(quant: FrameQuant) -> str:
+    """Build the text prompt with quant context."""
     parts: list[str] = []
 
     parts.append("## Frame Quantitative Data (auto-measured)")
     parts.append("```json")
     parts.append(quant.model_dump_json(indent=2))
     parts.append("```")
-
-    if prev_qual is not None:
-        parts.append("\n## Previous Frame Analysis (for continuity)")
-        parts.append("```json")
-        parts.append(prev_qual.model_dump_json(indent=2))
-        parts.append("```")
-    else:
-        parts.append("\nThis is the first frame of the video.")
 
     parts.append(
         "\nAnalyse the frame image above together with the quantitative data. "
@@ -63,67 +59,80 @@ def _build_prompt(quant: FrameQuant, prev_qual: FrameQual | None) -> str:
 
 
 def _make_client() -> genai.Client:
-    api_key = os.environ.get("GEMINI_API_KEY", "")
+    # Prefer Tier 3 key for higher rate limits
+    api_key = os.environ.get("GEMINI_API_KEY_PRO", "") or os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         raise RuntimeError(
-            "GEMINI_API_KEY environment variable is not set. "
+            "GEMINI_API_KEY or GEMINI_API_KEY_PRO environment variable is not set. "
             "Copy .env.example to .env and fill in your key."
         )
+    key_type = "PRO (Tier 3)" if os.environ.get("GEMINI_API_KEY_PRO") else "Free"
+    print(f"  Using Gemini API key: {key_type}")
     return genai.Client(api_key=api_key)
 
 
 async def analyse_frame_qual(
     client: genai.Client,
+    semaphore: asyncio.Semaphore,
     jpeg_bytes: bytes,
     timestamp: float,
     quant: FrameQuant,
-    prev_qual: FrameQual | None = None,
 ) -> FrameQual:
     """Send a single frame to Gemini Flash and return FrameQual."""
-    prompt = _build_prompt(quant, prev_qual)
+    prompt = _build_prompt(quant)
 
     image_part = types.Part.from_bytes(data=jpeg_bytes, mime_type="image/jpeg")
     text_part = types.Part.from_text(text=prompt)
 
-    response = await client.aio.models.generate_content(
-        model=MODEL,
-        contents=[image_part, text_part],
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_INSTRUCTION,
-            response_mime_type="application/json",
-            response_schema=FrameQual,
-            temperature=0.1,
-        ),
-    )
-
-    data = json.loads(response.text)
-    data["timestamp"] = timestamp
-    return FrameQual.model_validate(data)
+    max_retries = 5
+    async with semaphore:
+        await asyncio.sleep(REQUEST_DELAY)  # throttle
+        for attempt in range(max_retries):
+            try:
+                response = await client.aio.models.generate_content(
+                    model=MODEL,
+                    contents=[image_part, text_part],
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_INSTRUCTION,
+                        response_mime_type="application/json",
+                        response_schema=FrameQual,
+                        temperature=0.1,
+                    ),
+                )
+                data = json.loads(response.text)
+                data["timestamp"] = timestamp
+                return FrameQual.model_validate(data)
+            except Exception as e:
+                wait = 2 ** attempt * 5  # 5, 10, 20, 40, 80s
+                err_name = type(e).__name__
+                if attempt < max_retries - 1:
+                    print(f"  ⚠ Frame {timestamp}s retry {attempt+1}/{max_retries} ({err_name}), waiting {wait}s...")
+                    await asyncio.sleep(wait)
+                else:
+                    raise RuntimeError(f"Frame {timestamp}s failed after {max_retries} retries: {e}") from e
 
 
 async def analyse_frames_qual(
     jpeg_frames: list[tuple[float, bytes]],
     quants: list[FrameQuant],
-    concurrency: int = 1,
+    concurrency: int = MAX_CONCURRENCY,
 ) -> list[FrameQual]:
-    """Analyse all frames sequentially (each frame depends on previous result).
+    """Analyse all frames in parallel with throttling.
 
     Parameters
     ----------
     jpeg_frames : list of (timestamp, jpeg_bytes)
     quants : list of FrameQuant matching each frame
-    concurrency : unused for now (sequential due to continuity requirement)
+    concurrency : max simultaneous API calls (default 10)
     """
     client = _make_client()
+    semaphore = asyncio.Semaphore(concurrency)
 
-    results: list[FrameQual] = []
-    prev_qual: FrameQual | None = None
+    tasks = [
+        analyse_frame_qual(client, semaphore, jpeg_bytes, timestamp, quant)
+        for (timestamp, jpeg_bytes), quant in zip(jpeg_frames, quants)
+    ]
 
-    for (timestamp, jpeg_bytes), quant in zip(jpeg_frames, quants):
-        qual = await analyse_frame_qual(
-            client, jpeg_bytes, timestamp, quant, prev_qual
-        )
-        results.append(qual)
-        prev_qual = qual
-
-    return results
+    results = await asyncio.gather(*tasks)
+    # Sort by timestamp to maintain order
+    return sorted(results, key=lambda q: q.timestamp)
