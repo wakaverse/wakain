@@ -7,11 +7,14 @@ from __future__ import annotations
 
 from collections import Counter
 from pathlib import Path
+from typing import Optional
 
 from .schemas import (
     Audio,
     BrandVisibility,
     EffectivenessAssessment,
+    FrameQual,
+    FrameQuant,
     Meta,
     Music,
     ProductStrategy,
@@ -140,8 +143,12 @@ def _normalize(value: str, mapping: dict[str, str], default: str) -> str:
     return default
 
 
-def _compute_visual_style(scenes: list[Scene]) -> VisualStyle:
-    """Derive visual_style from scene data."""
+def _compute_visual_style(
+    scenes: list[Scene],
+    quants: list[FrameQuant] | None = None,
+    quals: list[FrameQual] | None = None,
+) -> VisualStyle:
+    """Derive visual_style from scene data + frame-level data when available."""
     if not scenes:
         raise ValueError("No scenes to build visual style from")
 
@@ -169,10 +176,12 @@ def _compute_visual_style(scenes: list[Scene]) -> VisualStyle:
     # Brightness profile: check if there's a clear trend
     brightness_profile = "consistent"
 
-    # Cut stats
-    total_cuts = sum(s.visual_summary.cut_count for s in scenes)
-    cut_intervals = [s.visual_summary.avg_cut_interval for s in scenes if s.visual_summary.cut_count > 0]
-    avg_cut_interval = round(sum(cut_intervals) / len(cut_intervals), 2) if cut_intervals else total_duration
+    # Cut stats — count from frame_quant edge_diff > 40 (actual cut transitions)
+    if quants:
+        total_cuts = sum(1 for q in quants[1:] if q.edge_diff > 40)
+    else:
+        total_cuts = sum(s.visual_summary.cut_count for s in scenes)
+    avg_cut_interval = round(total_duration / max(total_cuts, 1), 2)
 
     # Transition style (from motion levels)
     motion_counts = Counter(s.visual_summary.motion_level for s in scenes)
@@ -201,20 +210,44 @@ def _compute_visual_style(scenes: list[Scene]) -> VisualStyle:
         language_tone="casual",
     )
 
-    # Screen time ratios
-    human_time = sum(
-        s.duration for s in scenes
-        if s.content_summary.subject_type in ("person_with_product", "person_only")
-    )
-    product_time = sum(
-        s.duration for s in scenes
-        if s.content_summary.product_visibility in ("full", "in_use", "partial")
-    )
-    face_time = sum(
-        s.duration for s in scenes
-        if s.content_summary.subject_type in ("person_with_product", "person_only")
-        and s.visual_summary.dominant_shot in ("closeup", "medium")
-    )
+    # Screen time ratios — use frame_qual data when available for accuracy
+    if quals:
+        frame_interval = 0.5  # 2fps extraction
+        total_frames = len(quals)
+        total_frame_time = total_frames * frame_interval
+        human_frames = sum(
+            1 for q in quals
+            if q.subject_type in ("person_with_product", "person_only")
+        )
+        product_frames = sum(
+            1 for q in quals
+            if q.product_presentation.visibility in ("full", "in_use", "partial")
+        )
+        face_frames = sum(
+            1 for q in quals
+            if q.subject_type in ("person_with_product", "person_only")
+            and q.shot_type in ("closeup", "medium")
+        )
+        human_ratio = round(human_frames / total_frames, 2) if total_frames else 0
+        product_ratio = round(product_frames / total_frames, 2) if total_frames else 0
+        face_ratio = round(face_frames / total_frames, 2) if total_frames else 0
+    else:
+        human_time = sum(
+            s.duration for s in scenes
+            if s.content_summary.subject_type in ("person_with_product", "person_only")
+        )
+        product_time = sum(
+            s.duration for s in scenes
+            if s.content_summary.product_visibility in ("full", "in_use", "partial")
+        )
+        face_time = sum(
+            s.duration for s in scenes
+            if s.content_summary.subject_type in ("person_with_product", "person_only")
+            and s.visual_summary.dominant_shot in ("closeup", "medium")
+        )
+        human_ratio = round(human_time / total_duration, 2) if total_duration else 0
+        product_ratio = round(product_time / total_duration, 2) if total_duration else 0
+        face_ratio = round(face_time / total_duration, 2) if total_duration else 0
 
     return VisualStyle(
         overall_mood=overall_mood,
@@ -225,15 +258,17 @@ def _compute_visual_style(scenes: list[Scene]) -> VisualStyle:
         total_cuts=total_cuts,
         transition_style=transition_style,
         text_usage=text_usage,
-        human_screen_time_ratio=round(human_time / total_duration, 2) if total_duration else 0,
-        product_screen_time_ratio=round(product_time / total_duration, 2) if total_duration else 0,
-        face_time_ratio=round(face_time / total_duration, 2) if total_duration else 0,
+        human_screen_time_ratio=human_ratio,
+        product_screen_time_ratio=product_ratio,
+        face_time_ratio=face_ratio,
     )
 
 
 def build_recipe(
     scenes: list[Scene],
     video_analysis: dict,
+    quants: list[FrameQuant] | None = None,
+    quals: list[FrameQual] | None = None,
 ) -> VideoRecipe:
     """Merge scene data (Track 1) + video analysis (Track 2) into VideoRecipe."""
 
@@ -259,8 +294,9 @@ def build_recipe(
         for s in scenes
     ]
 
+    # hook_time = total duration of all hook-role scenes
     hook_scenes = [s for s in scenes if s.role == "hook"]
-    hook_time = hook_scenes[0].duration if hook_scenes else raw_struct.get("hook_time", 0)
+    hook_time = sum(s.duration for s in hook_scenes) if hook_scenes else raw_struct.get("hook_time", 0)
 
     product_scenes = [
         s for s in scenes
@@ -279,8 +315,8 @@ def build_recipe(
         cta_start=cta_start,
     )
 
-    # ── Visual style (from Track 1 scenes) ───────────────────────────────
-    visual_style = _compute_visual_style(scenes)
+    # ── Visual style (from Track 1 scenes + frame data) ────────────────
+    visual_style = _compute_visual_style(scenes, quants=quants, quals=quals)
 
     # ── Audio (from Track 2) ─────────────────────────────────────────────
     raw_audio = video_analysis.get("audio", {})

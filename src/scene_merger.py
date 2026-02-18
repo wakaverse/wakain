@@ -16,6 +16,8 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 
+from typing import Literal
+
 from .schemas import (
     ContentSummary,
     EffectivenessSignals,
@@ -60,13 +62,16 @@ def _make_client() -> genai.Client:
 # ── Frame grouping ──────────────────────────────────────────────────────────
 
 
+MIN_SCENE_DURATION = 1.5  # seconds — short scenes get absorbed into neighbours
+
 def _group_frames(
     quants: list[FrameQuant], quals: list[FrameQual],
 ) -> list[list[int]]:
     """Group consecutive frame indices with similar shot_type + subject_type.
 
-    A new group starts when shot_type OR subject_type changes,
+    A new group starts only when BOTH shot_type AND subject_type change,
     OR when there is a significant visual cut (high edge_diff + color_diff).
+    Relaxed criteria to avoid over-splitting short-form videos.
     """
     if not quals:
         return []
@@ -81,10 +86,47 @@ def _group_frames(
         subject_changed = curr.subject_type != prev.subject_type
         big_cut = quant.edge_diff > 40 and quant.color_diff > 0.8
 
-        if shot_changed or subject_changed or big_cut:
+        # Only split when BOTH shot and subject change, or on a hard visual cut
+        if (shot_changed and subject_changed) or big_cut:
             groups.append([i])
         else:
             groups[-1].append(i)
+
+    return groups
+
+
+def _merge_short_scenes(
+    groups: list[list[int]], quants: list[FrameQuant],
+) -> list[list[int]]:
+    """Absorb scenes shorter than MIN_SCENE_DURATION into their neighbours."""
+    if len(groups) <= 1:
+        return groups
+
+    def _duration(group: list[int]) -> float:
+        ts_start = quants[group[0]].timestamp
+        ts_end = quants[group[-1]].timestamp + 0.5
+        return ts_end - ts_start
+
+    merged = True
+    while merged:
+        merged = False
+        new_groups: list[list[int]] = []
+        i = 0
+        while i < len(groups):
+            if _duration(groups[i]) < MIN_SCENE_DURATION and len(groups) > 1:
+                # Absorb into the neighbour with shorter duration (prefer previous)
+                if new_groups:
+                    new_groups[-1].extend(groups[i])
+                    merged = True
+                elif i + 1 < len(groups):
+                    groups[i + 1] = groups[i] + groups[i + 1]
+                    merged = True
+                else:
+                    new_groups.append(groups[i])
+            else:
+                new_groups.append(groups[i])
+            i += 1
+        groups = new_groups
 
     return groups
 
@@ -171,7 +213,10 @@ def _compute_content_summary(
 
 class _SceneRoleResponse(EffectivenessSignals):
     """Extended response that also includes role and key_action."""
-    role: str
+    role: Literal[
+        "hook", "problem", "solution", "demo", "proof",
+        "cta", "transition", "brand_intro",
+    ]
     key_action: str
 
 
@@ -196,7 +241,7 @@ Content summary:
 {json.dumps(content_summary, indent=2, ensure_ascii=False)}
 
 Based on the scene's position in the video, visual content, and text overlays:
-1. Assign the scene role (hook/problem/solution/demo/proof/cta/transition/brand_intro)
+1. Assign the scene role — MUST be exactly one of: hook, problem, solution, demo, proof, cta, transition, brand_intro
 2. Write a 1-line key_action describing what happens in this scene
 3. Assess effectiveness signals (hook_strength, information_density, emotional_trigger)
 
@@ -236,6 +281,9 @@ async def merge_scenes(
     groups = _group_frames(quants, quals)
     if not groups:
         return []
+
+    # Absorb short scenes into neighbours
+    groups = _merge_short_scenes(groups, quants)
 
     client = _make_client()
     scenes: list[Scene] = []

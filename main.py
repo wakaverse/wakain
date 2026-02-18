@@ -30,9 +30,17 @@ from src.schemas import FrameAnalysis, FrameQual, FrameQuant, Scene
 
 
 def _resolve_output_dir(output_base: str, video_path: str) -> Path:
-    """Resolve output directory: output/<video_name>/"""
+    """Resolve output directory: output/<video_name>/
+
+    Guards against double-nesting: if output_base already ends with video_name,
+    don't append it again (e.g. output/sample2 + sample2 → output/sample2, not output/sample2/sample2).
+    """
     video_name = Path(video_path).stem
-    out = Path(output_base) / video_name
+    base = Path(output_base)
+    if base.name == video_name:
+        out = base
+    else:
+        out = base / video_name
     out.mkdir(parents=True, exist_ok=True)
     return out, video_name
 
@@ -145,9 +153,19 @@ def run_phase_5(output_dir: str, video_path: str, scenes: list[Scene] | None = N
         analysis_path = out / f"{video_name}_video_analysis.json"
         video_analysis = json.loads(analysis_path.read_text())
 
+    # Load frame_quant and frame_qual for accurate aggregation
+    quants = None
+    quals = None
+    quant_path = out / f"{video_name}_frame_quant.json"
+    qual_path = out / f"{video_name}_frame_qual.json"
+    if quant_path.exists():
+        quants = [FrameQuant.model_validate(d) for d in json.loads(quant_path.read_text())]
+    if qual_path.exists():
+        quals = [FrameQual.model_validate(d) for d in json.loads(qual_path.read_text())]
+
     print(f"[Phase 5] Building video recipe ...")
     t0 = time.perf_counter()
-    recipe = build_recipe(scenes, video_analysis)
+    recipe = build_recipe(scenes, video_analysis, quants=quants, quals=quals)
     print(f"          → done ({time.perf_counter() - t0:.1f}s)")
 
     # Save recipe

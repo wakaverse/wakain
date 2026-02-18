@@ -69,10 +69,10 @@ _RESPONSE_SCHEMA = {
         "meta": {
             "type": "OBJECT",
             "properties": {
-                "platform": {"type": "STRING"},
+                "platform": {"type": "STRING", "enum": ["tiktok", "reels", "shorts", "ad"]},
                 "duration": {"type": "NUMBER"},
-                "aspect_ratio": {"type": "STRING"},
-                "category": {"type": "STRING"},
+                "aspect_ratio": {"type": "STRING", "enum": ["9:16", "1:1", "16:9"]},
+                "category": {"type": "STRING", "enum": ["beauty", "food", "tech", "fashion", "health", "home", "finance", "education"]},
                 "sub_category": {"type": "STRING"},
                 "target_audience": {"type": "STRING"},
             },
@@ -81,7 +81,7 @@ _RESPONSE_SCHEMA = {
         "structure": {
             "type": "OBJECT",
             "properties": {
-                "type": {"type": "STRING"},
+                "type": {"type": "STRING", "enum": ["problem_solution", "before_after", "demo", "review", "listicle", "story", "trend_ride"]},
                 "scene_sequence": {
                     "type": "ARRAY",
                     "items": {
@@ -107,8 +107,8 @@ _RESPONSE_SCHEMA = {
                     "type": "OBJECT",
                     "properties": {
                         "present": {"type": "BOOLEAN"},
-                        "genre": {"type": "STRING"},
-                        "energy_profile": {"type": "STRING"},
+                        "genre": {"type": "STRING", "enum": ["upbeat_pop", "lo_fi", "dramatic", "trending_sound", "acoustic", "edm", "none"]},
+                        "energy_profile": {"type": "STRING", "enum": ["steady", "building", "drop", "calm_to_hype"]},
                         "bpm_range": {"type": "STRING"},
                         "mood_match": {"type": "STRING"},
                         "beat_sync": {"type": "STRING"},
@@ -118,8 +118,8 @@ _RESPONSE_SCHEMA = {
                 "voice": {
                     "type": "OBJECT",
                     "properties": {
-                        "type": {"type": "STRING"},
-                        "tone": {"type": "STRING"},
+                        "type": {"type": "STRING", "enum": ["narration", "dialogue", "voiceover", "tts", "none"]},
+                        "tone": {"type": "STRING", "enum": ["conversational", "professional", "excited", "asmr", "storytelling"]},
                         "language": {"type": "STRING"},
                         "script_summary": {"type": "STRING"},
                         "hook_line": {"type": "STRING"},
@@ -132,7 +132,7 @@ _RESPONSE_SCHEMA = {
                     "properties": {
                         "used": {"type": "BOOLEAN"},
                         "types": {"type": "ARRAY", "items": {"type": "STRING"}},
-                        "frequency": {"type": "STRING"},
+                        "frequency": {"type": "STRING", "enum": ["heavy", "moderate", "minimal", "none"]},
                     },
                     "required": ["used", "types", "frequency"],
                 },
@@ -143,14 +143,14 @@ _RESPONSE_SCHEMA = {
         "product_strategy": {
             "type": "OBJECT",
             "properties": {
-                "reveal_timing": {"type": "STRING"},
-                "demonstration_method": {"type": "STRING"},
+                "reveal_timing": {"type": "STRING", "enum": ["immediate", "gradual", "delayed_reveal", "teaser"]},
+                "demonstration_method": {"type": "STRING", "enum": ["in_use", "comparison", "transformation", "testimonial", "spec_highlight", "unboxing"]},
                 "key_benefit_shown": {"type": "STRING"},
                 "price_shown": {"type": "BOOLEAN"},
-                "price_framing": {"type": "STRING"},
+                "price_framing": {"type": "STRING", "enum": ["discount", "per_day", "vs_competitor", "bundle", "none"]},
                 "offer_type": {"type": "STRING"},
-                "social_proof": {"type": "STRING"},
-                "urgency_trigger": {"type": "STRING"},
+                "social_proof": {"type": "STRING", "enum": ["reviews", "ugc", "numbers", "celebrity", "expert", "none"]},
+                "urgency_trigger": {"type": "STRING", "enum": ["time_limit", "stock_limit", "trend", "none"]},
                 "brand_visibility": {
                     "type": "OBJECT",
                     "properties": {
