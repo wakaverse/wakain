@@ -231,6 +231,7 @@ class Scene(BaseModel):
     visual_summary: VisualSummary
     content_summary: ContentSummary
     effectiveness_signals: EffectivenessSignals
+    description: str = Field(default="", description="Brief description of what happens in this scene")
     energy: Optional[SceneEnergy] = None
     transcript_segments: list[TranscriptSegment] = Field(default_factory=list)
     text_effects: list = Field(default_factory=list)

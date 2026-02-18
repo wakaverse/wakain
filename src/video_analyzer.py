@@ -67,6 +67,7 @@ For text_effects:
 For scene_roles:
 - Identify each scene's narrative role with start/end times
 - Roles: hook, problem, solution, demo, proof, brand_intro, transition, cta, recap
+- Include a concise description (1-2 sentences, in Korean) of what happens visually and narratively in each scene
 """
 
 
@@ -232,8 +233,9 @@ _RESPONSE_SCHEMA = {
                     "start": {"type": "NUMBER"},
                     "end": {"type": "NUMBER"},
                     "role": {"type": "STRING", "enum": ["hook", "problem", "solution", "demo", "proof", "brand_intro", "transition", "cta", "recap"]},
+                    "description": {"type": "STRING"},
                 },
-                "required": ["start", "end", "role"],
+                "required": ["start", "end", "role", "description"],
             },
         },
     },

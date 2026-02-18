@@ -60,6 +60,7 @@ def merge_analysis(
 
         # 1. Find best matching role from scene_roles (max time overlap)
         best_role = "transition"
+        best_description = ""
         best_overlap = 0.0
         for sr in scene_roles:
             sr_range = [float(sr.get("start", 0)), float(sr.get("end", 0))]
@@ -67,6 +68,7 @@ def merge_analysis(
             if overlap > best_overlap:
                 best_overlap = overlap
                 best_role = sr.get("role", "transition")
+                best_description = sr.get("description", "")
 
         # 2. Match transcript segments by time range overlap
         matched_transcript: list[TranscriptSegment] = []
@@ -90,6 +92,7 @@ def merge_analysis(
         enriched = Scene(
             scene_id=scene.scene_id,
             role=best_role,
+            description=best_description,
             time_range=scene.time_range,
             duration=scene.duration,
             visual_summary=scene.visual_summary,
