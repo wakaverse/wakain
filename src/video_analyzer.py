@@ -27,7 +27,7 @@ from .schemas import (
     Structure,
 )
 
-MODEL = "gemini-2.0-flash"
+MODEL = "gemini-2.5-flash"
 MAX_UPLOAD_SIZE_MB = 20
 
 SYSTEM_INSTRUCTION = """\
@@ -206,9 +206,11 @@ _RESPONSE_SCHEMA = {
 
 
 def _make_client() -> genai.Client:
-    api_key = os.environ.get("GEMINI_API_KEY", "")
+    api_key = os.environ.get("GEMINI_API_KEY_PRO") or os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY not set")
+    key_label = "PRO" if os.environ.get("GEMINI_API_KEY_PRO") else "FREE"
+    print(f"  Using Gemini API key: {key_label}")
     return genai.Client(api_key=api_key)
 
 
