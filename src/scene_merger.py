@@ -74,6 +74,8 @@ def _group_frames_by_scene_boundaries(
     """Group frame indices using PySceneDetect scene boundaries.
 
     Each frame is assigned to the scene whose time range contains it.
+    Empty scenes (no frame landed inside) get the nearest frame assigned
+    so that every PySceneDetect boundary produces a scene.
     """
     if not quants or not scene_boundaries:
         return [[i for i in range(len(quants))]] if quants else []
@@ -91,8 +93,16 @@ def _group_frames_by_scene_boundaries(
             # Frame after last scene end — put in last group
             groups[-1].append(idx)
 
-    # Remove empty groups
-    return [g for g in groups if g]
+    # Fill empty groups with the nearest frame (by scene midpoint)
+    timestamps = [q.timestamp for q in quants]
+    for s_idx, grp in enumerate(groups):
+        if not grp:
+            mid = (scene_boundaries[s_idx][0] + scene_boundaries[s_idx][1]) / 2.0
+            nearest_idx = min(range(len(timestamps)),
+                             key=lambda i: abs(timestamps[i] - mid))
+            groups[s_idx] = [nearest_idx]
+
+    return groups
 
 
 def _group_frames_fallback(
@@ -423,8 +433,13 @@ async def merge_scenes(
         grp_quants = [quants[i] for i in frame_indices]
         grp_quals = [quals[i] for i in frame_indices]
 
-        ts_start = grp_quants[0].timestamp
-        ts_end = grp_quants[-1].timestamp + 0.5
+        # Use PySceneDetect boundaries for accurate time_range
+        if scene_boundaries and scene_idx < len(scene_boundaries):
+            ts_start = scene_boundaries[scene_idx][0]
+            ts_end = scene_boundaries[scene_idx][1]
+        else:
+            ts_start = grp_quants[0].timestamp
+            ts_end = grp_quants[-1].timestamp + 0.5
         duration = round(ts_end - ts_start, 2)
         time_range = [round(ts_start, 2), round(ts_end, 2)]
 

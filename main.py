@@ -149,9 +149,16 @@ def run_phase_3(
                 json.loads(temporal_path.read_text())
             )
 
+    # Load PySceneDetect boundaries if available
+    scene_boundaries = None
+    sd_path = out / f"{video_name}_scene_detect.json"
+    if sd_path.exists():
+        sd_data = json.loads(sd_path.read_text())
+        scene_boundaries = [tuple(b) for b in sd_data.get("boundaries", [])]
+
     print(f"[Phase 3] Running scene merger ...")
     t0 = time.perf_counter()
-    scenes = load_and_merge(out, video_name, temporal=temporal)
+    scenes = load_and_merge(out, video_name, temporal=temporal, scene_boundaries=scene_boundaries)
     print(f"          → {len(scenes)} scenes merged ({time.perf_counter() - t0:.1f}s)")
 
     # Save scenes
