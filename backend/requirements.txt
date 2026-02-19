@@ -2,13 +2,15 @@
 fastapi==0.115.0
 uvicorn==0.30.0
 python-multipart==0.0.9
-supabase==2.0.0
 python-dotenv==1.0.0
 pydantic>=2.0.0
 
+# Supabase — use latest to resolve websockets conflict
+supabase>=2.11.0
+
 # --- Video-analyzer pipeline ---
-google-genai==1.0.0
-opencv-python-headless==4.9.0.80
+google-genai>=1.60.0
+opencv-python-headless>=4.9.0
 numpy
 scenedetect[opencv]
 matplotlib

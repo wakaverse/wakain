@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 # System deps: ffmpeg for video processing, libgl1 for opencv
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg libgl1-mesa-glx && \
+    apt-get install -y --no-install-recommends ffmpeg && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
