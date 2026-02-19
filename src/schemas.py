@@ -377,29 +377,6 @@ class TranscriptSegment(BaseModel):
     speaker: Optional[str] = Field(default=None, description="Speaker label if identifiable")
 
 
-class SceneArtwork(BaseModel):
-    """Aggregated artwork analysis for a scene."""
-    # Typography consistency
-    typography_style: Optional[str] = Field(default=None, description="Dominant font family in scene")
-    typography_weight: Optional[str] = Field(default=None)
-    text_color_primary: Optional[str] = Field(default=None, description="Most common text color (hex)")
-    text_color_highlight: Optional[str] = Field(default=None, description="Highlight color if used (hex)")
-    has_text_background: bool = False
-    text_bg_color: Optional[str] = Field(default=None)
-
-    # Graphic elements
-    graphic_elements: list[str] = Field(default_factory=list, description="Unique graphic elements used")
-
-    # Layout pattern
-    dominant_layout: str = Field(default="", description="e.g. 'text-top/person-middle/product-bottom'")
-    text_product_overlap: bool = False
-
-    # Color design
-    primary_color: Optional[str] = None
-    accent_color: Optional[str] = None
-    contrast_level: str = "medium"
-
-
 class Scene(BaseModel):
     scene_id: int
     role: Literal[
