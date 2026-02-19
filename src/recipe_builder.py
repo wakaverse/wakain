@@ -760,8 +760,8 @@ def build_recipe(
         message_clarity=raw_ea.get("message_clarity", ""),
         cta_strength=raw_ea.get("cta_strength", ""),
         replay_factor=raw_ea.get("replay_factor", ""),
-        standout_elements=raw_ea.get("standout_elements", []),
-        weak_points=raw_ea.get("weak_points", []),
+        standout_elements=raw_ea.get("standout_elements", raw_ea.get("strengths", [])),
+        weak_points=raw_ea.get("weak_points", raw_ea.get("weaknesses", [])),
     )
 
     # ── Persuasion analysis (from Track 2) ─────────────────────────────

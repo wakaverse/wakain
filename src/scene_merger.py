@@ -6,6 +6,8 @@ by time range overlap. Pure local computation — no API calls.
 
 from __future__ import annotations
 
+import copy
+
 from .schemas import (
     ContentSummary,
     EffectivenessSignals,
@@ -20,6 +22,36 @@ def _time_overlap(range_a: list[float], range_b: list[float]) -> float:
     start = max(range_a[0], range_b[0])
     end = min(range_a[1], range_b[1])
     return max(0.0, end - start)
+
+
+def _rescale_timestamps(video_analysis: dict, duration: float) -> dict:
+    """Rescale normalized (0.0-1.0) timestamps to actual seconds."""
+    va = copy.deepcopy(video_analysis)
+
+    for sr in va.get("scene_roles", []):
+        if "start" in sr:
+            sr["start"] = float(sr["start"]) * duration
+        if "end" in sr:
+            sr["end"] = float(sr["end"]) * duration
+
+    transcript = va.get("audio", {}).get("voice", {}).get("transcript", [])
+    for seg in transcript:
+        if "start" in seg:
+            seg["start"] = float(seg["start"]) * duration
+        if "end" in seg:
+            seg["end"] = float(seg["end"]) * duration
+
+    for te in va.get("text_effects", []):
+        if "time" in te:
+            te["time"] = float(te["time"]) * duration
+
+    appeal_points = va.get("persuasion_analysis", {}).get("appeal_points", [])
+    for ap in appeal_points:
+        vp = ap.get("visual_proof", {})
+        if vp.get("timestamp") is not None:
+            vp["timestamp"] = float(vp["timestamp"]) * duration
+
+    return va
 
 
 def merge_analysis(
@@ -43,6 +75,38 @@ def merge_analysis(
     scene_boundaries : optional
         PySceneDetect boundaries (unused here, kept for API consistency).
     """
+    # ── Detect & fix normalized timestamps (ratio 0.0~1.0 instead of seconds)
+    duration = aggregated_scenes[-1].time_range[1] if aggregated_scenes else 0.0
+
+    if duration > 0:
+        all_ts: list[float] = []
+        for sr in video_analysis.get("scene_roles", []):
+            if "start" in sr:
+                all_ts.append(float(sr["start"]))
+            if "end" in sr:
+                all_ts.append(float(sr["end"]))
+        for seg in video_analysis.get("audio", {}).get("voice", {}).get("transcript", []):
+            if "start" in seg:
+                all_ts.append(float(seg["start"]))
+            if "end" in seg:
+                all_ts.append(float(seg["end"]))
+        for te in video_analysis.get("text_effects", []):
+            if "time" in te:
+                all_ts.append(float(te["time"]))
+        for ap in video_analysis.get("persuasion_analysis", {}).get("appeal_points", []):
+            vp = ap.get("visual_proof", {})
+            if vp.get("timestamp") is not None:
+                all_ts.append(float(vp["timestamp"]))
+
+        if all_ts:
+            max_ts = max(all_ts)
+            if max_ts < duration * 0.1:
+                print(
+                    f"  ⚠️ Detected normalized timestamps "
+                    f"(max={max_ts:.2f}s for {duration:.1f}s video). Rescaling..."
+                )
+                video_analysis = _rescale_timestamps(video_analysis, duration)
+
     scene_roles = video_analysis.get("scene_roles", [])
     transcript = (
         video_analysis.get("audio", {})
@@ -73,6 +137,16 @@ def merge_analysis(
                 best_role = sr.get("role", "transition")
                 best_description = sr.get("description", "")
 
+        # 1b. Fallback: position-based role when no overlap found
+        if best_overlap == 0:
+            relative_pos = s_start / duration if duration > 0 else 0.5
+            if relative_pos < 0.10:
+                best_role = "hook"
+            elif relative_pos >= 0.85:
+                best_role = "cta"
+            else:
+                best_role = "body"
+
         # 2. Match transcript segments by time range overlap
         matched_transcript: list[TranscriptSegment] = []
         for seg in transcript:
@@ -99,6 +173,16 @@ def merge_analysis(
             ap_time = vp.get("timestamp")
             if ap_time is not None and s_start <= float(ap_time) <= s_end:
                 matched_appeals.append(ap)
+
+        # 4b. Generate description from text_effects if empty
+        if not best_description and matched_text_effects:
+            text_parts = [
+                te.get("content", "") or te.get("text", "")
+                for te in matched_text_effects
+                if te.get("content") or te.get("text")
+            ]
+            if text_parts:
+                best_description = " / ".join(text_parts[:3])
 
         enriched = Scene(
             scene_id=scene.scene_id,
