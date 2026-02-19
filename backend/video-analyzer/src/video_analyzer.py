@@ -83,8 +83,26 @@ For persuasion_analysis (소구 분석 — CRITICAL):
   - Is their face shown? What gives them credibility?
 - **video_style**: Overall style (pitch/demo/mukbang/comparison/vlog/review/info/story/challenge)
 - **appeal_points**: List EVERY persuasion/appeal point in order of appearance:
-  - Types (rational): myth_bust, ingredient, process, achievement, price, comparison, guarantee, origin, specification
-  - Types (emotional): sensory, authenticity, social_proof, urgency, lifestyle, nostalgia, authority, emotional
+  - Types (rational) — 각 정의를 정확히 따를 것:
+    - myth_bust (오해반박): 흔한 오해나 편견을 깨는 소구
+    - ingredient (원재료): 원재료/성분의 품질·희귀성 강조
+    - manufacturing (제조공정): 제품이 만들어지는 과정·공정·기술. ⚠️ 제품 사용 시연은 feature_demo
+    - track_record (실적): 수상, 판매량, 인증 등 객관적 실적
+    - price (가격): 가격, 할인, 무료 증정, 가성비
+    - comparison (비교): 경쟁 제품·기존 방식과의 비교
+    - guarantee (보장): 환불, 보증, 무료체험 등 리스크 제거
+    - origin (원산지): 산지, 생산지, 브랜드 역사
+    - feature_demo (기능시연): 제품 기능을 직접 시연하며 보여줌 (터치, 동작, 사용법 등)
+    - spec_data (스펙수치): 수치·규격·용량 등 객관적 스펙 데이터
+  - Types (emotional) — 각 정의를 정확히 따를 것:
+    - design_aesthetic (디자인감성): 색감, 질감, 디자인의 시각적 매력, 인테리어 매칭
+    - authenticity (진정성): 리얼후기, 솔직함, 날것의 매력
+    - social_proof (사회적증거): 인기, 트렌드, 많은 사람이 쓴다는 증거
+    - urgency (긴급성): 한정수량, 기간한정
+    - lifestyle (라이프스타일): 이 제품이 있는 삶의 모습, 동경
+    - nostalgia (향수): 추억, 옛날 감성, 레트로
+    - authority (권위): 전문가, 셀럽, 인플루언서 추천
+    - emotional (감정): 감동, 유머, 공감 등 감정 자극
   - For each: what specific claim is made? How is it VISUALLY proven? (closeup/slow_motion/process_shot/graph_number/etc.)
   - Rate each appeal's strength (strong/moderate/weak) based on how convincingly it's delivered
 - **product_emphasis**: How is the product visually highlighted?
@@ -94,6 +112,14 @@ For persuasion_analysis (소구 분석 — CRITICAL):
 - **primary_appeal**: Which single appeal type is the strongest?
 - **appeal_layering**: How do appeals build on each other? Describe the sequence in Korean.
 - **persuasion_summary**: 1-2 sentence summary of the overall persuasion strategy in Korean.
+
+## 텍스트 오버레이 영상 대응 (나레이션 없는 영상)
+만약 영상에 나레이션/음성이 없거나 극히 적고, 텍스트 오버레이가 주요 정보 전달 수단인 경우:
+- voice.type은 "none"으로, voice.script_summary에는 "텍스트 오버레이 기반 영상"으로 기재
+- text_effects 섹션에 화면에 나타나는 모든 텍스트를 시간순으로 빠짐없이 기록
+- 텍스트 오버레이의 내용 변화를 소구 전환점으로 판단
+- 텍스트의 크기·색상·강조 방식(볼드, 색상변경, 크기확대)이 메시지 강도를 나타냄
+- appeal_points의 claim은 실제 화면에 나타나는 텍스트 내용 기반으로 작성
 """
 
 
@@ -290,9 +316,9 @@ _RESPONSE_SCHEMA = {
                         "type": "OBJECT",
                         "properties": {
                             "type": {"type": "STRING", "enum": [
-                                "myth_bust", "ingredient", "process", "achievement", "price",
-                                "comparison", "guarantee", "origin", "specification",
-                                "sensory", "authenticity", "social_proof", "urgency",
+                                "myth_bust", "ingredient", "manufacturing", "track_record", "price",
+                                "comparison", "guarantee", "origin", "feature_demo", "spec_data",
+                                "design_aesthetic", "authenticity", "social_proof", "urgency",
                                 "lifestyle", "nostalgia", "authority", "emotional",
                             ]},
                             "claim": {"type": "STRING"},
@@ -339,9 +365,9 @@ _RESPONSE_SCHEMA = {
                     "required": ["first_appear", "screen_time_ratio", "hero_shots", "emphasis_techniques", "key_visual_moment", "key_visual_timestamp"],
                 },
                 "primary_appeal": {"type": "STRING", "enum": [
-                    "myth_bust", "ingredient", "process", "achievement", "price",
-                    "comparison", "guarantee", "origin", "specification",
-                    "sensory", "authenticity", "social_proof", "urgency",
+                    "myth_bust", "ingredient", "manufacturing", "track_record", "price",
+                    "comparison", "guarantee", "origin", "feature_demo", "spec_data",
+                    "design_aesthetic", "authenticity", "social_proof", "urgency",
                     "lifestyle", "nostalgia", "authority", "emotional",
                 ]},
                 "appeal_layering": {"type": "STRING"},
@@ -462,6 +488,7 @@ def _upload_video(client: genai.Client, video_path: Path) -> types.File:
 async def analyse_video(
     video_path: str | Path,
     resolution: int = 720,
+    frame_quals: list[dict] | None = None,
 ) -> dict:
     """Upload video to Gemini and get full analysis (audio, structure, product, effectiveness)."""
     client = _make_client()
@@ -496,6 +523,27 @@ Return a JSON object with these sections:
    - persuasion_summary: 1-2 sentence summary of persuasion strategy (in Korean)
 
 Be specific and detailed. Use Korean for script_summary, hook_line, cta_line, persuasion_summary, appeal claims, and descriptions."""
+
+        # Inject OCR text timeline from Phase 2 frame_qual results
+        if frame_quals:
+            text_timeline = []
+            for fq in frame_quals:
+                ts = fq.get("timestamp", 0)
+                texts = fq.get("text_overlay", fq.get("text_overlays", []))
+                if texts:
+                    items = []
+                    for t in texts:
+                        if isinstance(t, str):
+                            items.append(t)
+                        elif isinstance(t, dict):
+                            items.append(t.get("content", t.get("text", str(t))))
+                    if items:
+                        text_timeline.append(f"  {ts:.1f}s: {' | '.join(items)}")
+            if text_timeline:
+                prompt += (
+                    "\n\n[참고: 프레임별 OCR 텍스트 오버레이 감지 결과]\n"
+                    + "\n".join(text_timeline[:60])  # limit to 60 entries
+                )
 
         max_retries = 5
         for attempt in range(max_retries):
@@ -583,6 +631,10 @@ Return a JSON object with art_direction containing:
             upload_path.unlink()
 
 
-def run_video_analysis(video_path: str | Path, resolution: int = 720) -> dict:
+def run_video_analysis(
+    video_path: str | Path,
+    resolution: int = 720,
+    frame_quals: list[dict] | None = None,
+) -> dict:
     """Sync wrapper for analyse_video."""
-    return asyncio.run(analyse_video(video_path, resolution=resolution))
+    return asyncio.run(analyse_video(video_path, resolution=resolution, frame_quals=frame_quals))

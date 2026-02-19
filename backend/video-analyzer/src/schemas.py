@@ -303,7 +303,7 @@ class Scene(BaseModel):
     scene_id: int
     role: Literal[
         "hook", "problem", "solution", "demo", "proof",
-        "cta", "transition", "brand_intro", "recap",
+        "cta", "transition", "brand_intro", "recap", "body",
     ]
     time_range: list[float] = Field(description="[start, end]")
     duration: float

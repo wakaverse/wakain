@@ -2,20 +2,31 @@ import { useState } from 'react';
 import type { AppealPoint } from '../../types';
 
 const APPEAL_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
-  myth_bust:     { label: '신화파괴',     color: 'text-purple-700',  bg: 'bg-purple-100',   border: 'border-purple-200' },
-  sensory:       { label: '감각',         color: 'text-red-700',     bg: 'bg-red-100',      border: 'border-red-200'   },
-  specification: { label: '스펙',         color: 'text-blue-700',    bg: 'bg-blue-100',     border: 'border-blue-200'  },
-  price:         { label: '가격',         color: 'text-green-700',   bg: 'bg-green-100',    border: 'border-green-200' },
-  process:       { label: '제조공정',     color: 'text-orange-700',  bg: 'bg-orange-100',   border: 'border-orange-200'},
-  origin:        { label: '원산지',       color: 'text-amber-700',   bg: 'bg-amber-100',    border: 'border-amber-200' },
-  authority:     { label: '권위',         color: 'text-indigo-700',  bg: 'bg-indigo-100',   border: 'border-indigo-200'},
-  social_proof:  { label: '사회적증거',   color: 'text-pink-700',    bg: 'bg-pink-100',     border: 'border-pink-200'  },
-  guarantee:     { label: '보증',         color: 'text-teal-700',    bg: 'bg-teal-100',     border: 'border-teal-200'  },
-  comparison:    { label: '비교',         color: 'text-yellow-700',  bg: 'bg-yellow-100',   border: 'border-yellow-200'},
-  urgency:       { label: '긴급',         color: 'text-red-700',     bg: 'bg-red-100',      border: 'border-red-200'   },
-  lifestyle:     { label: '라이프스타일', color: 'text-sky-700',     bg: 'bg-sky-100',      border: 'border-sky-200'   },
-  emotional:     { label: '감성',         color: 'text-purple-700',  bg: 'bg-purple-100',   border: 'border-purple-200'},
-  achievement:   { label: '성과',         color: 'text-emerald-700', bg: 'bg-emerald-100',  border: 'border-emerald-200'},
+  // Rational
+  myth_bust:       { label: '오해반박',     color: 'text-purple-700',  bg: 'bg-purple-100',   border: 'border-purple-200' },
+  ingredient:      { label: '원재료',       color: 'text-lime-700',    bg: 'bg-lime-100',     border: 'border-lime-200'   },
+  manufacturing:   { label: '제조공정',     color: 'text-orange-700',  bg: 'bg-orange-100',   border: 'border-orange-200' },
+  track_record:    { label: '실적',         color: 'text-emerald-700', bg: 'bg-emerald-100',  border: 'border-emerald-200'},
+  price:           { label: '가격',         color: 'text-green-700',   bg: 'bg-green-100',    border: 'border-green-200'  },
+  comparison:      { label: '비교',         color: 'text-yellow-700',  bg: 'bg-yellow-100',   border: 'border-yellow-200' },
+  guarantee:       { label: '보장',         color: 'text-teal-700',    bg: 'bg-teal-100',     border: 'border-teal-200'   },
+  origin:          { label: '원산지',       color: 'text-amber-700',   bg: 'bg-amber-100',    border: 'border-amber-200'  },
+  feature_demo:    { label: '기능시연',     color: 'text-blue-700',    bg: 'bg-blue-100',     border: 'border-blue-200'   },
+  spec_data:       { label: '스펙수치',     color: 'text-cyan-700',    bg: 'bg-cyan-100',     border: 'border-cyan-200'   },
+  // Emotional
+  design_aesthetic: { label: '디자인감성',  color: 'text-red-700',     bg: 'bg-red-100',      border: 'border-red-200'    },
+  authenticity:    { label: '진정성',       color: 'text-stone-700',   bg: 'bg-stone-100',    border: 'border-stone-200'  },
+  social_proof:    { label: '사회적증거',   color: 'text-pink-700',    bg: 'bg-pink-100',     border: 'border-pink-200'   },
+  urgency:         { label: '긴급성',       color: 'text-red-700',     bg: 'bg-red-100',      border: 'border-red-200'    },
+  lifestyle:       { label: '라이프스타일', color: 'text-sky-700',     bg: 'bg-sky-100',      border: 'border-sky-200'    },
+  nostalgia:       { label: '향수',         color: 'text-amber-700',   bg: 'bg-amber-100',    border: 'border-amber-200'  },
+  authority:       { label: '권위',         color: 'text-indigo-700',  bg: 'bg-indigo-100',   border: 'border-indigo-200' },
+  emotional:       { label: '감정',         color: 'text-purple-700',  bg: 'bg-purple-100',   border: 'border-purple-200' },
+  // Legacy (하위 호환)
+  sensory:         { label: '감각',         color: 'text-red-700',     bg: 'bg-red-100',      border: 'border-red-200'    },
+  specification:   { label: '스펙',         color: 'text-blue-700',    bg: 'bg-blue-100',     border: 'border-blue-200'   },
+  process:         { label: '제조공정',     color: 'text-orange-700',  bg: 'bg-orange-100',   border: 'border-orange-200' },
+  achievement:     { label: '실적',         color: 'text-emerald-700', bg: 'bg-emerald-100',  border: 'border-emerald-200'},
 };
 
 function getAppealConfig(type: string) {

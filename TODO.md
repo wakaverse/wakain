@@ -1,56 +1,37 @@
-# WakaIn TODO — 2026-02-20
+# WakaIn TODO — 2026-02-20 업데이트
 
-## 🔴 긴급 (내일 바로)
+## ✅ 완료 (오늘)
+- [x] 소구(Appeal) enum 재설계 — 17개→18개, 한국어 정의 명시
+- [x] 텍스트 오버레이 영상 자동 감지 + 프롬프트 분기 (Phase 4)
+- [x] Phase 2 OCR → Phase 4 프롬프트 주입
+- [x] 커밋 + 푸시 + Cloud Run/Cloudflare 배포
 
-### 1. R2 presigned URL 업로드
-- [ ] Cloudflare R2 활성화 (대시보드)
-- [ ] R2 API 토큰 생성 (Access Key + Secret)
-- [ ] R2 버킷 `wakain-videos` 생성
-- [ ] R2 CORS 설정 (wakain.pages.dev, wakain.site 허용)
-- [ ] Cloud Run 환경변수에 R2 키 추가
-- [ ] 재배포 + 테스트 (89MB 파일)
-- 코드는 포지가 작업 완료함 (plaid-shore 세션)
+## 🔴 HIGH — 내일 우선
+- [ ] **유지율(retention) 100점 버그** — dropoff_predictor.py 기준값 조정
+  - 집중도 < 20 → < 40, 소구공백 5초→3초, 씬정체 4초→3초
+  - 집중도 커브(per-second) 직접 반영 (현재 씬당 1개 점수만 사용)
+- [ ] **summary_json 빈 배열 버그** — worker.py `_build_summary()` 경로 수정
+  - strengths/weaknesses/suggestions가 비어있음
+  - recipe JSON 경로와 불일치 (effectiveness_assessment 키 매핑)
+- [ ] **0220.mp4 재분석** — enum 변경 + 텍스트 오버레이 개선 후 결과 확인
+- [ ] **R2 presigned URL 업로드** — 포지(plaid-shore) 작업 확인
+  - R2 대시보드 활성화 (주인님 Cloudflare 대시보드에서)
+  - R2 API 토큰 생성 필요
 
-### 2. 알고리즘 고도화 — Scene Merger
-- [x] 타임스탬프 정규화 감지 + 자동 보정 (c347cc9)
-- [x] Scene role fallback (hook/body/cta)
-- [ ] **여전히 빈틈**: Phase 4 Gemini가 타임스탬프를 비율로 줄 때만 감지됨. 다른 패턴의 오류 가능성 있음
-- [ ] Scene description이 동일한 문제 — Gemini scene_roles 프롬프트 개선 필요
+## 🟡 MEDIUM
+- [ ] **wakain.site 커스텀 도메인** — DNS 전파 확인
+- [ ] **프론트엔드 소구 흐름 한국어 매핑** — 신규 enum 반영 확인
+- [ ] **text_effects 타임스탬프 0.0초 집중** — Gemini가 text_effects만 다른 패턴으로 반환하는 문제
+- [ ] **GCP OAuth 프로덕션 게시** — 현재 테스트 모드
 
-### 3. 알고리즘 고도화 — 텍스트 오버레이 영상 지원
-- [ ] STT 없는 영상 (BGM + 텍스트만) — 현재 소구 분석은 됨, 씬별 매핑이 안 됨
-- [ ] 프레임별 OCR 텍스트 → 씬 매핑 로직 필요
-- [ ] 리테일/이커머스 숏폼의 상당수가 이 패턴 — 반드시 해결
+## 🟢 LOW
+- [ ] Pipeline 최적화 — Phase 2 배칭 (60→12 호출) + Phase 2/4 병렬
+- [ ] Benchmark DB — 50+ 영상 분석 후 카테고리별 기준선
+- [ ] Template engine — 레시피 → 재사용 가능한 템플릿 추상화
+- [ ] 대용량 영상(>20MB) 직접 업로드 대응 (R2 완료 후)
 
-## 🟡 중요 (이번 주)
-
-### 4. Summary 빌더 완성
-- [x] strengths/weaknesses 필드 매핑 수정
-- [ ] overall_score 계산 로직 (retention + effectiveness 가중 평균)
-- [ ] improvement_suggestions 자동 생성
-
-### 5. 파이프라인 최적화
-- [ ] Phase 2 배칭 (60→12 API콜, -30초)
-- [ ] Phase 2 + Phase 4 병렬 실행 (-40초)
-- [ ] 목표: 250초 → 120초
-
-### 6. wakain.site 도메인
-- [ ] DNS 전파 확인
-- [ ] 커스텀 도메인 SSL 확인
-
-### 7. Cold Start 최적화
-- [ ] min-instances=1 설정 (월 ~₩15,000)
-- [ ] 또는 Cloud Run startup probe 최적화
-
-## 🟢 나중에
-
-### 8. 리포트 UI 개선
-- [ ] Scene description 동일 문제 해결 후 UI 확인
-- [ ] 모바일 반응형 테스트
-- [ ] 에러 핸들링 UX 개선
-
-### 9. 결제/크레딧 (PMF 확인 후)
-- SPEC.md Phase 2-4 로드맵 참고
-
-### 10. 벤치마크 DB
-- 카테고리별 50+ 영상 수집 필요
+## 📊 현재 상태
+- 프론트: https://wakain.pages.dev ✅
+- 백엔드: https://wakain-api-191739349431.asia-northeast3.run.app ✅
+- Supabase: btektycyknkqetmfmywc ✅
+- 분석 완료 영상: 1건 (0220.mp4 — 쿠진 칼 살균기)

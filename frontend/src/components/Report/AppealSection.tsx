@@ -1,20 +1,31 @@
 import type { AppealPoint } from '../../types';
 
 const APPEAL_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  myth_bust:    { label: '신화파괴',   color: 'text-purple-400',  bg: 'bg-purple-500/15' },
-  sensory:      { label: '감각적',     color: 'text-red-400',     bg: 'bg-red-500/15' },
-  specification:{ label: '스펙',       color: 'text-blue-400',    bg: 'bg-blue-500/15' },
-  price:        { label: '가격',       color: 'text-green-400',   bg: 'bg-green-500/15' },
-  process:      { label: '제조공정',   color: 'text-orange-400',  bg: 'bg-orange-500/15' },
-  origin:       { label: '원산지',     color: 'text-amber-700',   bg: 'bg-amber-700/15' },
-  authority:    { label: '권위',       color: 'text-indigo-400',  bg: 'bg-indigo-500/15' },
-  social_proof: { label: '사회적증거', color: 'text-pink-400',    bg: 'bg-pink-500/15' },
-  guarantee:    { label: '보증',       color: 'text-teal-400',    bg: 'bg-teal-500/15' },
-  comparison:   { label: '비교',       color: 'text-yellow-400',  bg: 'bg-yellow-500/15' },
-  urgency:      { label: '긴급',       color: 'text-red-400',     bg: 'bg-red-500/15' },
-  lifestyle:    { label: '라이프스타일', color: 'text-sky-400',   bg: 'bg-sky-500/15' },
-  emotional:    { label: '감성',       color: 'text-purple-400',  bg: 'bg-purple-500/15' },
-  achievement:  { label: '성과',       color: 'text-green-400',   bg: 'bg-green-500/15' },
+  // Rational
+  myth_bust:       { label: '오해반박',     color: 'text-purple-400',  bg: 'bg-purple-500/15' },
+  ingredient:      { label: '원재료',       color: 'text-lime-400',    bg: 'bg-lime-500/15'   },
+  manufacturing:   { label: '제조공정',     color: 'text-orange-400',  bg: 'bg-orange-500/15' },
+  track_record:    { label: '실적',         color: 'text-emerald-400', bg: 'bg-emerald-500/15'},
+  price:           { label: '가격',         color: 'text-green-400',   bg: 'bg-green-500/15'  },
+  comparison:      { label: '비교',         color: 'text-yellow-400',  bg: 'bg-yellow-500/15' },
+  guarantee:       { label: '보장',         color: 'text-teal-400',    bg: 'bg-teal-500/15'   },
+  origin:          { label: '원산지',       color: 'text-amber-400',   bg: 'bg-amber-500/15'  },
+  feature_demo:    { label: '기능시연',     color: 'text-blue-400',    bg: 'bg-blue-500/15'   },
+  spec_data:       { label: '스펙수치',     color: 'text-cyan-400',    bg: 'bg-cyan-500/15'   },
+  // Emotional
+  design_aesthetic: { label: '디자인감성',  color: 'text-red-400',     bg: 'bg-red-500/15'    },
+  authenticity:    { label: '진정성',       color: 'text-stone-400',   bg: 'bg-stone-500/15'  },
+  social_proof:    { label: '사회적증거',   color: 'text-pink-400',    bg: 'bg-pink-500/15'   },
+  urgency:         { label: '긴급성',       color: 'text-red-400',     bg: 'bg-red-500/15'    },
+  lifestyle:       { label: '라이프스타일', color: 'text-sky-400',     bg: 'bg-sky-500/15'    },
+  nostalgia:       { label: '향수',         color: 'text-amber-400',   bg: 'bg-amber-500/15'  },
+  authority:       { label: '권위',         color: 'text-indigo-400',  bg: 'bg-indigo-500/15' },
+  emotional:       { label: '감정',         color: 'text-purple-400',  bg: 'bg-purple-500/15' },
+  // Legacy
+  sensory:         { label: '감각',         color: 'text-red-400',     bg: 'bg-red-500/15'    },
+  specification:   { label: '스펙',         color: 'text-blue-400',    bg: 'bg-blue-500/15'   },
+  process:         { label: '제조공정',     color: 'text-orange-400',  bg: 'bg-orange-500/15' },
+  achievement:     { label: '실적',         color: 'text-green-400',   bg: 'bg-green-500/15'  },
 };
 
 function getAppealConfig(type: string) {

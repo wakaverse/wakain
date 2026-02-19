@@ -183,13 +183,16 @@ def run_phase_3(
     return scenes
 
 
-def run_phase_4(video_path: str, output_dir: str, resolution: int = 720) -> dict:
+def run_phase_4(video_path: str, output_dir: str, resolution: int = 720, frame_quals: list[dict] | None = None) -> dict:
     """Run Phase 4: full video analysis via Gemini."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
     print(f"[Phase 4] Running video analysis (Gemini, full video upload, {resolution}p) ...")
+    if frame_quals:
+        text_count = sum(1 for fq in frame_quals if fq.get("text_overlay") or fq.get("text_overlays"))
+        print(f"          (OCR context: {text_count}/{len(frame_quals)} frames with text)")
     t0 = time.perf_counter()
-    analysis = run_video_analysis(video_path, resolution=resolution)
+    analysis = run_video_analysis(video_path, resolution=resolution, frame_quals=frame_quals)
     print(f"          → done ({time.perf_counter() - t0:.1f}s)")
 
     # Save analysis
@@ -320,8 +323,15 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720) -
     # Phase 3: scene aggregator (local, no API)
     scenes = run_phase_3(output_dir, video_path, temporal=temporal)
 
+    # Load frame_qual results for Phase 4 OCR context
+    _out4, _vn4 = _resolve_output_dir(output_dir, video_path)
+    _qual_path4 = _out4 / f"{_vn4}_frame_qual.json"
+    _frame_quals4 = None
+    if _qual_path4.exists():
+        _frame_quals4 = json.loads(_qual_path4.read_text())
+
     # Phase 4: video analysis (Gemini)
-    video_analysis = run_phase_4(video_path, output_dir, resolution=resolution)
+    video_analysis = run_phase_4(video_path, output_dir, resolution=resolution, frame_quals=_frame_quals4)
 
     # Phase 5: scene merger — merge Phase 3 + Phase 4 (local, no API)
     merged_scenes = run_phase_5(output_dir, video_path, scenes=scenes, video_analysis=video_analysis)
