@@ -1,4 +1,3 @@
-import { Lightbulb, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import type { DropoffAnalysis, VideoRecipe } from '../../types';
 
 interface Props {
@@ -11,87 +10,58 @@ export default function Suggestions({ dropoffAnalysis, effectiveness }: Props) {
 
   return (
     <section>
-      <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-        <span className="text-blue-400">💡</span> 개선 제안
-      </h2>
+      <h2 className="text-base font-semibold text-gray-900 mb-4">개선 제안</h2>
 
-      <div className="grid sm:grid-cols-2 gap-4">
-        {/* Improvement priority */}
-        {improvements.length > 0 && (
-          <div className="bg-gray-900 border border-yellow-500/20 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-4 h-4 text-yellow-400" />
-              <h3 className="font-semibold text-white text-sm">개선 우선순위</h3>
-            </div>
-            <ul className="space-y-2">
-              {improvements.map((item, i) => (
-                <li key={i} className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                    {i + 1}
-                  </span>
-                  <span className="text-sm text-gray-300">{item}</span>
-                </li>
-              ))}
-            </ul>
+      {/* Numbered priority list */}
+      {improvements.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl p-5 mb-4">
+          <div className="space-y-3">
+            {improvements.map((item, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="w-6 h-6 bg-amber-50 text-amber-700 border border-amber-200 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                  {i + 1}
+                </span>
+                <p className="text-sm text-gray-700 leading-relaxed">{item}</p>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Risk zone suggestions */}
-        {dropoffAnalysis.risk_zones?.length > 0 && (
-          <div className="bg-gray-900 border border-red-500/20 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Lightbulb className="w-4 h-4 text-red-400" />
-              <h3 className="font-semibold text-white text-sm">이탈 위험 구간 대책</h3>
+      {/* Risk zones + weak points */}
+      {(dropoffAnalysis.risk_zones?.length > 0 || effectiveness.weak_points?.length > 0) && (
+        <div className="grid sm:grid-cols-2 gap-3">
+          {dropoffAnalysis.risk_zones?.length > 0 && (
+            <div className="bg-red-50 border border-red-100 rounded-xl p-4">
+              <p className="text-xs font-semibold text-red-600 uppercase tracking-widest mb-3">이탈 위험 구간</p>
+              <ul className="space-y-3">
+                {dropoffAnalysis.risk_zones.map((zone, i) => (
+                  <li key={i}>
+                    <span className="font-mono text-xs text-red-500 font-semibold">
+                      {zone.time_range[0]}s – {zone.time_range[1]}s
+                    </span>
+                    <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">{zone.suggestion}</p>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="space-y-3">
-              {dropoffAnalysis.risk_zones.map((zone, i) => (
-                <li key={i} className="text-sm">
-                  <span className="text-red-400 font-mono text-xs">
-                    {zone.time_range[0]}s – {zone.time_range[1]}s
-                  </span>
-                  <p className="text-gray-300 mt-0.5">{zone.suggestion}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          )}
 
-        {/* Standout elements */}
-        {effectiveness.standout_elements?.length > 0 && (
-          <div className="bg-gray-900 border border-green-500/20 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <CheckCircle2 className="w-4 h-4 text-green-400" />
-              <h3 className="font-semibold text-white text-sm">잘 된 점</h3>
+          {effectiveness.weak_points?.length > 0 && (
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">아쉬운 점</p>
+              <ul className="space-y-2">
+                {effectiveness.weak_points.map((el, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                    <span className="text-gray-300 flex-shrink-0 font-bold">×</span>
+                    {el}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="space-y-2">
-              {effectiveness.standout_elements.map((el, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-green-400 mt-0.5 flex-shrink-0">✓</span>
-                  <span className="text-sm text-gray-300">{el}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Weak points */}
-        {effectiveness.weak_points?.length > 0 && (
-          <div className="bg-gray-900 border border-gray-700 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <XCircle className="w-4 h-4 text-gray-400" />
-              <h3 className="font-semibold text-white text-sm">아쉬운 점</h3>
-            </div>
-            <ul className="space-y-2">
-              {effectiveness.weak_points.map((el, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-gray-500 mt-0.5 flex-shrink-0">×</span>
-                  <span className="text-sm text-gray-400">{el}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }

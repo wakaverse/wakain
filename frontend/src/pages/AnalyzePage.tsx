@@ -50,7 +50,6 @@ export default function AnalyzePage() {
     setUploading(true);
     setProgress(0);
 
-    // Simulate upload progress
     const interval = setInterval(() => {
       setProgress((p) => {
         if (p >= 90) { clearInterval(interval); return p; }
@@ -74,8 +73,8 @@ export default function AnalyzePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
       <div className="mb-10">
-        <h1 className="text-3xl font-bold text-white mb-2">영상 분석 시작</h1>
-        <p className="text-gray-400">숏폼 영상을 업로드하면 AI가 자동으로 분석합니다</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">영상 분석 시작</h1>
+        <p className="text-gray-500 text-sm">숏폼 영상을 업로드하면 AI가 자동으로 분석합니다</p>
       </div>
 
       {/* Dropzone */}
@@ -83,32 +82,32 @@ export default function AnalyzePage() {
         {...getRootProps()}
         className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all ${
           isDragActive
-            ? 'border-blue-400 bg-blue-500/10'
-            : 'border-gray-700 hover:border-gray-600 hover:bg-gray-900/50'
-        } ${file ? 'border-green-500/50 bg-green-500/5' : ''}`}
+            ? 'border-blue-400 bg-blue-50'
+            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+        } ${file ? 'border-green-400 bg-green-50' : ''}`}
       >
         <input {...getInputProps()} />
         {file ? (
           <div className="flex flex-col items-center gap-3">
-            <CheckCircle2 className="w-12 h-12 text-green-400" />
+            <CheckCircle2 className="w-12 h-12 text-green-500" />
             <div>
-              <p className="text-white font-medium">{file.name}</p>
-              <p className="text-sm text-gray-400 mt-1">{formatBytes(file.size)}</p>
+              <p className="text-gray-900 font-medium">{file.name}</p>
+              <p className="text-sm text-gray-500 mt-1">{formatBytes(file.size)}</p>
             </div>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-3">
             {isDragActive ? (
               <>
-                <Upload className="w-12 h-12 text-blue-400" />
-                <p className="text-blue-400 font-medium">여기에 놓으세요</p>
+                <Upload className="w-12 h-12 text-blue-500" />
+                <p className="text-blue-600 font-medium">여기에 놓으세요</p>
               </>
             ) : (
               <>
-                <FileVideo className="w-12 h-12 text-gray-500" />
+                <FileVideo className="w-12 h-12 text-gray-300" />
                 <div>
-                  <p className="text-white font-medium">영상을 드래그하거나 클릭하여 선택</p>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-gray-700 font-medium">영상을 드래그하거나 클릭하여 선택</p>
+                  <p className="text-sm text-gray-400 mt-1">
                     .mp4, .mov, .webm · 최대 100MB
                   </p>
                 </div>
@@ -120,7 +119,7 @@ export default function AnalyzePage() {
 
       {/* Error */}
       {error && (
-        <div className="mt-4 flex items-center gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
+        <div className="mt-4 flex items-center gap-2 text-red-600 text-sm bg-red-50 border border-red-100 rounded-lg px-4 py-3">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           {error}
         </div>
@@ -128,17 +127,17 @@ export default function AnalyzePage() {
 
       {/* File info */}
       {file && !uploading && (
-        <div className="mt-4 flex items-center justify-between bg-gray-900 border border-gray-800 rounded-lg px-4 py-3">
+        <div className="mt-4 flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
           <div className="flex items-center gap-3">
-            <FileVideo className="w-5 h-5 text-blue-400" />
+            <FileVideo className="w-5 h-5 text-blue-600" />
             <div>
-              <p className="text-sm text-white font-medium">{file.name}</p>
-              <p className="text-xs text-gray-500">{formatBytes(file.size)}</p>
+              <p className="text-sm text-gray-900 font-medium">{file.name}</p>
+              <p className="text-xs text-gray-400">{formatBytes(file.size)}</p>
             </div>
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); setFile(null); setError(''); }}
-            className="text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -148,13 +147,13 @@ export default function AnalyzePage() {
       {/* Progress bar */}
       {uploading && (
         <div className="mt-6">
-          <div className="flex justify-between text-sm text-gray-400 mb-2">
+          <div className="flex justify-between text-sm text-gray-500 mb-2">
             <span>업로드 중...</span>
             <span>{progress}%</span>
           </div>
-          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 rounded-full transition-all duration-300"
+              className="h-full bg-blue-600 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -165,12 +164,12 @@ export default function AnalyzePage() {
       <button
         onClick={handleSubmit}
         disabled={!file || uploading}
-        className="mt-6 w-full py-3.5 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+        className="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
       >
         {uploading ? '업로드 중...' : '분석 시작'}
       </button>
 
-      <p className="mt-4 text-center text-xs text-gray-600">
+      <p className="mt-4 text-center text-xs text-gray-400">
         무료 플랜 기준 월 3건 · 분석 소요 시간 약 2분
       </p>
     </div>

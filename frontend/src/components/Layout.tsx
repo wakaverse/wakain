@@ -14,12 +14,12 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
-      <header className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-            <BarChart2 className="w-5 h-5 text-blue-500" />
-            <span className="text-white">WakaIn</span>
+            <BarChart2 className="w-5 h-5 text-blue-600" />
+            <span className="text-gray-900">WakaIn</span>
           </Link>
           <nav className="flex items-center gap-1">
             {navLinks.map(({ to, label, icon: Icon }) => (
@@ -28,8 +28,8 @@ export default function Layout({ children }: LayoutProps) {
                 to={to}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   location.pathname === to
-                    ? 'bg-blue-500/10 text-blue-400'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -38,7 +38,7 @@ export default function Layout({ children }: LayoutProps) {
             ))}
             <Link
               to="/analyze"
-              className="ml-2 px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-md transition-colors"
+              className="ml-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
             >
               무료로 분석해보기
             </Link>
@@ -46,8 +46,8 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="border-t border-gray-800 py-6 text-center text-gray-500 text-sm">
-        © 2026 CRABs Inc. | Powered by WakaShorts
+      <footer className="border-t border-gray-100 py-6 text-center text-gray-400 text-sm">
+        © 2026 CRABs Inc.
       </footer>
     </div>
   );
