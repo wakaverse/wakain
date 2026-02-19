@@ -10,8 +10,15 @@ SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_KEY_PRO = os.getenv("GEMINI_API_KEY_PRO")
 
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB
+MAX_FILE_SIZE = 200 * 1024 * 1024  # 200MB
 ALLOWED_EXTENSIONS = {".mp4", ".mov", ".webm"}
+
+# --- Cloudflare R2 (S3-compatible) ---
+R2_ACCOUNT_ID = os.getenv("R2_ACCOUNT_ID", "30394601614039e785c78d10d7e0fbc9")
+R2_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
+R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
+R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "wakain-videos")
+R2_ENDPOINT = f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
 
 # Path to video-analyzer project (used by subprocess worker)
 # Default: /app/video-analyzer in container, sibling dir in local dev

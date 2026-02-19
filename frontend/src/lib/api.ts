@@ -10,19 +10,68 @@ async function authHeaders(): Promise<Record<string, string>> {
   return {};
 }
 
-export async function createJob(file: File): Promise<{ id: string }> {
-  const form = new FormData();
-  form.append('file', file);
-  const res = await fetch(`${API_URL}/api/analyze`, {
+/**
+ * Upload file to R2 via presigned URL, then start analysis.
+ * onProgress fires with 0-100 during the R2 upload phase.
+ */
+export async function createJob(
+  file: File,
+  onProgress?: (percent: number) => void,
+): Promise<{ id: string }> {
+  const headers = await authHeaders();
+
+  // 1. Get presigned upload URL from backend
+  const urlRes = await fetch(`${API_URL}/api/upload-url`, {
     method: 'POST',
-    headers: await authHeaders(),
-    body: form,
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      filename: file.name,
+      content_type: file.type || 'video/mp4',
+    }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: '업로드에 실패했습니다' }));
-    throw new Error(err.detail || '업로드에 실패했습니다');
+  if (!urlRes.ok) {
+    const err = await urlRes.json().catch(() => ({ detail: '업로드 URL 발급에 실패했습니다' }));
+    throw new Error(err.detail || '업로드 URL 발급에 실패했습니다');
   }
-  const data = await res.json();
+  const { upload_url, r2_key } = await urlRes.json();
+
+  // 2. Upload file directly to R2 via presigned URL (with progress)
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', upload_url);
+    xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve();
+      } else {
+        reject(new Error(`R2 업로드 실패 (${xhr.status})`));
+      }
+    };
+    xhr.onerror = () => reject(new Error('R2 업로드 중 네트워크 오류'));
+    xhr.send(file);
+  });
+
+  // 3. Start analysis with R2 key
+  const analyzeRes = await fetch(`${API_URL}/api/analyze`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      r2_key,
+      filename: file.name,
+      file_size_mb: file.size / (1024 * 1024),
+    }),
+  });
+  if (!analyzeRes.ok) {
+    const err = await analyzeRes.json().catch(() => ({ detail: '분석 시작에 실패했습니다' }));
+    throw new Error(err.detail || '분석 시작에 실패했습니다');
+  }
+  const data = await analyzeRes.json();
   return { id: data.job_id };
 }
 

@@ -8,6 +8,9 @@ pydantic>=2.0.0
 # Supabase — use latest to resolve websockets conflict
 supabase>=2.11.0
 
+# Cloudflare R2 (S3-compatible)
+boto3
+
 # --- Video-analyzer pipeline ---
 google-genai>=1.60.0
 opencv-python-headless>=4.9.0

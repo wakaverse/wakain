@@ -6,6 +6,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import boto3
+from botocore.config import Config as BotoConfig
 from supabase import create_client
 
 from app.config import (
@@ -13,11 +15,27 @@ from app.config import (
     SUPABASE_SERVICE_KEY,
     ANALYZER_DIR,
     OUTPUT_DIR,
+    UPLOAD_DIR,
+    R2_ACCESS_KEY_ID,
+    R2_SECRET_ACCESS_KEY,
+    R2_BUCKET_NAME,
+    R2_ENDPOINT,
 )
 
 
 def _supabase():
     return create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+
+def _s3():
+    return boto3.client(
+        "s3",
+        endpoint_url=R2_ENDPOINT,
+        aws_access_key_id=R2_ACCESS_KEY_ID,
+        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        config=BotoConfig(signature_version="s3v4"),
+        region_name="auto",
+    )
 
 
 def _now() -> str:
@@ -28,14 +46,23 @@ def _update_job(job_id: str, **fields) -> None:
     _supabase().table("jobs").update(fields).eq("id", job_id).execute()
 
 
-def run_analysis(job_id: str, video_path: str) -> None:
-    """Run full video-analyzer pipeline and persist results to Supabase."""
+def run_analysis(job_id: str, r2_key: str) -> None:
+    """Download video from R2, run pipeline, persist results, clean up."""
     output_dir = str(OUTPUT_DIR / job_id)
+
+    # Determine local path for downloaded video
+    filename = Path(r2_key).name
+    suffix = Path(filename).suffix
+    video_path = UPLOAD_DIR / f"{job_id}{suffix}"
 
     # Mark job as processing
     _update_job(job_id, status="processing", started_at=_now())
 
     try:
+        # Download from R2
+        s3 = _s3()
+        s3.download_file(R2_BUCKET_NAME, r2_key, str(video_path))
+
         # Use the current Python interpreter (works in both local and container)
         python_bin = sys.executable
 
@@ -44,7 +71,7 @@ def run_analysis(job_id: str, video_path: str) -> None:
                 python_bin,
                 "main.py",
                 "analyze",
-                video_path,
+                str(video_path),
                 "--output",
                 output_dir,
             ],
@@ -112,9 +139,14 @@ def run_analysis(job_id: str, video_path: str) -> None:
             error_message=str(exc)[:2000],
         )
     finally:
-        # Clean up uploaded video
+        # Clean up local video file
         try:
             Path(video_path).unlink(missing_ok=True)
+        except Exception:
+            pass
+        # Clean up video from R2 (privacy)
+        try:
+            _s3().delete_object(Bucket=R2_BUCKET_NAME, Key=r2_key)
         except Exception:
             pass
 

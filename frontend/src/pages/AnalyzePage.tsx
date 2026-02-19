@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Upload, FileVideo, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { createJob } from '../lib/api';
 
-const MAX_SIZE = 100 * 1024 * 1024; // 100MB
+const MAX_SIZE = 200 * 1024 * 1024; // 200MB
 const ACCEPTED_TYPES = { 'video/mp4': ['.mp4'], 'video/quicktime': ['.mov'], 'video/webm': ['.webm'] };
 
 function formatBytes(bytes: number) {
@@ -15,11 +15,13 @@ function formatBytes(bytes: number) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
+type Phase = 'idle' | 'uploading' | 'starting';
+
 export default function AnalyzePage() {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>('');
-  const [uploading, setUploading] = useState(false);
+  const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState(0);
 
   const onDrop = useCallback((accepted: File[], rejected: FileRejection[]) => {
@@ -27,7 +29,7 @@ export default function AnalyzePage() {
     if (rejected.length > 0) {
       const err = rejected[0].errors[0];
       if (err.message.includes('size')) {
-        setError('파일 크기는 100MB 이하만 업로드 가능합니다.');
+        setError('파일 크기는 200MB 이하만 업로드 가능합니다.');
       } else {
         setError('.mp4, .mov, .webm 형식만 업로드 가능합니다.');
       }
@@ -47,28 +49,29 @@ export default function AnalyzePage() {
 
   async function handleSubmit() {
     if (!file) return;
-    setUploading(true);
+    setPhase('uploading');
     setProgress(0);
-
-    const interval = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 90) { clearInterval(interval); return p; }
-        return p + 10;
-      });
-    }, 200);
+    setError('');
 
     try {
-      const { id } = await createJob(file);
-      clearInterval(interval);
-      setProgress(100);
-      await new Promise((r) => setTimeout(r, 300));
+      // Upload to R2 with real progress
+      setPhase('uploading');
+      const { id } = await createJob(file, (percent) => {
+        setProgress(percent);
+        if (percent === 100) {
+          setPhase('starting');
+        }
+      });
       navigate(`/jobs/${id}`);
-    } catch {
-      clearInterval(interval);
-      setError('업로드 중 오류가 발생했습니다. 다시 시도해주세요.');
-      setUploading(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '업로드 중 오류가 발생했습니다. 다시 시도해주세요.');
+      setPhase('idle');
+      setProgress(0);
     }
   }
+
+  const busy = phase !== 'idle';
+  const statusText = phase === 'uploading' ? '업로드 중...' : phase === 'starting' ? '분석 요청 중...' : '';
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
@@ -108,7 +111,7 @@ export default function AnalyzePage() {
                 <div>
                   <p className="text-gray-700 font-medium">영상을 드래그하거나 클릭하여 선택</p>
                   <p className="text-sm text-gray-400 mt-1">
-                    .mp4, .mov, .webm · 최대 100MB
+                    .mp4, .mov, .webm · 최대 200MB
                   </p>
                 </div>
               </>
@@ -126,7 +129,7 @@ export default function AnalyzePage() {
       )}
 
       {/* File info */}
-      {file && !uploading && (
+      {file && !busy && (
         <div className="mt-4 flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
           <div className="flex items-center gap-3">
             <FileVideo className="w-5 h-5 text-blue-600" />
@@ -145,16 +148,18 @@ export default function AnalyzePage() {
       )}
 
       {/* Progress bar */}
-      {uploading && (
+      {busy && (
         <div className="mt-6">
           <div className="flex justify-between text-sm text-gray-500 mb-2">
-            <span>업로드 중...</span>
-            <span>{progress}%</span>
+            <span>{statusText}</span>
+            {phase === 'uploading' && <span>{progress}%</span>}
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-600 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              className={`h-full rounded-full transition-all duration-300 ${
+                phase === 'starting' ? 'bg-green-500' : 'bg-blue-600'
+              }`}
+              style={{ width: phase === 'starting' ? '100%' : `${progress}%` }}
             />
           </div>
         </div>
@@ -163,10 +168,10 @@ export default function AnalyzePage() {
       {/* Submit */}
       <button
         onClick={handleSubmit}
-        disabled={!file || uploading}
+        disabled={!file || busy}
         className="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
       >
-        {uploading ? '업로드 중...' : '분석 시작'}
+        {busy ? statusText : '분석 시작'}
       </button>
 
       <p className="mt-4 text-center text-xs text-gray-400">
