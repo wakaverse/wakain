@@ -41,57 +41,6 @@ class FrameQuant(BaseModel):
 # ── frame_qual (Phase 2: Gemini Flash qualitative) ──────────────────────────
 
 
-# ── Artwork analysis (per-frame) ────────────────────────────────────────────
-
-
-class FrameTypography(BaseModel):
-    """Typography details for text overlays in a frame."""
-    font_family: Literal["gothic", "rounded", "serif", "handwritten", "display", "monospace"]
-    font_weight: Literal["thin", "regular", "bold", "extra_bold"]
-    font_color: str = Field(description="Primary text color (hex)")
-    font_size_ratio: Literal["large", "medium", "small"]
-    has_outline: bool
-    outline_color: Optional[str] = Field(default=None, description="Outline color (hex)")
-    has_shadow: bool
-    has_background: bool
-    background_color: Optional[str] = Field(default=None, description="Background box color (hex)")
-    text_alignment: Literal["left", "center", "right"]
-    line_count: int = Field(description="Number of text lines visible")
-    highlight_technique: Literal[
-        "color_change", "size_increase", "underline", "box_highlight",
-        "glow", "bold_keyword", "none",
-    ]
-    highlight_color: Optional[str] = Field(default=None, description="Highlight color if used (hex)")
-
-
-class LayoutZones(BaseModel):
-    """What occupies each vertical third of the frame."""
-    top: Literal["text", "product", "person", "graphic", "empty", "mixed"]
-    middle: Literal["text", "product", "person", "graphic", "empty", "mixed"]
-    bottom: Literal["text", "product", "person", "graphic", "empty", "mixed"]
-    text_product_overlap: bool = Field(description="Whether text overlaps product area")
-
-
-class ColorDesign(BaseModel):
-    """Color usage strategy in the frame."""
-    primary_color: str = Field(description="Dominant background/theme color (hex)")
-    accent_color: Optional[str] = Field(default=None, description="Emphasis/highlight color (hex)")
-    text_bg_contrast: Literal["high", "medium", "low"]
-    color_harmony: Literal["monochrome", "complementary", "analogous", "triadic", "warm_cool_split"]
-
-
-class FrameArtwork(BaseModel):
-    """Per-frame artwork/design analysis."""
-    typography: Optional[FrameTypography] = Field(default=None, description="Typography details; null if no text")
-    graphic_elements: list[Literal[
-        "icon", "sticker", "emoji", "arrow", "circle_highlight",
-        "underline", "box_border", "gradient_overlay", "pattern_bg",
-        "logo", "badge", "watermark", "none",
-    ]] = Field(default_factory=list)
-    layout_zones: LayoutZones
-    color_design: ColorDesign
-
-
 # ── Scene-level artwork (aggregated) ────────────────────────────────────────
 
 
@@ -110,32 +59,6 @@ class SceneArtwork(BaseModel):
     accent_color: Optional[str] = None
     contrast_level: str = "medium"
     color_harmony: Optional[str] = None
-
-
-# ── Video-level art direction ───────────────────────────────────────────────
-
-
-class ArtDirection(BaseModel):
-    """Overall art direction / visual identity of the video."""
-    tone_and_manner: str = Field(description="Overall visual tone in Korean")
-    heading_font: str = Field(description="Primary heading font family")
-    body_font: str = Field(description="Body/subtitle font family")
-    font_color_system: list[str] = Field(description="Colors used for text (hex list)")
-    highlight_method: str = Field(description="How keywords are emphasized")
-    brand_colors: list[str] = Field(description="Brand/theme colors used (hex)")
-    background_style: Literal[
-        "solid_color", "gradient", "image_bg", "video_bg", "transparent", "mixed",
-    ]
-    color_temperature: Literal["warm", "neutral", "cool"]
-    graphic_style: Literal[
-        "clean_minimal", "bold_graphic", "playful_sticker", "premium_elegant",
-        "retro_vintage", "info_graphic", "hand_drawn", "photo_real",
-    ]
-    recurring_elements: list[str] = Field(description="Repeated visual elements (Korean)")
-    text_position_pattern: str = Field(description="Where text typically appears")
-    frame_composition_rule: str = Field(description="Layout rule in Korean")
-    visual_consistency: Literal["high", "medium", "low"]
-    style_reference: str = Field(description="What this style resembles in Korean")
 
 
 # ── Original models continue ───────────────────────────────────────────────
@@ -260,7 +183,6 @@ class FrameQual(BaseModel):
     attention_element: str = Field(
         description="One-line description of the key attention-grabbing element"
     )
-    artwork: Optional[FrameArtwork] = Field(default=None, description="Artwork/design analysis")
     artwork: Optional[FrameArtwork] = Field(default=None, description="Artwork/design analysis")
 
 
@@ -391,10 +313,9 @@ class Scene(BaseModel):
     description: str = Field(default="", description="Brief description of what happens in this scene")
     attention: Optional[SceneAttention] = None
     transcript_segments: list[TranscriptSegment] = Field(default_factory=list)
-    artwork: Optional[SceneArtwork] = Field(default=None)
+    artwork: Optional[SceneArtwork] = Field(default=None, description="Aggregated artwork/design analysis")
     text_effects: list = Field(default_factory=list)
     appeal_points: list = Field(default_factory=list, description="Persuasion appeal points mapped to this scene by timestamp")
-    artwork: Optional[SceneArtwork] = Field(default=None, description="Aggregated artwork/design analysis")
 
 
 # ── Layer 3: Video Recipe (Phase 5: recipe_builder) ────────────────────────
@@ -814,7 +735,7 @@ class SceneTimingGuide(BaseModel):
     duration: float
     cut_rhythm: str = Field(description="e.g. '0.8s/cut, accelerating'")
     text_timing: str = Field(description="e.g. 'text appears at 0.5s, stays 1.2s'")
-    attention_level: str = Field(description="e.g. 'high attention, peak at 1.2s'")
+    attention_level: str = Field(default="", description="e.g. 'high attention, peak at 1.2s'")
     camera_suggestion: str = Field(description="e.g. 'closeup→wide transition'")
     key_technique: str
 
@@ -824,12 +745,12 @@ class ProductionGuide(BaseModel):
     recommended_cut_rhythm: str
     text_overlay_strategy: str
     camera_movement_notes: str
-    attention_curve_target: str
+    attention_curve_target: str = ""
 
 
 class TemporalProfile(BaseModel):
     total_duration: float
-    attention_arc: str
+    attention_arc: str = ""
     cut_rhythm_summary: str
     dominant_transition: str
     text_density: str
@@ -924,3 +845,48 @@ class VideoRecipe(BaseModel):
     scene_cards: list[SceneCard] = Field(default_factory=list)
     dropoff_analysis: Optional[DropOffAnalysis] = None
     performance_metrics: Optional[PerformanceMetrics] = None
+
+
+# ── Comparator schemas ──────────────────────────────────────────────────────
+
+
+class VideoSummary(BaseModel):
+    """비디오 비교용 단일 영상 요약 / Single video summary for comparison"""
+    video_name: str
+    label: Optional[str] = None  # "success" / "failure" / None
+    duration: float
+    scene_count: int
+    cut_density: float  # 초당 컷 수 / cuts per second
+    appeal_count: int
+    appeal_types: list[str]  # 고유 소구 유형 목록 / unique appeal types used
+    attention_avg: int
+    attention_min: int
+    attention_max: int
+    first_appeal_time: float
+    time_to_cta: Optional[float] = None
+    product_focus_ratio: float
+    text_readability: int
+    info_density: float
+    retention_score: int  # dropoff_analysis.overall_retention_score
+    dominant_appeal_sequence: list[str]  # 순서대로 정렬된 소구 유형 / ordered appeal types
+    art_style: str  # art_direction.tone_and_manner
+
+
+class ComparisonInsight(BaseModel):
+    """비교 인사이트 / Comparison insight"""
+    category: str  # "attention", "appeal", "structure", "artwork"
+    finding: str
+    evidence: str
+    recommendation: str
+
+
+class VideoComparison(BaseModel):
+    """복수 영상 비교 결과 / Multi-video comparison result"""
+    videos: list[VideoSummary]
+    metrics_table: dict[str, list]  # metric_name → [val1, val2, ...]
+    success_patterns: list[str]  # 성공 영상 공통 패턴 / common among success-labeled
+    failure_patterns: list[str]  # 실패 영상 공통 패턴 / common among failure-labeled
+    key_differentiators: list[str]  # 성공/실패 차이점 / success vs failure differences
+    appeal_frequency: dict[str, int]  # appeal_type → 전체 합계
+    winning_combinations: list[str]  # 성공 영상의 소구 시퀀스 / frequent appeal sequences in success videos
+    insights: list[ComparisonInsight]
