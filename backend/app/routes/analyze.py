@@ -1,7 +1,7 @@
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, UploadFile, File
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile, File
 from supabase import create_client
 
 from app.config import (
@@ -11,6 +11,7 @@ from app.config import (
     ALLOWED_EXTENSIONS,
     UPLOAD_DIR,
 )
+from app.auth import get_current_user
 from app.worker import run_analysis
 
 router = APIRouter()
@@ -24,6 +25,7 @@ def get_supabase():
 async def analyze_video(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
+    user: dict = Depends(get_current_user),
 ):
     # Validate extension
     suffix = Path(file.filename).suffix.lower()
@@ -51,6 +53,7 @@ async def analyze_video(
     size_mb = len(content) / (1024 * 1024)
     supabase.table("jobs").insert({
         "id": job_id,
+        "user_id": user["id"],
         "status": "pending",
         "video_name": file.filename,
         "video_size_mb": round(size_mb, 2),

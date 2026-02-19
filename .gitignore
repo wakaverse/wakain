@@ -3,3 +3,4 @@ backend/venv/
 backend/uploads/
 backend/output/
 backend/__pycache__/
+frontend/.env

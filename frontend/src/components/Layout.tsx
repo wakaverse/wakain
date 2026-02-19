@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { BarChart2, Upload, LayoutDashboard } from 'lucide-react';
+import { BarChart2, Upload, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -7,6 +8,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const { user, loading, signInWithGoogle, signOut } = useAuth();
 
   const navLinks = [
     { to: '/dashboard', label: '대시보드', icon: LayoutDashboard },
@@ -42,6 +44,25 @@ export default function Layout({ children }: LayoutProps) {
             >
               무료로 분석해보기
             </Link>
+            {!loading && (
+              user ? (
+                <button
+                  onClick={signOut}
+                  className="ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  로그아웃
+                </button>
+              ) : (
+                <button
+                  onClick={signInWithGoogle}
+                  className="ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Google 로그인
+                </button>
+              )
+            )}
           </nav>
         </div>
       </header>
