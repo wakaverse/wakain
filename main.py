@@ -291,6 +291,21 @@ def run_phase_6(
 
 def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720) -> None:
     """Run all phases end-to-end."""
+    out, video_name = _resolve_output_dir(output_dir, video_path)
+
+    # Phase 0.5: PySceneDetect — run on original video (full fps, resolution-independent)
+    from src.scene_detect import detect_scenes
+    print(f"[Phase 0.5] Running PySceneDetect (original video, full fps) ...")
+    t0 = time.perf_counter()
+    scene_boundaries, cut_timestamps = detect_scenes(str(video_path))
+    print(f"            → {len(scene_boundaries)} scenes, {len(cut_timestamps)} cuts ({time.perf_counter() - t0:.1f}s)")
+    sd_path = out / f"{video_name}_scene_detect.json"
+    sd_path.write_text(json.dumps({
+        "boundaries": scene_boundaries,
+        "cut_timestamps": cut_timestamps,
+    }, indent=2))
+    print(f"            → saved to {sd_path}")
+
     # Phase 1+2: frame extraction + quant + qual
     run_phase_1_2(video_path, output_dir, quant_only=False, resolution=resolution)
 
