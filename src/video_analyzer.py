@@ -28,7 +28,7 @@ from .schemas import (
 )
 
 MODEL = "gemini-2.5-flash"
-MAX_UPLOAD_SIZE_MB = 20
+MAX_UPLOAD_SIZE_MB = 10
 
 SYSTEM_INSTRUCTION = """\
 You are a shortform marketing video analyst specialising in Korean commerce ads.
