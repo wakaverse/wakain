@@ -10,7 +10,6 @@ from .schemas import (
     ContentSummary,
     EffectivenessSignals,
     Scene,
-    SceneEnergy,
     TranscriptSegment,
     VisualSummary,
 )
@@ -110,7 +109,7 @@ def merge_analysis(
             visual_summary=scene.visual_summary,
             content_summary=scene.content_summary,
             effectiveness_signals=scene.effectiveness_signals,
-            energy=scene.energy,
+            attention=scene.attention,
             transcript_segments=matched_transcript,
             text_effects=matched_text_effects,
             appeal_points=matched_appeals,

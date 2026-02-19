@@ -15,8 +15,8 @@ from .schemas import (
     FrameQual,
     FrameQuant,
     Scene,
+    SceneAttention,
     SceneArtwork,
-    SceneEnergy,
     SceneHumanElement,
     SceneTextOverlay,
     TemporalAnalysis,
@@ -247,35 +247,42 @@ def _compute_content_summary(
     }
 
 
-# ── Scene energy from temporal data ─────────────────────────────────────────
+# ── Scene attention from temporal data ───────────────────────────────────────
+
+_SECTION_TO_LEVEL = {
+    "정적": "low",
+    "중": "medium",
+    "강": "high",
+    "클라이막스": "peak",
+}
 
 
-def _compute_scene_energy(
+def _compute_scene_attention(
     temporal: TemporalAnalysis,
     time_range: list[float],
 ) -> dict | None:
-    """Compute energy stats for a scene from temporal energy curve."""
+    """Compute attention stats (0-100) for a scene from temporal attention curve."""
     s_start, s_end = time_range
     points = [
-        p for p in temporal.energy_curve.points
+        p for p in temporal.attention_curve.points
         if s_start <= p.timestamp <= s_end
     ]
     if not points:
         return None
 
     scores = [p.score for p in points]
-    avg_score = round(sum(scores) / len(scores), 3)
+    attention_score = int(round(sum(scores) / len(scores)))
     peak_point = max(points, key=lambda p: p.score)
-    peak_score = round(peak_point.score, 3)
+    attention_peak = peak_point.score
     peak_timestamp = round(peak_point.timestamp, 2)
-    section = peak_point.section
-    is_climax = peak_score >= 0.75
+    attention_level = _SECTION_TO_LEVEL.get(peak_point.section, "medium")
+    is_climax = attention_peak >= 75
 
     return {
-        "avg_score": avg_score,
-        "peak_score": peak_score,
+        "attention_score": attention_score,
+        "attention_peak": attention_peak,
         "peak_timestamp": peak_timestamp,
-        "section": section,
+        "attention_level": attention_level,
         "is_climax": is_climax,
     }
 
@@ -418,11 +425,11 @@ def aggregate_scenes(
         )
         content_summary = _compute_content_summary(grp_quals, grp_quants)
 
-        energy = None
+        attention = None
         if temporal:
-            energy_data = _compute_scene_energy(temporal, time_range)
-            if energy_data:
-                energy = SceneEnergy(**energy_data)
+            attention_data = _compute_scene_attention(temporal, time_range)
+            if attention_data:
+                attention = SceneAttention(**attention_data)
 
         artwork = _compute_scene_artwork(grp_quals)
 
@@ -438,7 +445,7 @@ def aggregate_scenes(
                 information_density="medium",
                 emotional_trigger="none",
             ),
-            energy=energy,
+            attention=attention,
             artwork=artwork,
         )
         scenes.append(scene)

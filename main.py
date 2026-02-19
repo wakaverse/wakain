@@ -121,7 +121,7 @@ def run_phase_2_5(output_dir: str, video_path: str) -> TemporalAnalysis:
     temporal = run_temporal_analysis(quants, quals)
     elapsed = time.perf_counter() - t0
     print(f"            → done ({elapsed:.1f}s)")
-    print(f"            → energy: {temporal.energy_curve.energy_arc}, "
+    print(f"            → attention: {temporal.attention_curve.attention_arc}, "
           f"cuts: {temporal.cut_rhythm.total_cuts}, "
           f"transitions: {temporal.transition_texture.dominant_type}")
 

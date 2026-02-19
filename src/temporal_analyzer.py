@@ -11,14 +11,14 @@ from collections import Counter
 from typing import Optional
 
 from .schemas import (
+    AttentionCurve,
+    AttentionPoint,
     BRollSegment,
     CaptionPattern,
     ColorChangeCurve,
     ColorChangePoint,
     ColorShift,
     CutRhythm,
-    EnergyCurve,
-    EnergyPoint,
     ExposureCurve,
     ExposureSegment,
     FrameQual,
@@ -37,17 +37,17 @@ from .schemas import (
 # Frame interval assumed from 2fps extraction
 FRAME_INTERVAL = 0.5
 
-# ── 1. Energy Curve ──────────────────────────────────────────────────────────
+# ── 1. Attention Curve ───────────────────────────────────────────────────────
 
 
-def _analyse_energy(quants: list[FrameQuant]) -> EnergyCurve:
-    """Per-frame energy score from edge_diff + color_diff + brightness delta."""
+def _analyse_attention(quants: list[FrameQuant]) -> AttentionCurve:
+    """Per-frame attention score (0-100) from edge_diff + color_diff + brightness delta."""
     if not quants:
-        return EnergyCurve(
-            points=[], peak_timestamps=[], avg_energy=0.0, energy_arc="flat",
+        return AttentionCurve(
+            points=[], peak_timestamps=[], attention_avg=0, attention_arc="flat",
         )
 
-    points: list[EnergyPoint] = []
+    points: list[AttentionPoint] = []
     for i, q in enumerate(quants):
         # Normalize components to 0-1 range
         edge_norm = min(q.edge_diff / 60.0, 1.0)  # 60 is high edge_diff
@@ -57,62 +57,63 @@ def _analyse_energy(quants: list[FrameQuant]) -> EnergyCurve:
             brightness_delta = abs(q.brightness - quants[i - 1].brightness)
         bright_norm = min(brightness_delta / 0.3, 1.0)
 
-        score = round(edge_norm * 0.4 + color_norm * 0.4 + bright_norm * 0.2, 3)
+        raw = edge_norm * 0.4 + color_norm * 0.4 + bright_norm * 0.2
+        score = int(round(raw * 100))
 
-        if score > 0.75:
+        if score > 75:
             section = "클라이막스"
-        elif score > 0.45:
+        elif score > 45:
             section = "강"
-        elif score > 0.2:
+        elif score > 20:
             section = "중"
         else:
             section = "정적"
 
-        points.append(EnergyPoint(
+        points.append(AttentionPoint(
             timestamp=q.timestamp, score=score, section=section,
         ))
 
     # Find peaks: local maxima above threshold
     scores = [p.score for p in points]
-    avg_energy = round(sum(scores) / len(scores), 3)
+    attention_avg = int(round(sum(scores) / len(scores)))
 
     peak_timestamps: list[float] = []
     for i in range(1, len(scores) - 1):
-        if scores[i] > scores[i - 1] and scores[i] > scores[i + 1] and scores[i] > 0.5:
+        if scores[i] > scores[i - 1] and scores[i] > scores[i + 1] and scores[i] > 50:
             peak_timestamps.append(points[i].timestamp)
     # Also check first and last
-    if len(scores) >= 2 and scores[0] > scores[1] and scores[0] > 0.5:
+    if len(scores) >= 2 and scores[0] > scores[1] and scores[0] > 50:
         peak_timestamps.insert(0, points[0].timestamp)
-    if len(scores) >= 2 and scores[-1] > scores[-2] and scores[-1] > 0.5:
+    if len(scores) >= 2 and scores[-1] > scores[-2] and scores[-1] > 50:
         peak_timestamps.append(points[-1].timestamp)
 
-    # Determine energy arc
+    # Determine attention arc
     n = len(scores)
     if n < 4:
-        energy_arc = "flat"
+        attention_arc = "flat"
     else:
         first_quarter = sum(scores[: n // 4]) / max(n // 4, 1)
         last_quarter = sum(scores[3 * n // 4 :]) / max(n - 3 * n // 4, 1)
-        mid_peak = max(scores[n // 4 : 3 * n // 4]) if n > 2 else avg_energy
+        mid_peak = max(scores[n // 4 : 3 * n // 4]) if n > 2 else attention_avg
 
         if mid_peak > first_quarter * 1.5 and mid_peak > last_quarter * 1.5:
-            energy_arc = "building→peak→fade"
+            attention_arc = "building→peak→fade"
         elif last_quarter > first_quarter * 1.3:
-            energy_arc = "building"
+            attention_arc = "building"
         elif first_quarter > last_quarter * 1.3:
-            energy_arc = "fading"
-        elif avg_energy > 0.45:
-            energy_arc = "sustained_high"
-        elif avg_energy < 0.2:
-            energy_arc = "sustained_low"
+            attention_arc = "fading"
+        elif attention_avg > 45:
+            attention_arc = "sustained_high"
+        elif attention_avg < 20:
+            attention_arc = "sustained_low"
         else:
-            energy_arc = "flat"
+            attention_arc = "flat"
 
-    return EnergyCurve(
+    return AttentionCurve(
         points=points,
         peak_timestamps=peak_timestamps,
-        avg_energy=avg_energy,
-        energy_arc=energy_arc,
+        attention_avg=attention_avg,
+        attention_arc=attention_arc,
     )
 
 
@@ -760,7 +761,7 @@ class TemporalAnalyzer:
     def analyse(self) -> TemporalAnalysis:
         """Run all 11 temporal analyses and return TemporalAnalysis."""
         return TemporalAnalysis(
-            energy_curve=_analyse_energy(self.quants),
+            attention_curve=_analyse_attention(self.quants),
             cut_rhythm=_analyse_cut_rhythm(self.quants, self.cut_timestamps),
             playback_speed=_analyse_playback_speed(self.quants),
             text_dwell=_analyse_text_dwell(self.quals),

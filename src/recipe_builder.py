@@ -9,18 +9,22 @@ from collections import Counter
 from pathlib import Path
 from typing import Optional
 
+from .dropoff_predictor import predict_dropoff
 from .schemas import (
     ArtDirection,
     Audio,
     BrandVisibility,
+    DropOffAnalysis,
     EffectivenessAssessment,
     FrameQual,
     FrameQuant,
     Meta,
     Music,
+    PerformanceMetrics,
     ProductionGuide,
     ProductStrategy,
     Scene,
+    SceneCard,
     SceneSequenceItem,
     SceneTimingGuide,
     SFX,
@@ -294,8 +298,8 @@ def _build_temporal_profile(
 ) -> TemporalProfile:
     """Summarise key temporal patterns into a compact profile."""
     total_duration = 0.0
-    if temporal.energy_curve.points:
-        pts = temporal.energy_curve.points
+    if temporal.attention_curve.points:
+        pts = temporal.attention_curve.points
         total_duration = pts[-1].timestamp - pts[0].timestamp + 0.5
 
     # Cut rhythm summary
@@ -329,7 +333,7 @@ def _build_temporal_profile(
 
     return TemporalProfile(
         total_duration=round(total_duration, 2),
-        energy_arc=temporal.energy_curve.energy_arc,
+        attention_arc=temporal.attention_curve.attention_arc,
         cut_rhythm_summary=cut_summary,
         dominant_transition=temporal.transition_texture.dominant_type,
         text_density=text_density,
@@ -345,27 +349,27 @@ def _build_production_guide(
     scene_guides: list[SceneTimingGuide] = []
 
     # Pre-index temporal data by timestamp range
-    energy_pts = {round(p.timestamp, 2): p for p in temporal.energy_curve.points}
+    attention_pts_map = {round(p.timestamp, 2): p for p in temporal.attention_curve.points}
     cut_ts_set = set(temporal.cut_rhythm.cut_timestamps)
 
     for scene in scenes:
         s_start, s_end = scene.time_range
         scene_duration = scene.duration
 
-        # Energy level for this scene
-        scene_energy_pts = [
-            p for p in temporal.energy_curve.points
+        # Attention level for this scene
+        scene_attention_pts = [
+            p for p in temporal.attention_curve.points
             if s_start <= p.timestamp <= s_end
         ]
-        if scene_energy_pts:
-            avg_e = sum(p.score for p in scene_energy_pts) / len(scene_energy_pts)
-            peak_in_scene = [p for p in scene_energy_pts if p.score > 0.5]
+        if scene_attention_pts:
+            avg_a = sum(p.score for p in scene_attention_pts) / len(scene_attention_pts)
+            peak_in_scene = [p for p in scene_attention_pts if p.score > 50]
             if peak_in_scene:
                 peak_ts = max(peak_in_scene, key=lambda p: p.score)
-                energy_desc = f"{peak_ts.section} energy, peak at {peak_ts.timestamp:.1f}s (score {peak_ts.score:.2f})"
+                energy_desc = f"{peak_ts.section} attention, peak at {peak_ts.timestamp:.1f}s (score {peak_ts.score})"
             else:
-                section = scene_energy_pts[0].section
-                energy_desc = f"{section} energy, avg score {avg_e:.2f}"
+                section = scene_attention_pts[0].section
+                energy_desc = f"{section} attention, avg score {int(avg_a)}"
         else:
             energy_desc = "no data"
 
@@ -422,7 +426,7 @@ def _build_production_guide(
             duration=scene.duration,
             cut_rhythm=cut_desc,
             text_timing=text_desc,
-            energy_level=energy_desc,
+            attention_level=energy_desc,
             camera_suggestion=camera_desc,
             key_technique=scene.content_summary.key_action,
         ))
@@ -450,17 +454,194 @@ def _build_production_guide(
         camera_notes.append(f"{broll_count} B-roll segments")
     camera_notes_str = ", ".join(camera_notes) if camera_notes else "static camera work"
 
-    ec = temporal.energy_curve
-    energy_target = f"{ec.energy_arc}, avg energy {ec.avg_energy:.2f}"
-    if ec.peak_timestamps:
-        energy_target += f", peaks at {', '.join(f'{t:.1f}s' for t in ec.peak_timestamps)}"
+    ac = temporal.attention_curve
+    attention_target = f"{ac.attention_arc}, avg attention {ac.attention_avg}"
+    if ac.peak_timestamps:
+        attention_target += f", peaks at {', '.join(f'{t:.1f}s' for t in ac.peak_timestamps)}"
 
     return ProductionGuide(
         scene_guides=scene_guides,
         recommended_cut_rhythm=recommended_rhythm,
         text_overlay_strategy=text_strategy,
         camera_movement_notes=camera_notes_str,
-        energy_curve_target=energy_target,
+        attention_curve_target=attention_target,
+    )
+
+
+def _build_scene_cards(
+    scenes: list[Scene],
+    production_guide: Optional["ProductionGuide"] = None,
+) -> list[SceneCard]:
+    """Build SceneCards by merging scenes with production_guide scene guides."""
+    guide_map: dict[int, SceneTimingGuide] = {}
+    if production_guide:
+        for g in production_guide.scene_guides:
+            guide_map[g.scene_id] = g
+
+    cards: list[SceneCard] = []
+    for scene in scenes:
+        guide = guide_map.get(scene.scene_id)
+
+        # Attention
+        attn_score = 0
+        attn_peak = 0
+        attn_level = "low"
+        if scene.attention:
+            attn_score = scene.attention.attention_score
+            attn_peak = scene.attention.attention_peak
+            attn_level = scene.attention.attention_level
+
+        # Visual direction
+        vs = scene.visual_summary
+        cs = scene.content_summary
+
+        # Cut rhythm description
+        cut_count = vs.cut_count
+        if guide and guide.cut_rhythm:
+            cut_rhythm = guide.cut_rhythm
+        else:
+            avg_iv = round(scene.duration / max(cut_count, 1), 1)
+            cut_rhythm = f"{cut_count} cuts, {avg_iv}s/cut"
+
+        # Text overlays as dicts
+        text_overlays: list[dict] = []
+        for t in cs.text_overlays:
+            if hasattr(t, "model_dump"):
+                text_overlays.append(t.model_dump())
+            elif isinstance(t, dict):
+                text_overlays.append(t)
+
+        # Font style from artwork
+        font_style: Optional[str] = None
+        if scene.artwork:
+            parts = [
+                p for p in [
+                    scene.artwork.typography_style,
+                    scene.artwork.typography_weight,
+                    scene.artwork.text_color_primary,
+                ]
+                if p
+            ]
+            font_style = " ".join(parts) if parts else None
+
+        # Narration from transcript
+        narration: Optional[str] = None
+        if scene.transcript_segments:
+            narration = " ".join(seg.text for seg in scene.transcript_segments[:3])
+
+        # Graphic style: derive from artwork or default
+        graphic_style = "photo_real"
+        if scene.artwork and scene.artwork.graphic_elements:
+            elems = scene.artwork.graphic_elements
+            if any(e in elems for e in ("icon", "sticker", "emoji")):
+                graphic_style = "bold_graphic"
+            elif any(e in elems for e in ("gradient_overlay", "pattern_bg")):
+                graphic_style = "info_graphic"
+
+        cards.append(SceneCard(
+            scene_id=scene.scene_id,
+            time_range=scene.time_range,
+            duration=scene.duration,
+            role=scene.role,
+            description=scene.description,
+            appeal_points=scene.appeal_points,
+            shot_type=vs.dominant_shot,
+            camera_motion=vs.motion_level,
+            composition=vs.composition,
+            subject=cs.subject_type,
+            product_visibility=cs.product_visibility,
+            attention_score=attn_score,
+            attention_peak=attn_peak,
+            attention_level=attn_level,
+            cut_count=cut_count,
+            cut_rhythm=cut_rhythm,
+            transition_in=vs.transition_in,
+            transition_out=vs.transition_out,
+            text_overlays=text_overlays,
+            color_palette=vs.color_palette,
+            graphic_style=graphic_style,
+            font_style=font_style,
+            narration=narration,
+            sound_direction="BGM 유지",
+        ))
+
+    return cards
+
+
+def _compute_performance_metrics(
+    scenes: list[Scene],
+    total_duration: float,
+    total_cuts: int,
+) -> PerformanceMetrics:
+    """Compute performance metrics from scene data."""
+    # brand_exposure_sec: scenes where product is visibly featured
+    brand_scenes = [
+        s for s in scenes
+        if s.content_summary.product_visibility in ("full", "partial", "in_use")
+    ]
+    brand_exposure_sec = round(sum(s.duration for s in brand_scenes), 2)
+
+    # product_focus_ratio: % scenes with product focus (0-100)
+    product_focus_ratio = round(len(brand_scenes) / max(len(scenes), 1) * 100, 1)
+
+    # text_readability_score: heuristic from text overlay count × avg scene duration
+    total_text_items = sum(len(s.content_summary.text_overlays) for s in scenes)
+    avg_duration = total_duration / max(len(scenes), 1)
+    text_readability_score = min(100, int(total_text_items * avg_duration * 5))
+
+    # time_to_first_appeal: earliest appeal timestamp
+    first_appeal_t = total_duration
+    for scene in scenes:
+        for ap in scene.appeal_points:
+            vp = ap.get("visual_proof", {})
+            ts = vp.get("timestamp")
+            if ts is not None and float(ts) < first_appeal_t:
+                first_appeal_t = float(ts)
+    time_to_first_appeal = round(
+        first_appeal_t if first_appeal_t < total_duration else 0.0, 2
+    )
+
+    # time_to_cta
+    cta_scenes = [s for s in scenes if s.role == "cta"]
+    time_to_cta = round(cta_scenes[0].time_range[0], 2) if cta_scenes else None
+
+    # appeal stats
+    all_appeals = [ap for s in scenes for ap in s.appeal_points]
+    appeal_count = len(all_appeals)
+    appeal_diversity = len(set(ap.get("type", "") for ap in all_appeals))
+
+    # info_density: (appeals + text_effects + transcript_segments) / total_duration
+    total_text_effects = sum(len(s.text_effects) for s in scenes)
+    total_transcript_segs = sum(len(s.transcript_segments) for s in scenes)
+    info_density = round(
+        (appeal_count + total_text_effects + total_transcript_segs) / max(total_duration, 1),
+        3,
+    )
+
+    # cut_density: cuts/sec
+    cut_density = round(total_cuts / max(total_duration, 1), 3)
+
+    # attention_avg
+    attn_scores = [s.attention.attention_score for s in scenes if s.attention]
+    attention_avg = int(round(sum(attn_scores) / len(attn_scores))) if attn_scores else 0
+
+    # attention_valley_count: scenes with attention_score < 30
+    attention_valley_count = sum(
+        1 for s in scenes if s.attention and s.attention.attention_score < 30
+    )
+
+    return PerformanceMetrics(
+        brand_exposure_sec=brand_exposure_sec,
+        product_focus_ratio=product_focus_ratio,
+        text_readability_score=text_readability_score,
+        time_to_first_appeal=time_to_first_appeal,
+        time_to_cta=time_to_cta,
+        info_density=info_density,
+        appeal_count=appeal_count,
+        appeal_diversity=appeal_diversity,
+        cut_density=cut_density,
+        attention_avg=attention_avg,
+        attention_valley_count=attention_valley_count,
     )
 
 
@@ -668,6 +849,28 @@ def build_recipe(
         temporal_profile = _build_temporal_profile(temporal)
         production_guide = _build_production_guide(scenes, temporal)
 
+    # ── Scene cards (scenes + production_guide merged) ───────────────────
+    scene_cards = _build_scene_cards(scenes, production_guide)
+
+    # ── Drop-off analysis ────────────────────────────────────────────────
+    dropoff_analysis: Optional[DropOffAnalysis] = None
+    try:
+        dropoff_analysis = predict_dropoff(scenes)
+    except Exception as e:
+        print(f"  ⚠ Drop-off analysis error: {e}")
+
+    # ── Performance metrics ──────────────────────────────────────────────
+    total_duration = sum(s.duration for s in scenes)
+    if quants:
+        total_cuts = sum(1 for q in quants[1:] if q.edge_diff > 40)
+    else:
+        total_cuts = sum(s.visual_summary.cut_count for s in scenes)
+    performance_metrics: Optional[PerformanceMetrics] = None
+    try:
+        performance_metrics = _compute_performance_metrics(scenes, total_duration, total_cuts)
+    except Exception as e:
+        print(f"  ⚠ Performance metrics error: {e}")
+
     return VideoRecipe(
         meta=meta,
         structure=structure,
@@ -680,4 +883,7 @@ def build_recipe(
         scenes=[s for s in scenes],
         temporal_profile=temporal_profile,
         production_guide=production_guide,
+        scene_cards=scene_cards,
+        dropoff_analysis=dropoff_analysis,
+        performance_metrics=performance_metrics,
     )

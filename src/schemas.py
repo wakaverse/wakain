@@ -291,12 +291,12 @@ class SceneHumanElement(BaseModel):
     gesture: str = Field(description="Most common gesture")
 
 
-class SceneEnergy(BaseModel):
-    avg_score: float
-    peak_score: float
+class SceneAttention(BaseModel):
+    attention_score: int = Field(description="Average attention score 0-100")
+    attention_peak: int = Field(description="Peak attention score 0-100")
     peak_timestamp: float
-    section: Literal["강", "중", "정적", "클라이막스"]
-    is_climax: bool = Field(description="True if peak_score >= 0.75")
+    attention_level: str = Field(description="low/medium/high/peak")
+    is_climax: bool = Field(description="True if attention_peak >= 75")
 
 
 class VisualSummary(BaseModel):
@@ -389,7 +389,7 @@ class Scene(BaseModel):
     content_summary: ContentSummary
     effectiveness_signals: EffectivenessSignals
     description: str = Field(default="", description="Brief description of what happens in this scene")
-    energy: Optional[SceneEnergy] = None
+    attention: Optional[SceneAttention] = None
     transcript_segments: list[TranscriptSegment] = Field(default_factory=list)
     artwork: Optional[SceneArtwork] = Field(default=None)
     text_effects: list = Field(default_factory=list)
@@ -666,17 +666,17 @@ class EffectivenessAssessment(BaseModel):
 # ── Layer 2.5: Temporal Analysis (Phase 2.5: temporal_analyzer) ──────────────
 
 
-class EnergyPoint(BaseModel):
+class AttentionPoint(BaseModel):
     timestamp: float
-    score: float = Field(description="Energy score 0.0-1.0")
+    score: int = Field(description="Attention score 0-100")
     section: Literal["강", "중", "정적", "클라이막스"]
 
 
-class EnergyCurve(BaseModel):
-    points: list[EnergyPoint]
-    peak_timestamps: list[float] = Field(description="Timestamps of energy peaks")
-    avg_energy: float
-    energy_arc: str = Field(description="Overall energy arc description, e.g. 'building→peak→fade'")
+class AttentionCurve(BaseModel):
+    points: list[AttentionPoint]
+    peak_timestamps: list[float] = Field(description="Timestamps of attention peaks")
+    attention_avg: int
+    attention_arc: str = Field(description="Overall attention arc description, e.g. 'building→peak→fade'")
 
 
 class CutRhythm(BaseModel):
@@ -791,7 +791,7 @@ class TransitionTexture(BaseModel):
 
 
 class TemporalAnalysis(BaseModel):
-    energy_curve: EnergyCurve
+    attention_curve: AttentionCurve
     cut_rhythm: CutRhythm
     playback_speed: list[PlaybackSpeedSegment]
     text_dwell: TextDwellAnalysis
@@ -814,7 +814,7 @@ class SceneTimingGuide(BaseModel):
     duration: float
     cut_rhythm: str = Field(description="e.g. '0.8s/cut, accelerating'")
     text_timing: str = Field(description="e.g. 'text appears at 0.5s, stays 1.2s'")
-    energy_level: str = Field(description="e.g. 'high energy, peak at 1.2s'")
+    attention_level: str = Field(description="e.g. 'high attention, peak at 1.2s'")
     camera_suggestion: str = Field(description="e.g. 'closeup→wide transition'")
     key_technique: str
 
@@ -824,16 +824,89 @@ class ProductionGuide(BaseModel):
     recommended_cut_rhythm: str
     text_overlay_strategy: str
     camera_movement_notes: str
-    energy_curve_target: str
+    attention_curve_target: str
 
 
 class TemporalProfile(BaseModel):
     total_duration: float
-    energy_arc: str
+    attention_arc: str
     cut_rhythm_summary: str
     dominant_transition: str
     text_density: str
     product_human_balance: str
+
+
+class SceneCard(BaseModel):
+    """씬별 통합 제작 지시서 / Integrated Scene Production Brief"""
+    scene_id: int
+    time_range: list[float]
+    duration: float
+
+    # Role & Narrative
+    role: str
+    description: str
+
+    # Appeal (소구)
+    appeal_points: list[dict]
+
+    # Visual Direction (촬영 지시)
+    shot_type: str
+    camera_motion: str
+    composition: str
+    subject: str
+    product_visibility: str
+
+    # Attention & Rhythm (집중도 & 리듬)
+    attention_score: int
+    attention_peak: int
+    attention_level: str
+    cut_count: int
+    cut_rhythm: str
+    transition_in: str
+    transition_out: str
+
+    # Text & Art (텍스트 & 아트)
+    text_overlays: list[dict]
+    color_palette: list[str]
+    graphic_style: str
+    font_style: Optional[str] = None
+
+    # Audio (오디오)
+    narration: Optional[str] = None
+    sound_direction: str
+
+
+class DropOffZone(BaseModel):
+    """이탈 위험 구간 / Drop-off Risk Zone"""
+    time_range: tuple[float, float]
+    risk_score: int
+    risk_level: str
+    risk_factors: list[str]
+    suggestion: str
+
+
+class DropOffAnalysis(BaseModel):
+    """이탈 예측 분석 / Drop-off Prediction Analysis"""
+    risk_zones: list[DropOffZone]
+    safe_zones: list[tuple[float, float]]
+    overall_retention_score: int
+    worst_zone: Optional[DropOffZone] = None
+    improvement_priority: list[str]
+
+
+class PerformanceMetrics(BaseModel):
+    """퍼포먼스 지표 / Performance Metrics"""
+    brand_exposure_sec: float
+    product_focus_ratio: float
+    text_readability_score: int
+    time_to_first_appeal: float
+    time_to_cta: Optional[float] = None
+    info_density: float
+    appeal_count: int
+    appeal_diversity: int
+    cut_density: float
+    attention_avg: int
+    attention_valley_count: int
 
 
 class VideoRecipe(BaseModel):
@@ -848,3 +921,6 @@ class VideoRecipe(BaseModel):
     scenes: list[Scene]
     temporal_profile: Optional[TemporalProfile] = None
     production_guide: Optional[ProductionGuide] = None
+    scene_cards: list[SceneCard] = Field(default_factory=list)
+    dropoff_analysis: Optional[DropOffAnalysis] = None
+    performance_metrics: Optional[PerformanceMetrics] = None
