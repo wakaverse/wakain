@@ -48,14 +48,14 @@ def _resolve_output_dir(output_base: str, video_path: str) -> Path:
     return out, video_name
 
 
-def run_phase_1_2(video_path: str, output_dir: str, quant_only: bool) -> None:
+def run_phase_1_2(video_path: str, output_dir: str, quant_only: bool, resolution: int = 720) -> None:
     """Run Phase 1 (frame_quant) + Phase 2 (frame_qual)."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
     # ── Phase 0: Frame extraction ────────────────────────────────────────
-    print(f"[Phase 0] Extracting frames at 2fps from {video_path} ...")
+    print(f"[Phase 0] Extracting frames at 2fps from {video_path} ({resolution}p) ...")
     t0 = time.perf_counter()
-    frames = extract_frames(video_path)
+    frames = extract_frames(video_path, max_dimension=resolution)
     print(f"          → {len(frames)} frames extracted ({time.perf_counter() - t0:.1f}s)")
 
     if not frames:
@@ -178,13 +178,13 @@ def run_phase_3(
     return scenes
 
 
-def run_phase_4(video_path: str, output_dir: str) -> dict:
+def run_phase_4(video_path: str, output_dir: str, resolution: int = 720) -> dict:
     """Run Phase 4: full video analysis via Gemini."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
-    print(f"[Phase 4] Running video analysis (Gemini, full video upload) ...")
+    print(f"[Phase 4] Running video analysis (Gemini, full video upload, {resolution}p) ...")
     t0 = time.perf_counter()
-    analysis = run_video_analysis(video_path)
+    analysis = run_video_analysis(video_path, resolution=resolution)
     print(f"          → done ({time.perf_counter() - t0:.1f}s)")
 
     # Save analysis
@@ -289,10 +289,10 @@ def run_phase_6(
     print(f"\n✅ Full pipeline complete! Recipe: {recipe_path}")
 
 
-def run_full_pipeline(video_path: str, output_dir: str) -> None:
+def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720) -> None:
     """Run all phases end-to-end."""
     # Phase 1+2: frame extraction + quant + qual
-    run_phase_1_2(video_path, output_dir, quant_only=False)
+    run_phase_1_2(video_path, output_dir, quant_only=False, resolution=resolution)
 
     # Phase 2.5: temporal analysis (local, no API)
     temporal = run_phase_2_5(output_dir, video_path)
@@ -301,7 +301,7 @@ def run_full_pipeline(video_path: str, output_dir: str) -> None:
     scenes = run_phase_3(output_dir, video_path, temporal=temporal)
 
     # Phase 4: video analysis (Gemini)
-    video_analysis = run_phase_4(video_path, output_dir)
+    video_analysis = run_phase_4(video_path, output_dir, resolution=resolution)
 
     # Phase 5: scene merger — merge Phase 3 + Phase 4 (local, no API)
     merged_scenes = run_phase_5(output_dir, video_path, scenes=scenes, video_analysis=video_analysis)
@@ -326,27 +326,31 @@ def main() -> None:
         "--phase", type=str, choices=["1", "2", "2.5", "3", "4", "5", "6"],
         help="Run only a specific phase (assumes previous phase data exists)",
     )
+    parser.add_argument(
+        "--resolution", type=int, choices=[480, 720], default=720,
+        help="Frame/video resolution: 720 (default, better text detection) or 480 (faster/smaller)",
+    )
     args = parser.parse_args()
 
     if args.quant_only:
         run_phase_1_2(args.video, args.output, quant_only=True)
     elif args.phase == "1":
-        run_phase_1_2(args.video, args.output, quant_only=True)
+        run_phase_1_2(args.video, args.output, quant_only=True, resolution=args.resolution)
     elif args.phase == "2":
-        run_phase_1_2(args.video, args.output, quant_only=False)
+        run_phase_1_2(args.video, args.output, quant_only=False, resolution=args.resolution)
     elif args.phase == "2.5":
         run_phase_2_5(args.output, args.video)
     elif args.phase == "3":
         run_phase_3(args.output, args.video)
     elif args.phase == "4":
-        run_phase_4(args.video, args.output)
+        run_phase_4(args.video, args.output, resolution=args.resolution)
     elif args.phase == "5":
         run_phase_5(args.output, args.video)
     elif args.phase == "6":
         run_phase_6(args.output, args.video)
     else:
         # Full pipeline
-        run_full_pipeline(args.video, args.output)
+        run_full_pipeline(args.video, args.output, resolution=args.resolution)
 
 
 if __name__ == "__main__":

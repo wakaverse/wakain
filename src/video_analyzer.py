@@ -252,7 +252,7 @@ def _make_client() -> genai.Client:
     return genai.Client(api_key=api_key)
 
 
-def _resize_video(video_path: str | Path, max_mb: int = MAX_UPLOAD_SIZE_MB) -> Path:
+def _resize_video(video_path: str | Path, max_mb: int = MAX_UPLOAD_SIZE_MB, resolution: int = 720) -> Path:
     """Re-encode video to fit under max_mb using ffmpeg if needed."""
     src = Path(video_path)
     size_mb = src.stat().st_size / (1024 * 1024)
@@ -278,7 +278,7 @@ def _resize_video(video_path: str | Path, max_mb: int = MAX_UPLOAD_SIZE_MB) -> P
 
     subprocess.run(
         ["ffmpeg", "-y", "-i", str(src),
-         "-vf", "scale=-2:720",
+         "-vf", f"scale=-2:{resolution}",
          "-b:v", f"{target_bitrate}k",
          "-c:v", "libx264", "-preset", "fast",
          "-c:a", "aac", "-b:a", "64k",
@@ -312,13 +312,15 @@ def _upload_video(client: genai.Client, video_path: Path) -> types.File:
 
 async def analyse_video(
     video_path: str | Path,
+    resolution: int = 720,
 ) -> dict:
     """Upload video to Gemini and get full analysis (audio, structure, product, effectiveness)."""
     client = _make_client()
     video_path = Path(video_path)
 
     # Resize if too large
-    upload_path = _resize_video(video_path)
+    max_mb = 20 if resolution >= 720 else 10
+    upload_path = _resize_video(video_path, max_mb=max_mb, resolution=resolution)
     is_temp = upload_path != video_path
 
     try:
@@ -371,6 +373,6 @@ Be specific and detailed. Use Korean for script_summary, hook_line, cta_line if 
             upload_path.unlink()
 
 
-def run_video_analysis(video_path: str | Path) -> dict:
+def run_video_analysis(video_path: str | Path, resolution: int = 720) -> dict:
     """Sync wrapper for analyse_video."""
-    return asyncio.run(analyse_video(video_path))
+    return asyncio.run(analyse_video(video_path, resolution=resolution))

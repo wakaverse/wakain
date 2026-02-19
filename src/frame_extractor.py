@@ -22,6 +22,7 @@ class ExtractedFrame:
 def extract_frames(
     video_path: str | Path,
     fps: float = FPS_TARGET,
+    max_dimension: int = MAX_DIMENSION,
 ) -> list[ExtractedFrame]:
     """Extract frames from *video_path* at the given FPS rate.
 
@@ -51,8 +52,8 @@ def extract_frames(
             timestamp = frame_idx / video_fps
             # Resize: longest side ≤ MAX_DIMENSION
             h, w = frame.shape[:2]
-            if max(h, w) > MAX_DIMENSION:
-                scale = MAX_DIMENSION / max(h, w)
+            if max(h, w) > max_dimension:
+                scale = max_dimension / max(h, w)
                 frame = cv2.resize(frame, (int(w * scale), int(h * scale)),
                                    interpolation=cv2.INTER_AREA)
             _, jpeg = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
