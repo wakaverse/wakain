@@ -1,0 +1,5631 @@
+{
+  "video_recipe": {
+    "meta": {
+      "platform": "shorts",
+      "duration": 29.0,
+      "aspect_ratio": "9:16",
+      "category": "food",
+      "sub_category": "seasoned_seaweed",
+      "target_audience": "Korean food lovers, busy individuals seeking convenient side dishes, snack enthusiasts"
+    },
+    "structure": {
+      "type": "problem_solution",
+      "scene_sequence": [
+        {
+          "role": "hook",
+          "duration": 1.23,
+          "technique": "hook"
+        },
+        {
+          "role": "solution",
+          "duration": 0.8,
+          "technique": "solution"
+        },
+        {
+          "role": "solution",
+          "duration": 0.83,
+          "technique": "solution"
+        },
+        {
+          "role": "demo",
+          "duration": 2.0,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.73,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.67,
+          "technique": "demo"
+        },
+        {
+          "role": "proof",
+          "duration": 1.07,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 0.53,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 0.9,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 1.47,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 0.8,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 1.13,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 1.23,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 1.0,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 0.97,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 1.27,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 0.6,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 0.63,
+          "technique": "proof"
+        },
+        {
+          "role": "recap",
+          "duration": 1.03,
+          "technique": "recap"
+        },
+        {
+          "role": "recap",
+          "duration": 1.0,
+          "technique": "recap"
+        },
+        {
+          "role": "recap",
+          "duration": 0.63,
+          "technique": "recap"
+        },
+        {
+          "role": "demo",
+          "duration": 0.9,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 1.17,
+          "technique": "demo"
+        },
+        {
+          "role": "cta",
+          "duration": 1.73,
+          "technique": "cta"
+        },
+        {
+          "role": "cta",
+          "duration": 0.5,
+          "technique": "cta"
+        },
+        {
+          "role": "cta",
+          "duration": 2.93,
+          "technique": "cta"
+        },
+        {
+          "role": "cta",
+          "duration": 1.27,
+          "technique": "cta"
+        }
+      ],
+      "hook_time": 1.23,
+      "product_first_appear": 0.0,
+      "cta_start": 22.6
+    },
+    "visual_style": {
+      "overall_mood": "natural_organic",
+      "color_palette": [
+        "#C0BFBC",
+        "#6C665F",
+        "#6E6762",
+        "#C5A986",
+        "#C5A888"
+      ],
+      "color_grading": "natural",
+      "brightness_profile": "consistent",
+      "avg_cut_interval": 1.81,
+      "total_cuts": 16,
+      "transition_style": "hard_cut",
+      "text_usage": {
+        "frequency": "every_scene",
+        "style_consistency": "high",
+        "language_tone": "casual"
+      },
+      "human_screen_time_ratio": 0.92,
+      "product_screen_time_ratio": 1.0,
+      "face_time_ratio": 0.92
+    },
+    "audio": {
+      "music": {
+        "present": true,
+        "genre": "upbeat_pop",
+        "energy_profile": "steady",
+        "bpm_range": "120-140",
+        "mood_match": "energetic_informative",
+        "beat_sync": "moderate"
+      },
+      "voice": {
+        "type": "narration",
+        "tone": "excited",
+        "language": "Korean",
+        "script_summary": "진행자가 김은 다 똑같다는 편견을 깨고, 태풍김의 4가지 맛과 우수성을 설명합니다. 국내산 원초 사용, 두 번 굽는 방식, 방습제 없이도 오래가는 바삭함 등 차별점을 강조하며, 일본 수출 실적과 현지 인기를 증거로 제시합니다. 마지막으로 맛에 대한 강한 자신감을 표현하며 시식을 권유합니다.",
+        "hook_line": "김이 다 거기서 거기라고요?",
+        "cta_line": "맛 없으면 보장하실 거니까 보장할게요.",
+        "transcript": [
+          {
+            "start": 0.0,
+            "end": 1.0,
+            "text": "김이 다 거기서 거기라고요?",
+            "speaker": null
+          },
+          {
+            "start": 1.0,
+            "end": 2.8,
+            "text": "한 입 드셔보시면 바로 아실 겁니다.",
+            "speaker": null
+          },
+          {
+            "start": 3.0,
+            "end": 5.0,
+            "text": "참기름 명란 와사비 김치",
+            "speaker": null
+          },
+          {
+            "start": 5.0,
+            "end": 6.0,
+            "text": "이건 그냥 김이 아닙니다.",
+            "speaker": null
+          },
+          {
+            "start": 6.0,
+            "end": 6.5,
+            "text": "저희 태풍김은",
+            "speaker": null
+          },
+          {
+            "start": 7.0,
+            "end": 10.0,
+            "text": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+            "speaker": null
+          },
+          {
+            "start": 10.5,
+            "end": 11.0,
+            "text": "첫째",
+            "speaker": null
+          },
+          {
+            "start": 11.0,
+            "end": 13.0,
+            "text": "저희는 국내산 명품 원초만 사용합니다.",
+            "speaker": null
+          },
+          {
+            "start": 13.0,
+            "end": 13.5,
+            "text": "둘째",
+            "speaker": null
+          },
+          {
+            "start": 13.5,
+            "end": 15.0,
+            "text": "두 번 구워 더~ 바삭합니다.",
+            "speaker": null
+          },
+          {
+            "start": 15.0,
+            "end": 15.5,
+            "text": "셋째",
+            "speaker": null
+          },
+          {
+            "start": 15.5,
+            "end": 18.0,
+            "text": "방습제 없시도 바삭바삭함이 오래 갑니다.",
+            "speaker": null
+          },
+          {
+            "start": 18.0,
+            "end": 19.5,
+            "text": "네 가지 맛을 밥 반찬으로 완벽합니다.",
+            "speaker": null
+          },
+          {
+            "start": 19.5,
+            "end": 20.5,
+            "text": "태풍 마트김 그 한 장에 다릅니다.",
+            "speaker": null
+          },
+          {
+            "start": 22.5,
+            "end": 23.5,
+            "text": "일본에서 아마 증명됐으니까",
+            "speaker": null
+          },
+          {
+            "start": 23.5,
+            "end": 24.0,
+            "text": "아마가 아니",
+            "speaker": null
+          },
+          {
+            "start": 24.0,
+            "end": 25.0,
+            "text": "진짜 증명됐으니까 한번 드셔보시",
+            "speaker": null
+          },
+          {
+            "start": 25.0,
+            "end": 26.0,
+            "text": "드셔보시",
+            "speaker": null
+          },
+          {
+            "start": 26.0,
+            "end": 27.0,
+            "text": "맛 없으면 보장하실 거니까",
+            "speaker": null
+          },
+          {
+            "start": 27.0,
+            "end": 27.5,
+            "text": "보장할게요.",
+            "speaker": null
+          },
+          {
+            "start": 27.5,
+            "end": 28.0,
+            "text": "보장할게요.",
+            "speaker": null
+          },
+          {
+            "start": 28.0,
+            "end": 28.5,
+            "text": "보장.",
+            "speaker": null
+          }
+        ]
+      },
+      "sfx": {
+        "used": true,
+        "types": [
+          "crunch",
+          "whoosh",
+          "pop"
+        ],
+        "frequency": "moderate"
+      },
+      "audio_visual_sync": "high"
+    },
+    "product_strategy": {
+      "reveal_timing": "immediate",
+      "demonstration_method": "in_use",
+      "key_benefit_shown": "unique flavors, superior crispiness, premium domestic ingredients, global popularity, versatility as a side dish",
+      "price_shown": false,
+      "price_framing": "none",
+      "offer_type": "none",
+      "social_proof": "numbers",
+      "urgency_trigger": "none",
+      "brand_visibility": {
+        "logo_shown": true,
+        "brand_color_used": true,
+        "brand_mention_count": 5
+      }
+    },
+    "persuasion_analysis": {
+      "presenter": {
+        "type": "narrator",
+        "face_shown": true,
+        "credibility_factor": "Appears to be a factory worker or manager (wearing a cleanroom suit), implying direct involvement in production and product knowledge."
+      },
+      "video_style": {
+        "type": "info",
+        "sub_style": "product_highlight_with_review_elements"
+      },
+      "appeal_points": [
+        {
+          "type": "myth_bust",
+          "claim": "김이 다 거기서 거기라고요?",
+          "visual_proof": {
+            "technique": "none",
+            "description": "진행자가 직접 질문을 던지며 시청자의 고정관념을 자극",
+            "timestamp": 0.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "strong"
+        },
+        {
+          "type": "sensory",
+          "claim": "한 입 드셔보시면 바로 아실 겁니다.",
+          "visual_proof": {
+            "technique": "closeup",
+            "description": "밥 위에 김을 올려 먹는 모습 클로즈업",
+            "timestamp": 1.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "strong"
+        },
+        {
+          "type": "specification",
+          "claim": "참기름 명란 와사비 김치 4가지 맛",
+          "visual_proof": {
+            "technique": "package_shot",
+            "description": "다양한 맛의 김 제품 패키지를 보여줌",
+            "timestamp": 3.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "strong"
+        },
+        {
+          "type": "achievement",
+          "claim": "150억 팔린 조미김",
+          "visual_proof": {
+            "technique": "text_overlay",
+            "description": "화면에 '150억 팔린 조미김' 텍스트 강조",
+            "timestamp": 1.0
+          },
+          "audio_sync": "text_only",
+          "strength": "strong"
+        },
+        {
+          "type": "social_proof",
+          "claim": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+          "visual_proof": {
+            "technique": "location_shot",
+            "description": "일본 마트 진열대 사진과 함께 수출액 및 매장 수 텍스트 오버레이",
+            "timestamp": 7.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "strong"
+        },
+        {
+          "type": "origin",
+          "claim": "100% 국내산 명품 원초 사용 (완도 + 서천)",
+          "visual_proof": {
+            "technique": "text_overlay",
+            "description": "진행자가 제품을 들고 '100% 국내산 원초 사용' 텍스트 강조",
+            "timestamp": 11.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "strong"
+        },
+        {
+          "type": "process",
+          "claim": "두 번 구워 더~ 바삭합니다.",
+          "visual_proof": {
+            "technique": "process_shot",
+            "description": "김이 컨베이어 벨트에서 두 번 구워지는 공정 과정",
+            "timestamp": 14.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "strong"
+        },
+        {
+          "type": "specification",
+          "claim": "방습제 없는데 오래오래 바삭바삭",
+          "visual_proof": {
+            "technique": "closeup",
+            "description": "방습제 없는 김 봉투와 바삭한 김을 보여줌",
+            "timestamp": 16.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "strong"
+        },
+        {
+          "type": "lifestyle",
+          "claim": "네 가지 맛을 밥 반찬으로 완벽합니다.",
+          "visual_proof": {
+            "technique": "ingredient_shot",
+            "description": "다양한 반찬과 함께 김을 먹는 모습",
+            "timestamp": 18.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "moderate"
+        },
+        {
+          "type": "guarantee",
+          "claim": "맛 없으면 보장해라 (PD), 보장할게요 (Presenter)",
+          "visual_proof": {
+            "technique": "text_overlay",
+            "description": "화면에 '맛 없으면 보장해라' 텍스트와 진행자의 자신감 있는 표정",
+            "timestamp": 26.0
+          },
+          "audio_sync": "narration_sync",
+          "strength": "strong"
+        }
+      ],
+      "product_emphasis": {
+        "first_appear": 0.0,
+        "screen_time_ratio": 0.7,
+        "hero_shots": 8,
+        "emphasis_techniques": [
+          "closeup",
+          "in_use_demo",
+          "package_focus",
+          "texture_detail"
+        ],
+        "key_visual_moment": "Presenter eating the seaweed with a loud crunch.",
+        "key_visual_timestamp": 21.0
+      },
+      "primary_appeal": "sensory",
+      "appeal_layering": "영상은 '김은 다 똑같다'는 시청자의 고정관념을 깨는 질문으로 시작하여 호기심을 유발합니다. 이어서 4가지 독특한 맛과 150억 판매, 일본 수출 및 현지 인기라는 강력한 사회적 증거와 성과를 제시하여 제품의 신뢰도를 높입니다. 이후 국내산 명품 원초, 두 번 굽는 공정, 방습제 없는 바삭함 등 구체적인 제품 사양과 제조 과정을 통해 품질 우수성을 강조하며, 마지막으로 맛에 대한 강력한 보장으로 시청자의 구매를 확신시킵니다.",
+      "persuasion_summary": "태풍김은 '김은 다 똑같다'는 편견을 깨고, 4가지 독특한 맛과 국내산 프리미엄 원초, 특별한 제조 공정을 통해 차별화된 맛과 바삭함을 제공한다고 주장합니다. 일본 시장에서의 성공적인 수출 실적과 현지 인기를 강력한 사회적 증거로 제시하며, 맛에 대한 자신감 있는 보장으로 시청자의 구매를 유도하는 설득 전략을 사용합니다."
+    },
+    "art_direction": {
+      "tone_and_manner": "활기차고 정보 전달형, 유머러스하고 친근함",
+      "heading_font": "고딕체",
+      "body_font": "고딕체",
+      "font_color_system": [
+        "#FFFF00",
+        "#FF0000",
+        "#FFFFFF",
+        "#000000"
+      ],
+      "highlight_method": "밝은 노란색 텍스트에 강렬한 빨간색 테두리, 별/하트 아이콘, 방사형 폭발 애니메이션",
+      "brand_colors": [
+        "#F08080",
+        "#90EE90",
+        "#FFFF00",
+        "#000000",
+        "#FFFFFF"
+      ],
+      "background_style": "mixed",
+      "color_temperature": "neutral",
+      "graphic_style": "bold_graphic",
+      "recurring_elements": [
+        "별 아이콘",
+        "하트 아이콘",
+        "방사형 폭발 애니메이션",
+        "제품 패키지"
+      ],
+      "text_position_pattern": "텍스트는 주로 화면 중앙 상단 또는 중앙 하단에 가로로 중앙 정렬되어 나타남",
+      "frame_composition_rule": "제품 및 음식의 다이내믹한 클로즈업, 열정적인 발표자의 미디엄 샷. 텍스트 오버레이는 가독성과 임팩트를 위해 크고 화면의 상당 부분을 차지함",
+      "visual_consistency": "high",
+      "style_reference": "틱톡/유튜브 쇼츠 등 한국 이커머스 및 소셜 미디어 광고에서 흔히 볼 수 있는 활기차고 직관적인 숏폼 콘텐츠 스타일"
+    },
+    "effectiveness_assessment": {
+      "hook_rating": "strong",
+      "flow_rating": "strong",
+      "message_clarity": "strong",
+      "cta_strength": "strong",
+      "replay_factor": "moderate",
+      "standout_elements": [
+        "Presenter's energetic delivery",
+        "Satisfying crunch sound effect",
+        "Clear visual demonstration of product features (crispiness, variety)",
+        "Strong social proof (export numbers, Japanese market presence)"
+      ],
+      "weak_points": [
+        "No explicit pricing or purchase information"
+      ]
+    },
+    "scenes": [
+      {
+        "scene_id": 1,
+        "role": "hook",
+        "time_range": [
+          0.0,
+          1.23
+        ],
+        "duration": 1.23,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.5,
+          "motion_level": "slow",
+          "color_consistency": 0.77,
+          "color_mood": "muted_luxury",
+          "color_palette": [
+            "#C0BFBC",
+            "#6C665F",
+            "#6E6762"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "none"
+          },
+          "text_overlays": [
+            {
+              "content": "김\n길이 다",
+              "purpose": "brand",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "김\n길이 다\n거기서 거기라고요?",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "깊이 다\n거기서 거기라고요?",
+              "purpose": "hook_question",
+              "font_style": "handwritten",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Person in clean suit surrounded by seaweed snack packages",
+            "Person presenting various seaweed snack products",
+            "Person in cleanroom suit surrounded by seaweed snack packages"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 '김이 다 거기서 거기'라는 일반적인 인식을 질문하며 시청자의 호기심을 자극한다.",
+        "attention": {
+          "attention_score": 11,
+          "attention_peak": 19,
+          "peak_timestamp": 0.5,
+          "attention_level": "low",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 0.0,
+            "end": 1.0,
+            "text": "김이 다 거기서 거기라고요?",
+            "speaker": null
+          },
+          {
+            "start": 1.0,
+            "end": 2.8,
+            "text": "한 입 드셔보시면 바로 아실 겁니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "empty-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#C4C4C0",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 0.0,
+            "content": "김이 다 거기서 거기라고요?",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 1.0,
+            "content": "참기름 명란 와사비 김치",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "color_highlight",
+            "sync_with": "voice"
+          },
+          {
+            "time": 1.0,
+            "content": "4가지맛 150억 팔린 조미김",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "color_highlight",
+            "sync_with": "voice"
+          },
+          {
+            "time": 1.0,
+            "content": "한 입 드셔보시면",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "myth_bust",
+            "claim": "김이 다 거기서 거기라고요?",
+            "visual_proof": {
+              "technique": "none",
+              "description": "진행자가 직접 질문을 던지며 시청자의 고정관념을 자극",
+              "timestamp": 0.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          },
+          {
+            "type": "sensory",
+            "claim": "한 입 드셔보시면 바로 아실 겁니다.",
+            "visual_proof": {
+              "technique": "closeup",
+              "description": "밥 위에 김을 올려 먹는 모습 클로즈업",
+              "timestamp": 1.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          },
+          {
+            "type": "achievement",
+            "claim": "150억 팔린 조미김",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '150억 팔린 조미김' 텍스트 강조",
+              "timestamp": 1.0
+            },
+            "audio_sync": "text_only",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 2,
+        "role": "solution",
+        "time_range": [
+          1.23,
+          2.03
+        ],
+        "duration": 0.8,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup",
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.12,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#C5A986",
+            "#C5A888",
+            "#967A67"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n한 입 드셔보시면",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n한 입 드셔보시면",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Hand holding seaweed wrap with rice",
+            "Hand holding seaweed rice bite"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "밥 위에 김을 올려 먹는 모습을 클로즈업하여 제품의 맛을 시각적으로 암시하며, 직접 먹어보면 차이를 알 것이라고 말한다.",
+        "attention": {
+          "attention_score": 53,
+          "attention_peak": 86,
+          "peak_timestamp": 1.5,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 1.0,
+            "end": 2.8,
+            "text": "한 입 드셔보시면 바로 아실 겁니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "text-top/product-middle/text-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#C5A888",
+          "accent_color": "yellow",
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 2.0,
+            "content": "바로 아실 겁니다",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 3,
+        "role": "solution",
+        "time_range": [
+          2.03,
+          2.87
+        ],
+        "duration": 0.83,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#9D8B88",
+            "#1D1713",
+            "#E0C0A6"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "★참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n★바로 아실겁니다★",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Hands holding seaweed snack with product packaging in background"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "밥 위에 김을 올려 먹는 모습을 클로즈업하여 제품의 맛을 시각적으로 암시하며, 직접 먹어보면 차이를 알 것이라고 말한다.",
+        "attention": {
+          "attention_score": 68,
+          "attention_peak": 68,
+          "peak_timestamp": 2.5,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 1.0,
+            "end": 2.8,
+            "text": "한 입 드셔보시면 바로 아실 겁니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFF00",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#9D8B88",
+          "accent_color": "#AE842F",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 4,
+        "role": "demo",
+        "time_range": [
+          2.87,
+          4.87
+        ],
+        "duration": 2.0,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 2.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.24,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#A0A19C",
+            "#969B8D",
+            "#94958F"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n태김\nSESAME O\n참기름\n200 태\n태풍김 4종\n시대인은 참기름가득\nFOLCE\n2024.08.20\n한국건\n・SESAME OIL ごま油塩味。\n참기름 가득 3부\n신년에 좋은 원\n방식으로 입맛과 향이\nHACCP 인증기one\n15022300 연중기ISH\nW",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n자\n대풍愛김\nSAMEOL\nPOLLACK\n명란\n2024.08.20 대용\n★태풍김 4종★\n한국전트 재래김\n서해안 좋은원 참기름가득\n풍김\nG08.20\nPOLLACK 明太子。\n•POLLACK 明太子味。\n*POLLACK 明太子珠\n서해안 좋은원초\n참기름 가\n방식으로 김맛과 향이 뛰어난\nHACCPFDA\n15022000\n명란맛",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n愛김\n와사비\n2005.08.31\n2005. 08. 31\n★태풍김 4종\n・WASABI わさび味・\n한국전통재래김\n서태안 좋은텐츠 장기용가득\n태풍愛김\n2024.08.31\n참기름가동\n김 태풍김\n・WASABI わさび味\n・WASABI わさび味・\n서해안 좋은원초\n참기름 가득 3봉\n신년감 좋은 원초\n방식으로 김맛과 향이 뛰어\nHACCP 인증기업 | FDA O",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n김\n김치\nEH\n한국\n2008.08.20\nE ★태풍김 4종★\n한국전통재래김\n좋은원초 참기름가득\n대풍愛김\nKIMCHIキムチ\n태풍愛김\n*KIMCHI キムチ味・\n서해안 좋은원초\n참기를 가득 3봉\n구이\n정식으로 맛과 등이 뛰어났다\nHACCP 인증기업\n15022000 경기",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Person holding seaweed product with overlaid text",
+            "Person holding seaweed product",
+            "Person holding product with text overlay",
+            "Presenter holding kimchi product"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 4가지 맛(참기름, 명란, 와사비, 김치)의 태풍김 제품을 직접 들고 보여주며, 단순한 김이 아님을 강조한다.",
+        "attention": {
+          "attention_score": 40,
+          "attention_peak": 76,
+          "peak_timestamp": 3.0,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 3.0,
+            "end": 5.0,
+            "text": "참기름 명란 와사비 김치",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [
+            "badge",
+            "sticker"
+          ],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#95968C",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 3.0,
+            "content": "명란",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 3.0,
+            "content": "태풍김 4종",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "color_highlight",
+            "sync_with": "voice"
+          },
+          {
+            "time": 4.0,
+            "content": "김치",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "specification",
+            "claim": "참기름 명란 와사비 김치 4가지 맛",
+            "visual_proof": {
+              "technique": "package_shot",
+              "description": "다양한 맛의 김 제품 패키지를 보여줌",
+              "timestamp": 3.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 5,
+        "role": "demo",
+        "time_range": [
+          4.87,
+          5.6
+        ],
+        "duration": 0.73,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup",
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#C0B59A",
+            "#C0B79D",
+            "#E1DDCF"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "product_only",
+          "product_visibility": "full",
+          "product_angle": "top",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n그냥 김이 아닙니다",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 1.0
+            }
+          ],
+          "attention_elements": [
+            "Variety of Korean side dishes and seasoned seaweed"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 4가지 맛(참기름, 명란, 와사비, 김치)의 태풍김 제품을 직접 들고 보여주며, 단순한 김이 아님을 강조한다.",
+        "attention": {
+          "attention_score": 46,
+          "attention_peak": 69,
+          "peak_timestamp": 5.0,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 3.0,
+            "end": 5.0,
+            "text": "참기름 명란 와사비 김치",
+            "speaker": null
+          },
+          {
+            "start": 5.0,
+            "end": 6.0,
+            "text": "이건 그냥 김이 아닙니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#000000",
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": "#FFFF00",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/product-middle/text-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#FFFFFF",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 5.0,
+            "content": "그냥 김이 아닙니다",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 6,
+        "role": "demo",
+        "time_range": [
+          5.6,
+          6.27
+        ],
+        "duration": 0.67,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#A3A39C",
+            "#CFCDD4",
+            "#75654C"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "excited",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n(뭔데요?)",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Person holding multiple packages of seaweed snacks"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 4가지 맛(참기름, 명란, 와사비, 김치)의 태풍김 제품을 직접 들고 보여주며, 단순한 김이 아님을 강조한다.",
+        "attention": {
+          "attention_score": 72,
+          "attention_peak": 72,
+          "peak_timestamp": 6.0,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 5.0,
+            "end": 6.0,
+            "text": "이건 그냥 김이 아닙니다.",
+            "speaker": null
+          },
+          {
+            "start": 6.0,
+            "end": 6.5,
+            "text": "저희 태풍김은",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#A3A39C",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 6.0,
+            "content": "저희 태풍김은",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 7,
+        "role": "proof",
+        "time_range": [
+          6.27,
+          7.33
+        ],
+        "duration": 1.07,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup",
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 1,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#7F5A53",
+            "#97969B",
+            "#1A1512"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n저희 태풍김은",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n일본에서만",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Hands holding seaweed snack packages",
+            "Hand holding seaweed snack"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "일본 대형 마트 진열대 사진과 함께 1000만 달러 이상 수출 및 현지 편의점(로손, 돈키호테)에서의 인기를 언급하며 제품의 글로벌 경쟁력을 증명한다.",
+        "attention": {
+          "attention_score": 70,
+          "attention_peak": 70,
+          "peak_timestamp": 6.5,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 6.0,
+            "end": 6.5,
+            "text": "저희 태풍김은",
+            "speaker": null
+          },
+          {
+            "start": 7.0,
+            "end": 10.0,
+            "text": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#ffffff",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/product-middle/text-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#7F5A53",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 7.0,
+            "content": "1000만 달러",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "color_highlight",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "social_proof",
+            "claim": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+            "visual_proof": {
+              "technique": "location_shot",
+              "description": "일본 마트 진열대 사진과 함께 수출액 및 매장 수 텍스트 오버레이",
+              "timestamp": 7.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 8,
+        "role": "proof",
+        "time_range": [
+          7.33,
+          7.87
+        ],
+        "duration": 0.53,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#C4A899",
+            "#AE8A5D",
+            "#6D5647"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1000만딸라",
+              "purpose": "price_offer",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Hand holding seaweed snack packages"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "일본 대형 마트 진열대 사진과 함께 1000만 달러 이상 수출 및 현지 편의점(로손, 돈키호테)에서의 인기를 언급하며 제품의 글로벌 경쟁력을 증명한다.",
+        "attention": {
+          "attention_score": 72,
+          "attention_peak": 72,
+          "peak_timestamp": 7.5,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 7.0,
+            "end": 10.0,
+            "text": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "product-top/product-middle/product-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#C4A899",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 9,
+        "role": "proof",
+        "time_range": [
+          7.87,
+          8.77
+        ],
+        "duration": 0.9,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup",
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.65,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#C19C8F",
+            "#C4A699",
+            "#B0895F"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "★★참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n1000만딸라",
+              "purpose": "price_offer",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "★참기를 명란 와사비 김치★\n4가지맛 150억 팔린 조미김",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "top_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Stack of seaweed snack packages held by a hand",
+            "Hand holding seaweed snack packages"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "일본 대형 마트 진열대 사진과 함께 1000만 달러 이상 수출 및 현지 편의점(로손, 돈키호테)에서의 인기를 언급하며 제품의 글로벌 경쟁력을 증명한다.",
+        "attention": {
+          "attention_score": 30,
+          "attention_peak": 30,
+          "peak_timestamp": 8.0,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 7.0,
+            "end": 10.0,
+            "text": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "product-top/product-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#C4A699",
+          "accent_color": "#B0895F",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 8.0,
+            "content": "수출되고",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 10,
+        "role": "proof",
+        "time_range": [
+          8.77,
+          10.23
+        ],
+        "duration": 1.47,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.5,
+          "motion_level": "moderate",
+          "color_consistency": 0.32,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#888989",
+            "#7C7F7F",
+            "#787B7C"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\nお菓子\n(일본 24개 18000개 매장)\n태풍 김\n태풍 김 대표 김\nSESAVEで\n서해안 좋은\n태풍김\n참기름 가득 3ㅎ\n소비",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\nお菓子\n로손 등\n(일본 24개 18000개 매장)\n태풍김\n소비\nSESAVE\n서안 좋은음초\n참기를 가득",
+              "purpose": "benefit",
+              "font_style": "minimal",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Person holding seaweed product in front of a store display",
+            "Person holding seaweed product in front of a store shelf"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "일본 대형 마트 진열대 사진과 함께 1000만 달러 이상 수출 및 현지 편의점(로손, 돈키호테)에서의 인기를 언급하며 제품의 글로벌 경쟁력을 증명한다.",
+        "attention": {
+          "attention_score": 34,
+          "attention_peak": 84,
+          "peak_timestamp": 9.0,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 7.0,
+            "end": 10.0,
+            "text": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "white",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "black",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/mixed-middle/product-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#A6A093",
+          "accent_color": "#CBA138",
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 9.0,
+            "content": "로손 등 (일본 24개 18000개 매장)",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 10.0,
+            "content": "사랑받고 있습니다",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 11,
+        "role": "proof",
+        "time_range": [
+          10.23,
+          11.03
+        ],
+        "duration": 0.8,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#A9ABA3",
+            "#ABADA6",
+            "#9A8B73"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n♥사랑받고 있습니다♡",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n♡사랑받고 있습니다♡",
+              "purpose": "social_proof",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding seaweed snack packages",
+            "Person holding seaweed product"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 국내산 명품 원초(완도+서천)만을 사용한다는 첫 번째 자랑을 설명하며 제품의 원재료 우수성을 강조한다.",
+        "attention": {
+          "attention_score": 46,
+          "attention_peak": 84,
+          "peak_timestamp": 10.5,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 10.5,
+            "end": 11.0,
+            "text": "첫째",
+            "speaker": null
+          },
+          {
+            "start": 11.0,
+            "end": 13.0,
+            "text": "저희는 국내산 명품 원초만 사용합니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "emoji",
+            "sticker"
+          ],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#A9ABA3",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 10.5,
+            "content": "첫째",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 11.0,
+            "content": "100% 국내산 원초 사용",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "color_highlight",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "origin",
+            "claim": "100% 국내산 명품 원초 사용 (완도 + 서천)",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "진행자가 제품을 들고 '100% 국내산 원초 사용' 텍스트 강조",
+              "timestamp": 11.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 12,
+        "role": "proof",
+        "time_range": [
+          11.03,
+          12.17
+        ],
+        "duration": 1.13,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.41,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#94968D",
+            "#94978E",
+            "#D6D7E1"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "pointing"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n첫째\n100% 국내산 원초 사용",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "full",
+              "dwell_time": 1.0
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding seaweed product",
+            "Presenter holding and pointing to product"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 국내산 명품 원초(완도+서천)만을 사용한다는 첫 번째 자랑을 설명하며 제품의 원재료 우수성을 강조한다.",
+        "attention": {
+          "attention_score": 32,
+          "attention_peak": 60,
+          "peak_timestamp": 11.5,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 11.0,
+            "end": 13.0,
+            "text": "저희는 국내산 명품 원초만 사용합니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "bold",
+          "text_color_primary": "yellow",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "black",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#D6D7E1",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 12.0,
+            "content": "(완도 + 서천)",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 13,
+        "role": "proof",
+        "time_range": [
+          12.17,
+          13.4
+        ],
+        "duration": 1.23,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.68,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#9FA099",
+            "#D3D3DC",
+            "#D2D2DA"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "pointing"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n첫째\n100% 국내산 원초 사용\n(완도 + 서천)",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n자\n첫째\n100% 국내산 원초 사용\nEH\nSESA\n(완도 + 서천)\n단원에 참가\n태풍김\nSESAME\n油電\n오리지날\n태풍자반\nKOREAN\nSEASONED\nFLAKES",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding product with text overlay",
+            "Presenter holding seaweed snack"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 국내산 명품 원초(완도+서천)만을 사용한다는 첫 번째 자랑을 설명하며 제품의 원재료 우수성을 강조한다.",
+        "attention": {
+          "attention_score": 22,
+          "attention_peak": 33,
+          "peak_timestamp": 12.5,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 11.0,
+            "end": 13.0,
+            "text": "저희는 국내산 명품 원초만 사용합니다.",
+            "speaker": null
+          },
+          {
+            "start": 13.0,
+            "end": 13.5,
+            "text": "둘째",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "rounded",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFF00",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [
+            "sticker"
+          ],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#D2D2DA",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 13.0,
+            "content": "태풍김의 자랑",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 13.0,
+            "content": "둘째",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 14,
+        "role": "proof",
+        "time_range": [
+          13.4,
+          14.4
+        ],
+        "duration": 1.0,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 1,
+          "avg_cut_interval": 1.0,
+          "motion_level": "jump_cut",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#949487",
+            "#61625D",
+            "#262621"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n태풍임의 자랑\n둘째",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n둘째\n두번 구워 더~ 빠삭",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding seaweed product",
+            "Seaweed sheets moving on conveyor belt"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "김이 컨베이어 벨트에서 두 번 구워지는 공정 과정을 보여주며, '더 바삭함'이라는 두 번째 특징을 시각적으로 증명한다.",
+        "attention": {
+          "attention_score": 68,
+          "attention_peak": 81,
+          "peak_timestamp": 14.0,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 13.0,
+            "end": 13.5,
+            "text": "둘째",
+            "speaker": null
+          },
+          {
+            "start": 13.5,
+            "end": 15.0,
+            "text": "두 번 구워 더~ 바삭합니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#ffffff",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#949487",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 14.0,
+            "content": "두 번 구워 더~ 바삭",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "color_highlight",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "process",
+            "claim": "두 번 구워 더~ 바삭합니다.",
+            "visual_proof": {
+              "technique": "process_shot",
+              "description": "김이 컨베이어 벨트에서 두 번 구워지는 공정 과정",
+              "timestamp": 14.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 15,
+        "role": "proof",
+        "time_range": [
+          14.4,
+          15.37
+        ],
+        "duration": 0.97,
+        "visual_summary": {
+          "dominant_shot": "wide",
+          "shot_sequence": [
+            "wide",
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.42,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#767C6A",
+            "#54544B",
+            "#4E4B45"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "product_only",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "studio",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n둘째\n두번 구워 더~ 빠삭",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n둘째\n두 번 구워 더~ 빠삭",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Seaweed sheets on a conveyor belt with overlaid text promoting the product.",
+            "Seaweed sheets on a conveyor belt"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "김이 컨베이어 벨트에서 두 번 구워지는 공정 과정을 보여주며, '더 바삭함'이라는 두 번째 특징을 시각적으로 증명한다.",
+        "attention": {
+          "attention_score": 32,
+          "attention_peak": 47,
+          "peak_timestamp": 14.5,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 13.5,
+            "end": 15.0,
+            "text": "두 번 구워 더~ 바삭합니다.",
+            "speaker": null
+          },
+          {
+            "start": 15.0,
+            "end": 15.5,
+            "text": "셋째",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFF00",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/text-middle/empty-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#7E8572",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 15.0,
+            "content": "태풍김의 자랑",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 15.0,
+            "content": "셋째",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 16,
+        "role": "proof",
+        "time_range": [
+          15.37,
+          16.63
+        ],
+        "duration": 1.27,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 1,
+          "avg_cut_interval": 1.5,
+          "motion_level": "fast",
+          "color_consistency": 0.08,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#9C9D95",
+            "#929182",
+            "#D6D6D6"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n셋째\n방습제 없는데\n오래오래 바삭바삭",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n셋째\n방습제 없는데\n오래오래 바삭바삭 ||\nCA GEL\nCLEAN PAK",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding seaweed product",
+            "Presenter holding product with text overlay"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "방습제 없이도 오래 바삭함을 유지한다는 세 번째 특징을 설명하며, 제품의 신선도 유지 기술력을 강조한다.",
+        "attention": {
+          "attention_score": 49,
+          "attention_peak": 82,
+          "peak_timestamp": 15.5,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 15.0,
+            "end": 15.5,
+            "text": "셋째",
+            "speaker": null
+          },
+          {
+            "start": 15.5,
+            "end": 18.0,
+            "text": "방습제 없시도 바삭바삭함이 오래 갑니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#CACCD3",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 16.0,
+            "content": "방습제 없는데 오래오래 바삭바삭",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "color_highlight",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "specification",
+            "claim": "방습제 없는데 오래오래 바삭바삭",
+            "visual_proof": {
+              "technique": "closeup",
+              "description": "방습제 없는 김 봉투와 바삭한 김을 보여줌",
+              "timestamp": 16.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 17,
+        "role": "proof",
+        "time_range": [
+          16.63,
+          17.23
+        ],
+        "duration": 0.6,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#988B88",
+            "#DDC5B1",
+            "#1B1612"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n셋째\n태풍 김\n방습제 없는데\n오래오래 바삭바삭",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Crispy seaweed snack held by gloved hands"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "방습제 없이도 오래 바삭함을 유지한다는 세 번째 특징을 설명하며, 제품의 신선도 유지 기술력을 강조한다.",
+        "attention": {
+          "attention_score": 75,
+          "attention_peak": 75,
+          "peak_timestamp": 17.0,
+          "attention_level": "high",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 15.5,
+            "end": 18.0,
+            "text": "방습제 없시도 바삭바삭함이 오래 갑니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFF00",
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "text-top/text-middle/product-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#DDC5B1",
+          "accent_color": "#A77B30",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 18,
+        "role": "proof",
+        "time_range": [
+          17.23,
+          17.87
+        ],
+        "duration": 0.63,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "slow",
+          "color_consistency": 0.52,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#968E8D",
+            "#E3C9B2",
+            "#9E7735"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n셋째\n방습제 없는데\n오래오래 바삭바삭",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Hand holding seaweed snack with product packaging in background"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "방습제 없이도 오래 바삭함을 유지한다는 세 번째 특징을 설명하며, 제품의 신선도 유지 기술력을 강조한다.",
+        "attention": {
+          "attention_score": 23,
+          "attention_peak": 23,
+          "peak_timestamp": 17.5,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 15.5,
+            "end": 18.0,
+            "text": "방습제 없시도 바삭바삭함이 오래 갑니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "yellow",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "black",
+          "graphic_elements": [
+            "sticker"
+          ],
+          "dominant_layout": "text-top/text-middle/product-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#968E8D",
+          "accent_color": "yellow",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 19,
+        "role": "recap",
+        "time_range": [
+          17.87,
+          18.9
+        ],
+        "duration": 1.03,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.21,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#98968F",
+            "#B0AFAA",
+            "#929086"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n4가지 맛으로",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "top_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n밥 반찬",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding multiple packages of seaweed snacks",
+            "Person holding stacks of seaweed snacks"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 4가지 맛 김이 밥 반찬으로 완벽하다고 요약하며 제품의 활용도를 다시 한번 강조한다.",
+        "attention": {
+          "attention_score": 45,
+          "attention_peak": 64,
+          "peak_timestamp": 18.0,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 15.5,
+            "end": 18.0,
+            "text": "방습제 없시도 바삭바삭함이 오래 갑니다.",
+            "speaker": null
+          },
+          {
+            "start": 18.0,
+            "end": 19.5,
+            "text": "네 가지 맛을 밥 반찬으로 완벽합니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFF00",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#B0AFAA",
+          "accent_color": "yellow",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 18.0,
+            "content": "밥 반찬",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "lifestyle",
+            "claim": "네 가지 맛을 밥 반찬으로 완벽합니다.",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "다양한 반찬과 함께 김을 먹는 모습",
+              "timestamp": 18.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "moderate"
+          }
+        ]
+      },
+      {
+        "scene_id": 20,
+        "role": "recap",
+        "time_range": [
+          18.9,
+          19.9
+        ],
+        "duration": 1.0,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 1,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.4,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#A2A19B",
+            "#B5B4B2",
+            "#93918C"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n술안주로",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n완벽합니다",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding seaweed snacks",
+            "Presenter holding product with text overlay"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 4가지 맛 김이 밥 반찬으로 완벽하다고 요약하며 제품의 활용도를 다시 한번 강조한다.",
+        "attention": {
+          "attention_score": 38,
+          "attention_peak": 39,
+          "peak_timestamp": 19.5,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 18.0,
+            "end": 19.5,
+            "text": "네 가지 맛을 밥 반찬으로 완벽합니다.",
+            "speaker": null
+          },
+          {
+            "start": 19.5,
+            "end": 20.5,
+            "text": "태풍 마트김 그 한 장에 다릅니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/text-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#B5B4B2",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 19.0,
+            "content": "완벽합니다",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 21,
+        "role": "recap",
+        "time_range": [
+          19.9,
+          20.53
+        ],
+        "duration": 0.63,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#C6C5C2",
+            "#C1BFBC",
+            "#A0876E"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n태풍마트 김",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding seaweed snacks"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 4가지 맛 김이 밥 반찬으로 완벽하다고 요약하며 제품의 활용도를 다시 한번 강조한다.",
+        "attention": {
+          "attention_score": 40,
+          "attention_peak": 72,
+          "peak_timestamp": 20.0,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 19.5,
+            "end": 20.5,
+            "text": "태풍 마트김 그 한 장에 다릅니다.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#000000",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#C6C5C2",
+          "accent_color": "yellow",
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 20.0,
+            "content": "태풍 마트김",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 20.0,
+            "content": "그 한 장에 다릅니다",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 22,
+        "role": "demo",
+        "time_range": [
+          20.53,
+          21.43
+        ],
+        "duration": 0.9,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "moderate",
+          "color_consistency": 0.48,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#C0C0BD",
+            "#5F503E",
+            "#9C8672"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n이 한장이...\n다릅니다....\n태풍 김\nZIPPER\n불고\nZIPPER\n한국 가정식의 전통\n한국 가정식\n태풍\nKOREAN\nSEASON\nFLAKE\n태풍",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter holding seaweed product"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 김을 크게 한 입 베어 물며 바삭한 소리를 들려주고, 제품의 식감을 생생하게 전달한다.",
+        "attention": {
+          "attention_score": 34,
+          "attention_peak": 34,
+          "peak_timestamp": 21.0,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "logo"
+          ],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#C0C0BD",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 23,
+        "role": "demo",
+        "time_range": [
+          21.43,
+          22.6
+        ],
+        "duration": 1.17,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.5,
+          "motion_level": "moderate",
+          "color_consistency": 0.47,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#BCBAB8",
+            "#BBB9B7",
+            "#CACAC7"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "excited",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n쿠어나와와ㅏ칵",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n오백만불 수출의\n쿠어나와와ㅏ 칵",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n김\n쿠어나와와 칼\n태풍\nZIPPER\n불고기\n기\nDRA\n태종김\n태풍행\nKOREAN\nSEASON\nFLAKE\nZIPPER\n타",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Person eating seaweed with exaggerated expression",
+            "Person eating seaweed with excited expression",
+            "Person eating seaweed snack"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 김을 크게 한 입 베어 물며 바삭한 소리를 들려주고, 제품의 식감을 생생하게 전달한다.",
+        "attention": {
+          "attention_score": 30,
+          "attention_peak": 42,
+          "peak_timestamp": 21.5,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 22.5,
+            "end": 23.5,
+            "text": "일본에서 아마 증명됐으니까",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [
+            "sticker"
+          ],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#BCBAB8",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 24,
+        "role": "cta",
+        "time_range": [
+          22.6,
+          24.33
+        ],
+        "duration": 1.73,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.5,
+          "motion_level": "moderate",
+          "color_consistency": 0.61,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#BEBCB7",
+            "#E6E4DE",
+            "#745C48"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "none"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 일본에서 아마(?)",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 증명 됐으니까",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 1.0
+            }
+          ],
+          "attention_elements": [
+            "Presenter with various seaweed products",
+            "Presenter with various seaweed snack products"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 일본에서의 성공을 언급하며 제품의 맛에 대한 강력한 자신감을 표현하고, '맛 없으면 보장'이라는 멘트로 시청자의 구매를 유도한다.",
+        "attention": {
+          "attention_score": 22,
+          "attention_peak": 52,
+          "peak_timestamp": 23.0,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 22.5,
+            "end": 23.5,
+            "text": "일본에서 아마 증명됐으니까",
+            "speaker": null
+          },
+          {
+            "start": 23.5,
+            "end": 24.0,
+            "text": "아마가 아니",
+            "speaker": null
+          },
+          {
+            "start": 24.0,
+            "end": 25.0,
+            "text": "진짜 증명됐으니까 한번 드셔보시",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#BEBCB7",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 25,
+        "role": "cta",
+        "time_range": [
+          24.33,
+          24.83
+        ],
+        "duration": 0.5,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium"
+          ],
+          "composition": "rule_of_thirds",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "fast",
+          "color_consistency": 0.37,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#BFBEBA",
+            "#9E9487",
+            "#7A5B42"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "none"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 아마가 아니ㄱ",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter with product packaging"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 일본에서의 성공을 언급하며 제품의 맛에 대한 강력한 자신감을 표현하고, '맛 없으면 보장'이라는 멘트로 시청자의 구매를 유도한다.",
+        "attention": {
+          "attention_score": 39,
+          "attention_peak": 39,
+          "peak_timestamp": 24.5,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 24.0,
+            "end": 25.0,
+            "text": "진짜 증명됐으니까 한번 드셔보시",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#BFBEBA",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 26,
+        "role": "cta",
+        "time_range": [
+          24.83,
+          27.77
+        ],
+        "duration": 2.93,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium",
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 3.0,
+          "motion_level": "slow",
+          "color_consistency": 0.74,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#BEBCB8",
+            "#BEBDB9",
+            "#E7E5DF"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "none"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 진짜 증명됐으니까",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 1.0
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 한 번 드셔보세요",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 일단 드셔보시ㄱ",
+              "purpose": "hook_question",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n(PD) - 맛 없으면 보장해라",
+              "purpose": "social_proof",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 1.0
+            }
+          ],
+          "attention_elements": [
+            "Seaweed product packaging",
+            "Seaweed snack packaging",
+            "Person presenting various seaweed snack products",
+            "Presenter with various seaweed snack products",
+            "Variety of seasoned seaweed products"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 일본에서의 성공을 언급하며 제품의 맛에 대한 강력한 자신감을 표현하고, '맛 없으면 보장'이라는 멘트로 시청자의 구매를 유도한다.",
+        "attention": {
+          "attention_score": 16,
+          "attention_peak": 40,
+          "peak_timestamp": 25.0,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 24.0,
+            "end": 25.0,
+            "text": "진짜 증명됐으니까 한번 드셔보시",
+            "speaker": null
+          },
+          {
+            "start": 25.0,
+            "end": 26.0,
+            "text": "드셔보시",
+            "speaker": null
+          },
+          {
+            "start": 26.0,
+            "end": 27.0,
+            "text": "맛 없으면 보장하실 거니까",
+            "speaker": null
+          },
+          {
+            "start": 27.0,
+            "end": 27.5,
+            "text": "보장할게요.",
+            "speaker": null
+          },
+          {
+            "start": 27.5,
+            "end": 28.0,
+            "text": "보장할게요.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": null,
+          "typography_weight": null,
+          "text_color_primary": null,
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#BEBCB8",
+          "accent_color": null,
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 26.0,
+            "content": "(PD) - 맛 없으면 보장해라",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "independent"
+          },
+          {
+            "time": 27.0,
+            "content": "태풍 김",
+            "entrance": "slide_up",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "guarantee",
+            "claim": "맛 없으면 보장해라 (PD), 보장할게요 (Presenter)",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '맛 없으면 보장해라' 텍스트와 진행자의 자신감 있는 표정",
+              "timestamp": 26.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 27,
+        "role": "cta",
+        "time_range": [
+          27.77,
+          29.03
+        ],
+        "duration": 1.27,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 2,
+          "avg_cut_interval": 0.75,
+          "motion_level": "fast",
+          "color_consistency": 0.51,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#BEBEBB",
+            "#BBB9B5",
+            "#BCBBB7"
+          ],
+          "zoom_events": [
+            {
+              "time_range": [
+                28.0,
+                29.0
+              ],
+              "direction": "zoom_out",
+              "scale_change": 0.099
+            }
+          ],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "packaging",
+          "product_context": "studio",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": true,
+            "gesture": "none"
+          },
+          "text_overlays": [
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n-○○ 보장한다\n(PD) - 맛 없으면 보장해라",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n태풍김\n김\n味付\nのり\n付り\n태풍\nZIPPER\nK\n한국 가정식도\n태풍",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "진짜\n자신 있습니다",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Presenter promoting various seaweed snack products",
+            "Person presenting seaweed product with text overlay",
+            "Presenter confidently promoting product"
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "진행자가 일본에서의 성공을 언급하며 제품의 맛에 대한 강력한 자신감을 표현하고, '맛 없으면 보장'이라는 멘트로 시청자의 구매를 유도한다.",
+        "attention": {
+          "attention_score": 45,
+          "attention_peak": 56,
+          "peak_timestamp": 29.0,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 27.5,
+            "end": 28.0,
+            "text": "보장할게요.",
+            "speaker": null
+          },
+          {
+            "start": 28.0,
+            "end": 28.5,
+            "text": "보장.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": null,
+          "has_text_background": true,
+          "text_bg_color": "#000000",
+          "graphic_elements": [
+            "logo"
+          ],
+          "dominant_layout": "text-top/person-middle/product-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#BBB9B5",
+          "accent_color": "#968775",
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      }
+    ],
+    "temporal_profile": {
+      "total_duration": 29.5,
+      "attention_arc": "building→peak→fade",
+      "cut_rhythm_summary": "16 cuts, 1.8s avg interval, decelerating",
+      "dominant_transition": "hard_cut",
+      "text_density": "high",
+      "product_human_balance": "product-dominant"
+    },
+    "production_guide": {
+      "scene_guides": [
+        {
+          "scene_id": 1,
+          "role": "hook",
+          "time_range": [
+            0.0,
+            1.23
+          ],
+          "duration": 1.23,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.0s, stays 0.5s",
+          "attention_level": "정적 attention, avg score 11",
+          "camera_suggestion": "medium shot, slow motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 2,
+          "role": "solution",
+          "time_range": [
+            1.23,
+            2.03
+          ],
+          "duration": 0.8,
+          "cut_rhythm": "1 cuts, ~0.8s/cut",
+          "text_timing": "text appears at 0.3s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 1.5s (score 86)",
+          "camera_suggestion": "closeup shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 3,
+          "role": "solution",
+          "time_range": [
+            2.03,
+            2.87
+          ],
+          "duration": 0.83,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.5s, stays 0.5s",
+          "attention_level": "강 attention, peak at 2.5s (score 68)",
+          "camera_suggestion": "closeup shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 4,
+          "role": "demo",
+          "time_range": [
+            2.87,
+            4.87
+          ],
+          "duration": 2.0,
+          "cut_rhythm": "1 cuts, ~2.0s/cut",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 3.0s (score 76)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 5,
+          "role": "demo",
+          "time_range": [
+            4.87,
+            5.6
+          ],
+          "duration": 0.73,
+          "cut_rhythm": "1 cuts, ~0.7s/cut",
+          "text_timing": "text appears at 0.1s, stays 1.0s",
+          "attention_level": "강 attention, peak at 5.0s (score 69)",
+          "camera_suggestion": "closeup shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 6,
+          "role": "demo",
+          "time_range": [
+            5.6,
+            6.27
+          ],
+          "duration": 0.67,
+          "cut_rhythm": "1 cuts, ~0.7s/cut",
+          "text_timing": "text appears at 0.4s, stays 0.5s",
+          "attention_level": "강 attention, peak at 6.0s (score 72)",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 7,
+          "role": "proof",
+          "time_range": [
+            6.27,
+            7.33
+          ],
+          "duration": 1.07,
+          "cut_rhythm": "1 cuts, ~1.1s/cut",
+          "text_timing": "text appears at 0.2s, stays 0.5s",
+          "attention_level": "강 attention, peak at 6.5s (score 70)",
+          "camera_suggestion": "closeup shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 8,
+          "role": "proof",
+          "time_range": [
+            7.33,
+            7.87
+          ],
+          "duration": 0.53,
+          "cut_rhythm": "1 cuts, ~0.5s/cut",
+          "text_timing": "text appears at 0.2s, stays 0.5s",
+          "attention_level": "강 attention, peak at 7.5s (score 72)",
+          "camera_suggestion": "closeup shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 9,
+          "role": "proof",
+          "time_range": [
+            7.87,
+            8.77
+          ],
+          "duration": 0.9,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "중 attention, avg score 30",
+          "camera_suggestion": "closeup shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 10,
+          "role": "proof",
+          "time_range": [
+            8.77,
+            10.23
+          ],
+          "duration": 1.47,
+          "cut_rhythm": "1 cuts, ~1.5s/cut",
+          "text_timing": "text appears at 0.2s, stays 11.5s",
+          "attention_level": "클라이막스 attention, peak at 9.0s (score 84)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 11,
+          "role": "proof",
+          "time_range": [
+            10.23,
+            11.03
+          ],
+          "duration": 0.8,
+          "cut_rhythm": "1 cuts, ~0.8s/cut",
+          "text_timing": "text appears at 0.3s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 10.5s (score 84)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 12,
+          "role": "proof",
+          "time_range": [
+            11.03,
+            12.17
+          ],
+          "duration": 1.13,
+          "cut_rhythm": "1 cuts, ~1.1s/cut",
+          "text_timing": "text appears at 0.5s, stays 1.0s",
+          "attention_level": "강 attention, peak at 11.5s (score 60)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 13,
+          "role": "proof",
+          "time_range": [
+            12.17,
+            13.4
+          ],
+          "duration": 1.23,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.3s, stays 0.5s",
+          "attention_level": "중 attention, avg score 21",
+          "camera_suggestion": "medium shot, moderate motion, zoom_out (8%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 14,
+          "role": "proof",
+          "time_range": [
+            13.4,
+            14.4
+          ],
+          "duration": 1.0,
+          "cut_rhythm": "2 cuts, ~0.5s/cut",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 14.0s (score 81)",
+          "camera_suggestion": "medium shot, jump_cut motion, zoom_in (5%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 15,
+          "role": "proof",
+          "time_range": [
+            14.4,
+            15.37
+          ],
+          "duration": 0.97,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.6s, stays 0.5s",
+          "attention_level": "강 attention, avg score 32",
+          "camera_suggestion": "wide shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 16,
+          "role": "proof",
+          "time_range": [
+            15.37,
+            16.63
+          ],
+          "duration": 1.27,
+          "cut_rhythm": "1 cuts, ~1.3s/cut",
+          "text_timing": "text appears at 0.6s, stays 2.0s",
+          "attention_level": "클라이막스 attention, peak at 15.5s (score 82)",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 17,
+          "role": "proof",
+          "time_range": [
+            16.63,
+            17.23
+          ],
+          "duration": 0.6,
+          "cut_rhythm": "1 cuts, ~0.6s/cut",
+          "text_timing": "text appears at 0.4s, stays 0.5s",
+          "attention_level": "강 attention, peak at 17.0s (score 75)",
+          "camera_suggestion": "closeup shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 18,
+          "role": "proof",
+          "time_range": [
+            17.23,
+            17.87
+          ],
+          "duration": 0.63,
+          "cut_rhythm": "no cuts",
+          "text_timing": "no text overlay",
+          "attention_level": "중 attention, avg score 23",
+          "camera_suggestion": "closeup shot, slow motion, zoom_out (7%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 19,
+          "role": "recap",
+          "time_range": [
+            17.87,
+            18.9
+          ],
+          "duration": 1.03,
+          "cut_rhythm": "1 cuts, ~1.0s/cut",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "강 attention, peak at 18.0s (score 64)",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 20,
+          "role": "recap",
+          "time_range": [
+            18.9,
+            19.9
+          ],
+          "duration": 1.0,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "중 attention, avg score 37",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 21,
+          "role": "recap",
+          "time_range": [
+            19.9,
+            20.53
+          ],
+          "duration": 0.63,
+          "cut_rhythm": "1 cuts, ~0.6s/cut",
+          "text_timing": "text appears at 0.6s, stays 0.5s",
+          "attention_level": "강 attention, peak at 20.0s (score 72)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 22,
+          "role": "demo",
+          "time_range": [
+            20.53,
+            21.43
+          ],
+          "duration": 0.9,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.5s, stays 0.5s",
+          "attention_level": "중 attention, avg score 34",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 23,
+          "role": "demo",
+          "time_range": [
+            21.43,
+            22.6
+          ],
+          "duration": 1.17,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "중 attention, avg score 30",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 24,
+          "role": "cta",
+          "time_range": [
+            22.6,
+            24.33
+          ],
+          "duration": 1.73,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.4s, stays 0.5s",
+          "attention_level": "강 attention, peak at 23.0s (score 52)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 25,
+          "role": "cta",
+          "time_range": [
+            24.33,
+            24.83
+          ],
+          "duration": 0.5,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.2s, stays 0.5s",
+          "attention_level": "중 attention, avg score 39",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 26,
+          "role": "cta",
+          "time_range": [
+            24.83,
+            27.77
+          ],
+          "duration": 2.93,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.2s, stays 1.0s",
+          "attention_level": "중 attention, avg score 16",
+          "camera_suggestion": "medium shot, slow motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 27,
+          "role": "cta",
+          "time_range": [
+            27.77,
+            29.03
+          ],
+          "duration": 1.27,
+          "cut_rhythm": "1 cuts, ~1.3s/cut",
+          "text_timing": "text appears at 0.2s, stays 0.5s",
+          "attention_level": "강 attention, peak at 29.0s (score 56)",
+          "camera_suggestion": "medium shot, fast motion, zoom_out (10%)",
+          "key_technique": ""
+        }
+      ],
+      "recommended_cut_rhythm": "decelerating rhythm, target 1.8s avg interval",
+      "text_overlay_strategy": "50 text overlays, avg dwell 0.8s, 1.70 texts/sec",
+      "camera_movement_notes": "4 zoom events",
+      "attention_curve_target": "building→peak→fade, avg attention 38, peaks at 1.5s, 3.0s, 5.0s, 6.0s, 7.5s, 9.0s, 10.5s, 11.5s, 14.0s, 15.5s, 17.0s, 18.0s, 20.0s, 23.0s, 29.0s"
+    },
+    "scene_cards": [
+      {
+        "scene_id": 1,
+        "time_range": [
+          0.0,
+          1.23
+        ],
+        "duration": 1.23,
+        "role": "hook",
+        "description": "진행자가 '김이 다 거기서 거기'라는 일반적인 인식을 질문하며 시청자의 호기심을 자극한다.",
+        "appeal_points": [
+          {
+            "type": "myth_bust",
+            "claim": "김이 다 거기서 거기라고요?",
+            "visual_proof": {
+              "technique": "none",
+              "description": "진행자가 직접 질문을 던지며 시청자의 고정관념을 자극",
+              "timestamp": 0.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          },
+          {
+            "type": "sensory",
+            "claim": "한 입 드셔보시면 바로 아실 겁니다.",
+            "visual_proof": {
+              "technique": "closeup",
+              "description": "밥 위에 김을 올려 먹는 모습 클로즈업",
+              "timestamp": 1.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          },
+          {
+            "type": "achievement",
+            "claim": "150억 팔린 조미김",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '150억 팔린 조미김' 텍스트 강조",
+              "timestamp": 1.0
+            },
+            "audio_sync": "text_only",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "slow",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 11,
+        "attention_peak": 19,
+        "attention_level": "low",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "김\n길이 다",
+            "purpose": "brand",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "김\n길이 다\n거기서 거기라고요?",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "깊이 다\n거기서 거기라고요?",
+            "purpose": "hook_question",
+            "font_style": "handwritten",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#C0BFBC",
+          "#6C665F",
+          "#6E6762"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": null,
+        "narration": "김이 다 거기서 거기라고요? 한 입 드셔보시면 바로 아실 겁니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 2,
+        "time_range": [
+          1.23,
+          2.03
+        ],
+        "duration": 0.8,
+        "role": "solution",
+        "description": "밥 위에 김을 올려 먹는 모습을 클로즈업하여 제품의 맛을 시각적으로 암시하며, 직접 먹어보면 차이를 알 것이라고 말한다.",
+        "appeal_points": [],
+        "shot_type": "closeup",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 53,
+        "attention_peak": 86,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.8s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n한 입 드셔보시면",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n한 입 드셔보시면",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#C5A986",
+          "#C5A888",
+          "#967A67"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": null,
+        "narration": "한 입 드셔보시면 바로 아실 겁니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 3,
+        "time_range": [
+          2.03,
+          2.87
+        ],
+        "duration": 0.83,
+        "role": "solution",
+        "description": "밥 위에 김을 올려 먹는 모습을 클로즈업하여 제품의 맛을 시각적으로 암시하며, 직접 먹어보면 차이를 알 것이라고 말한다.",
+        "appeal_points": [],
+        "shot_type": "closeup",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 68,
+        "attention_peak": 68,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "★참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n★바로 아실겁니다★",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#9D8B88",
+          "#1D1713",
+          "#E0C0A6"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #FFFF00",
+        "narration": "한 입 드셔보시면 바로 아실 겁니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 4,
+        "time_range": [
+          2.87,
+          4.87
+        ],
+        "duration": 2.0,
+        "role": "demo",
+        "description": "진행자가 4가지 맛(참기름, 명란, 와사비, 김치)의 태풍김 제품을 직접 들고 보여주며, 단순한 김이 아님을 강조한다.",
+        "appeal_points": [
+          {
+            "type": "specification",
+            "claim": "참기름 명란 와사비 김치 4가지 맛",
+            "visual_proof": {
+              "technique": "package_shot",
+              "description": "다양한 맛의 김 제품 패키지를 보여줌",
+              "timestamp": 3.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 40,
+        "attention_peak": 76,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~2.0s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n태김\nSESAME O\n참기름\n200 태\n태풍김 4종\n시대인은 참기름가득\nFOLCE\n2024.08.20\n한국건\n・SESAME OIL ごま油塩味。\n참기름 가득 3부\n신년에 좋은 원\n방식으로 입맛과 향이\nHACCP 인증기one\n15022300 연중기ISH\nW",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n자\n대풍愛김\nSAMEOL\nPOLLACK\n명란\n2024.08.20 대용\n★태풍김 4종★\n한국전트 재래김\n서해안 좋은원 참기름가득\n풍김\nG08.20\nPOLLACK 明太子。\n•POLLACK 明太子味。\n*POLLACK 明太子珠\n서해안 좋은원초\n참기름 가\n방식으로 김맛과 향이 뛰어난\nHACCPFDA\n15022000\n명란맛",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n愛김\n와사비\n2005.08.31\n2005. 08. 31\n★태풍김 4종\n・WASABI わさび味・\n한국전통재래김\n서태안 좋은텐츠 장기용가득\n태풍愛김\n2024.08.31\n참기름가동\n김 태풍김\n・WASABI わさび味\n・WASABI わさび味・\n서해안 좋은원초\n참기름 가득 3봉\n신년감 좋은 원초\n방식으로 김맛과 향이 뛰어\nHACCP 인증기업 | FDA O",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n김\n김치\nEH\n한국\n2008.08.20\nE ★태풍김 4종★\n한국전통재래김\n좋은원초 참기름가득\n대풍愛김\nKIMCHIキムチ\n태풍愛김\n*KIMCHI キムチ味・\n서해안 좋은원초\n참기를 가득 3봉\n구이\n정식으로 맛과 등이 뛰어났다\nHACCP 인증기업\n15022000 경기",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#A0A19C",
+          "#969B8D",
+          "#94958F"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic bold #FFFFFF",
+        "narration": "참기름 명란 와사비 김치",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 5,
+        "time_range": [
+          4.87,
+          5.6
+        ],
+        "duration": 0.73,
+        "role": "demo",
+        "description": "진행자가 4가지 맛(참기름, 명란, 와사비, 김치)의 태풍김 제품을 직접 들고 보여주며, 단순한 김이 아님을 강조한다.",
+        "appeal_points": [],
+        "shot_type": "closeup",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "product_only",
+        "product_visibility": "full",
+        "attention_score": 46,
+        "attention_peak": 69,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.7s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n그냥 김이 아닙니다",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 1.0
+          }
+        ],
+        "color_palette": [
+          "#C0B59A",
+          "#C0B79D",
+          "#E1DDCF"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #000000",
+        "narration": "참기름 명란 와사비 김치 이건 그냥 김이 아닙니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 6,
+        "time_range": [
+          5.6,
+          6.27
+        ],
+        "duration": 0.67,
+        "role": "demo",
+        "description": "진행자가 4가지 맛(참기름, 명란, 와사비, 김치)의 태풍김 제품을 직접 들고 보여주며, 단순한 김이 아님을 강조한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 72,
+        "attention_peak": 72,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.7s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n(뭔데요?)",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#A3A39C",
+          "#CFCDD4",
+          "#75654C"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": null,
+        "narration": "이건 그냥 김이 아닙니다. 저희 태풍김은",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 7,
+        "time_range": [
+          6.27,
+          7.33
+        ],
+        "duration": 1.07,
+        "role": "proof",
+        "description": "일본 대형 마트 진열대 사진과 함께 1000만 달러 이상 수출 및 현지 편의점(로손, 돈키호테)에서의 인기를 언급하며 제품의 글로벌 경쟁력을 증명한다.",
+        "appeal_points": [
+          {
+            "type": "social_proof",
+            "claim": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+            "visual_proof": {
+              "technique": "location_shot",
+              "description": "일본 마트 진열대 사진과 함께 수출액 및 매장 수 텍스트 오버레이",
+              "timestamp": 7.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "closeup",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 70,
+        "attention_peak": 70,
+        "attention_level": "high",
+        "cut_count": 1,
+        "cut_rhythm": "1 cuts, ~1.1s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n저희 태풍김은",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n일본에서만",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#7F5A53",
+          "#97969B",
+          "#1A1512"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #ffffff",
+        "narration": "저희 태풍김은 일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 8,
+        "time_range": [
+          7.33,
+          7.87
+        ],
+        "duration": 0.53,
+        "role": "proof",
+        "description": "일본 대형 마트 진열대 사진과 함께 1000만 달러 이상 수출 및 현지 편의점(로손, 돈키호테)에서의 인기를 언급하며 제품의 글로벌 경쟁력을 증명한다.",
+        "appeal_points": [],
+        "shot_type": "closeup",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 72,
+        "attention_peak": 72,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.5s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "1000만딸라",
+            "purpose": "price_offer",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#C4A899",
+          "#AE8A5D",
+          "#6D5647"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": null,
+        "narration": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 9,
+        "time_range": [
+          7.87,
+          8.77
+        ],
+        "duration": 0.9,
+        "role": "proof",
+        "description": "일본 대형 마트 진열대 사진과 함께 1000만 달러 이상 수출 및 현지 편의점(로손, 돈키호테)에서의 인기를 언급하며 제품의 글로벌 경쟁력을 증명한다.",
+        "appeal_points": [],
+        "shot_type": "closeup",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 30,
+        "attention_peak": 30,
+        "attention_level": "medium",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "★★참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n1000만딸라",
+            "purpose": "price_offer",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "★참기를 명란 와사비 김치★\n4가지맛 150억 팔린 조미김",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "top_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#C19C8F",
+          "#C4A699",
+          "#B0895F"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": null,
+        "narration": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 10,
+        "time_range": [
+          8.77,
+          10.23
+        ],
+        "duration": 1.47,
+        "role": "proof",
+        "description": "일본 대형 마트 진열대 사진과 함께 1000만 달러 이상 수출 및 현지 편의점(로손, 돈키호테)에서의 인기를 언급하며 제품의 글로벌 경쟁력을 증명한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 34,
+        "attention_peak": 84,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~1.5s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\nお菓子\n(일본 24개 18000개 매장)\n태풍 김\n태풍 김 대표 김\nSESAVEで\n서해안 좋은\n태풍김\n참기름 가득 3ㅎ\n소비",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\nお菓子\n로손 등\n(일본 24개 18000개 매장)\n태풍김\n소비\nSESAVE\n서안 좋은음초\n참기를 가득",
+            "purpose": "benefit",
+            "font_style": "minimal",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#888989",
+          "#7C7F7F",
+          "#787B7C"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold white",
+        "narration": "일본에서도 천만 달러 이상 수출되고 롱키오떼, 로손 같은 곳에서도 사랑받고 있습니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 11,
+        "time_range": [
+          10.23,
+          11.03
+        ],
+        "duration": 0.8,
+        "role": "proof",
+        "description": "진행자가 국내산 명품 원초(완도+서천)만을 사용한다는 첫 번째 자랑을 설명하며 제품의 원재료 우수성을 강조한다.",
+        "appeal_points": [
+          {
+            "type": "origin",
+            "claim": "100% 국내산 명품 원초 사용 (완도 + 서천)",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "진행자가 제품을 들고 '100% 국내산 원초 사용' 텍스트 강조",
+              "timestamp": 11.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 46,
+        "attention_peak": 84,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.8s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n♥사랑받고 있습니다♡",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n♡사랑받고 있습니다♡",
+            "purpose": "social_proof",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#A9ABA3",
+          "#ABADA6",
+          "#9A8B73"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": null,
+        "narration": "첫째 저희는 국내산 명품 원초만 사용합니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 12,
+        "time_range": [
+          11.03,
+          12.17
+        ],
+        "duration": 1.13,
+        "role": "proof",
+        "description": "진행자가 국내산 명품 원초(완도+서천)만을 사용한다는 첫 번째 자랑을 설명하며 제품의 원재료 우수성을 강조한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 32,
+        "attention_peak": 60,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~1.1s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n첫째\n100% 국내산 원초 사용",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "full",
+            "dwell_time": 1.0
+          }
+        ],
+        "color_palette": [
+          "#94968D",
+          "#94978E",
+          "#D6D7E1"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "handwritten bold yellow",
+        "narration": "저희는 국내산 명품 원초만 사용합니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 13,
+        "time_range": [
+          12.17,
+          13.4
+        ],
+        "duration": 1.23,
+        "role": "proof",
+        "description": "진행자가 국내산 명품 원초(완도+서천)만을 사용한다는 첫 번째 자랑을 설명하며 제품의 원재료 우수성을 강조한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 22,
+        "attention_peak": 33,
+        "attention_level": "medium",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n첫째\n100% 국내산 원초 사용\n(완도 + 서천)",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n자\n첫째\n100% 국내산 원초 사용\nEH\nSESA\n(완도 + 서천)\n단원에 참가\n태풍김\nSESAME\n油電\n오리지날\n태풍자반\nKOREAN\nSEASONED\nFLAKES",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#9FA099",
+          "#D3D3DC",
+          "#D2D2DA"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "rounded bold #FFFF00",
+        "narration": "저희는 국내산 명품 원초만 사용합니다. 둘째",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 14,
+        "time_range": [
+          13.4,
+          14.4
+        ],
+        "duration": 1.0,
+        "role": "proof",
+        "description": "김이 컨베이어 벨트에서 두 번 구워지는 공정 과정을 보여주며, '더 바삭함'이라는 두 번째 특징을 시각적으로 증명한다.",
+        "appeal_points": [
+          {
+            "type": "process",
+            "claim": "두 번 구워 더~ 바삭합니다.",
+            "visual_proof": {
+              "technique": "process_shot",
+              "description": "김이 컨베이어 벨트에서 두 번 구워지는 공정 과정",
+              "timestamp": 14.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "jump_cut",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 68,
+        "attention_peak": 81,
+        "attention_level": "peak",
+        "cut_count": 1,
+        "cut_rhythm": "2 cuts, ~0.5s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n태풍임의 자랑\n둘째",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n둘째\n두번 구워 더~ 빠삭",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#949487",
+          "#61625D",
+          "#262621"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #ffffff",
+        "narration": "둘째 두 번 구워 더~ 바삭합니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 15,
+        "time_range": [
+          14.4,
+          15.37
+        ],
+        "duration": 0.97,
+        "role": "proof",
+        "description": "김이 컨베이어 벨트에서 두 번 구워지는 공정 과정을 보여주며, '더 바삭함'이라는 두 번째 특징을 시각적으로 증명한다.",
+        "appeal_points": [],
+        "shot_type": "wide",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "product_only",
+        "product_visibility": "full",
+        "attention_score": 32,
+        "attention_peak": 47,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n둘째\n두번 구워 더~ 빠삭",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n둘째\n두 번 구워 더~ 빠삭",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#767C6A",
+          "#54544B",
+          "#4E4B45"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #FFFF00",
+        "narration": "두 번 구워 더~ 바삭합니다. 셋째",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 16,
+        "time_range": [
+          15.37,
+          16.63
+        ],
+        "duration": 1.27,
+        "role": "proof",
+        "description": "방습제 없이도 오래 바삭함을 유지한다는 세 번째 특징을 설명하며, 제품의 신선도 유지 기술력을 강조한다.",
+        "appeal_points": [
+          {
+            "type": "specification",
+            "claim": "방습제 없는데 오래오래 바삭바삭",
+            "visual_proof": {
+              "technique": "closeup",
+              "description": "방습제 없는 김 봉투와 바삭한 김을 보여줌",
+              "timestamp": 16.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 49,
+        "attention_peak": 82,
+        "attention_level": "peak",
+        "cut_count": 1,
+        "cut_rhythm": "1 cuts, ~1.3s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n셋째\n방습제 없는데\n오래오래 바삭바삭",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n셋째\n방습제 없는데\n오래오래 바삭바삭 ||\nCA GEL\nCLEAN PAK",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#9C9D95",
+          "#929182",
+          "#D6D6D6"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #FFFFFF",
+        "narration": "셋째 방습제 없시도 바삭바삭함이 오래 갑니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 17,
+        "time_range": [
+          16.63,
+          17.23
+        ],
+        "duration": 0.6,
+        "role": "proof",
+        "description": "방습제 없이도 오래 바삭함을 유지한다는 세 번째 특징을 설명하며, 제품의 신선도 유지 기술력을 강조한다.",
+        "appeal_points": [],
+        "shot_type": "closeup",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 75,
+        "attention_peak": 75,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.6s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n셋째\n태풍 김\n방습제 없는데\n오래오래 바삭바삭",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#988B88",
+          "#DDC5B1",
+          "#1B1612"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #FFFF00",
+        "narration": "방습제 없시도 바삭바삭함이 오래 갑니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 18,
+        "time_range": [
+          17.23,
+          17.87
+        ],
+        "duration": 0.63,
+        "role": "proof",
+        "description": "방습제 없이도 오래 바삭함을 유지한다는 세 번째 특징을 설명하며, 제품의 신선도 유지 기술력을 강조한다.",
+        "appeal_points": [],
+        "shot_type": "closeup",
+        "camera_motion": "slow",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 23,
+        "attention_peak": 23,
+        "attention_level": "medium",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n셋째\n방습제 없는데\n오래오래 바삭바삭",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#968E8D",
+          "#E3C9B2",
+          "#9E7735"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic bold yellow",
+        "narration": "방습제 없시도 바삭바삭함이 오래 갑니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 19,
+        "time_range": [
+          17.87,
+          18.9
+        ],
+        "duration": 1.03,
+        "role": "recap",
+        "description": "진행자가 4가지 맛 김이 밥 반찬으로 완벽하다고 요약하며 제품의 활용도를 다시 한번 강조한다.",
+        "appeal_points": [
+          {
+            "type": "lifestyle",
+            "claim": "네 가지 맛을 밥 반찬으로 완벽합니다.",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "다양한 반찬과 함께 김을 먹는 모습",
+              "timestamp": 18.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "moderate"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 45,
+        "attention_peak": 64,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~1.0s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치★\n4가지맛 150억 팔린 조미김\n4가지 맛으로",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "top_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n밥 반찬",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#98968F",
+          "#B0AFAA",
+          "#929086"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #FFFF00",
+        "narration": "방습제 없시도 바삭바삭함이 오래 갑니다. 네 가지 맛을 밥 반찬으로 완벽합니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 20,
+        "time_range": [
+          18.9,
+          19.9
+        ],
+        "duration": 1.0,
+        "role": "recap",
+        "description": "진행자가 4가지 맛 김이 밥 반찬으로 완벽하다고 요약하며 제품의 활용도를 다시 한번 강조한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 38,
+        "attention_peak": 39,
+        "attention_level": "medium",
+        "cut_count": 1,
+        "cut_rhythm": "no cuts",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n술안주로",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n완벽합니다",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#A2A19B",
+          "#B5B4B2",
+          "#93918C"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #FFFFFF",
+        "narration": "네 가지 맛을 밥 반찬으로 완벽합니다. 태풍 마트김 그 한 장에 다릅니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 21,
+        "time_range": [
+          19.9,
+          20.53
+        ],
+        "duration": 0.63,
+        "role": "recap",
+        "description": "진행자가 4가지 맛 김이 밥 반찬으로 완벽하다고 요약하며 제품의 활용도를 다시 한번 강조한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 40,
+        "attention_peak": 72,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.6s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n태풍마트 김",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#C6C5C2",
+          "#C1BFBC",
+          "#A0876E"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #000000",
+        "narration": "태풍 마트김 그 한 장에 다릅니다.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 22,
+        "time_range": [
+          20.53,
+          21.43
+        ],
+        "duration": 0.9,
+        "role": "demo",
+        "description": "진행자가 김을 크게 한 입 베어 물며 바삭한 소리를 들려주고, 제품의 식감을 생생하게 전달한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 34,
+        "attention_peak": 34,
+        "attention_level": "medium",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n이 한장이...\n다릅니다....\n태풍 김\nZIPPER\n불고\nZIPPER\n한국 가정식의 전통\n한국 가정식\n태풍\nKOREAN\nSEASON\nFLAKE\n태풍",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#C0C0BD",
+          "#5F503E",
+          "#9C8672"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": null,
+        "narration": null,
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 23,
+        "time_range": [
+          21.43,
+          22.6
+        ],
+        "duration": 1.17,
+        "role": "demo",
+        "description": "진행자가 김을 크게 한 입 베어 물며 바삭한 소리를 들려주고, 제품의 식감을 생생하게 전달한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 30,
+        "attention_peak": 42,
+        "attention_level": "medium",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n쿠어나와와ㅏ칵",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n오백만불 수출의\n쿠어나와와ㅏ 칵",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n김\n쿠어나와와 칼\n태풍\nZIPPER\n불고기\n기\nDRA\n태종김\n태풍행\nKOREAN\nSEASON\nFLAKE\nZIPPER\n타",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#BCBAB8",
+          "#BBB9B7",
+          "#CACAC7"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic bold #FFFFFF",
+        "narration": "일본에서 아마 증명됐으니까",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 24,
+        "time_range": [
+          22.6,
+          24.33
+        ],
+        "duration": 1.73,
+        "role": "cta",
+        "description": "진행자가 일본에서의 성공을 언급하며 제품의 맛에 대한 강력한 자신감을 표현하고, '맛 없으면 보장'이라는 멘트로 시청자의 구매를 유도한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 22,
+        "attention_peak": 52,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 일본에서 아마(?)",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 증명 됐으니까",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 1.0
+          }
+        ],
+        "color_palette": [
+          "#BEBCB7",
+          "#E6E4DE",
+          "#745C48"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #FFFFFF",
+        "narration": "일본에서 아마 증명됐으니까 아마가 아니 진짜 증명됐으니까 한번 드셔보시",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 25,
+        "time_range": [
+          24.33,
+          24.83
+        ],
+        "duration": 0.5,
+        "role": "cta",
+        "description": "진행자가 일본에서의 성공을 언급하며 제품의 맛에 대한 강력한 자신감을 표현하고, '맛 없으면 보장'이라는 멘트로 시청자의 구매를 유도한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "rule_of_thirds",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 39,
+        "attention_peak": 39,
+        "attention_level": "medium",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 아마가 아니ㄱ",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#BFBEBA",
+          "#9E9487",
+          "#7A5B42"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": null,
+        "narration": "진짜 증명됐으니까 한번 드셔보시",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 26,
+        "time_range": [
+          24.83,
+          27.77
+        ],
+        "duration": 2.93,
+        "role": "cta",
+        "description": "진행자가 일본에서의 성공을 언급하며 제품의 맛에 대한 강력한 자신감을 표현하고, '맛 없으면 보장'이라는 멘트로 시청자의 구매를 유도한다.",
+        "appeal_points": [
+          {
+            "type": "guarantee",
+            "claim": "맛 없으면 보장해라 (PD), 보장할게요 (Presenter)",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '맛 없으면 보장해라' 텍스트와 진행자의 자신감 있는 표정",
+              "timestamp": 26.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "slow",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 16,
+        "attention_peak": 40,
+        "attention_level": "medium",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 진짜 증명됐으니까",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 1.0
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 한 번 드셔보세요",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n- 일단 드셔보시ㄱ",
+            "purpose": "hook_question",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n(PD) - 맛 없으면 보장해라",
+            "purpose": "social_proof",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 1.0
+          }
+        ],
+        "color_palette": [
+          "#BEBCB8",
+          "#BEBDB9",
+          "#E7E5DF"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": null,
+        "narration": "진짜 증명됐으니까 한번 드셔보시 드셔보시 맛 없으면 보장하실 거니까",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 27,
+        "time_range": [
+          27.77,
+          29.03
+        ],
+        "duration": 1.27,
+        "role": "cta",
+        "description": "진행자가 일본에서의 성공을 언급하며 제품의 맛에 대한 강력한 자신감을 표현하고, '맛 없으면 보장'이라는 멘트로 시청자의 구매를 유도한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 45,
+        "attention_peak": 56,
+        "attention_level": "high",
+        "cut_count": 2,
+        "cut_rhythm": "1 cuts, ~1.3s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n-○○ 보장한다\n(PD) - 맛 없으면 보장해라",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "참기름 명란 와사비 김치\n4가지맛 150억 팔린 조미김\n태풍김\n김\n味付\nのり\n付り\n태풍\nZIPPER\nK\n한국 가정식도\n태풍",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "진짜\n자신 있습니다",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#BEBEBB",
+          "#BBB9B5",
+          "#BCBBB7"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic bold #FFFFFF",
+        "narration": "보장할게요. 보장.",
+        "sound_direction": "BGM 유지"
+      }
+    ],
+    "dropoff_analysis": {
+      "risk_zones": [
+        {
+          "time_range": [
+            23.0,
+            27.0
+          ],
+          "risk_score": 40,
+          "risk_level": "medium",
+          "risk_factors": [
+            "소구 공백 5초",
+            "소구 공백 6초",
+            "소구 공백 7초",
+            "집중도 급락 (16%)"
+          ],
+          "suggestion": "이 구간에 sensory 소구 삽입 권장 / 시각적 전환(컷/모션) 추가"
+        }
+      ],
+      "safe_zones": [
+        [
+          0.0,
+          23.0
+        ],
+        [
+          27.0,
+          29.03
+        ]
+      ],
+      "overall_retention_score": 95,
+      "worst_zone": {
+        "time_range": [
+          23.0,
+          27.0
+        ],
+        "risk_score": 40,
+        "risk_level": "medium",
+        "risk_factors": [
+          "소구 공백 5초",
+          "소구 공백 6초",
+          "소구 공백 7초",
+          "집중도 급락 (16%)"
+        ],
+        "suggestion": "이 구간에 sensory 소구 삽입 권장 / 시각적 전환(컷/모션) 추가"
+      },
+      "improvement_priority": [
+        "소구 공백 구간에 적절한 소구 포인트 삽입",
+        "집중도 저하 구간 시각적 전환 추가"
+      ]
+    },
+    "performance_metrics": {
+      "brand_exposure_sec": 29.02,
+      "product_focus_ratio": 100.0,
+      "text_readability_score": 100,
+      "time_to_first_appeal": 0.0,
+      "time_to_cta": 22.6,
+      "info_density": 2.86,
+      "appeal_count": 10,
+      "appeal_diversity": 9,
+      "cut_density": 0.551,
+      "attention_avg": 43,
+      "attention_valley_count": 5
+    }
+  }
+}
