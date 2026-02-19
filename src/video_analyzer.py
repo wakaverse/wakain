@@ -69,6 +69,15 @@ For scene_roles:
 - Roles: hook, problem, solution, demo, proof, brand_intro, transition, cta, recap
 - Include a concise description (1-2 sentences, in Korean) of what happens visually and narratively in each scene
 
+For art_direction (아트 디렉션 — visual identity):
+- tone_and_manner: Overall visual tone in Korean (e.g. '깔끔하고 신뢰감 있는 정보형', '트렌디하고 젊은 감성')
+- Typography system: heading font family, body font family, font colors (hex), how keywords are highlighted
+- Color system: brand/theme colors (hex), background style (solid/gradient/image/video/transparent/mixed), color temperature (warm/neutral/cool)
+- Graphic identity: overall graphic style (clean_minimal/bold_graphic/playful_sticker/premium_elegant/retro_vintage/info_graphic/hand_drawn/photo_real), recurring visual elements (Korean)
+- Layout system: where text typically appears, frame composition rule (Korean)
+- Visual consistency assessment (high/medium/low)
+- Style reference: what this style resembles (Korean, e.g. '쿠팡 라이브 스타일', '인스타 감성')
+
 For persuasion_analysis (소구 분석 — CRITICAL):
 - **presenter**: Who presents the video? (founder/reviewer/narrator/customer/expert/character/none)
   - Is their face shown? What gives them credibility?
@@ -344,6 +353,44 @@ _RESPONSE_SCHEMA = {
     "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis"],
 }
 
+# Separate schema for art_direction (to stay under Gemini schema complexity limit)
+_ART_DIRECTION_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
+        "art_direction": {
+            "type": "OBJECT",
+            "properties": {
+                "tone_and_manner": {"type": "STRING"},
+                "heading_font": {"type": "STRING"},
+                "body_font": {"type": "STRING"},
+                "font_color_system": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "highlight_method": {"type": "STRING"},
+                "brand_colors": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "background_style": {"type": "STRING", "enum": [
+                    "solid_color", "gradient", "image_bg", "video_bg", "transparent", "mixed",
+                ]},
+                "color_temperature": {"type": "STRING", "enum": ["warm", "neutral", "cool"]},
+                "graphic_style": {"type": "STRING", "enum": [
+                    "clean_minimal", "bold_graphic", "playful_sticker", "premium_elegant",
+                    "retro_vintage", "info_graphic", "hand_drawn", "photo_real",
+                ]},
+                "recurring_elements": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "text_position_pattern": {"type": "STRING"},
+                "frame_composition_rule": {"type": "STRING"},
+                "visual_consistency": {"type": "STRING", "enum": ["high", "medium", "low"]},
+                "style_reference": {"type": "STRING"},
+            },
+            "required": [
+                "tone_and_manner", "heading_font", "body_font", "font_color_system",
+                "highlight_method", "brand_colors", "background_style", "color_temperature",
+                "graphic_style", "recurring_elements", "text_position_pattern",
+                "frame_composition_rule", "visual_consistency", "style_reference",
+            ],
+        },
+    },
+    "required": ["art_direction"],
+}
+
 
 def _make_client() -> genai.Client:
     api_key = os.environ.get("GEMINI_API_KEY_PRO") or os.environ.get("GEMINI_API_KEY", "")
@@ -469,7 +516,8 @@ Be specific and detailed. Use Korean for script_summary, hook_line, cta_line, pe
                         temperature=0.1,
                     ),
                 )
-                return json.loads(response.text)
+                result = json.loads(response.text)
+                break
             except Exception as e:
                 wait = 2 ** attempt * 5
                 if attempt < max_retries - 1:
@@ -477,6 +525,58 @@ Be specific and detailed. Use Korean for script_summary, hook_line, cta_line, pe
                     await asyncio.sleep(wait)
                 else:
                     raise RuntimeError(f"Video analysis failed after {max_retries} retries: {e}") from e
+
+        # Phase 4b: Art direction (separate call, same uploaded file)
+        print("  Analysing art direction...")
+        art_prompt = """Analyse this shortform marketing video's visual identity and art direction.
+
+Return a JSON object with art_direction containing:
+- tone_and_manner: overall visual tone in Korean (e.g. '깔끔하고 신뢰감 있는 정보형')
+- heading_font: primary heading font family (gothic/rounded/serif/handwritten/display)
+- body_font: body/subtitle font family
+- font_color_system: list of text colors used (hex)
+- highlight_method: how key words are emphasized (Korean)
+- brand_colors: brand/theme colors (hex list)
+- background_style: solid_color/gradient/image_bg/video_bg/transparent/mixed
+- color_temperature: warm/neutral/cool
+- graphic_style: clean_minimal/bold_graphic/playful_sticker/premium_elegant/retro_vintage/info_graphic/hand_drawn/photo_real
+- recurring_elements: repeated visual elements (Korean list)
+- text_position_pattern: where text typically appears
+- frame_composition_rule: layout rule in Korean
+- visual_consistency: high/medium/low
+- style_reference: what this style resembles in Korean"""
+
+        for attempt in range(max_retries):
+            try:
+                art_response = await client.aio.models.generate_content(
+                    model=MODEL,
+                    contents=[
+                        types.Part.from_uri(
+                            file_uri=uploaded_file.uri,
+                            mime_type=uploaded_file.mime_type,
+                        ),
+                        types.Part.from_text(text=art_prompt),
+                    ],
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_INSTRUCTION,
+                        response_mime_type="application/json",
+                        response_schema=_ART_DIRECTION_SCHEMA,
+                        temperature=0.1,
+                    ),
+                )
+                art_data = json.loads(art_response.text)
+                result["art_direction"] = art_data.get("art_direction", art_data)
+                print("  ✓ Art direction complete")
+                break
+            except Exception as e:
+                wait = 2 ** attempt * 5
+                if attempt < max_retries - 1:
+                    print(f"  ⚠ Art direction retry {attempt+1}/{max_retries} ({type(e).__name__}), waiting {wait}s...")
+                    await asyncio.sleep(wait)
+                else:
+                    print(f"  ⚠ Art direction failed after {max_retries} retries, skipping: {e}")
+
+        return result
     finally:
         # Clean up temp file
         if is_temp and upload_path.exists():

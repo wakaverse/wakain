@@ -114,6 +114,7 @@ def merge_analysis(
             transcript_segments=matched_transcript,
             text_effects=matched_text_effects,
             appeal_points=matched_appeals,
+            artwork=scene.artwork,
         )
         enriched_scenes.append(enriched)
         print(

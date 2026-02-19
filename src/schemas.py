@@ -41,6 +41,106 @@ class FrameQuant(BaseModel):
 # ── frame_qual (Phase 2: Gemini Flash qualitative) ──────────────────────────
 
 
+# ── Artwork analysis (per-frame) ────────────────────────────────────────────
+
+
+class FrameTypography(BaseModel):
+    """Typography details for text overlays in a frame."""
+    font_family: Literal["gothic", "rounded", "serif", "handwritten", "display", "monospace"]
+    font_weight: Literal["thin", "regular", "bold", "extra_bold"]
+    font_color: str = Field(description="Primary text color (hex)")
+    font_size_ratio: Literal["large", "medium", "small"]
+    has_outline: bool
+    outline_color: Optional[str] = Field(default=None, description="Outline color (hex)")
+    has_shadow: bool
+    has_background: bool
+    background_color: Optional[str] = Field(default=None, description="Background box color (hex)")
+    text_alignment: Literal["left", "center", "right"]
+    line_count: int = Field(description="Number of text lines visible")
+    highlight_technique: Literal[
+        "color_change", "size_increase", "underline", "box_highlight",
+        "glow", "bold_keyword", "none",
+    ]
+    highlight_color: Optional[str] = Field(default=None, description="Highlight color if used (hex)")
+
+
+class LayoutZones(BaseModel):
+    """What occupies each vertical third of the frame."""
+    top: Literal["text", "product", "person", "graphic", "empty", "mixed"]
+    middle: Literal["text", "product", "person", "graphic", "empty", "mixed"]
+    bottom: Literal["text", "product", "person", "graphic", "empty", "mixed"]
+    text_product_overlap: bool = Field(description="Whether text overlaps product area")
+
+
+class ColorDesign(BaseModel):
+    """Color usage strategy in the frame."""
+    primary_color: str = Field(description="Dominant background/theme color (hex)")
+    accent_color: Optional[str] = Field(default=None, description="Emphasis/highlight color (hex)")
+    text_bg_contrast: Literal["high", "medium", "low"]
+    color_harmony: Literal["monochrome", "complementary", "analogous", "triadic", "warm_cool_split"]
+
+
+class FrameArtwork(BaseModel):
+    """Per-frame artwork/design analysis."""
+    typography: Optional[FrameTypography] = Field(default=None, description="Typography details; null if no text")
+    graphic_elements: list[Literal[
+        "icon", "sticker", "emoji", "arrow", "circle_highlight",
+        "underline", "box_border", "gradient_overlay", "pattern_bg",
+        "logo", "badge", "watermark", "none",
+    ]] = Field(default_factory=list)
+    layout_zones: LayoutZones
+    color_design: ColorDesign
+
+
+# ── Scene-level artwork (aggregated) ────────────────────────────────────────
+
+
+class SceneArtwork(BaseModel):
+    """Aggregated artwork analysis for a scene."""
+    typography_style: Optional[str] = Field(default=None, description="Dominant font family")
+    typography_weight: Optional[str] = Field(default=None)
+    text_color_primary: Optional[str] = Field(default=None, description="Most common text color (hex)")
+    text_color_highlight: Optional[str] = Field(default=None, description="Highlight color if used (hex)")
+    has_text_background: bool = False
+    text_bg_color: Optional[str] = Field(default=None)
+    graphic_elements: list[str] = Field(default_factory=list, description="Unique graphic elements used")
+    dominant_layout: str = Field(default="", description="e.g. 'text-top/person-middle/product-bottom'")
+    text_product_overlap: bool = False
+    primary_color: Optional[str] = None
+    accent_color: Optional[str] = None
+    contrast_level: str = "medium"
+    color_harmony: Optional[str] = None
+
+
+# ── Video-level art direction ───────────────────────────────────────────────
+
+
+class ArtDirection(BaseModel):
+    """Overall art direction / visual identity of the video."""
+    tone_and_manner: str = Field(description="Overall visual tone in Korean")
+    heading_font: str = Field(description="Primary heading font family")
+    body_font: str = Field(description="Body/subtitle font family")
+    font_color_system: list[str] = Field(description="Colors used for text (hex list)")
+    highlight_method: str = Field(description="How keywords are emphasized")
+    brand_colors: list[str] = Field(description="Brand/theme colors used (hex)")
+    background_style: Literal[
+        "solid_color", "gradient", "image_bg", "video_bg", "transparent", "mixed",
+    ]
+    color_temperature: Literal["warm", "neutral", "cool"]
+    graphic_style: Literal[
+        "clean_minimal", "bold_graphic", "playful_sticker", "premium_elegant",
+        "retro_vintage", "info_graphic", "hand_drawn", "photo_real",
+    ]
+    recurring_elements: list[str] = Field(description="Repeated visual elements (Korean)")
+    text_position_pattern: str = Field(description="Where text typically appears")
+    frame_composition_rule: str = Field(description="Layout rule in Korean")
+    visual_consistency: Literal["high", "medium", "low"]
+    style_reference: str = Field(description="What this style resembles in Korean")
+
+
+# ── Original models continue ───────────────────────────────────────────────
+
+
 class Composition(BaseModel):
     layout: Literal[
         "center", "rule_of_thirds", "diagonal", "symmetry", "frame_in_frame"
@@ -83,6 +183,61 @@ class HumanElement(BaseModel):
     ]
 
 
+class FrameTypography(BaseModel):
+    """Typography details for text overlays in a frame."""
+    font_family: Literal["gothic", "rounded", "serif", "handwritten", "display", "monospace"]
+    font_weight: Literal["thin", "regular", "bold", "extra_bold"]
+    font_color: str = Field(description="Primary text color (hex)")
+    font_size_ratio: Literal["large", "medium", "small"]  # relative to frame
+    has_outline: bool
+    outline_color: Optional[str] = Field(default=None, description="Outline color (hex)")
+    has_shadow: bool
+    has_background: bool
+    background_color: Optional[str] = Field(default=None, description="Background box color (hex)")
+    text_alignment: Literal["left", "center", "right"]
+    line_count: int = Field(description="Number of text lines visible")
+    highlight_technique: Literal[
+        "color_change", "size_increase", "underline", "box_highlight",
+        "glow", "bold_keyword", "none"
+    ] = Field(description="How key words are emphasized")
+    highlight_color: Optional[str] = Field(default=None, description="Highlight color if used (hex)")
+
+
+class LayoutZones(BaseModel):
+    """What occupies each vertical third of the frame."""
+    top: Literal["text", "product", "person", "graphic", "empty", "mixed"]
+    middle: Literal["text", "product", "person", "graphic", "empty", "mixed"]
+    bottom: Literal["text", "product", "person", "graphic", "empty", "mixed"]
+    text_product_overlap: bool = Field(description="Whether text overlaps product area")
+
+
+class ColorDesign(BaseModel):
+    """Color usage strategy in the frame."""
+    primary_color: str = Field(description="Dominant background/theme color (hex)")
+    accent_color: Optional[str] = Field(default=None, description="Emphasis/highlight color (hex)")
+    text_bg_contrast: Literal["high", "medium", "low"] = Field(description="Contrast between text and its background")
+    color_harmony: Literal["monochrome", "complementary", "analogous", "triadic", "warm_cool_split"]
+
+
+class FrameArtwork(BaseModel):
+    """Per-frame artwork/design analysis."""
+    # Typography
+    typography: Optional[FrameTypography] = None  # null if no text
+
+    # Graphic elements
+    graphic_elements: list[Literal[
+        "icon", "sticker", "emoji", "arrow", "circle_highlight",
+        "underline", "box_border", "gradient_overlay", "pattern_bg",
+        "logo", "badge", "watermark", "none",
+    ]] = Field(default_factory=list)
+
+    # Layout
+    layout_zones: LayoutZones  # what occupies top/middle/bottom third
+
+    # Color design
+    color_design: ColorDesign
+
+
 class FrameQual(BaseModel):
     timestamp: float
     shot_type: Literal[
@@ -105,6 +260,8 @@ class FrameQual(BaseModel):
     attention_element: str = Field(
         description="One-line description of the key attention-grabbing element"
     )
+    artwork: Optional[FrameArtwork] = Field(default=None, description="Artwork/design analysis")
+    artwork: Optional[FrameArtwork] = Field(default=None, description="Artwork/design analysis")
 
 
 # ── Combined frame result ───────────────────────────────────────────────────
@@ -220,6 +377,29 @@ class TranscriptSegment(BaseModel):
     speaker: Optional[str] = Field(default=None, description="Speaker label if identifiable")
 
 
+class SceneArtwork(BaseModel):
+    """Aggregated artwork analysis for a scene."""
+    # Typography consistency
+    typography_style: Optional[str] = Field(default=None, description="Dominant font family in scene")
+    typography_weight: Optional[str] = Field(default=None)
+    text_color_primary: Optional[str] = Field(default=None, description="Most common text color (hex)")
+    text_color_highlight: Optional[str] = Field(default=None, description="Highlight color if used (hex)")
+    has_text_background: bool = False
+    text_bg_color: Optional[str] = Field(default=None)
+
+    # Graphic elements
+    graphic_elements: list[str] = Field(default_factory=list, description="Unique graphic elements used")
+
+    # Layout pattern
+    dominant_layout: str = Field(default="", description="e.g. 'text-top/person-middle/product-bottom'")
+    text_product_overlap: bool = False
+
+    # Color design
+    primary_color: Optional[str] = None
+    accent_color: Optional[str] = None
+    contrast_level: str = "medium"
+
+
 class Scene(BaseModel):
     scene_id: int
     role: Literal[
@@ -234,8 +414,10 @@ class Scene(BaseModel):
     description: str = Field(default="", description="Brief description of what happens in this scene")
     energy: Optional[SceneEnergy] = None
     transcript_segments: list[TranscriptSegment] = Field(default_factory=list)
+    artwork: Optional[SceneArtwork] = Field(default=None)
     text_effects: list = Field(default_factory=list)
     appeal_points: list = Field(default_factory=list, description="Persuasion appeal points mapped to this scene by timestamp")
+    artwork: Optional[SceneArtwork] = Field(default=None, description="Aggregated artwork/design analysis")
 
 
 # ── Layer 3: Video Recipe (Phase 5: recipe_builder) ────────────────────────
@@ -460,6 +642,40 @@ class PersuasionAnalysis(BaseModel):
     persuasion_summary: str = Field(description="1-2 sentence summary of the persuasion strategy (Korean)")
 
 
+class ArtDirection(BaseModel):
+    """Overall art direction / visual identity of the video."""
+    # Tone & Manner
+    tone_and_manner: str = Field(description="Overall visual tone in Korean, e.g. '깔끔하고 신뢰감 있는 정보형'")
+
+    # Typography system
+    heading_font: str = Field(description="Primary heading font family")
+    body_font: str = Field(description="Body/subtitle font family")
+    font_color_system: list[str] = Field(description="Colors used for text (hex list)")
+    highlight_method: str = Field(description="How keywords are emphasized")
+
+    # Color system
+    brand_colors: list[str] = Field(description="Brand/theme colors used (hex)")
+    background_style: Literal[
+        "solid_color", "gradient", "image_bg", "video_bg", "transparent", "mixed"
+    ]
+    color_temperature: Literal["warm", "neutral", "cool"]
+
+    # Graphic identity
+    graphic_style: Literal[
+        "clean_minimal", "bold_graphic", "playful_sticker", "premium_elegant",
+        "retro_vintage", "info_graphic", "hand_drawn", "photo_real",
+    ]
+    recurring_elements: list[str] = Field(description="Repeated visual elements (Korean)")
+
+    # Layout system
+    text_position_pattern: str = Field(description="Where text typically appears, e.g. 'top-center, bottom-left alternating'")
+    frame_composition_rule: str = Field(description="Layout rule, e.g. '상단 텍스트 + 중앙 제품 + 하단 가격/CTA'")
+
+    # Overall assessment
+    visual_consistency: Literal["high", "medium", "low"]
+    style_reference: str = Field(description="What this style resembles, e.g. '쿠팡 라이브 스타일', '인스타 감성'")
+
+
 class EffectivenessAssessment(BaseModel):
     hook_rating: str
     flow_rating: str
@@ -650,6 +866,7 @@ class VideoRecipe(BaseModel):
     audio: Audio
     product_strategy: ProductStrategy
     persuasion_analysis: Optional[PersuasionAnalysis] = None
+    art_direction: Optional[ArtDirection] = None
     effectiveness_assessment: EffectivenessAssessment
     scenes: list[Scene]
     temporal_profile: Optional[TemporalProfile] = None

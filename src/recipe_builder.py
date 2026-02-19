@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Optional
 
 from .schemas import (
+    ArtDirection,
     Audio,
     BrandVisibility,
     EffectivenessAssessment,
@@ -636,6 +637,30 @@ def build_recipe(
         except Exception as e:
             print(f"  ⚠ Persuasion analysis parse error: {e}")
 
+    # ── Art direction (from Track 2) ──────────────────────────────────
+    raw_ad = video_analysis.get("art_direction")
+    art_direction = None
+    if raw_ad:
+        try:
+            art_direction = ArtDirection(
+                tone_and_manner=raw_ad.get("tone_and_manner", ""),
+                heading_font=raw_ad.get("heading_font", ""),
+                body_font=raw_ad.get("body_font", ""),
+                font_color_system=raw_ad.get("font_color_system", []),
+                highlight_method=raw_ad.get("highlight_method", ""),
+                brand_colors=raw_ad.get("brand_colors", []),
+                background_style=raw_ad.get("background_style", "mixed"),
+                color_temperature=raw_ad.get("color_temperature", "neutral"),
+                graphic_style=raw_ad.get("graphic_style", "clean_minimal"),
+                recurring_elements=raw_ad.get("recurring_elements", []),
+                text_position_pattern=raw_ad.get("text_position_pattern", ""),
+                frame_composition_rule=raw_ad.get("frame_composition_rule", ""),
+                visual_consistency=raw_ad.get("visual_consistency", "medium"),
+                style_reference=raw_ad.get("style_reference", ""),
+            )
+        except Exception as e:
+            print(f"  ⚠ Art direction parse error: {e}")
+
     # ── Temporal profile + production guide (from temporal analysis) ────
     temporal_profile = None
     production_guide = None
@@ -650,6 +675,7 @@ def build_recipe(
         audio=audio,
         product_strategy=product_strategy,
         persuasion_analysis=persuasion_analysis,
+        art_direction=art_direction,
         effectiveness_assessment=effectiveness,
         scenes=[s for s in scenes],
         temporal_profile=temporal_profile,

@@ -15,6 +15,7 @@ from .schemas import (
     FrameQual,
     FrameQuant,
     Scene,
+    SceneArtwork,
     SceneEnergy,
     SceneHumanElement,
     SceneTextOverlay,
@@ -279,6 +280,102 @@ def _compute_scene_energy(
     }
 
 
+# ── Artwork aggregation ──────────────────────────────────────────────────────
+
+
+def _compute_scene_artwork(quals: list[FrameQual]) -> SceneArtwork | None:
+    """Aggregate FrameArtwork data across frames into a SceneArtwork."""
+    artwork_frames = [q for q in quals if q.artwork is not None]
+    if not artwork_frames:
+        return None
+
+    # Typography: most common font family, weight, colors
+    typo_frames = [q for q in artwork_frames if q.artwork.typography is not None]
+    typography_style = None
+    typography_weight = None
+    text_color_primary = None
+    text_color_highlight = None
+    has_text_background = False
+    text_bg_color = None
+
+    if typo_frames:
+        family_counts = Counter(q.artwork.typography.font_family for q in typo_frames)
+        typography_style = family_counts.most_common(1)[0][0]
+
+        weight_counts = Counter(q.artwork.typography.font_weight for q in typo_frames)
+        typography_weight = weight_counts.most_common(1)[0][0]
+
+        color_counts = Counter(q.artwork.typography.font_color for q in typo_frames)
+        text_color_primary = color_counts.most_common(1)[0][0]
+
+        highlight_colors = [q.artwork.typography.highlight_color for q in typo_frames if q.artwork.typography.highlight_color]
+        if highlight_colors:
+            hl_counts = Counter(highlight_colors)
+            text_color_highlight = hl_counts.most_common(1)[0][0]
+
+        bg_frames = [q for q in typo_frames if q.artwork.typography.has_background]
+        has_text_background = len(bg_frames) > len(typo_frames) / 2
+        if bg_frames:
+            bg_colors = [q.artwork.typography.background_color for q in bg_frames if q.artwork.typography.background_color]
+            if bg_colors:
+                bg_counts = Counter(bg_colors)
+                text_bg_color = bg_counts.most_common(1)[0][0]
+
+    # Graphic elements: union of all unique elements
+    all_elements: set[str] = set()
+    for q in artwork_frames:
+        for elem in q.artwork.graphic_elements:
+            if elem != "none":
+                all_elements.add(elem)
+    graphic_elements = sorted(all_elements)
+
+    # Layout: most common zone pattern
+    layout_patterns: list[str] = []
+    overlap_count = 0
+    for q in artwork_frames:
+        lz = q.artwork.layout_zones
+        pattern = f"{lz.top}-top/{lz.middle}-middle/{lz.bottom}-bottom"
+        layout_patterns.append(pattern)
+        if lz.text_product_overlap:
+            overlap_count += 1
+
+    layout_counts = Counter(layout_patterns)
+    dominant_layout = layout_counts.most_common(1)[0][0] if layout_patterns else ""
+    text_product_overlap = overlap_count > len(artwork_frames) / 2
+
+    # Color: most common primary/accent colors
+    primary_counts = Counter(q.artwork.color_design.primary_color for q in artwork_frames)
+    primary_color = primary_counts.most_common(1)[0][0]
+
+    accent_colors = [q.artwork.color_design.accent_color for q in artwork_frames if q.artwork.color_design.accent_color]
+    accent_color = None
+    if accent_colors:
+        accent_counts = Counter(accent_colors)
+        accent_color = accent_counts.most_common(1)[0][0]
+
+    contrast_counts = Counter(q.artwork.color_design.text_bg_contrast for q in artwork_frames)
+    contrast_level = contrast_counts.most_common(1)[0][0]
+
+    harmony_counts = Counter(q.artwork.color_design.color_harmony for q in artwork_frames)
+    color_harmony = harmony_counts.most_common(1)[0][0] if harmony_counts else None
+
+    return SceneArtwork(
+        typography_style=typography_style,
+        typography_weight=typography_weight,
+        text_color_primary=text_color_primary,
+        text_color_highlight=text_color_highlight,
+        has_text_background=has_text_background,
+        text_bg_color=text_bg_color,
+        graphic_elements=graphic_elements,
+        dominant_layout=dominant_layout,
+        text_product_overlap=text_product_overlap,
+        primary_color=primary_color,
+        accent_color=accent_color,
+        contrast_level=contrast_level,
+        color_harmony=color_harmony,
+    )
+
+
 # ── Public API ──────────────────────────────────────────────────────────────
 
 
@@ -327,6 +424,8 @@ def aggregate_scenes(
             if energy_data:
                 energy = SceneEnergy(**energy_data)
 
+        artwork = _compute_scene_artwork(grp_quals)
+
         scene = Scene(
             scene_id=scene_idx + 1,
             role="transition",  # placeholder; Phase 5 assigns real role
@@ -340,6 +439,7 @@ def aggregate_scenes(
                 emotional_trigger="none",
             ),
             energy=energy,
+            artwork=artwork,
         )
         scenes.append(scene)
         print(f"  ✓ Scene {scene_idx+1}/{len(groups)}: aggregated ({time_range[0]:.1f}s-{time_range[1]:.1f}s)")

@@ -41,6 +41,28 @@ For text_overlay: set to null if no text is visible in the frame.
   outline (bool), shadow (bool), background_box (bool), font_size (large/medium/small).
 For product_presentation: if no product is visible, use visibility="hidden".
 For human_element: if no person is visible, use role="none".
+
+For artwork analysis:
+- typography: Identify font family (gothic=고딕/sans-serif, rounded=둥근체, serif=명조,
+  handwritten=손글씨, display=장식체, monospace=고정폭). Note weight, color (hex),
+  outline/shadow/background, alignment, line count. Detect highlight technique
+  (color_change=특정 단어만 다른 색, size_increase, underline, box_highlight, glow, bold_keyword).
+  Set typography to null if NO text is visible.
+- graphic_elements: List all visual design elements (icon, sticker, emoji, arrow,
+  circle_highlight, underline, box_border, gradient_overlay, pattern_bg, logo, badge, watermark).
+  Use ["none"] if no graphic elements.
+- layout_zones: What occupies each vertical third (top/middle/bottom) of the frame.
+  Options: text, product, person, graphic, empty, mixed.
+- color_design: Identify primary background color (hex), accent/highlight color (hex),
+  text-background contrast level, and color harmony type.
+
+For artwork analysis:
+- Identify typography details: font family (gothic/rounded/serif/handwritten/display), weight, color, outline, shadow, background box
+- Note highlight techniques: which words are emphasized and how (color change, size, underline, glow)
+- Identify graphic elements: icons, stickers, arrows, badges, gradient overlays
+- Describe layout zones: what occupies top/middle/bottom third of frame
+- Assess color design: primary/accent colors, text-background contrast, color harmony
+- If no text/graphics visible, set artwork to null
 """
 
 
