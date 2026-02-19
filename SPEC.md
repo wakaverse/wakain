@@ -156,6 +156,88 @@ wakain/
 - Memory: 2GB, CPU: 2
 - Timeout: 300s (분석 시간 고려)
 
+## 확장 로드맵
+
+### Phase 2: 결제 + 크레딧 (PMF 확인 후)
+```sql
+-- users 확장
+alter table users add column plan text default 'free'; -- free/pro/business
+alter table users add column credits_remaining int default 3;
+alter table users add column credits_reset_at timestamptz;
+
+-- 결제 이력
+create table subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id),
+  plan text not null,
+  provider text not null, -- stripe/portone
+  provider_sub_id text,
+  status text default 'active', -- active/canceled/past_due
+  current_period_start timestamptz,
+  current_period_end timestamptz,
+  created_at timestamptz default now()
+);
+
+create table credit_transactions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id),
+  amount int not null, -- +충전 / -사용
+  reason text, -- 'monthly_reset', 'analysis', 'bonus'
+  job_id uuid references jobs(id),
+  created_at timestamptz default now()
+);
+```
+- 결제: Stripe (글로벌) + 포트원 (국내)
+- 크레딧: Free 3건/월, Pro 50건/월, Business 무제한
+- `middleware/billing.py` — 분석 전 크레딧 차감 체크
+
+### Phase 3: 팀 + 공유 (유료 전환 시)
+```sql
+create table organizations (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  plan text default 'business',
+  created_at timestamptz default now()
+);
+
+create table org_members (
+  org_id uuid references organizations(id),
+  user_id uuid references auth.users(id),
+  role text default 'member', -- owner/admin/member/viewer
+  primary key (org_id, user_id)
+);
+
+-- jobs에 org 컬럼 추가
+alter table jobs add column org_id uuid references organizations(id);
+
+-- 공유 링크
+create table shared_links (
+  id uuid primary key default gen_random_uuid(),
+  job_id uuid references jobs(id),
+  token text unique not null,
+  expires_at timestamptz,
+  created_by uuid references auth.users(id),
+  created_at timestamptz default now()
+);
+```
+- RLS: `org_members`에 기반한 팀 단위 접근 제어
+- 공유: 토큰 기반 공개 URL (`/shared/{token}`)
+- 팀 대시보드: 팀원별 분석 현황
+
+### Phase 4: 엔터프라이즈 (B2B 수요 확인 시)
+- SSO (SAML/OIDC)
+- API Key 발급 (`api_keys` 테이블) → 외부 연동
+- 대량 분석 배치 API
+- 커스텀 벤치마크 DB (자사 영상끼리 비교)
+- SLA + 전용 Cloud Run 인스턴스
+- 감사 로그 (`audit_logs` 테이블)
+
+### 확장 설계 원칙
+1. **모든 테이블에 `user_id` FK** → Phase 3에서 `org_id` 추가만으로 팀 전환
+2. **RLS 정책 기반 권한** → 코드 변경 없이 정책만 추가
+3. **서비스 레이어 분리** → `services/billing.py`, `services/sharing.py` 등 독립 모듈
+4. **config 기반 제한** → plan별 limits를 config/DB로 관리 (하드코딩 금지)
+
 ## 비용 (월)
 
 | 항목 | Free tier | 100건/월 | 1,000건/월 |

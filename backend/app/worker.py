@@ -36,13 +36,8 @@ def run_analysis(job_id: str, video_path: str) -> None:
     _update_job(job_id, status="processing", started_at=_now())
 
     try:
-        # Prefer the video-analyzer venv; fall back to system python3 (which has cv2/google-genai)
-        import shutil
-        analyzer_venv_python = Path(ANALYZER_DIR) / "venv" / "bin" / "python3"
-        if analyzer_venv_python.exists():
-            python_bin = str(analyzer_venv_python)
-        else:
-            python_bin = shutil.which("python3") or sys.executable
+        # Use system python3 (has cv2, google-genai, scenedetect etc.)
+        python_bin = "/opt/homebrew/bin/python3"
 
         result = subprocess.run(
             [
