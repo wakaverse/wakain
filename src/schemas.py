@@ -354,6 +354,111 @@ class ProductStrategy(BaseModel):
     brand_visibility: BrandVisibility
 
 
+# ── Layer 3.5: Persuasion Analysis (소구 분석) ────────────────────────────
+
+
+class VisualProof(BaseModel):
+    """How an appeal point is visually demonstrated in the video."""
+    technique: Literal[
+        "closeup", "slow_motion", "split_screen", "before_after",
+        "text_overlay", "reaction_shot", "process_shot", "package_shot",
+        "ingredient_shot", "location_shot", "graph_number", "none",
+    ] = Field(description="Primary visual technique used to prove this appeal")
+    description: str = Field(description="Specific description of the visual proof (Korean)")
+    timestamp: Optional[float] = Field(default=None, description="Approximate time in video")
+
+
+class AppealPoint(BaseModel):
+    """A single persuasion point — what claim + how it's proven visually."""
+    type: Literal[
+        # Rational appeals (이성 소구)
+        "myth_bust",       # 편견 파괴 — "김이 다 거기서 거기?"
+        "ingredient",      # 원재료/성분 — "국내산 원초"
+        "process",         # 제조 공정 — "두 번 구워"
+        "achievement",     # 실적/수치 — "150억 판매"
+        "price",           # 가성비/가격 — "한 팩 990원"
+        "comparison",      # 비교 우위 — "일반 김 vs 태풍김"
+        "guarantee",       # 보증/리스크 제거 — "맛없으면 보장"
+        "origin",          # 산지/원산지 — "통영 직송"
+        "specification",   # 스펙/기능 — "18000RPM 흡입력"
+        # Emotional appeals (감성 소구)
+        "sensory",         # 감각 자극 — ASMR, 먹방, 바삭 소리
+        "authenticity",    # 진정성/인간미 — "사장이 직접"
+        "social_proof",    # 사회적 증거 — 리뷰, 판매량
+        "urgency",         # 긴급/한정 — "오늘만 이 가격"
+        "lifestyle",       # 라이프스타일 — "퇴근 후 혼술 안주"
+        "nostalgia",       # 향수/추억 — "어릴 때 먹던 그 맛"
+        "authority",       # 권위/전문가 — "미슐랭 셰프 추천"
+        "emotional",       # 감정 호소 — 감동, 유머, 공감
+    ]
+    claim: str = Field(description="The specific claim or message (Korean)")
+    visual_proof: VisualProof = Field(description="How this claim is visually demonstrated")
+    audio_sync: Literal[
+        "narration_sync", "text_only", "sfx_emphasis", "music_beat", "silent", "independent",
+    ] = Field(description="How the appeal syncs with audio")
+    strength: Literal["strong", "moderate", "weak"] = Field(
+        description="How convincingly this appeal is delivered"
+    )
+
+
+class PresenterProfile(BaseModel):
+    """Who presents/speaks in the video."""
+    type: Literal[
+        "founder",    # 대표/사장 직접 출연
+        "reviewer",   # 체험자/인플루언서
+        "narrator",   # 보이지 않는 내레이터
+        "customer",   # 실제 고객 후기
+        "expert",     # 전문가 (셰프, 의사 등)
+        "character",  # 캐릭터/마스코트
+        "none",       # 텍스트/비주얼만
+    ]
+    face_shown: bool = Field(description="Whether presenter's face appears on screen")
+    credibility_factor: str = Field(description="What gives this presenter credibility (Korean)")
+
+
+class ProductEmphasis(BaseModel):
+    """How the product is visually emphasized in the video."""
+    first_appear: float = Field(description="Seconds when product first appears")
+    screen_time_ratio: float = Field(description="Ratio of frames showing product (0.0-1.0)")
+    hero_shots: int = Field(description="Number of dedicated product close-up/hero shots")
+    emphasis_techniques: list[Literal[
+        "closeup", "slow_motion", "zoom_in", "spotlight",
+        "rotation", "unboxing", "size_comparison",
+        "texture_detail", "steam_sizzle", "pour_drip",
+        "before_after", "multi_angle", "ingredient_breakdown",
+        "in_use_demo", "package_focus",
+    ]] = Field(description="Visual techniques used to emphasize the product")
+    key_visual_moment: str = Field(description="The single most impactful product shot (Korean)")
+    key_visual_timestamp: Optional[float] = Field(default=None)
+
+
+class VideoStyle(BaseModel):
+    """Overall video presentation style."""
+    type: Literal[
+        "pitch",       # 직접 판매 (홈쇼핑식 설득)
+        "demo",        # 제품 시연 중심
+        "mukbang",     # 먹방/ASMR/감각 자극
+        "comparison",  # 비교 (before/after, vs 경쟁)
+        "vlog",        # 일상 속 자연스러운 노출
+        "review",      # 솔직 후기/언박싱
+        "info",        # 정보/교육형
+        "story",       # 스토리텔링/감성
+        "challenge",   # 챌린지/트렌드
+    ]
+    sub_style: str = Field(default="", description="More specific style note (Korean)")
+
+
+class PersuasionAnalysis(BaseModel):
+    """Complete persuasion/appeal analysis of a marketing video."""
+    presenter: PresenterProfile
+    video_style: VideoStyle
+    appeal_points: list[AppealPoint] = Field(description="All persuasion points, ordered by appearance")
+    product_emphasis: ProductEmphasis
+    primary_appeal: str = Field(description="The single strongest appeal type code")
+    appeal_layering: str = Field(description="How appeals build on each other (Korean)")
+    persuasion_summary: str = Field(description="1-2 sentence summary of the persuasion strategy (Korean)")
+
+
 class EffectivenessAssessment(BaseModel):
     hook_rating: str
     flow_rating: str
@@ -543,6 +648,7 @@ class VideoRecipe(BaseModel):
     visual_style: VisualStyle
     audio: Audio
     product_strategy: ProductStrategy
+    persuasion_analysis: Optional[PersuasionAnalysis] = None
     effectiveness_assessment: EffectivenessAssessment
     scenes: list[Scene]
     temporal_profile: Optional[TemporalProfile] = None
