@@ -28,7 +28,7 @@ from .schemas import (
 )
 
 MODEL = "gemini-2.5-flash"
-MAX_UPLOAD_SIZE_MB = 10
+MAX_UPLOAD_SIZE_MB = 20
 
 SYSTEM_INSTRUCTION = """\
 You are a shortform marketing video analyst specialising in Korean commerce ads.
@@ -278,7 +278,7 @@ def _resize_video(video_path: str | Path, max_mb: int = MAX_UPLOAD_SIZE_MB) -> P
 
     subprocess.run(
         ["ffmpeg", "-y", "-i", str(src),
-         "-vf", "scale=-2:480",
+         "-vf", "scale=-2:720",
          "-b:v", f"{target_bitrate}k",
          "-c:v", "libx264", "-preset", "fast",
          "-c:a", "aac", "-b:a", "64k",
