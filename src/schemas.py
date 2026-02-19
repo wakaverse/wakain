@@ -235,6 +235,7 @@ class Scene(BaseModel):
     energy: Optional[SceneEnergy] = None
     transcript_segments: list[TranscriptSegment] = Field(default_factory=list)
     text_effects: list = Field(default_factory=list)
+    appeal_points: list = Field(default_factory=list, description="Persuasion appeal points mapped to this scene by timestamp")
 
 
 # ── Layer 3: Video Recipe (Phase 5: recipe_builder) ────────────────────────

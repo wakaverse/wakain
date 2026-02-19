@@ -51,6 +51,10 @@ def merge_analysis(
         .get("transcript", [])
     )
     text_effects = video_analysis.get("text_effects", [])
+    appeal_points = (
+        video_analysis.get("persuasion_analysis", {})
+        .get("appeal_points", [])
+    )
 
     enriched_scenes: list[Scene] = []
 
@@ -89,6 +93,14 @@ def merge_analysis(
             if s_start <= te_time <= s_end:
                 matched_text_effects.append(te)
 
+        # 4. Match appeal_points to scene by visual_proof timestamp
+        matched_appeals: list[dict] = []
+        for ap in appeal_points:
+            vp = ap.get("visual_proof", {})
+            ap_time = vp.get("timestamp")
+            if ap_time is not None and s_start <= float(ap_time) <= s_end:
+                matched_appeals.append(ap)
+
         enriched = Scene(
             scene_id=scene.scene_id,
             role=best_role,
@@ -101,12 +113,14 @@ def merge_analysis(
             energy=scene.energy,
             transcript_segments=matched_transcript,
             text_effects=matched_text_effects,
+            appeal_points=matched_appeals,
         )
         enriched_scenes.append(enriched)
         print(
             f"  ✓ Scene {scene.scene_id}: role={best_role}, "
             f"transcript_segs={len(matched_transcript)}, "
-            f"text_effects={len(matched_text_effects)}"
+            f"text_effects={len(matched_text_effects)}, "
+            f"appeals={len(matched_appeals)}"
         )
 
     return enriched_scenes
