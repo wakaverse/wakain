@@ -1,7 +1,12 @@
 """CLI entry point — runs the full video analysis pipeline.
 
 Usage:
-    python main.py <video_path> [--output <dir>] [--quant-only] [--phase <N>]
+    python main.py analyze <video_path> [--output <dir>] [--phase <N>]
+    python main.py compare <output_dir1> <output_dir2> ... [--labels success failure ...]
+    python main.py report <recipe_path> [--format markdown|telegram|summary]
+
+    # analyze 서브커맨드 생략 가능 (하위 호환성 유지)
+    python main.py <video_path> [--output <dir>] [--phase <N>]
 
 Full pipeline: Phase 1 (quant) → Phase 2 (qual) → Phase 2.5 (temporal) →
                Phase 3 (scene aggregate, local) → Phase 4 (video analysis) →
@@ -325,28 +330,78 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720) -
     run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Shortform marketing video analyzer — full pipeline"
-    )
-    parser.add_argument("video", help="Path to the video file")
-    parser.add_argument(
-        "--output", "-o", default="output", help="Output directory (default: output/)"
-    )
-    parser.add_argument(
-        "--quant-only", action="store_true",
-        help="Run only Phase 1 (OpenCV quant) — no Gemini API calls",
-    )
-    parser.add_argument(
-        "--phase", type=str, choices=["1", "2", "2.5", "3", "4", "5", "6"],
-        help="Run only a specific phase (assumes previous phase data exists)",
-    )
-    parser.add_argument(
-        "--resolution", type=int, choices=[480, 720], default=720,
-        help="Frame/video resolution: 720 (default, better text detection) or 480 (faster/smaller)",
-    )
-    args = parser.parse_args()
+# ── compare 서브커맨드 ──────────────────────────────────────────────────────────
 
+
+def cmd_compare(args: argparse.Namespace) -> None:
+    """compare 서브커맨드: N개의 영상을 비교해 VideoComparison JSON을 출력한다."""
+    from src.comparator import compare_videos
+
+    paths = args.paths
+    labels = args.labels if args.labels else None
+
+    if labels and len(labels) != len(paths):
+        print(f"오류: --labels 수({len(labels)})가 경로 수({len(paths)})와 다릅니다", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"\n🔍 {len(paths)}개 영상 비교 시작...\n")
+    comparison = compare_videos(paths, labels=labels)
+
+    # 출력
+    if args.output:
+        out_path = Path(args.output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(
+            json.dumps(comparison.model_dump(), indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        print(f"\n✅ 비교 결과 저장: {out_path}")
+    else:
+        print("\n" + json.dumps(comparison.model_dump(), indent=2, ensure_ascii=False))
+
+    # 핵심 인사이트 요약 출력
+    print(f"\n📊 비교 요약:")
+    print(f"  영상 수: {len(comparison.videos)}")
+    print(f"  성공 패턴: {len(comparison.success_patterns)}개")
+    print(f"  실패 패턴: {len(comparison.failure_patterns)}개")
+    print(f"  주요 차이점: {len(comparison.key_differentiators)}개")
+    print(f"  인사이트: {len(comparison.insights)}개")
+    if comparison.key_differentiators:
+        print("\n🔑 핵심 차이점:")
+        for d in comparison.key_differentiators:
+            print(f"  • {d}")
+
+
+# ── report 서브커맨드 ───────────────────────────────────────────────────────────
+
+
+def cmd_report(args: argparse.Namespace) -> None:
+    """report 서브커맨드: VideoRecipe JSON에서 리포트를 생성한다."""
+    from src.report_generator import generate_report
+
+    fmt = args.format
+    recipe_path = args.recipe
+
+    print(f"\n📝 리포트 생성 중... ({fmt} 형식)\n")
+    report = generate_report(recipe_path, fmt=fmt)
+
+    if args.output:
+        out_path = Path(args.output)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+        print(f"✅ 리포트 저장: {out_path}")
+    else:
+        print(report)
+
+    if fmt == "telegram":
+        print(f"\n(글자 수: {len(report)}/4096)")
+
+
+# ── analyze 서브커맨드 (기존 기능 래퍼) ──────────────────────────────────────────
+
+
+def cmd_analyze(args: argparse.Namespace) -> None:
+    """analyze 서브커맨드: 영상 분석 파이프라인 실행."""
     if args.quant_only:
         run_phase_1_2(args.video, args.output, quant_only=True)
     elif args.phase == "1":
@@ -364,8 +419,102 @@ def main() -> None:
     elif args.phase == "6":
         run_phase_6(args.output, args.video)
     else:
-        # Full pipeline
         run_full_pipeline(args.video, args.output, resolution=args.resolution)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Shortform marketing video analyzer — full pipeline",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python main.py analyze samples/sample5.mp4 --output output/s5_v2
+  python main.py compare output/s1_latest/sample1 output/s5_v2/sample5 --labels failure success
+  python main.py report output/s5_v2/sample5/sample5_video_recipe.json --format markdown
+  python main.py report output/s5_v2/sample5/sample5_video_recipe.json --format telegram
+        """,
+    )
+
+    subparsers = parser.add_subparsers(dest="command")
+
+    # ── analyze 서브커맨드 ──────────────────────────────────────────────────────
+    analyze_parser = subparsers.add_parser("analyze", help="영상 분석 파이프라인 실행")
+    analyze_parser.add_argument("video", help="Path to the video file")
+    analyze_parser.add_argument(
+        "--output", "-o", default="output", help="Output directory (default: output/)"
+    )
+    analyze_parser.add_argument(
+        "--quant-only", action="store_true",
+        help="Run only Phase 1 (OpenCV quant) — no Gemini API calls",
+    )
+    analyze_parser.add_argument(
+        "--phase", type=str, choices=["1", "2", "2.5", "3", "4", "5", "6"],
+        help="Run only a specific phase (assumes previous phase data exists)",
+    )
+    analyze_parser.add_argument(
+        "--resolution", type=int, choices=[480, 720], default=720,
+        help="Frame/video resolution: 720 (default) or 480 (faster/smaller)",
+    )
+
+    # ── compare 서브커맨드 ──────────────────────────────────────────────────────
+    compare_parser = subparsers.add_parser("compare", help="복수 영상 비교 분석")
+    compare_parser.add_argument(
+        "paths", nargs="+",
+        help="output 디렉토리 또는 *_video_recipe.json 경로 목록",
+    )
+    compare_parser.add_argument(
+        "--labels", nargs="+", metavar="LABEL",
+        help="각 영상의 레이블 (success/failure)",
+    )
+    compare_parser.add_argument(
+        "--output", "-o", default=None,
+        help="비교 결과 저장 경로 (기본: stdout)",
+    )
+
+    # ── report 서브커맨드 ───────────────────────────────────────────────────────
+    report_parser = subparsers.add_parser("report", help="비디오 레시피 리포트 생성")
+    report_parser.add_argument(
+        "recipe", help="*_video_recipe.json 파일 경로",
+    )
+    report_parser.add_argument(
+        "--format", "-f",
+        choices=["markdown", "telegram", "summary"],
+        default="markdown",
+        help="리포트 형식 (기본: markdown)",
+    )
+    report_parser.add_argument(
+        "--output", "-o", default=None,
+        help="리포트 저장 경로 (기본: stdout)",
+    )
+
+    # ── 하위 호환성: 서브커맨드 없이 video 파일 경로를 직접 전달하는 경우 ──────────
+    # 첫 번째 인자가 서브커맨드가 아니면 analyze로 처리
+    args, remaining = parser.parse_known_args()
+
+    if args.command is None:
+        # 서브커맨드 없이 실행 → 기존 analyze 동작 유지
+        legacy_parser = argparse.ArgumentParser()
+        legacy_parser.add_argument("video")
+        legacy_parser.add_argument("--output", "-o", default="output")
+        legacy_parser.add_argument("--quant-only", action="store_true")
+        legacy_parser.add_argument("--phase", type=str, choices=["1", "2", "2.5", "3", "4", "5", "6"])
+        legacy_parser.add_argument("--resolution", type=int, choices=[480, 720], default=720)
+
+        # 원래 sys.argv에서 파싱
+        legacy_args = legacy_parser.parse_args()
+        legacy_args.command = "analyze"
+        cmd_analyze(legacy_args)
+        return
+
+    if args.command == "analyze":
+        cmd_analyze(args)
+    elif args.command == "compare":
+        cmd_compare(args)
+    elif args.command == "report":
+        cmd_report(args)
+    else:
+        parser.print_help()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
