@@ -68,6 +68,23 @@ For scene_roles:
 - Identify each scene's narrative role with start/end times
 - Roles: hook, problem, solution, demo, proof, brand_intro, transition, cta, recap
 - Include a concise description (1-2 sentences, in Korean) of what happens visually and narratively in each scene
+
+For persuasion_analysis (소구 분석 — CRITICAL):
+- **presenter**: Who presents the video? (founder/reviewer/narrator/customer/expert/character/none)
+  - Is their face shown? What gives them credibility?
+- **video_style**: Overall style (pitch/demo/mukbang/comparison/vlog/review/info/story/challenge)
+- **appeal_points**: List EVERY persuasion/appeal point in order of appearance:
+  - Types (rational): myth_bust, ingredient, process, achievement, price, comparison, guarantee, origin, specification
+  - Types (emotional): sensory, authenticity, social_proof, urgency, lifestyle, nostalgia, authority, emotional
+  - For each: what specific claim is made? How is it VISUALLY proven? (closeup/slow_motion/process_shot/graph_number/etc.)
+  - Rate each appeal's strength (strong/moderate/weak) based on how convincingly it's delivered
+- **product_emphasis**: How is the product visually highlighted?
+  - When does it first appear? How much screen time? How many hero/close-up shots?
+  - What visual techniques are used? (closeup/zoom_in/texture_detail/steam_sizzle/before_after/etc.)
+  - What is the single most impactful product visual moment?
+- **primary_appeal**: Which single appeal type is the strongest?
+- **appeal_layering**: How do appeals build on each other? Describe the sequence in Korean.
+- **persuasion_summary**: 1-2 sentence summary of the overall persuasion strategy in Korean.
 """
 
 
@@ -238,8 +255,93 @@ _RESPONSE_SCHEMA = {
                 "required": ["start", "end", "role", "description"],
             },
         },
+        "persuasion_analysis": {
+            "type": "OBJECT",
+            "properties": {
+                "presenter": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "type": {"type": "STRING", "enum": ["founder", "reviewer", "narrator", "customer", "expert", "character", "none"]},
+                        "face_shown": {"type": "BOOLEAN"},
+                        "credibility_factor": {"type": "STRING"},
+                    },
+                    "required": ["type", "face_shown", "credibility_factor"],
+                },
+                "video_style": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "type": {"type": "STRING", "enum": ["pitch", "demo", "mukbang", "comparison", "vlog", "review", "info", "story", "challenge"]},
+                        "sub_style": {"type": "STRING"},
+                    },
+                    "required": ["type", "sub_style"],
+                },
+                "appeal_points": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "type": {"type": "STRING", "enum": [
+                                "myth_bust", "ingredient", "process", "achievement", "price",
+                                "comparison", "guarantee", "origin", "specification",
+                                "sensory", "authenticity", "social_proof", "urgency",
+                                "lifestyle", "nostalgia", "authority", "emotional",
+                            ]},
+                            "claim": {"type": "STRING"},
+                            "visual_proof": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "technique": {"type": "STRING", "enum": [
+                                        "closeup", "slow_motion", "split_screen", "before_after",
+                                        "text_overlay", "reaction_shot", "process_shot", "package_shot",
+                                        "ingredient_shot", "location_shot", "graph_number", "none",
+                                    ]},
+                                    "description": {"type": "STRING"},
+                                    "timestamp": {"type": "NUMBER"},
+                                },
+                                "required": ["technique", "description", "timestamp"],
+                            },
+                            "audio_sync": {"type": "STRING", "enum": [
+                                "narration_sync", "text_only", "sfx_emphasis", "music_beat", "silent", "independent",
+                            ]},
+                            "strength": {"type": "STRING", "enum": ["strong", "moderate", "weak"]},
+                        },
+                        "required": ["type", "claim", "visual_proof", "audio_sync", "strength"],
+                    },
+                },
+                "product_emphasis": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "first_appear": {"type": "NUMBER"},
+                        "screen_time_ratio": {"type": "NUMBER"},
+                        "hero_shots": {"type": "INTEGER"},
+                        "emphasis_techniques": {
+                            "type": "ARRAY",
+                            "items": {"type": "STRING", "enum": [
+                                "closeup", "slow_motion", "zoom_in", "spotlight",
+                                "rotation", "unboxing", "size_comparison",
+                                "texture_detail", "steam_sizzle", "pour_drip",
+                                "before_after", "multi_angle", "ingredient_breakdown",
+                                "in_use_demo", "package_focus",
+                            ]},
+                        },
+                        "key_visual_moment": {"type": "STRING"},
+                        "key_visual_timestamp": {"type": "NUMBER"},
+                    },
+                    "required": ["first_appear", "screen_time_ratio", "hero_shots", "emphasis_techniques", "key_visual_moment", "key_visual_timestamp"],
+                },
+                "primary_appeal": {"type": "STRING", "enum": [
+                    "myth_bust", "ingredient", "process", "achievement", "price",
+                    "comparison", "guarantee", "origin", "specification",
+                    "sensory", "authenticity", "social_proof", "urgency",
+                    "lifestyle", "nostalgia", "authority", "emotional",
+                ]},
+                "appeal_layering": {"type": "STRING"},
+                "persuasion_summary": {"type": "STRING"},
+            },
+            "required": ["presenter", "video_style", "appeal_points", "product_emphasis", "primary_appeal", "appeal_layering", "persuasion_summary"],
+        },
     },
-    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles"],
+    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis"],
 }
 
 
@@ -337,8 +439,16 @@ Return a JSON object with these sections:
 5. effectiveness_assessment: ratings for hook, flow, clarity, CTA, replay + standout elements + weak points
 6. text_effects: list every on-screen text animation (time, content, entrance, exit, emphasis, sync_with)
 7. scene_roles: list each scene's start/end time and narrative role
+8. persuasion_analysis: CRITICAL — analyse the video's persuasion strategy:
+   - presenter: who speaks/presents (founder/reviewer/narrator/etc.), face shown?, credibility factor
+   - video_style: overall style (pitch/demo/mukbang/comparison/review/etc.)
+   - appeal_points: list EVERY persuasion point with: type, specific claim, visual_proof (technique + description + timestamp), audio_sync, strength
+   - product_emphasis: first_appear time, screen_time_ratio, hero_shots count, emphasis_techniques, key_visual_moment + timestamp
+   - primary_appeal: the single strongest appeal type
+   - appeal_layering: how appeals build on each other (in Korean)
+   - persuasion_summary: 1-2 sentence summary of persuasion strategy (in Korean)
 
-Be specific and detailed. Use Korean for script_summary, hook_line, cta_line if the video is in Korean."""
+Be specific and detailed. Use Korean for script_summary, hook_line, cta_line, persuasion_summary, appeal claims, and descriptions."""
 
         max_retries = 5
         for attempt in range(max_retries):

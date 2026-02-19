@@ -582,6 +582,60 @@ def build_recipe(
         weak_points=raw_ea.get("weak_points", []),
     )
 
+    # ── Persuasion analysis (from Track 2) ─────────────────────────────
+    raw_pa = video_analysis.get("persuasion_analysis")
+    persuasion_analysis = None
+    if raw_pa:
+        from .schemas import (
+            PersuasionAnalysis, PresenterProfile, VideoStyle,
+            AppealPoint, VisualProof, ProductEmphasis,
+        )
+        try:
+            presenter = PresenterProfile(
+                type=raw_pa.get("presenter", {}).get("type", "none"),
+                face_shown=raw_pa.get("presenter", {}).get("face_shown", False),
+                credibility_factor=raw_pa.get("presenter", {}).get("credibility_factor", ""),
+            )
+            video_style_data = raw_pa.get("video_style", {})
+            video_style_obj = VideoStyle(
+                type=video_style_data.get("type", "demo"),
+                sub_style=video_style_data.get("sub_style", ""),
+            )
+            appeal_points = []
+            for ap in raw_pa.get("appeal_points", []):
+                vp = ap.get("visual_proof", {})
+                appeal_points.append(AppealPoint(
+                    type=ap.get("type", "sensory"),
+                    claim=ap.get("claim", ""),
+                    visual_proof=VisualProof(
+                        technique=vp.get("technique", "none"),
+                        description=vp.get("description", ""),
+                        timestamp=vp.get("timestamp"),
+                    ),
+                    audio_sync=ap.get("audio_sync", "independent"),
+                    strength=ap.get("strength", "moderate"),
+                ))
+            pe = raw_pa.get("product_emphasis", {})
+            product_emphasis = ProductEmphasis(
+                first_appear=pe.get("first_appear", 0),
+                screen_time_ratio=pe.get("screen_time_ratio", 0),
+                hero_shots=pe.get("hero_shots", 0),
+                emphasis_techniques=pe.get("emphasis_techniques", []),
+                key_visual_moment=pe.get("key_visual_moment", ""),
+                key_visual_timestamp=pe.get("key_visual_timestamp"),
+            )
+            persuasion_analysis = PersuasionAnalysis(
+                presenter=presenter,
+                video_style=video_style_obj,
+                appeal_points=appeal_points,
+                product_emphasis=product_emphasis,
+                primary_appeal=raw_pa.get("primary_appeal", "sensory"),
+                appeal_layering=raw_pa.get("appeal_layering", ""),
+                persuasion_summary=raw_pa.get("persuasion_summary", ""),
+            )
+        except Exception as e:
+            print(f"  ⚠ Persuasion analysis parse error: {e}")
+
     # ── Temporal profile + production guide (from temporal analysis) ────
     temporal_profile = None
     production_guide = None
@@ -595,6 +649,7 @@ def build_recipe(
         visual_style=visual_style,
         audio=audio,
         product_strategy=product_strategy,
+        persuasion_analysis=persuasion_analysis,
         effectiveness_assessment=effectiveness,
         scenes=[s for s in scenes],
         temporal_profile=temporal_profile,
