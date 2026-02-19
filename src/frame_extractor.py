@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 
 FPS_TARGET = 2
-MAX_DIMENSION = 720  # Resize frames so longest side ≤ this
+MAX_DIMENSION = 480  # Resize frames so longest side ≤ this
 
 
 @dataclass

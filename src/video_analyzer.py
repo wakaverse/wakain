@@ -278,7 +278,7 @@ def _resize_video(video_path: str | Path, max_mb: int = MAX_UPLOAD_SIZE_MB) -> P
 
     subprocess.run(
         ["ffmpeg", "-y", "-i", str(src),
-         "-vf", "scale=-2:720",
+         "-vf", "scale=-2:480",
          "-b:v", f"{target_bitrate}k",
          "-c:v", "libx264", "-preset", "fast",
          "-c:a", "aac", "-b:a", "64k",
