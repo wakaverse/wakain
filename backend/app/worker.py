@@ -158,14 +158,18 @@ def _build_summary(recipe_json: dict) -> dict:
     effectiveness = recipe.get("effectiveness_assessment", {})
     structure = recipe.get("structure", {})
     scenes = recipe.get("scenes", [])
+    dropoff = recipe.get("dropoff_analysis", {})
+    performance = recipe.get("performance_metrics", {})
     return {
         "duration_sec": meta.get("duration"),
         "scene_count": len(scenes),
         "category": meta.get("category"),
         "platform": meta.get("platform"),
         "structure_type": structure.get("type"),
-        "overall_score": effectiveness.get("viral_potential_score"),
-        "strengths": effectiveness.get("strengths", [])[:3],
-        "weaknesses": effectiveness.get("weaknesses", [])[:3],
+        "overall_score": effectiveness.get("viral_potential_score") or effectiveness.get("hook_rating"),
+        "retention_score": dropoff.get("overall_retention_score"),
+        "attention_avg": performance.get("attention_avg"),
+        "strengths": effectiveness.get("standout_elements", effectiveness.get("strengths", []))[:3],
+        "weaknesses": effectiveness.get("weak_points", effectiveness.get("weaknesses", []))[:3],
         "improvement_suggestions": effectiveness.get("improvement_suggestions", [])[:3],
     }
