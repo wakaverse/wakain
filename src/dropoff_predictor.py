@@ -1,11 +1,12 @@
 """Drop-off prediction engine — local computation, zero API cost.
 
 Scans scenes in 1-second windows and scores each second for viewer
-drop-off risk based on four factors:
-  1. Attention drop  (attention_score < 20 for 3+ seconds → +40)
-  2. Appeal gap      (no new appeal point for 5+ seconds → +30)
-  3. Content vacuum  (no text overlay AND no narration for 4+ seconds → +20)
-  4. Scene stall     (same scene for 4+ seconds → +10)
+drop-off risk based on five factors:
+  1. Visual stimulus drop  (score < 40 for 2+ seconds → +35)
+  2. Appeal gap            (no new appeal point for 3+ seconds → +30)
+  3. Content vacuum        (no text AND no narration for 3+ seconds → +20)
+  4. Scene stall           (same scene for 3+ seconds → +10)
+  5. Relative drop         (20+ point drop vs 2 seconds ago → +25)
 """
 
 from __future__ import annotations
@@ -87,40 +88,47 @@ def predict_dropoff(scenes: list[Scene]) -> DropOffAnalysis:
         factors: list[str] = []
         risk = 0
 
-        # Factor 1: attention drop — attention < 20 for 3+ seconds
+        # Factor 1: attention drop — attention < 40 for 2+ seconds
         low_attn_streak = sum(
-            1 for s in range(max(0, t - 2), t + 1)
-            if attention_by_second.get(s, 30) < 20
+            1 for s in range(max(0, t - 1), t + 1)
+            if attention_by_second.get(s, 30) < 40
         )
-        if low_attn_streak >= 3:
+        if low_attn_streak >= 2:
             attn_val = attention_by_second.get(t, 30)
-            factors.append(f"집중도 급락 ({attn_val}%)")
-            risk += 40
+            factors.append(f"시각적 자극도 저하 ({attn_val}%)")
+            risk += 35
 
-        # Factor 2: appeal gap — no new appeal for 5+ seconds
+        # Factor 5: relative attention drop — 20+ point drop vs 2 seconds ago
+        prev_attn = attention_by_second.get(t - 2, 50)
+        curr_attn = attention_by_second.get(t, 50)
+        if prev_attn - curr_attn >= 20:
+            factors.append(f"시각적 자극도 급락 ({prev_attn}→{curr_attn})")
+            risk += 25
+
+        # Factor 2: appeal gap — no new appeal for 3+ seconds
         last_appeal = max((a for a in appeal_timestamps if a <= t), default=None)
         appeal_gap = (t - last_appeal) if last_appeal is not None else t
-        if appeal_gap >= 5:
+        if appeal_gap >= 3:
             factors.append(f"소구 공백 {int(appeal_gap)}초")
             risk += 30
 
-        # Factor 3: content vacuum — no text AND no narration for 4+ seconds
+        # Factor 3: content vacuum — no text AND no narration for 3+ seconds
         no_content_streak = sum(
-            1 for s in range(max(0, t - 3), t + 1)
+            1 for s in range(max(0, t - 2), t + 1)
             if not has_text_by_second.get(s, False) and not has_narration_by_second.get(s, False)
         )
-        if no_content_streak >= 4:
+        if no_content_streak >= 3:
             factors.append("텍스트/나레이션 공백")
             risk += 20
 
-        # Factor 4: scene stall — same scene for 4+ seconds
+        # Factor 4: scene stall — same scene for 3+ seconds
         current_scene = scene_by_second.get(t, -1)
         stall_streak = sum(
-            1 for s in range(max(0, t - 3), t + 1)
+            1 for s in range(max(0, t - 2), t + 1)
             if scene_by_second.get(s, -1) == current_scene
         )
-        if stall_streak >= 4:
-            factors.append("씬 정체 (동일 씬 4초+)")
+        if stall_streak >= 3:
+            factors.append("씬 정체 (동일 씬 3초+)")
             risk += 10
 
         risk = min(risk, 100)
@@ -158,7 +166,7 @@ def predict_dropoff(scenes: list[Scene]) -> DropOffAnalysis:
         # Build suggestion from factors
         suggestion_parts: list[str] = []
         for f in all_factors:
-            if "집중도" in f:
+            if "시각적" in f:
                 suggestion_parts.append("시각적 전환(컷/모션) 추가")
             elif "소구 공백" in f:
                 next_type = _next_appeal_type(scenes, z_end)
@@ -197,14 +205,19 @@ def predict_dropoff(scenes: list[Scene]) -> DropOffAnalysis:
     if prev_end < total_duration:
         safe_zones.append((prev_end, total_duration))
 
-    # Overall retention score (inverse of avg risk)
+    # Overall retention score (inverse of avg risk + attention penalty)
     total_seconds = int(total_duration) + 1
     risk_seconds = len(second_risks)
     avg_risk_per_second = (
         sum(r for r, _ in second_risks.values()) / total_seconds
         if second_risks else 0
     )
-    overall_retention_score = max(0, int(100 - avg_risk_per_second))
+    # Factor in average visual stimulus — below 50 incurs additional penalty
+    avg_attention = sum(
+        attention_by_second.get(t, 50) for t in range(total_seconds)
+    ) / max(total_seconds, 1)
+    attention_penalty = max(0, (50 - avg_attention)) * 0.5
+    overall_retention_score = max(0, min(100, int(100 - avg_risk_per_second - attention_penalty)))
 
     worst_zone = max(risk_zones, key=lambda z: z.risk_score) if risk_zones else None
 
@@ -216,7 +229,7 @@ def predict_dropoff(scenes: list[Scene]) -> DropOffAnalysis:
             factor_counts[key] = factor_counts.get(key, 0) + 1
 
     priority_map = {
-        "집중도": "집중도 저하 구간 시각적 전환 추가",
+        "시각적": "시각적 자극도 저하 구간 시각적 전환 추가",
         "소구": "소구 공백 구간에 적절한 소구 포인트 삽입",
         "텍스트/나레이션": "콘텐츠 공백 구간에 텍스트 오버레이 추가",
         "씬": "장기 정체 씬 분할 편집",
