@@ -19,7 +19,7 @@ from google.genai import types
 
 from .schemas import FrameQual, FrameQuant
 
-MODEL = "gemini-2.0-flash"
+MODEL = "gemini-2.5-flash"
 MAX_CONCURRENCY = 10  # simultaneous API calls
 REQUEST_DELAY = 0.3   # seconds between requests
 

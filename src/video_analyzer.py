@@ -122,6 +122,93 @@ For persuasion_analysis (소구 분석 — CRITICAL):
 - appeal_points의 claim은 실제 화면에 나타나는 텍스트 내용 기반으로 작성
 """
 
+# ── Track-specific prompt supplements (B-4) ──────────────────────────────────
+
+VOICE_TRACK_SUPPLEMENT = """
+## 분석 트랙: VOICE (내레이션 기반)
+이 영상에는 음성 내레이션이 있습니다. 아래 STT 결과를 참고하여 분석하세요.
+
+**핵심 분석 축:**
+- 내레이션 텍스트를 기반으로 설득 구조를 분석하세요
+- 음성 흐름(어조, 속도, 강조)이 소구 전달에 미치는 영향을 평가하세요
+- 텍스트 오버레이는 보조 역할로 평가하세요
+- 내레이션과 시각 요소의 싱크를 중점 분석하세요
+
+[STT 전문]
+{stt_transcript}
+"""
+
+CAPTION_TRACK_SUPPLEMENT = """
+## 분석 트랙: CAPTION (텍스트 오버레이 기반)
+이 영상에는 의미 있는 음성 내레이션이 없습니다. 텍스트 오버레이가 주요 정보 전달 수단입니다.
+
+**핵심 분석 축:**
+- 화면에 나타나는 텍스트 오버레이를 시간순으로 정밀 분석하세요
+- 텍스트 내용의 변화를 소구 전환점으로 판단하세요
+- 타이포그래피 분석 강화: 크기, 색상, 강조 방식이 메시지 강도를 나타냄
+- BGM/효과음의 역할을 더 비중 있게 평가하세요
+- appeal_points의 claim은 실제 화면 텍스트 내용 기반으로 작성하세요
+"""
+
+STYLE_CONTEXT_TEMPLATE = """
+## 영상 스타일 컨텍스트
+- 형식(Format): {format_ko} ({format_key})
+- 의도(Intent): {intent_ko} ({intent_key})
+{secondary_line}
+이 스타일에 맞는 관점으로 분석하세요. 예를 들어:
+- 핵심 지표: {key_metrics}
+- 유효한 소구: {effective_appeals}
+- 권장 구조: {structure}
+"""
+
+
+def _build_track_supplement(
+    narration_type: str | None = None,
+    stt_transcript: str | None = None,
+    style_classification: dict | None = None,
+) -> str:
+    """Build additional prompt context based on narration type and style."""
+    parts = []
+
+    # Track supplement
+    if narration_type == "voice" and stt_transcript:
+        parts.append(VOICE_TRACK_SUPPLEMENT.format(stt_transcript=stt_transcript))
+    elif narration_type in ("caption", "silent"):
+        parts.append(CAPTION_TRACK_SUPPLEMENT)
+
+    # Style context
+    if style_classification:
+        from .style_classifier import FORMAT_LABELS_KO, INTENT_LABELS_KO
+        from .style_profiles import get_merged_profile
+
+        fmt_key = style_classification.get("primary_format", "")
+        int_key = style_classification.get("primary_intent", "")
+        fmt_ko = FORMAT_LABELS_KO.get(fmt_key, fmt_key)
+        int_ko = INTENT_LABELS_KO.get(int_key, int_key)
+
+        sec_fmt = style_classification.get("secondary_format")
+        secondary_line = ""
+        if sec_fmt:
+            sec_ko = FORMAT_LABELS_KO.get(sec_fmt, sec_fmt)
+            secondary_line = f"- 보조 형식: {sec_ko} ({sec_fmt})\n"
+
+        profile = get_merged_profile(fmt_key, int_key)
+        key_metrics = ", ".join(profile.get("key_metrics", []))
+        effective = ", ".join(profile.get("effective_appeals", []))
+        structure = " → ".join(profile.get("recommended_structure", []))
+
+        parts.append(STYLE_CONTEXT_TEMPLATE.format(
+            format_ko=fmt_ko, format_key=fmt_key,
+            intent_ko=int_ko, intent_key=int_key,
+            secondary_line=secondary_line,
+            key_metrics=key_metrics,
+            effective_appeals=effective,
+            structure=structure,
+        ))
+
+    return "\n".join(parts)
+
+
 
 class _VideoAnalysisResponse(Audio):
     """Full response schema for video analysis."""
@@ -489,6 +576,9 @@ async def analyse_video(
     video_path: str | Path,
     resolution: int = 720,
     frame_quals: list[dict] | None = None,
+    narration_type: str | None = None,
+    stt_transcript: str | None = None,
+    style_classification: dict | None = None,
 ) -> dict:
     """Upload video to Gemini and get full analysis (audio, structure, product, effectiveness)."""
     client = _make_client()
@@ -523,6 +613,15 @@ Return a JSON object with these sections:
    - persuasion_summary: 1-2 sentence summary of persuasion strategy (in Korean)
 
 Be specific and detailed. Use Korean for script_summary, hook_line, cta_line, persuasion_summary, appeal claims, and descriptions."""
+
+        # Inject track-specific supplement (B-4: voice/caption + style context)
+        track_supplement = _build_track_supplement(
+            narration_type=narration_type,
+            stt_transcript=stt_transcript,
+            style_classification=style_classification,
+        )
+        if track_supplement:
+            prompt += "\n" + track_supplement
 
         # Inject OCR text timeline from Phase 2 frame_qual results
         if frame_quals:
@@ -635,6 +734,16 @@ def run_video_analysis(
     video_path: str | Path,
     resolution: int = 720,
     frame_quals: list[dict] | None = None,
+    narration_type: str | None = None,
+    stt_transcript: str | None = None,
+    style_classification: dict | None = None,
 ) -> dict:
     """Sync wrapper for analyse_video."""
-    return asyncio.run(analyse_video(video_path, resolution=resolution, frame_quals=frame_quals))
+    return asyncio.run(analyse_video(
+        video_path,
+        resolution=resolution,
+        frame_quals=frame_quals,
+        narration_type=narration_type,
+        stt_transcript=stt_transcript,
+        style_classification=style_classification,
+    ))
