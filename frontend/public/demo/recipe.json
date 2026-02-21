@@ -1,0 +1,5311 @@
+{
+  "video_recipe": {
+    "meta": {
+      "platform": "shorts",
+      "duration": 35.0,
+      "aspect_ratio": "9:16",
+      "category": "food",
+      "sub_category": "health_drink",
+      "target_audience": "건강에 관심 있는 20-40대 여성, 디톡스 및 다이어트 효과를 원하는 소비자"
+    },
+    "structure": {
+      "type": "problem_solution",
+      "scene_sequence": [
+        {
+          "role": "hook",
+          "duration": 2.1,
+          "technique": "hook"
+        },
+        {
+          "role": "demo",
+          "duration": 1.24,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.87,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.83,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 1.4,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.63,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.83,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.73,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.97,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.8,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.57,
+          "technique": "demo"
+        },
+        {
+          "role": "demo",
+          "duration": 0.97,
+          "technique": "demo"
+        },
+        {
+          "role": "proof",
+          "duration": 1.6,
+          "technique": "proof"
+        },
+        {
+          "role": "proof",
+          "duration": 2.64,
+          "technique": "proof"
+        },
+        {
+          "role": "solution",
+          "duration": 1.8,
+          "technique": "solution"
+        },
+        {
+          "role": "solution",
+          "duration": 1.03,
+          "technique": "solution"
+        },
+        {
+          "role": "solution",
+          "duration": 0.53,
+          "technique": "solution"
+        },
+        {
+          "role": "solution",
+          "duration": 0.67,
+          "technique": "solution"
+        },
+        {
+          "role": "brand_intro",
+          "duration": 1.3,
+          "technique": "brand_intro"
+        },
+        {
+          "role": "brand_intro",
+          "duration": 2.0,
+          "technique": "brand_intro"
+        },
+        {
+          "role": "cta",
+          "duration": 1.87,
+          "technique": "cta"
+        },
+        {
+          "role": "cta",
+          "duration": 2.3,
+          "technique": "cta"
+        },
+        {
+          "role": "cta",
+          "duration": 2.8,
+          "technique": "cta"
+        },
+        {
+          "role": "cta",
+          "duration": 4.8,
+          "technique": "cta"
+        }
+      ],
+      "hook_time": 2.1,
+      "product_first_appear": 0.0,
+      "cta_start": 23.52
+    },
+    "visual_style": {
+      "overall_mood": "natural_organic",
+      "color_palette": [
+        "#342E1B",
+        "#302A1A",
+        "#696A48",
+        "#3A422E",
+        "#46533D"
+      ],
+      "color_grading": "natural",
+      "brightness_profile": "consistent",
+      "avg_cut_interval": 1.47,
+      "total_cuts": 24,
+      "transition_style": "hard_cut",
+      "text_usage": {
+        "frequency": "every_scene",
+        "style_consistency": "high",
+        "language_tone": "casual"
+      },
+      "human_screen_time_ratio": 0.41,
+      "product_screen_time_ratio": 1.0,
+      "face_time_ratio": 0.41
+    },
+    "audio": {
+      "music": {
+        "present": true,
+        "genre": "upbeat_pop",
+        "energy_profile": "steady",
+        "bpm_range": "120-140 BPM",
+        "mood_match": "The cheerful and light music perfectly matches the healthy and refreshing image of the detox juice.",
+        "beat_sync": "minimal"
+      },
+      "voice": {
+        "type": "voiceover",
+        "tone": "conversational",
+        "language": "Korean",
+        "script_summary": "이 영상은 아이엠그린 해독주스의 다양한 효능과 특징을 소개합니다. 염증 완화, 독소 배출, 100% NFC 착즙, 케일, 브로콜리, 사과, 그라비올라 등 풍부한 영양 성분, 낮은 칼로리, 다이어트 효과, 베트남 현지 착즙의 신선함, 그리고 특별 할인 가격 정보를 전달합니다.",
+        "hook_line": "염증 가득한 안색이 환해졌어요.",
+        "cta_line": "시크릿 링크에서만 더 저렴하게 보여드려요. 1리터 대용량 그린 주스 1만 원대에 만나보세요.",
+        "transcript": [
+          {
+            "start": 0.0,
+            "end": 1.5,
+            "text": "염증 가득한 안색이 환해졌어요.",
+            "speaker": null
+          },
+          {
+            "start": 1.5,
+            "end": 4.0,
+            "text": "이 한 병에 100% NFC 착즙한 그린 주스,",
+            "speaker": null
+          },
+          {
+            "start": 4.0,
+            "end": 6.0,
+            "text": "베타카로틴 루테인 덩어리 케일,",
+            "speaker": null
+          },
+          {
+            "start": 6.0,
+            "end": 7.5,
+            "text": "항암 효과 킹 브로콜리,",
+            "speaker": null
+          },
+          {
+            "start": 7.5,
+            "end": 9.0,
+            "text": "심혈관 보호 달콤한 사과,",
+            "speaker": null
+          },
+          {
+            "start": 9.0,
+            "end": 10.5,
+            "text": "슈퍼푸드 그라비올라,",
+            "speaker": null
+          },
+          {
+            "start": 10.5,
+            "end": 13.5,
+            "text": "비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요.",
+            "speaker": null
+          },
+          {
+            "start": 13.5,
+            "end": 15.0,
+            "text": "한 잔에 단 33칼로리,",
+            "speaker": null
+          },
+          {
+            "start": 15.0,
+            "end": 16.5,
+            "text": "묵은 독소 썩,",
+            "speaker": null
+          },
+          {
+            "start": 16.5,
+            "end": 18.5,
+            "text": "몸이 가벼워지니 다이어트 효과까지!",
+            "speaker": null
+          },
+          {
+            "start": 18.5,
+            "end": 20.5,
+            "text": "하루 단 한 잔에 마법 같은 효과,",
+            "speaker": null
+          },
+          {
+            "start": 20.5,
+            "end": 23.5,
+            "text": "일조량 좋은 베트남 현지에서 바로 착즙해 더욱 신선한 그린 주스.",
+            "speaker": null
+          },
+          {
+            "start": 23.5,
+            "end": 26.5,
+            "text": "시크릿 링크에서만 더 저렴하게 보여드려요.",
+            "speaker": null
+          },
+          {
+            "start": 26.5,
+            "end": 29.5,
+            "text": "1리터 대용량 그린 주스 1만 원대에 만나보세요.",
+            "speaker": null
+          }
+        ]
+      },
+      "sfx": {
+        "used": true,
+        "types": [
+          "pouring_liquid"
+        ],
+        "frequency": "minimal"
+      },
+      "audio_visual_sync": "Good synchronization between the voiceover, on-screen text, and visual demonstrations of the product and ingredients."
+    },
+    "product_strategy": {
+      "reveal_timing": "immediate",
+      "demonstration_method": "in_use",
+      "key_benefit_shown": "독소 배출, 안색 개선, 다이어트 효과, 풍부한 영양소 (비타민, 베타카로틴, 루테인)",
+      "price_shown": true,
+      "price_framing": "discount",
+      "offer_type": "비밀 링크를 통한 할인 특가",
+      "social_proof": "none",
+      "urgency_trigger": "none",
+      "brand_visibility": {
+        "logo_shown": true,
+        "brand_color_used": true,
+        "brand_mention_count": 0
+      }
+    },
+    "persuasion_analysis": null,
+    "art_direction": {
+      "tone_and_manner": "신선하고 건강한 느낌의 정보 전달형",
+      "heading_font": "handwritten",
+      "body_font": "gothic",
+      "font_color_system": [
+        "#FFFFFF",
+        "#FF0000",
+        "#FFFF00"
+      ],
+      "highlight_method": "글씨 크기 확대, 볼드 처리, 특정 색상(빨강, 노랑) 사용, 왕관 이모지 사용",
+      "brand_colors": [
+        "#4CAF50",
+        "#FF0000",
+        "#FFA500",
+        "#FFFFFF"
+      ],
+      "background_style": "mixed",
+      "color_temperature": "warm",
+      "graphic_style": "photo_real",
+      "recurring_elements": [
+        "아이엠그린 주스 병",
+        "사과",
+        "브로콜리",
+        "케일",
+        "그라비올라",
+        "주스를 컵에 따르는 장면",
+        "주스를 마시는 장면",
+        "상단 좌측의 작은 제품 아이콘과 고정 텍스트"
+      ],
+      "text_position_pattern": "주요 텍스트는 화면 중앙에 크게 배치되며, 보조 텍스트는 그 아래에 작게 배치. 상단 좌측에 고정 정보 텍스트 블록.",
+      "frame_composition_rule": "제품과 신선한 재료들이 자연스럽게 배치된 모습을 위에서 내려다보는 앵글이 많음. 제품의 특징을 강조하는 클로즈업 샷 활용.",
+      "visual_consistency": "high",
+      "style_reference": "인스타그램 릴스/숏폼 건강 음료 광고 스타일"
+    },
+    "effectiveness_assessment": {
+      "hook_rating": "strong",
+      "flow_rating": "strong",
+      "message_clarity": "strong",
+      "cta_strength": "moderate",
+      "replay_factor": "moderate",
+      "standout_elements": [
+        "명확하고 친근한 내레이션",
+        "신선한 과일과 채소의 생생한 비주얼",
+        "핵심 정보를 강조하는 텍스트 오버레이",
+        "제품의 다양한 효능을 빠르게 전달하는 편집"
+      ],
+      "weak_points": [
+        "강력한 사회적 증거 부재",
+        "긴급성을 유발하는 요소 부족",
+        "배경 음악이 다소 평이함"
+      ]
+    },
+    "scenes": [
+      {
+        "scene_id": 1,
+        "role": "hook",
+        "time_range": [
+          0.0,
+          2.1
+        ],
+        "duration": 2.1,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "wide",
+            "wide",
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 3,
+          "avg_cut_interval": 0.83,
+          "motion_level": "fast",
+          "color_consistency": 0.61,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#342E1B",
+            "#302A1A",
+            "#696A48"
+          ],
+          "zoom_events": [
+            {
+              "time_range": [
+                0.0,
+                1.0
+              ],
+              "direction": "zoom_out",
+              "scale_change": 0.105
+            }
+          ],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "lifestyle_scene",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "demonstrating"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 염증가득 안색",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 1.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 환해졌어요 독소배출 해독작용의 효과!",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 환해졌어요 독소배출 해독작용의 효과!",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Multiple product bottles arranged among fresh fruits and vegetables with prominent text overlays.",
+            "Prominent text overlays and multiple product bottles surrounded by fresh, vibrant ingredients like apples and broccoli.",
+            "Large white handwritten text overlaying green juice bottles and fresh produce.",
+            "Green juice being poured into a glass, with prominent handwritten text overlay.",
+            "Green juice being poured into a glass, with bold text highlighting detoxification benefits."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "제품과 신선한 재료들이 배경에 놓인 채, 안색 개선이라는 핵심 효능을 제시하며 시청자의 이목을 끈다.",
+        "attention": {
+          "attention_score": 32,
+          "attention_peak": 79,
+          "peak_timestamp": 1.5,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 0.0,
+            "end": 1.5,
+            "text": "염증 가득한 안색이 환해졌어요.",
+            "speaker": null
+          },
+          {
+            "start": 1.5,
+            "end": 4.0,
+            "text": "이 한 병에 100% NFC 착즙한 그린 주스,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#342E1B",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 0.0,
+            "content": "1L 대용량 100% 해독주스",
+            "entrance": "none",
+            "exit": "none",
+            "emphasis": "none",
+            "sync_with": "independent"
+          },
+          {
+            "time": 0.0,
+            "content": "몸속 찌든 독소 싹-배출",
+            "entrance": "none",
+            "exit": "none",
+            "emphasis": "none",
+            "sync_with": "independent"
+          },
+          {
+            "time": 0.0,
+            "content": "염증 가득한 안색",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 1.0,
+            "content": "환해졌어요",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 1.5,
+            "content": "독소배출 해독작용의 효과!",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "emotional",
+            "claim": "염증 가득한 안색이 환해졌어요.",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '염증 가득한 안색'과 '환해졌어요' 텍스트가 차례로 나타나며 문제점과 해결책을 제시합니다.",
+              "timestamp": 0.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          },
+          {
+            "type": "feature_demo",
+            "claim": "100% NFC 착즙한 그린 주스",
+            "visual_proof": {
+              "technique": "process_shot",
+              "description": "주스를 컵에 따르는 장면을 통해 신선하고 자연적인 착즙 과정을 시각적으로 보여줍니다.",
+              "timestamp": 1.5
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 2,
+        "role": "demo",
+        "time_range": [
+          2.1,
+          3.34
+        ],
+        "duration": 1.24,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "rule_of_thirds",
+          "cut_count": 1,
+          "avg_cut_interval": 1.0,
+          "motion_level": "jump_cut",
+          "color_consistency": 0.03,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#3A422E",
+            "#46533D",
+            "#8B814D"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "product_only",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "top_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 아이엠그린 I am Green 100% NFC 착즙 첨가물 無 베트남산 (OEM)",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Large product bottles with prominent yellow text overlay highlighting benefits.",
+            "Large yellow text highlighting product benefits and a vibrant red apple."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 68,
+          "attention_peak": 75,
+          "peak_timestamp": 2.5,
+          "attention_level": "high",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 1.5,
+            "end": 4.0,
+            "text": "이 한 병에 100% NFC 착즙한 그린 주스,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFEB3B",
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo",
+            "underline"
+          ],
+          "dominant_layout": "mixed-top/product-middle/mixed-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#46533D",
+          "accent_color": "#FFEB3B",
+          "contrast_level": "high",
+          "color_harmony": "monochrome"
+        },
+        "text_effects": [
+          {
+            "time": 2.5,
+            "content": "100% NFC 착즙",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 3.0,
+            "content": "첨가물 無",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 3,
+        "role": "demo",
+        "time_range": [
+          3.34,
+          4.2
+        ],
+        "duration": 0.87,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "rule_of_thirds",
+          "cut_count": 1,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.1,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#7A7231",
+            "#777529",
+            "#343719"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 100% NFC 착즙 첨가물 無",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "top_third",
+              "dwell_time": 1.0
+            }
+          ],
+          "attention_elements": [
+            "Bright green juice in glass and prominent yellow text overlay",
+            "A hand holding a large glass of green juice with prominent handwritten text overlays, set against a natural green background."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 58,
+          "attention_peak": 75,
+          "peak_timestamp": 3.5,
+          "attention_level": "high",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 1.5,
+            "end": 4.0,
+            "text": "이 한 병에 100% NFC 착즙한 그린 주스,",
+            "speaker": null
+          },
+          {
+            "start": 4.0,
+            "end": 6.0,
+            "text": "베타카로틴 루테인 덩어리 케일,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFD700",
+          "text_color_highlight": "#FFD700",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#7A7231",
+          "accent_color": "#FFD700",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 4.0,
+            "content": "신선한 그린주스",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 4,
+        "role": "demo",
+        "time_range": [
+          4.2,
+          5.04
+        ],
+        "duration": 0.83,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "closeup"
+          ],
+          "composition": "rule_of_thirds",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.21,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#36311E",
+            "#6B6133",
+            "#A59D56"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "in_use",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 신선한 그린주스 첨가물 無",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "top_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 신선한 그린주스 첨가물 無",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Hand holding a glass of green juice, with text overlays highlighting product benefits and detox claims.",
+            "A hand holding a glass of vibrant green juice, with prominent text overlays and fresh ingredients in the blurred background."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 48,
+          "attention_peak": 68,
+          "peak_timestamp": 4.5,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 4.0,
+            "end": 6.0,
+            "text": "베타카로틴 루테인 덩어리 케일,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "sticker"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#746D3C",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 4.5,
+            "content": "첨가물 無",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 5,
+        "role": "demo",
+        "time_range": [
+          5.04,
+          6.44
+        ],
+        "duration": 1.4,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.37,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#3A2F1D",
+            "#3A2D1C",
+            "#5F613E"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "lifestyle_scene",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 아이엠 그린 I am Green 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹~배출 아이엠그린 I am Green 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Vibrant natural ingredients (apples, broccoli) surrounding the product bottles, with prominent white and yellow text overlays.",
+            "Vibrant arrangement of green juice bottles with fresh red apples and green broccoli, highlighted by large, bold text overlays."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 42,
+          "attention_peak": 64,
+          "peak_timestamp": 5.51,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 4.0,
+            "end": 6.0,
+            "text": "베타카로틴 루테인 덩어리 케일,",
+            "speaker": null
+          },
+          {
+            "start": 6.0,
+            "end": 7.5,
+            "text": "항암 효과 킹 브로콜리,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "badge",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#5F613E",
+          "accent_color": "#BA4336",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 5.5,
+            "content": "베타카로틴 루테인",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 6.0,
+            "content": "그린주스엔 꼭 있는 케일!",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "ingredient",
+            "claim": "베타카로틴 루테인 덩어리 케일",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "신선한 케일 잎이 클로즈업되어 나타나며 주요 성분을 강조합니다.",
+              "timestamp": 5.5
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 6,
+        "role": "demo",
+        "time_range": [
+          6.44,
+          7.07
+        ],
+        "duration": 0.63,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#17100A",
+            "#140F0A",
+            "#2F2418"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "lifestyle_scene",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Bright yellow and white text overlays highlighting product benefits and ingredients, combined with fresh produce like red apples and green kale.",
+            "Large white handwritten text highlighting product benefits and key ingredients, surrounded by fresh produce."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 54,
+          "attention_peak": 97,
+          "peak_timestamp": 6.51,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 6.0,
+            "end": 7.5,
+            "text": "항암 효과 킹 브로콜리,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFD700",
+          "text_color_highlight": "#FFD700",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#140F0A",
+          "accent_color": "#FFD700",
+          "contrast_level": "high",
+          "color_harmony": "warm_cool_split"
+        },
+        "text_effects": [
+          {
+            "time": 7.0,
+            "content": "항암효과 KING",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "ingredient",
+            "claim": "항암 효과 킹 브로콜리",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "신선한 브로콜리가 클로즈업되어 나타나며 항암 효과를 시각적으로 연결합니다.",
+              "timestamp": 7.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 7,
+        "role": "demo",
+        "time_range": [
+          7.07,
+          7.91
+        ],
+        "duration": 0.83,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "jump_cut",
+          "color_consistency": 0.0,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#726338",
+            "#353422",
+            "#A49348"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "in_use",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 항암효과 KING 브로콜리 다크서클에만 좋은거 아니었어?",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "none",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Large white text '항암효과 KING' with a crown emoji, prominently displayed with hands holding the product and fresh ingredients."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 100,
+          "attention_peak": 100,
+          "peak_timestamp": 7.51,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 6.0,
+            "end": 7.5,
+            "text": "항암 효과 킹 브로콜리,",
+            "speaker": null
+          },
+          {
+            "start": 7.5,
+            "end": 9.0,
+            "text": "심혈관 보호 달콤한 사과,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "white",
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "emoji",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#726338",
+          "accent_color": "#FFD700",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 7.5,
+            "content": "브로콜리 다크서클에만 좋은거 아녔어?",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 8,
+        "role": "demo",
+        "time_range": [
+          7.91,
+          8.64
+        ],
+        "duration": 0.73,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#17140A",
+            "#252011",
+            "#332E1D"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "in_use",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 항암효과 KING 브로콜리 다크서클에만 좋은거 아니었어?",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 항암효과 KING 브로콜리 다크서클에만 좋은거 아니었어?",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Large, bold text '항암효과 KING' with a crown emoji and a prominent broccoli in the center.",
+            "Large, bold text highlighting benefits and a floating broccoli graphic with a crown emoji."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 53,
+          "attention_peak": 100,
+          "peak_timestamp": 8.01,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 7.5,
+            "end": 9.0,
+            "text": "심혈관 보호 달콤한 사과,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "display",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "emoji",
+            "icon",
+            "logo",
+            "sticker"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#17140A",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "warm_cool_split"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 9,
+        "role": "demo",
+        "time_range": [
+          8.64,
+          9.61
+        ],
+        "duration": 0.97,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "jump_cut",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#272116",
+            "#5A513A",
+            "#4E4432"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙~배출 심혈관 보호 0설탕 없이 달달한 이유! 사과!",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Hands holding green juice bottles surrounded by vibrant fresh produce and benefit-driven text overlays.",
+            "Large text overlay highlighting detox benefits and fresh ingredients surrounding the product."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 63,
+          "attention_peak": 98,
+          "peak_timestamp": 9.01,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 7.5,
+            "end": 9.0,
+            "text": "심혈관 보호 달콤한 사과,",
+            "speaker": null
+          },
+          {
+            "start": 9.0,
+            "end": 10.5,
+            "text": "슈퍼푸드 그라비올라,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#4E4432",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 9.0,
+            "content": "심혈관 보호",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 9.5,
+            "content": "달콤한 이유! 사과!",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "ingredient",
+            "claim": "심혈관 보호 달콤한 사과",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "빨간 사과가 클로즈업되어 나타나며 심혈관 보호 효능을 언급합니다.",
+              "timestamp": 9.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "moderate"
+          }
+        ]
+      },
+      {
+        "scene_id": 10,
+        "role": "demo",
+        "time_range": [
+          9.61,
+          10.41
+        ],
+        "duration": 0.8,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "jump_cut",
+          "color_consistency": 0.0,
+          "color_mood": "bold_contrast",
+          "color_palette": [
+            "#0F0D0A",
+            "#322A20"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "lifestyle_scene",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 심혈관 보호 설탕 없이 달달한 이유! 사과! 그린",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Bright red apple in the center and large yellow text highlighting product benefits."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 99,
+          "attention_peak": 99,
+          "peak_timestamp": 10.01,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 9.0,
+            "end": 10.5,
+            "text": "슈퍼푸드 그라비올라,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFC107",
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#0F0D0A",
+          "accent_color": "#FFC107",
+          "contrast_level": "high",
+          "color_harmony": "warm_cool_split"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 11,
+        "role": "demo",
+        "time_range": [
+          10.41,
+          10.98
+        ],
+        "duration": 0.57,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "jump_cut",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#595A3D",
+            "#8E8247",
+            "#322D1B"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "A hand holding a large green juice bottle, surrounded by fresh apples and broccoli, with prominent text overlays highlighting product benefits."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 100,
+          "attention_peak": 100,
+          "peak_timestamp": 10.51,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 9.0,
+            "end": 10.5,
+            "text": "슈퍼푸드 그라비올라,",
+            "speaker": null
+          },
+          {
+            "start": 10.5,
+            "end": 13.5,
+            "text": "비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": "#FFD700",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "badge",
+            "logo",
+            "sticker"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#595A3D",
+          "accent_color": "#FF0000",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 10.5,
+            "content": "슈퍼푸드",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "ingredient",
+            "claim": "슈퍼푸드 그라비올라",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "그라비올라 과일 이미지가 나타나며 슈퍼푸드임을 강조합니다.",
+              "timestamp": 10.5
+            },
+            "audio_sync": "narration_sync",
+            "strength": "moderate"
+          }
+        ]
+      },
+      {
+        "scene_id": 12,
+        "role": "demo",
+        "time_range": [
+          10.98,
+          11.95
+        ],
+        "duration": 0.97,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#262414",
+            "#12110A",
+            "#292615"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라 1,000mL (280kcal) 케일 40%, 브로콜리 30%, 사과 25%, 그라비올라 5% 베트남산 (OEM)",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Large yellow text highlighting detox benefits and the product held by a hand.",
+            "Large product bottle held by hand with prominent text and a large durian graphic."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "attention": {
+          "attention_score": 53,
+          "attention_peak": 100,
+          "peak_timestamp": 11.01,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 10.5,
+            "end": 13.5,
+            "text": "비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FDD835",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo",
+            "sticker"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#12110A",
+          "accent_color": "#FDD835",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 11.0,
+            "content": "해외에서 이미 유명한 그라비올라",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 13,
+        "role": "proof",
+        "time_range": [
+          11.95,
+          13.55
+        ],
+        "duration": 1.6,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "rule_of_thirds",
+          "cut_count": 0,
+          "avg_cut_interval": 2.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#AAA482",
+            "#ABA383",
+            "#ACA486"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "product_only",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 비타민 C, E",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 비타민 C E",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 비타민 C E 아이엠그린 I am Green",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 비타민 C E",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Large, bold text highlighting product benefits and the vibrant green juice.",
+            "Bright green juice and prominent text overlays highlighting benefits and vitamins.",
+            "Bright green detox juice in a glass with prominent vitamin callout text.",
+            "Large text overlay highlighting product benefits and key ingredients, alongside the product itself."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "비타민 함량, 일일 과채 섭취 권장량 3배, 33칼로리 등 구체적인 수치를 제시하여 제품의 영양적 가치와 저칼로리임을 부각한다.",
+        "attention": {
+          "attention_score": 35,
+          "attention_peak": 81,
+          "peak_timestamp": 12.01,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 10.5,
+            "end": 13.5,
+            "text": "비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요.",
+            "speaker": null
+          },
+          {
+            "start": 13.5,
+            "end": 15.0,
+            "text": "한 잔에 단 33칼로리,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "badge",
+            "circle_highlight",
+            "icon",
+            "logo",
+            "sticker"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#ADA78A",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 12.0,
+            "content": "비타민 C, E 등",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 13.0,
+            "content": "1일 과채 섭취 권장량 3배",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 13.5,
+            "content": "1일 섭취량 400g X 3배",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "spec_data",
+            "claim": "비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요.",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '비타민 C, E 등'과 '1일 과채 섭취 권장량 3배' 텍스트가 나타나며 구체적인 영양 정보를 제공합니다.",
+              "timestamp": 12.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 14,
+        "role": "proof",
+        "time_range": [
+          13.55,
+          16.18
+        ],
+        "duration": 2.64,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 2.51,
+          "motion_level": "moderate",
+          "color_consistency": 0.53,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#211A04",
+            "#281F09",
+            "#281F0B"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "lifestyle_scene",
+          "product_visibility": "in_use",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "demonstrating"
+          },
+          "text_overlays": [
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 아이엠그린 I am Green 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 과채성취 권장량 3배 1일 섭취량 400g X 3배",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "아이엠그린 1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Green juice being poured into a glass, surrounded by fresh apples and broccoli on grass.",
+            "Green juice being poured into a glass, surrounded by fresh apples and broccoli.",
+            "Green juice being poured into a glass, surrounded by fresh apples and broccoli, with prominent text overlays.",
+            "Green juice being poured into a glass, surrounded by fresh fruits and vegetables, with prominent text highlighting product benefits.",
+            "Green juice being poured into a glass, surrounded by fresh fruits and vegetables, with prominent text overlays."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "비타민 함량, 일일 과채 섭취 권장량 3배, 33칼로리 등 구체적인 수치를 제시하여 제품의 영양적 가치와 저칼로리임을 부각한다.",
+        "attention": {
+          "attention_score": 29,
+          "attention_peak": 78,
+          "peak_timestamp": 14.01,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 13.5,
+            "end": 15.0,
+            "text": "한 잔에 단 33칼로리,",
+            "speaker": null
+          },
+          {
+            "start": 15.0,
+            "end": 16.5,
+            "text": "묵은 독소 썩,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "logo",
+            "sticker"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#281F0B",
+          "accent_color": "#BF413B",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 15.0,
+            "content": "한 잔 = 33kcal",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 16.0,
+            "content": "묵은 독소 Bye~",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "spec_data",
+            "claim": "한 잔에 단 33칼로리",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '한 잔 = 33kcal' 텍스트가 나타나며 낮은 칼로리를 강조합니다.",
+              "timestamp": 15.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          },
+          {
+            "type": "lifestyle",
+            "claim": "묵은 독소 썩, 몸이 가벼워지니 다이어트 효과까지!",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "여성이 주스를 마시는 장면과 함께 '묵은 독소 Bye~', '몸이 훨씬 가볍네~', '살이 쭉쭉 빠져요' 텍스트가 나타나며 제품 사용 후의 긍정적인 변화를 보여줍니다.",
+              "timestamp": 16.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 15,
+        "role": "solution",
+        "time_range": [
+          16.18,
+          17.98
+        ],
+        "duration": 1.8,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "rule_of_thirds",
+          "cut_count": 0,
+          "avg_cut_interval": 1.5,
+          "motion_level": "fast",
+          "color_consistency": 0.29,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#28271E",
+            "#615E38",
+            "#252318"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 한잔 = 33kcal 아이엠그린 I am Green",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "top_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 한잔 = 33kcal 아이엠그린 I am Green",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 한잔 = 33kcal",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Large yellow text highlighting detox benefits and low calorie count, combined with hands holding the product in a natural setting.",
+            "Two large green juice bottles held by hands, with prominent yellow and white text overlays highlighting benefits and low calories.",
+            "Bright yellow text highlighting detox benefits and low calories on green juice bottles held by hands."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 마시는 사람의 모습과 함께 독소 배출, 몸이 가벼워지는 느낌, 다이어트 효과 등 제품이 가져다줄 라이프스타일 변화를 보여준다.",
+        "attention": {
+          "attention_score": 44,
+          "attention_peak": 76,
+          "peak_timestamp": 16.52,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 15.0,
+            "end": 16.5,
+            "text": "묵은 독소 썩,",
+            "speaker": null
+          },
+          {
+            "start": 16.5,
+            "end": 18.5,
+            "text": "몸이 가벼워지니 다이어트 효과까지!",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFD700",
+          "text_color_highlight": "#FFD700",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo",
+            "sticker"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#615E38",
+          "accent_color": "#FFD700",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 17.0,
+            "content": "몸이 훨씬 가볍네~",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 16,
+        "role": "solution",
+        "time_range": [
+          17.98,
+          19.02
+        ],
+        "duration": 1.03,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "rule_of_thirds",
+          "cut_count": 0,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.0,
+          "color_mood": "warm_cozy",
+          "color_palette": [
+            "#F2EBE2",
+            "#BAA08C",
+            "#B69C88"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "in_use",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "user",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "demonstrating"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 묵은 독소 Bye~",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "bottom_third",
+              "dwell_time": 1.0
+            }
+          ],
+          "attention_elements": [
+            "Person drinking detox juice with prominent benefit text overlays.",
+            "Person drinking detox juice with prominent benefit-driven text overlays."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 마시는 사람의 모습과 함께 독소 배출, 몸이 가벼워지는 느낌, 다이어트 효과 등 제품이 가져다줄 라이프스타일 변화를 보여준다.",
+        "attention": {
+          "attention_score": 71,
+          "attention_peak": 98,
+          "peak_timestamp": 18.02,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 16.5,
+            "end": 18.5,
+            "text": "몸이 가벼워지니 다이어트 효과까지!",
+            "speaker": null
+          },
+          {
+            "start": 18.5,
+            "end": 20.5,
+            "text": "하루 단 한 잔에 마법 같은 효과,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "#FFD700",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/person-bottom",
+          "text_product_overlap": false,
+          "primary_color": "#F2EBE2",
+          "accent_color": "#FFD700",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 18.0,
+            "content": "살이 쭉쭉 빠져요",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 19.0,
+            "content": "마법을 경험합니다..",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 17,
+        "role": "solution",
+        "time_range": [
+          19.02,
+          19.55
+        ],
+        "duration": 0.53,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 1,
+          "avg_cut_interval": 1.0,
+          "motion_level": "jump_cut",
+          "color_consistency": 0.0,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#534E3A",
+            "#574C36",
+            "#27241A"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "lifestyle_scene",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹~배출 몸이 훨씬 가볍네~",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 몸이 훨씬 가볍네~",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Multiple product bottles arranged with fresh ingredients and large, benefit-driven text overlays.",
+            "Large text overlay highlighting product benefits and multiple product bottles surrounded by fresh ingredients."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 마시는 사람의 모습과 함께 독소 배출, 몸이 가벼워지는 느낌, 다이어트 효과 등 제품이 가져다줄 라이프스타일 변화를 보여준다.",
+        "attention": {
+          "attention_score": 62,
+          "attention_peak": 98,
+          "peak_timestamp": 19.02,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 18.5,
+            "end": 20.5,
+            "text": "하루 단 한 잔에 마법 같은 효과,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#534E3A",
+          "accent_color": "#FFFF00",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 18,
+        "role": "solution",
+        "time_range": [
+          19.55,
+          20.22
+        ],
+        "duration": 0.67,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 0.5,
+          "motion_level": "fast",
+          "color_consistency": 0.76,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#4F4A31",
+            "#7F734A",
+            "#25231A"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "zoom_transition"
+        },
+        "content_summary": {
+          "subject_type": "lifestyle_scene",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "none",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Large, bold text overlay and multiple product bottles surrounded by fresh ingredients."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "주스를 마시는 사람의 모습과 함께 독소 배출, 몸이 가벼워지는 느낌, 다이어트 효과 등 제품이 가져다줄 라이프스타일 변화를 보여준다.",
+        "attention": {
+          "attention_score": 30,
+          "attention_peak": 30,
+          "peak_timestamp": 20.02,
+          "attention_level": "medium",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 18.5,
+            "end": 20.5,
+            "text": "하루 단 한 잔에 마법 같은 효과,",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFD700",
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#4F4A31",
+          "accent_color": "#FFD700",
+          "contrast_level": "high",
+          "color_harmony": "warm_cool_split"
+        },
+        "text_effects": [
+          {
+            "time": 20.0,
+            "content": "일조량 좋은 베트남",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "origin",
+            "claim": "일조량 좋은 베트남 현지에서 바로 착즙해 더욱 신선한 그린 주스.",
+            "visual_proof": {
+              "technique": "location_shot",
+              "description": "햇살 좋은 야외에 놓인 주스병들과 '일조량 좋은 베트남' 텍스트가 나타나며 원산지의 신선함을 강조합니다.",
+              "timestamp": 20.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "moderate"
+          }
+        ]
+      },
+      {
+        "scene_id": 19,
+        "role": "brand_intro",
+        "time_range": [
+          20.22,
+          21.52
+        ],
+        "duration": 1.3,
+        "visual_summary": {
+          "dominant_shot": "closeup",
+          "shot_sequence": [
+            "closeup",
+            "closeup",
+            "medium"
+          ],
+          "composition": "diagonal",
+          "cut_count": 2,
+          "avg_cut_interval": 0.75,
+          "motion_level": "jump_cut",
+          "color_consistency": 0.08,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#5F614A",
+            "#3C2E20",
+            "#5E685C"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "product_only",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "presenter",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 살이 쭉쭉 빠져요",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 1.0
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 하루 단 한잔",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "none",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Large text overlay highlighting benefits and prominent product with fresh ingredients",
+            "Bold text overlays emphasizing detox and weight loss benefits, combined with fresh produce.",
+            "Person holding a large glass of green juice with prominent white text overlays."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "베트남 현지 착즙이라는 원산지 및 제조 과정을 언급하며 신선도와 품질에 대한 신뢰를 높인다.",
+        "attention": {
+          "attention_score": 60,
+          "attention_peak": 88,
+          "peak_timestamp": 21.52,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 18.5,
+            "end": 20.5,
+            "text": "하루 단 한 잔에 마법 같은 효과,",
+            "speaker": null
+          },
+          {
+            "start": 20.5,
+            "end": 23.5,
+            "text": "일조량 좋은 베트남 현지에서 바로 착즙해 더욱 신선한 그린 주스.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "yellow",
+          "has_text_background": false,
+          "text_bg_color": "#FFD700",
+          "graphic_elements": [
+            "icon",
+            "logo",
+            "sticker"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/product-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#5F614A",
+          "accent_color": "yellow",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 20.5,
+            "content": "유통과정 줄여 더 저렴해졌어요!",
+            "entrance": "fade_in",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 21.5,
+            "content": "바로 착즙해 신~~~선",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 20,
+        "role": "brand_intro",
+        "time_range": [
+          21.52,
+          23.52
+        ],
+        "duration": 2.0,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "rule_of_thirds",
+          "cut_count": 1,
+          "avg_cut_interval": 2.0,
+          "motion_level": "moderate",
+          "color_consistency": 0.36,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#5D5132",
+            "#282516",
+            "#706751"
+          ],
+          "zoom_events": [
+            {
+              "time_range": [
+                21.52,
+                22.52
+              ],
+              "direction": "zoom_in",
+              "scale_change": 0.333
+            }
+          ],
+          "transition_in": "dissolve",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "in_use",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "user",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 하루 단 한잔",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 마법을 경험합니다..",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 마법을 경험합니다...",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "top_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요!",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Person holding a large glass of green detox juice with prominent text overlays.",
+            "Person drinking green juice with prominent benefit-oriented text overlays.",
+            "Person drinking green juice with prominent text overlay highlighting product benefits.",
+            "Large product bottles surrounded by fresh ingredients and bold text overlays."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "베트남 현지 착즙이라는 원산지 및 제조 과정을 언급하며 신선도와 품질에 대한 신뢰를 높인다.",
+        "attention": {
+          "attention_score": 47,
+          "attention_peak": 88,
+          "peak_timestamp": 21.52,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 20.5,
+            "end": 23.5,
+            "text": "일조량 좋은 베트남 현지에서 바로 착즙해 더욱 신선한 그린 주스.",
+            "speaker": null
+          },
+          {
+            "start": 23.5,
+            "end": 26.5,
+            "text": "시크릿 링크에서만 더 저렴하게 보여드려요.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#C3A887",
+          "accent_color": "#766D22",
+          "contrast_level": "high",
+          "color_harmony": "analogous"
+        },
+        "text_effects": [
+          {
+            "time": 23.0,
+            "content": "핫! 비밀링크",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": [
+          {
+            "type": "price",
+            "claim": "시크릿 링크에서만 더 저렴하게 보여드려요. 1리터 대용량 그린 주스 1만 원대에 만나보세요.",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '핫! 비밀링크', '단독!! 할인특가 진행', '1L 대용량 1만원대' 텍스트가 반복적으로 나타나며 가격 혜택을 강조합니다.",
+              "timestamp": 23.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ]
+      },
+      {
+        "scene_id": 21,
+        "role": "cta",
+        "time_range": [
+          23.52,
+          25.39
+        ],
+        "duration": 1.87,
+        "visual_summary": {
+          "dominant_shot": "overhead",
+          "shot_sequence": [
+            "overhead",
+            "medium",
+            "wide"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 1.51,
+          "motion_level": "moderate",
+          "color_consistency": 0.86,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#362E1D",
+            "#32281B",
+            "#5F5435"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "product_only",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹~배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요!",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "none",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요! 아이엠그린 I am Green NPC Juice 100%",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙~배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요!",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "full",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Multiple green juice bottles, red apples, and green broccoli scattered on grass, with prominent text overlays highlighting product benefits and origin.",
+            "Large text overlays highlighting product benefits and natural ingredients, combined with scattered fresh produce and product bottles.",
+            "Large handwritten text and vibrant fresh ingredients (apples, broccoli) scattered around juice bottles."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "다양한 주스 제품들을 보여주며 비밀 링크를 통한 할인 특가와 1리터 대용량 제품의 1만원대 가격을 강조하며 구매를 유도한다.",
+        "attention": {
+          "attention_score": 38,
+          "attention_peak": 88,
+          "peak_timestamp": 23.52,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 23.5,
+            "end": 26.5,
+            "text": "시크릿 링크에서만 더 저렴하게 보여드려요.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "#FFD700",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#362E1D",
+          "accent_color": "#B6423C",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 24.0,
+            "content": "단독!! 할인특가 진행",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 25.0,
+            "content": "1L 대용량",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 22,
+        "role": "cta",
+        "time_range": [
+          25.39,
+          27.69
+        ],
+        "duration": 2.3,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 2.5,
+          "motion_level": "moderate",
+          "color_consistency": 0.6,
+          "color_mood": "natural_organic",
+          "color_palette": [
+            "#7D683F",
+            "#7F6B42",
+            "#77643D"
+          ],
+          "zoom_events": [],
+          "transition_in": "dissolve",
+          "transition_out": "hard_cut"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "in_use",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "holding_product"
+          },
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 바로 착즙해 신~~~선",
+              "purpose": "benefit",
+              "font_style": "handwritten",
+              "position": "bottom_third",
+              "dwell_time": 1.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 바로 착즙해 신~~~~선",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹~배출 바로착즙해 신~~~선",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Green juice being poured into a glass, surrounded by fresh produce and product bottles, with overlaid text highlighting benefits.",
+            "Green juice being poured into a glass, with prominent text overlays and a natural outdoor setting.",
+            "Hand holding a glass of green juice with text overlays and a straw",
+            "Green juice being poured into a glass, highlighted by bold text overlays and a natural outdoor setting.",
+            "Green juice being poured into a glass held by a hand, with prominent white text overlays."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "다양한 주스 제품들을 보여주며 비밀 링크를 통한 할인 특가와 1리터 대용량 제품의 1만원대 가격을 강조하며 구매를 유도한다.",
+        "attention": {
+          "attention_score": 23,
+          "attention_peak": 83,
+          "peak_timestamp": 25.53,
+          "attention_level": "peak",
+          "is_climax": true
+        },
+        "transcript_segments": [
+          {
+            "start": 23.5,
+            "end": 26.5,
+            "text": "시크릿 링크에서만 더 저렴하게 보여드려요.",
+            "speaker": null
+          },
+          {
+            "start": 26.5,
+            "end": 29.5,
+            "text": "1리터 대용량 그린 주스 1만 원대에 만나보세요.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "handwritten",
+          "typography_weight": "bold",
+          "text_color_primary": "#FFFFFF",
+          "text_color_highlight": null,
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#7F6B42",
+          "accent_color": "#FF0000",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 26.0,
+            "content": "1만원대",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 27.0,
+            "content": "1L 대용량",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 23,
+        "role": "cta",
+        "time_range": [
+          27.69,
+          30.5
+        ],
+        "duration": 2.8,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "medium",
+            "medium",
+            "medium",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 0,
+          "avg_cut_interval": 2.5,
+          "motion_level": "moderate",
+          "color_consistency": 0.63,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#737340",
+            "#747242",
+            "#48391D"
+          ],
+          "zoom_events": [],
+          "transition_in": "hard_cut",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "person_with_product",
+          "product_visibility": "in_use",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": {
+            "role": "hand_only",
+            "emotion": "neutral",
+            "eye_contact": false,
+            "gesture": "demonstrating"
+          },
+          "text_overlays": [
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 샷! 비밀링크",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 1.0
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 단독!! 할인특가 진행",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 1.5
+            }
+          ],
+          "attention_elements": [
+            "Colorful juices being poured into glasses in a natural setting.",
+            "Pouring colorful detox juices into glasses in a vibrant outdoor setting.",
+            "Colorful juices being poured into glasses amidst fresh ingredients, highlighting product variety and freshness.",
+            "Colorful juices being poured into glasses, with bold promotional text overlay.",
+            "Multiple colorful juices being poured into glasses, with prominent text overlay highlighting benefits and a discount."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "다양한 주스 제품들을 보여주며 비밀 링크를 통한 할인 특가와 1리터 대용량 제품의 1만원대 가격을 강조하며 구매를 유도한다.",
+        "attention": {
+          "attention_score": 28,
+          "attention_peak": 68,
+          "peak_timestamp": 28.03,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [
+          {
+            "start": 26.5,
+            "end": 29.5,
+            "text": "1리터 대용량 그린 주스 1만 원대에 만나보세요.",
+            "speaker": null
+          }
+        ],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "white",
+          "text_color_highlight": "#FFFF00",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "badge",
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#737340",
+          "accent_color": "#FFD700",
+          "contrast_level": "high",
+          "color_harmony": "warm_cool_split"
+        },
+        "text_effects": [
+          {
+            "time": 28.0,
+            "content": "1만원대",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 29.0,
+            "content": "1L 대용량",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 30.0,
+            "content": "1만원대",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      },
+      {
+        "scene_id": 24,
+        "role": "cta",
+        "time_range": [
+          30.5,
+          35.3
+        ],
+        "duration": 4.8,
+        "visual_summary": {
+          "dominant_shot": "medium",
+          "shot_sequence": [
+            "overhead",
+            "wide",
+            "medium",
+            "medium",
+            "medium",
+            "medium",
+            "medium",
+            "closeup",
+            "medium",
+            "medium"
+          ],
+          "composition": "center",
+          "cut_count": 5,
+          "avg_cut_interval": 1.0,
+          "motion_level": "fast",
+          "color_consistency": 0.62,
+          "color_mood": "vibrant_energetic",
+          "color_palette": [
+            "#3C2E16",
+            "#CE5528",
+            "#413016"
+          ],
+          "zoom_events": [
+            {
+              "time_range": [
+                34.03,
+                35.04
+              ],
+              "direction": "zoom_in",
+              "scale_change": 0.107
+            }
+          ],
+          "transition_in": "dissolve",
+          "transition_out": "dissolve"
+        },
+        "content_summary": {
+          "subject_type": "lifestyle_scene",
+          "product_visibility": "full",
+          "product_angle": "front",
+          "product_context": "lifestyle",
+          "human_element": null,
+          "text_overlays": [
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "middle_third",
+              "dwell_time": 1.0
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "none",
+              "dwell_time": 2.5
+            },
+            {
+              "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대 아이엠 그린 아이엠 토마토",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "full",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 1L 대용량 1만원대",
+              "purpose": "price_offer",
+              "font_style": "handwritten",
+              "position": "middle_third",
+              "dwell_time": 0.5
+            },
+            {
+              "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대 아이엠 토마토 NFC JUICE CARROT",
+              "purpose": "benefit",
+              "font_style": "bold_impact",
+              "position": "bottom_third",
+              "dwell_time": 0.5
+            }
+          ],
+          "attention_elements": [
+            "Vibrant product bottles and fresh ingredients arranged on grass, highlighted by large, bold text overlays.",
+            "Large, bold text overlays highlighting product benefits and price, combined with colorful juice bottles and fresh ingredients in a natural setting.",
+            "Large juice bottles and vibrant text overlay against a natural backdrop of fresh produce.",
+            "Large, bold text highlighting product benefits and price, combined with colorful juice bottles and fresh ingredients.",
+            "Large, bold text highlighting product benefits and price, combined with vibrant colors of fresh ingredients and juice.",
+            "Large, bold yellow text overlay highlighting product benefits and price, set against natural ingredients.",
+            "Large, yellow handwritten text highlighting product benefits and price, combined with vibrant product colors and fresh ingredients.",
+            "Large, bold yellow text overlay highlighting product benefits and price, combined with colorful juice bottles and fresh ingredients.",
+            "Bold text overlays highlighting product benefits and price, combined with a vibrant display of fresh produce and juices.",
+            "Large juice bottle and prominent yellow text overlay against a natural background."
+          ],
+          "key_action": ""
+        },
+        "effectiveness_signals": {
+          "hook_strength": "none",
+          "information_density": "medium",
+          "emotional_trigger": "none"
+        },
+        "description": "다양한 주스 제품들을 보여주며 비밀 링크를 통한 할인 특가와 1리터 대용량 제품의 1만원대 가격을 강조하며 구매를 유도한다.",
+        "attention": {
+          "attention_score": 34,
+          "attention_peak": 56,
+          "peak_timestamp": 30.53,
+          "attention_level": "high",
+          "is_climax": false
+        },
+        "transcript_segments": [],
+        "artwork": {
+          "typography_style": "gothic",
+          "typography_weight": "extra_bold",
+          "text_color_primary": "#FFD700",
+          "text_color_highlight": "#FFD700",
+          "has_text_background": false,
+          "text_bg_color": null,
+          "graphic_elements": [
+            "badge",
+            "icon",
+            "logo"
+          ],
+          "dominant_layout": "mixed-top/mixed-middle/mixed-bottom",
+          "text_product_overlap": true,
+          "primary_color": "#696F3A",
+          "accent_color": "#FFD700",
+          "contrast_level": "high",
+          "color_harmony": "complementary"
+        },
+        "text_effects": [
+          {
+            "time": 31.0,
+            "content": "1L 대용량",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 32.0,
+            "content": "1만원대",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 33.0,
+            "content": "1L 대용량",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          },
+          {
+            "time": 34.0,
+            "content": "1만원대",
+            "entrance": "pop",
+            "exit": "cut",
+            "emphasis": "none",
+            "sync_with": "voice"
+          }
+        ],
+        "appeal_points": []
+      }
+    ],
+    "temporal_profile": {
+      "total_duration": 35.54,
+      "attention_arc": "building→peak→fade",
+      "cut_rhythm_summary": "24 cuts, 1.3s avg interval, decelerating",
+      "dominant_transition": "mixed",
+      "text_density": "high",
+      "product_human_balance": "product-dominant"
+    },
+    "production_guide": {
+      "scene_guides": [
+        {
+          "scene_id": 1,
+          "role": "hook",
+          "time_range": [
+            0.0,
+            2.1
+          ],
+          "duration": 2.1,
+          "cut_rhythm": "2 cuts, ~1.1s/cut",
+          "text_timing": "text appears at 0.0s, stays 1.5s",
+          "attention_level": "클라이막스 attention, peak at 1.5s (score 79)",
+          "camera_suggestion": "medium shot, fast motion, zoom_out (10%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 2,
+          "role": "demo",
+          "time_range": [
+            2.1,
+            3.34
+          ],
+          "duration": 1.24,
+          "cut_rhythm": "2 cuts, ~0.6s/cut",
+          "text_timing": "text appears at 0.4s, stays 18.0s",
+          "attention_level": "강 attention, peak at 2.5s (score 75)",
+          "camera_suggestion": "medium shot, jump_cut motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 3,
+          "role": "demo",
+          "time_range": [
+            3.34,
+            4.2
+          ],
+          "duration": 0.87,
+          "cut_rhythm": "1 cuts, ~0.9s/cut",
+          "text_timing": "text appears at 0.2s, stays 1.0s",
+          "attention_level": "강 attention, peak at 3.5s (score 75)",
+          "camera_suggestion": "medium shot, fast motion, zoom_out (18%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 4,
+          "role": "demo",
+          "time_range": [
+            4.2,
+            5.04
+          ],
+          "duration": 0.83,
+          "cut_rhythm": "1 cuts, ~0.8s/cut",
+          "text_timing": "text appears at 0.3s, stays 0.5s",
+          "attention_level": "강 attention, peak at 4.5s (score 68)",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 5,
+          "role": "demo",
+          "time_range": [
+            5.04,
+            6.44
+          ],
+          "duration": 1.4,
+          "cut_rhythm": "1 cuts, ~1.4s/cut",
+          "text_timing": "text appears at 0.5s, stays 0.5s",
+          "attention_level": "강 attention, peak at 5.5s (score 64)",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 6,
+          "role": "demo",
+          "time_range": [
+            6.44,
+            7.07
+          ],
+          "duration": 0.63,
+          "cut_rhythm": "1 cuts, ~0.6s/cut",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 6.5s (score 97)",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 7,
+          "role": "demo",
+          "time_range": [
+            7.07,
+            7.91
+          ],
+          "duration": 0.83,
+          "cut_rhythm": "1 cuts, ~0.8s/cut",
+          "text_timing": "text appears at 0.4s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 7.5s (score 100)",
+          "camera_suggestion": "medium shot, jump_cut motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 8,
+          "role": "demo",
+          "time_range": [
+            7.91,
+            8.64
+          ],
+          "duration": 0.73,
+          "cut_rhythm": "1 cuts, ~0.7s/cut",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 8.0s (score 100)",
+          "camera_suggestion": "medium shot, fast motion, zoom_in (20%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 9,
+          "role": "demo",
+          "time_range": [
+            8.64,
+            9.61
+          ],
+          "duration": 0.97,
+          "cut_rhythm": "1 cuts, ~1.0s/cut",
+          "text_timing": "text appears at 0.4s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 9.0s (score 98)",
+          "camera_suggestion": "medium shot, jump_cut motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 10,
+          "role": "demo",
+          "time_range": [
+            9.61,
+            10.41
+          ],
+          "duration": 0.8,
+          "cut_rhythm": "1 cuts, ~0.8s/cut",
+          "text_timing": "text appears at 0.4s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 10.0s (score 99)",
+          "camera_suggestion": "medium shot, jump_cut motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 11,
+          "role": "demo",
+          "time_range": [
+            10.41,
+            10.98
+          ],
+          "duration": 0.57,
+          "cut_rhythm": "1 cuts, ~0.6s/cut",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 10.5s (score 100)",
+          "camera_suggestion": "medium shot, jump_cut motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 12,
+          "role": "demo",
+          "time_range": [
+            10.98,
+            11.95
+          ],
+          "duration": 0.97,
+          "cut_rhythm": "1 cuts, ~1.0s/cut",
+          "text_timing": "text appears at 0.0s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 11.0s (score 100)",
+          "camera_suggestion": "medium shot, fast motion, zoom_in (14%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 13,
+          "role": "proof",
+          "time_range": [
+            11.95,
+            13.55
+          ],
+          "duration": 1.6,
+          "cut_rhythm": "no cuts",
+          "text_timing": "text appears at 0.1s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 12.0s (score 81)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 14,
+          "role": "proof",
+          "time_range": [
+            13.55,
+            16.18
+          ],
+          "duration": 2.64,
+          "cut_rhythm": "1 cuts, ~2.6s/cut",
+          "text_timing": "text appears at 0.5s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 14.0s (score 78)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 15,
+          "role": "solution",
+          "time_range": [
+            16.18,
+            17.98
+          ],
+          "duration": 1.8,
+          "cut_rhythm": "1 cuts, ~1.8s/cut",
+          "text_timing": "text appears at 0.3s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 16.5s (score 76)",
+          "camera_suggestion": "medium shot, fast motion, zoom_out (18%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 16,
+          "role": "solution",
+          "time_range": [
+            17.98,
+            19.02
+          ],
+          "duration": 1.03,
+          "cut_rhythm": "2 cuts, ~0.5s/cut",
+          "text_timing": "text appears at 0.0s, stays 1.0s",
+          "attention_level": "클라이막스 attention, peak at 18.0s (score 98)",
+          "camera_suggestion": "medium shot, fast motion, zoom_in (14%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 17,
+          "role": "solution",
+          "time_range": [
+            19.02,
+            19.55
+          ],
+          "duration": 0.53,
+          "cut_rhythm": "1 cuts, ~0.5s/cut",
+          "text_timing": "text appears at 0.0s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 19.0s (score 98)",
+          "camera_suggestion": "medium shot, jump_cut motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 18,
+          "role": "solution",
+          "time_range": [
+            19.55,
+            20.22
+          ],
+          "duration": 0.67,
+          "cut_rhythm": "no cuts",
+          "text_timing": "no text overlay",
+          "attention_level": "중 attention, avg score 30",
+          "camera_suggestion": "medium shot, fast motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 19,
+          "role": "brand_intro",
+          "time_range": [
+            20.22,
+            21.52
+          ],
+          "duration": 1.3,
+          "cut_rhythm": "2 cuts, ~0.7s/cut",
+          "text_timing": "text appears at 0.3s, stays 1.0s",
+          "attention_level": "클라이막스 attention, peak at 21.5s (score 88)",
+          "camera_suggestion": "closeup shot, jump_cut motion, zoom_in (33%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 20,
+          "role": "brand_intro",
+          "time_range": [
+            21.52,
+            23.52
+          ],
+          "duration": 2.0,
+          "cut_rhythm": "2 cuts, ~1.0s/cut",
+          "text_timing": "text appears at 0.0s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 21.5s (score 88)",
+          "camera_suggestion": "medium shot, moderate motion, zoom_in (33%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 21,
+          "role": "cta",
+          "time_range": [
+            23.52,
+            25.39
+          ],
+          "duration": 1.87,
+          "cut_rhythm": "1 cuts, ~1.9s/cut",
+          "text_timing": "text appears at 0.0s, stays 0.5s",
+          "attention_level": "클라이막스 attention, peak at 23.5s (score 88)",
+          "camera_suggestion": "overhead shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 22,
+          "role": "cta",
+          "time_range": [
+            25.39,
+            27.69
+          ],
+          "duration": 2.3,
+          "cut_rhythm": "1 cuts, ~2.3s/cut",
+          "text_timing": "text appears at 0.1s, stays 2.5s",
+          "attention_level": "클라이막스 attention, peak at 25.5s (score 83)",
+          "camera_suggestion": "medium shot, moderate motion, zoom_in (10%)",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 23,
+          "role": "cta",
+          "time_range": [
+            27.69,
+            30.5
+          ],
+          "duration": 2.8,
+          "cut_rhythm": "1 cuts, ~2.8s/cut",
+          "text_timing": "text appears at 0.3s, stays 1.0s",
+          "attention_level": "강 attention, peak at 28.0s (score 68)",
+          "camera_suggestion": "medium shot, moderate motion",
+          "key_technique": ""
+        },
+        {
+          "scene_id": 24,
+          "role": "cta",
+          "time_range": [
+            30.5,
+            35.3
+          ],
+          "duration": 4.8,
+          "cut_rhythm": "1 cuts, ~4.8s/cut",
+          "text_timing": "text appears at 0.0s, stays 5.0s",
+          "attention_level": "강 attention, peak at 30.5s (score 56)",
+          "camera_suggestion": "medium shot, fast motion, zoom_in (11%)",
+          "key_technique": ""
+        }
+      ],
+      "recommended_cut_rhythm": "decelerating rhythm, target 1.3s avg interval",
+      "text_overlay_strategy": "55 text overlays, avg dwell 1.1s, 1.55 texts/sec",
+      "camera_movement_notes": "9 zoom events, 5 B-roll segments",
+      "attention_curve_target": "building→peak→fade, avg attention 42, peaks at 1.5s, 2.5s, 3.5s, 4.5s, 5.5s, 6.5s, 9.0s, 12.0s, 14.0s, 16.5s, 18.0s, 19.0s, 20.5s, 21.5s, 23.5s, 25.5s, 28.0s, 30.5s"
+    },
+    "scene_cards": [
+      {
+        "scene_id": 1,
+        "time_range": [
+          0.0,
+          2.1
+        ],
+        "duration": 2.1,
+        "role": "hook",
+        "description": "제품과 신선한 재료들이 배경에 놓인 채, 안색 개선이라는 핵심 효능을 제시하며 시청자의 이목을 끈다.",
+        "appeal_points": [
+          {
+            "type": "emotional",
+            "claim": "염증 가득한 안색이 환해졌어요.",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '염증 가득한 안색'과 '환해졌어요' 텍스트가 차례로 나타나며 문제점과 해결책을 제시합니다.",
+              "timestamp": 0.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          },
+          {
+            "type": "feature_demo",
+            "claim": "100% NFC 착즙한 그린 주스",
+            "visual_proof": {
+              "technique": "process_shot",
+              "description": "주스를 컵에 따르는 장면을 통해 신선하고 자연적인 착즙 과정을 시각적으로 보여줍니다.",
+              "timestamp": 1.5
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "lifestyle_scene",
+        "product_visibility": "full",
+        "attention_score": 32,
+        "attention_peak": 79,
+        "attention_level": "peak",
+        "cut_count": 3,
+        "cut_rhythm": "2 cuts, ~1.1s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 염증가득 안색",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 1.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 환해졌어요 독소배출 해독작용의 효과!",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 환해졌어요 독소배출 해독작용의 효과!",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#342E1B",
+          "#302A1A",
+          "#696A48"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold #FFFFFF",
+        "narration": "염증 가득한 안색이 환해졌어요. 이 한 병에 100% NFC 착즙한 그린 주스,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 2,
+        "time_range": [
+          2.1,
+          3.34
+        ],
+        "duration": 1.24,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "jump_cut",
+        "composition": "rule_of_thirds",
+        "subject": "product_only",
+        "product_visibility": "full",
+        "attention_score": 68,
+        "attention_peak": 75,
+        "attention_level": "high",
+        "cut_count": 1,
+        "cut_rhythm": "2 cuts, ~0.6s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "top_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 아이엠그린 I am Green 100% NFC 착즙 첨가물 無 베트남산 (OEM)",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#3A422E",
+          "#46533D",
+          "#8B814D"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold #FFEB3B",
+        "narration": "이 한 병에 100% NFC 착즙한 그린 주스,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 3,
+        "time_range": [
+          3.34,
+          4.2
+        ],
+        "duration": 0.87,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "rule_of_thirds",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 58,
+        "attention_peak": 75,
+        "attention_level": "high",
+        "cut_count": 1,
+        "cut_rhythm": "1 cuts, ~0.9s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 100% NFC 착즙 첨가물 無",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "top_third",
+            "dwell_time": 1.0
+          }
+        ],
+        "color_palette": [
+          "#7A7231",
+          "#777529",
+          "#343719"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold #FFD700",
+        "narration": "이 한 병에 100% NFC 착즙한 그린 주스, 베타카로틴 루테인 덩어리 케일,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 4,
+        "time_range": [
+          4.2,
+          5.04
+        ],
+        "duration": 0.83,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "rule_of_thirds",
+        "subject": "person_with_product",
+        "product_visibility": "in_use",
+        "attention_score": 48,
+        "attention_peak": 68,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.8s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 신선한 그린주스 첨가물 無",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "top_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 신선한 그린주스 첨가물 無",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#36311E",
+          "#6B6133",
+          "#A59D56"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "handwritten bold white",
+        "narration": "베타카로틴 루테인 덩어리 케일,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 5,
+        "time_range": [
+          5.04,
+          6.44
+        ],
+        "duration": 1.4,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [
+          {
+            "type": "ingredient",
+            "claim": "베타카로틴 루테인 덩어리 케일",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "신선한 케일 잎이 클로즈업되어 나타나며 주요 성분을 강조합니다.",
+              "timestamp": 5.5
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "lifestyle_scene",
+        "product_visibility": "full",
+        "attention_score": 42,
+        "attention_peak": 64,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~1.4s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 아이엠 그린 I am Green 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹~배출 아이엠그린 I am Green 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#3A2F1D",
+          "#3A2D1C",
+          "#5F613E"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "handwritten bold #FFFFFF",
+        "narration": "베타카로틴 루테인 덩어리 케일, 항암 효과 킹 브로콜리,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 6,
+        "time_range": [
+          6.44,
+          7.07
+        ],
+        "duration": 0.63,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [
+          {
+            "type": "ingredient",
+            "claim": "항암 효과 킹 브로콜리",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "신선한 브로콜리가 클로즈업되어 나타나며 항암 효과를 시각적으로 연결합니다.",
+              "timestamp": 7.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "lifestyle_scene",
+        "product_visibility": "full",
+        "attention_score": 54,
+        "attention_peak": 97,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.6s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#17100A",
+          "#140F0A",
+          "#2F2418"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "handwritten extra_bold #FFD700",
+        "narration": "항암 효과 킹 브로콜리,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 7,
+        "time_range": [
+          7.07,
+          7.91
+        ],
+        "duration": 0.83,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "jump_cut",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "in_use",
+        "attention_score": 100,
+        "attention_peak": 100,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.8s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 항암효과 KING 브로콜리 다크서클에만 좋은거 아니었어?",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "none",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#726338",
+          "#353422",
+          "#A49348"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "handwritten extra_bold white",
+        "narration": "항암 효과 킹 브로콜리, 심혈관 보호 달콤한 사과,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 8,
+        "time_range": [
+          7.91,
+          8.64
+        ],
+        "duration": 0.73,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "in_use",
+        "attention_score": 53,
+        "attention_peak": 100,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.7s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 항암효과 KING 브로콜리 다크서클에만 좋은거 아니었어?",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 항암효과 KING 브로콜리 다크서클에만 좋은거 아니었어?",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#17140A",
+          "#252011",
+          "#332E1D"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "display extra_bold #FFFFFF",
+        "narration": "심혈관 보호 달콤한 사과,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 9,
+        "time_range": [
+          8.64,
+          9.61
+        ],
+        "duration": 0.97,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [
+          {
+            "type": "ingredient",
+            "claim": "심혈관 보호 달콤한 사과",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "빨간 사과가 클로즈업되어 나타나며 심혈관 보호 효능을 언급합니다.",
+              "timestamp": 9.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "moderate"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "jump_cut",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 63,
+        "attention_peak": 98,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~1.0s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙~배출 심혈관 보호 0설탕 없이 달달한 이유! 사과!",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#272116",
+          "#5A513A",
+          "#4E4432"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold white",
+        "narration": "심혈관 보호 달콤한 사과, 슈퍼푸드 그라비올라,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 10,
+        "time_range": [
+          9.61,
+          10.41
+        ],
+        "duration": 0.8,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "jump_cut",
+        "composition": "center",
+        "subject": "lifestyle_scene",
+        "product_visibility": "full",
+        "attention_score": 99,
+        "attention_peak": 99,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.8s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 심혈관 보호 설탕 없이 달달한 이유! 사과! 그린",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#0F0D0A",
+          "#322A20"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold #FFC107",
+        "narration": "슈퍼푸드 그라비올라,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 11,
+        "time_range": [
+          10.41,
+          10.98
+        ],
+        "duration": 0.57,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [
+          {
+            "type": "ingredient",
+            "claim": "슈퍼푸드 그라비올라",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "그라비올라 과일 이미지가 나타나며 슈퍼푸드임을 강조합니다.",
+              "timestamp": 10.5
+            },
+            "audio_sync": "narration_sync",
+            "strength": "moderate"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "jump_cut",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 100,
+        "attention_peak": 100,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~0.6s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#595A3D",
+          "#8E8247",
+          "#322D1B"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "handwritten extra_bold #FFFFFF",
+        "narration": "슈퍼푸드 그라비올라, 비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 12,
+        "time_range": [
+          10.98,
+          11.95
+        ],
+        "duration": 0.97,
+        "role": "demo",
+        "description": "주스를 컵에 따르는 시연과 함께 100% NFC 착즙이라는 제품의 핵심 특징을 강조하고, 케일, 브로콜리, 사과, 그라비올라 등 주요 재료들을 시각적으로 보여주며 각 성분의 효능을 내레이션과 텍스트로 설명한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 53,
+        "attention_peak": 100,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~1.0s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라 1,000mL (280kcal) 케일 40%, 브로콜리 30%, 사과 25%, 그라비올라 5% 베트남산 (OEM)",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#262414",
+          "#12110A",
+          "#292615"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold #FDD835",
+        "narration": "비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 13,
+        "time_range": [
+          11.95,
+          13.55
+        ],
+        "duration": 1.6,
+        "role": "proof",
+        "description": "비타민 함량, 일일 과채 섭취 권장량 3배, 33칼로리 등 구체적인 수치를 제시하여 제품의 영양적 가치와 저칼로리임을 부각한다.",
+        "appeal_points": [
+          {
+            "type": "spec_data",
+            "claim": "비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요.",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '비타민 C, E 등'과 '1일 과채 섭취 권장량 3배' 텍스트가 나타나며 구체적인 영양 정보를 제공합니다.",
+              "timestamp": 12.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "rule_of_thirds",
+        "subject": "product_only",
+        "product_visibility": "full",
+        "attention_score": 35,
+        "attention_peak": 81,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 비타민 C, E",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 비타민 C E",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 비타민 C E 아이엠그린 I am Green",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 비타민 C E",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#AAA482",
+          "#ABA383",
+          "#ACA486"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold white",
+        "narration": "비타민 C, E 등 일일 과채 섭취 권장량 3배가 들어있어요. 한 잔에 단 33칼로리,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 14,
+        "time_range": [
+          13.55,
+          16.18
+        ],
+        "duration": 2.64,
+        "role": "proof",
+        "description": "비타민 함량, 일일 과채 섭취 권장량 3배, 33칼로리 등 구체적인 수치를 제시하여 제품의 영양적 가치와 저칼로리임을 부각한다.",
+        "appeal_points": [
+          {
+            "type": "spec_data",
+            "claim": "한 잔에 단 33칼로리",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '한 잔 = 33kcal' 텍스트가 나타나며 낮은 칼로리를 강조합니다.",
+              "timestamp": 15.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          },
+          {
+            "type": "lifestyle",
+            "claim": "묵은 독소 썩, 몸이 가벼워지니 다이어트 효과까지!",
+            "visual_proof": {
+              "technique": "ingredient_shot",
+              "description": "여성이 주스를 마시는 장면과 함께 '묵은 독소 Bye~', '몸이 훨씬 가볍네~', '살이 쭉쭉 빠져요' 텍스트가 나타나며 제품 사용 후의 긍정적인 변화를 보여줍니다.",
+              "timestamp": 16.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "lifestyle_scene",
+        "product_visibility": "in_use",
+        "attention_score": 29,
+        "attention_peak": 78,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~2.6s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 아이엠그린 I am Green 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 과채성취 권장량 3배 1일 섭취량 400g X 3배",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "아이엠그린 1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#211A04",
+          "#281F09",
+          "#281F0B"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "handwritten bold white",
+        "narration": "한 잔에 단 33칼로리, 묵은 독소 썩,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 15,
+        "time_range": [
+          16.18,
+          17.98
+        ],
+        "duration": 1.8,
+        "role": "solution",
+        "description": "주스를 마시는 사람의 모습과 함께 독소 배출, 몸이 가벼워지는 느낌, 다이어트 효과 등 제품이 가져다줄 라이프스타일 변화를 보여준다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "rule_of_thirds",
+        "subject": "person_with_product",
+        "product_visibility": "full",
+        "attention_score": 44,
+        "attention_peak": 76,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~1.8s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 한잔 = 33kcal 아이엠그린 I am Green",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "top_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 한잔 = 33kcal 아이엠그린 I am Green",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 한잔 = 33kcal",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#28271E",
+          "#615E38",
+          "#252318"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold #FFD700",
+        "narration": "묵은 독소 썩, 몸이 가벼워지니 다이어트 효과까지!",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 16,
+        "time_range": [
+          17.98,
+          19.02
+        ],
+        "duration": 1.03,
+        "role": "solution",
+        "description": "주스를 마시는 사람의 모습과 함께 독소 배출, 몸이 가벼워지는 느낌, 다이어트 효과 등 제품이 가져다줄 라이프스타일 변화를 보여준다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "rule_of_thirds",
+        "subject": "person_with_product",
+        "product_visibility": "in_use",
+        "attention_score": 71,
+        "attention_peak": 98,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "2 cuts, ~0.5s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 묵은 독소 Bye~",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "bottom_third",
+            "dwell_time": 1.0
+          }
+        ],
+        "color_palette": [
+          "#F2EBE2",
+          "#BAA08C",
+          "#B69C88"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold white",
+        "narration": "몸이 가벼워지니 다이어트 효과까지! 하루 단 한 잔에 마법 같은 효과,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 17,
+        "time_range": [
+          19.02,
+          19.55
+        ],
+        "duration": 0.53,
+        "role": "solution",
+        "description": "주스를 마시는 사람의 모습과 함께 독소 배출, 몸이 가벼워지는 느낌, 다이어트 효과 등 제품이 가져다줄 라이프스타일 변화를 보여준다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "jump_cut",
+        "composition": "center",
+        "subject": "lifestyle_scene",
+        "product_visibility": "full",
+        "attention_score": 62,
+        "attention_peak": 98,
+        "attention_level": "peak",
+        "cut_count": 1,
+        "cut_rhythm": "1 cuts, ~0.5s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹~배출 몸이 훨씬 가볍네~",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 몸이 훨씬 가볍네~",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#534E3A",
+          "#574C36",
+          "#27241A"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold white",
+        "narration": "하루 단 한 잔에 마법 같은 효과,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 18,
+        "time_range": [
+          19.55,
+          20.22
+        ],
+        "duration": 0.67,
+        "role": "solution",
+        "description": "주스를 마시는 사람의 모습과 함께 독소 배출, 몸이 가벼워지는 느낌, 다이어트 효과 등 제품이 가져다줄 라이프스타일 변화를 보여준다.",
+        "appeal_points": [
+          {
+            "type": "origin",
+            "claim": "일조량 좋은 베트남 현지에서 바로 착즙해 더욱 신선한 그린 주스.",
+            "visual_proof": {
+              "technique": "location_shot",
+              "description": "햇살 좋은 야외에 놓인 주스병들과 '일조량 좋은 베트남' 텍스트가 나타나며 원산지의 신선함을 강조합니다.",
+              "timestamp": 20.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "moderate"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "lifestyle_scene",
+        "product_visibility": "full",
+        "attention_score": 30,
+        "attention_peak": 30,
+        "attention_level": "medium",
+        "cut_count": 0,
+        "cut_rhythm": "no cuts",
+        "transition_in": "hard_cut",
+        "transition_out": "zoom_transition",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "none",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#4F4A31",
+          "#7F734A",
+          "#25231A"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic extra_bold #FFD700",
+        "narration": "하루 단 한 잔에 마법 같은 효과,",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 19,
+        "time_range": [
+          20.22,
+          21.52
+        ],
+        "duration": 1.3,
+        "role": "brand_intro",
+        "description": "베트남 현지 착즙이라는 원산지 및 제조 과정을 언급하며 신선도와 품질에 대한 신뢰를 높인다.",
+        "appeal_points": [],
+        "shot_type": "closeup",
+        "camera_motion": "jump_cut",
+        "composition": "diagonal",
+        "subject": "product_only",
+        "product_visibility": "full",
+        "attention_score": 60,
+        "attention_peak": 88,
+        "attention_level": "peak",
+        "cut_count": 2,
+        "cut_rhythm": "2 cuts, ~0.7s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 살이 쭉쭉 빠져요",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 1.0
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 하루 단 한잔",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "none",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#5F614A",
+          "#3C2E20",
+          "#5E685C"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "handwritten extra_bold white",
+        "narration": "하루 단 한 잔에 마법 같은 효과, 일조량 좋은 베트남 현지에서 바로 착즙해 더욱 신선한 그린 주스.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 20,
+        "time_range": [
+          21.52,
+          23.52
+        ],
+        "duration": 2.0,
+        "role": "brand_intro",
+        "description": "베트남 현지 착즙이라는 원산지 및 제조 과정을 언급하며 신선도와 품질에 대한 신뢰를 높인다.",
+        "appeal_points": [
+          {
+            "type": "price",
+            "claim": "시크릿 링크에서만 더 저렴하게 보여드려요. 1리터 대용량 그린 주스 1만 원대에 만나보세요.",
+            "visual_proof": {
+              "technique": "text_overlay",
+              "description": "화면에 '핫! 비밀링크', '단독!! 할인특가 진행', '1L 대용량 1만원대' 텍스트가 반복적으로 나타나며 가격 혜택을 강조합니다.",
+              "timestamp": 23.0
+            },
+            "audio_sync": "narration_sync",
+            "strength": "strong"
+          }
+        ],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "rule_of_thirds",
+        "subject": "person_with_product",
+        "product_visibility": "in_use",
+        "attention_score": 47,
+        "attention_peak": 88,
+        "attention_level": "peak",
+        "cut_count": 1,
+        "cut_rhythm": "2 cuts, ~1.0s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 하루 단 한잔",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 마법을 경험합니다..",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 마법을 경험합니다...",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "top_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요!",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#5D5132",
+          "#282516",
+          "#706751"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic bold #FFFFFF",
+        "narration": "일조량 좋은 베트남 현지에서 바로 착즙해 더욱 신선한 그린 주스. 시크릿 링크에서만 더 저렴하게 보여드려요.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 21,
+        "time_range": [
+          23.52,
+          25.39
+        ],
+        "duration": 1.87,
+        "role": "cta",
+        "description": "다양한 주스 제품들을 보여주며 비밀 링크를 통한 할인 특가와 1리터 대용량 제품의 1만원대 가격을 강조하며 구매를 유도한다.",
+        "appeal_points": [],
+        "shot_type": "overhead",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "product_only",
+        "product_visibility": "full",
+        "attention_score": 38,
+        "attention_peak": 88,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~1.9s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹~배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요!",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "none",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요! 아이엠그린 I am Green NPC Juice 100%",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙~배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요!",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "full",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#362E1D",
+          "#32281B",
+          "#5F5435"
+        ],
+        "graphic_style": "photo_real",
+        "font_style": "gothic extra_bold white",
+        "narration": "시크릿 링크에서만 더 저렴하게 보여드려요.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 22,
+        "time_range": [
+          25.39,
+          27.69
+        ],
+        "duration": 2.3,
+        "role": "cta",
+        "description": "다양한 주스 제품들을 보여주며 비밀 링크를 통한 할인 특가와 1리터 대용량 제품의 1만원대 가격을 강조하며 구매를 유도한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "in_use",
+        "attention_score": 23,
+        "attention_peak": 83,
+        "attention_level": "peak",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~2.3s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "hard_cut",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 바로 착즙해 신~~~선",
+            "purpose": "benefit",
+            "font_style": "handwritten",
+            "position": "bottom_third",
+            "dwell_time": 1.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 바로 착즙해 신~~~~선",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹~배출 바로착즙해 신~~~선",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#7D683F",
+          "#7F6B42",
+          "#77643D"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "handwritten bold #FFFFFF",
+        "narration": "시크릿 링크에서만 더 저렴하게 보여드려요. 1리터 대용량 그린 주스 1만 원대에 만나보세요.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 23,
+        "time_range": [
+          27.69,
+          30.5
+        ],
+        "duration": 2.8,
+        "role": "cta",
+        "description": "다양한 주스 제품들을 보여주며 비밀 링크를 통한 할인 특가와 1리터 대용량 제품의 1만원대 가격을 강조하며 구매를 유도한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "moderate",
+        "composition": "center",
+        "subject": "person_with_product",
+        "product_visibility": "in_use",
+        "attention_score": 28,
+        "attention_peak": 68,
+        "attention_level": "high",
+        "cut_count": 0,
+        "cut_rhythm": "1 cuts, ~2.8s/cut",
+        "transition_in": "hard_cut",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 샷! 비밀링크",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 1.0
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 단독!! 할인특가 진행",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 1.5
+          }
+        ],
+        "color_palette": [
+          "#737340",
+          "#747242",
+          "#48391D"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold white",
+        "narration": "1리터 대용량 그린 주스 1만 원대에 만나보세요.",
+        "sound_direction": "BGM 유지"
+      },
+      {
+        "scene_id": 24,
+        "time_range": [
+          30.5,
+          35.3
+        ],
+        "duration": 4.8,
+        "role": "cta",
+        "description": "다양한 주스 제품들을 보여주며 비밀 링크를 통한 할인 특가와 1리터 대용량 제품의 1만원대 가격을 강조하며 구매를 유도한다.",
+        "appeal_points": [],
+        "shot_type": "medium",
+        "camera_motion": "fast",
+        "composition": "center",
+        "subject": "lifestyle_scene",
+        "product_visibility": "full",
+        "attention_score": 34,
+        "attention_peak": 56,
+        "attention_level": "high",
+        "cut_count": 5,
+        "cut_rhythm": "1 cuts, ~4.8s/cut",
+        "transition_in": "dissolve",
+        "transition_out": "dissolve",
+        "text_overlays": [
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "middle_third",
+            "dwell_time": 1.0
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "none",
+            "dwell_time": 2.5
+          },
+          {
+            "content": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대 아이엠 그린 아이엠 토마토",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "full",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 1L 대용량 1만원대",
+            "purpose": "price_offer",
+            "font_style": "handwritten",
+            "position": "middle_third",
+            "dwell_time": 0.5
+          },
+          {
+            "content": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대 아이엠 토마토 NFC JUICE CARROT",
+            "purpose": "benefit",
+            "font_style": "bold_impact",
+            "position": "bottom_third",
+            "dwell_time": 0.5
+          }
+        ],
+        "color_palette": [
+          "#3C2E16",
+          "#CE5528",
+          "#413016"
+        ],
+        "graphic_style": "bold_graphic",
+        "font_style": "gothic extra_bold #FFD700",
+        "narration": null,
+        "sound_direction": "BGM 유지"
+      }
+    ],
+    "dropoff_analysis": {
+      "risk_zones": [
+        {
+          "time_range": [
+            1.0,
+            2.0
+          ],
+          "risk_score": 35,
+          "risk_level": "medium",
+          "risk_factors": [
+            "시각적 자극도 저하 (32%)"
+          ],
+          "suggestion": "시각적 전환(컷/모션) 추가"
+        },
+        {
+          "time_range": [
+            4.0,
+            6.0
+          ],
+          "risk_score": 30,
+          "risk_level": "medium",
+          "risk_factors": [
+            "시각적 자극도 급락 (68→48)",
+            "소구 공백 3초"
+          ],
+          "suggestion": "시각적 전환(컷/모션) 추가 / 이 구간에 ingredient 소구 삽입 권장"
+        },
+        {
+          "time_range": [
+            11.0,
+            16.0
+          ],
+          "risk_score": 45,
+          "risk_level": "medium",
+          "risk_factors": [
+            "시각적 자극도 급락 (99→35)",
+            "시각적 자극도 저하 (35%)",
+            "시각적 자극도 저하 (29%)",
+            "씬 정체 (동일 씬 3초+)"
+          ],
+          "suggestion": "시각적 전환(컷/모션) 추가 / 컷 분할 또는 앵글 전환"
+        },
+        {
+          "time_range": [
+            19.0,
+            20.0
+          ],
+          "risk_score": 55,
+          "risk_level": "high",
+          "risk_factors": [
+            "시각적 자극도 급락 (71→30)",
+            "소구 공백 3초"
+          ],
+          "suggestion": "시각적 전환(컷/모션) 추가 / 이 구간에 price 소구 삽입 권장"
+        },
+        {
+          "time_range": [
+            24.0,
+            36.0
+          ],
+          "risk_score": 75,
+          "risk_level": "high",
+          "risk_factors": [
+            "시각적 자극도 저하 (38%)",
+            "시각적 자극도 저하 (23%)",
+            "소구 공백 3초",
+            "시각적 자극도 저하 (28%)",
+            "소구 공백 4초",
+            "소구 공백 5초",
+            "소구 공백 6초",
+            "씬 정체 (동일 씬 3초+)",
+            "시각적 자극도 저하 (34%)",
+            "소구 공백 7초",
+            "소구 공백 8초",
+            "소구 공백 9초",
+            "소구 공백 10초",
+            "소구 공백 11초",
+            "소구 공백 12초"
+          ],
+          "suggestion": "시각적 전환(컷/모션) 추가 / 이 구간에 sensory 소구 삽입 권장 / 컷 분할 또는 앵글 전환"
+        }
+      ],
+      "safe_zones": [
+        [
+          0.0,
+          1.0
+        ],
+        [
+          2.0,
+          4.0
+        ],
+        [
+          6.0,
+          11.0
+        ],
+        [
+          16.0,
+          19.0
+        ],
+        [
+          20.0,
+          24.0
+        ]
+      ],
+      "overall_retention_score": 66,
+      "worst_zone": {
+        "time_range": [
+          24.0,
+          36.0
+        ],
+        "risk_score": 75,
+        "risk_level": "high",
+        "risk_factors": [
+          "시각적 자극도 저하 (38%)",
+          "시각적 자극도 저하 (23%)",
+          "소구 공백 3초",
+          "시각적 자극도 저하 (28%)",
+          "소구 공백 4초",
+          "소구 공백 5초",
+          "소구 공백 6초",
+          "씬 정체 (동일 씬 3초+)",
+          "시각적 자극도 저하 (34%)",
+          "소구 공백 7초",
+          "소구 공백 8초",
+          "소구 공백 9초",
+          "소구 공백 10초",
+          "소구 공백 11초",
+          "소구 공백 12초"
+        ],
+        "suggestion": "시각적 전환(컷/모션) 추가 / 이 구간에 sensory 소구 삽입 권장 / 컷 분할 또는 앵글 전환"
+      },
+      "improvement_priority": [
+        "시각적 자극도 저하 구간 시각적 전환 추가",
+        "소구 공백 구간에 적절한 소구 포인트 삽입",
+        "장기 정체 씬 분할 편집"
+      ]
+    },
+    "performance_metrics": {
+      "brand_exposure_sec": 35.28,
+      "product_focus_ratio": 100.0,
+      "text_readability_score": 100,
+      "time_to_first_appeal": 0.0,
+      "time_to_cta": 23.52,
+      "info_density": 2.466,
+      "appeal_count": 11,
+      "appeal_diversity": 7,
+      "cut_density": 0.68,
+      "attention_avg": 53,
+      "attention_valley_count": 3
+    }
+  }
+}

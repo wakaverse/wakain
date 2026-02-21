@@ -1,0 +1,72 @@
+{
+  "classification": {
+    "format": "caption_text",
+    "format_ko": "캡션/텍스트형",
+    "intent": "branding",
+    "intent_ko": "브랜딩/이미지",
+    "secondary_format": "ugc_vlog",
+    "narration_type": "voice"
+  },
+  "dimensions": [
+    {
+      "name": "visual_stimulus",
+      "name_ko": "시각적 자극도",
+      "value": 55,
+      "weight": 0.3,
+      "weighted": 16.5,
+      "evidence": "어텐션 arc=building→peak→fade, 다양한 전환 효과"
+    },
+    {
+      "name": "persuasion_density",
+      "name_ko": "설득 밀도",
+      "value": 20.0,
+      "weight": 0.25,
+      "weighted": 5.0,
+      "evidence": "소구 포인트 없음"
+    },
+    {
+      "name": "information_density",
+      "name_ko": "정보 밀도",
+      "value": 72.4,
+      "weight": 0.3,
+      "weighted": 21.7,
+      "evidence": "음성 32s (91%), 캡션 18개 (36s)"
+    },
+    {
+      "name": "edit_rhythm",
+      "name_ko": "편집 리듬",
+      "value": 75,
+      "weight": 0.1,
+      "weighted": 7.5,
+      "evidence": "컷 24개, 밀도 0.69/s"
+    },
+    {
+      "name": "audio_stimulus",
+      "name_ko": "청각 자극도",
+      "value": 85.0,
+      "weight": 0.2,
+      "weighted": 17.0,
+      "evidence": "BGM upbeat_pop, 음성 voiceover, 효과음 3개"
+    }
+  ],
+  "engagement_score": 67.7,
+  "diagnoses": [
+    {
+      "time_range": "전체",
+      "severity": "ok",
+      "finding": "텍스트 오버레이 비율 102%",
+      "prescription": "텍스트형이므로 정보 전달에 효과적입니다.",
+      "dimension": "information_density",
+      "style_context": ""
+    }
+  ],
+  "summary": "캡션/텍스트형×브랜딩/이미지 영상으로, 전반적으로 양호합니다. 강점: 정보 밀도 우수 (72점), 편집 리듬 우수 (75점).",
+  "strengths": [
+    "정보 밀도 우수 (72점)",
+    "편집 리듬 우수 (75점)",
+    "청각 자극도 우수 (85점)"
+  ],
+  "weaknesses": [
+    "설득 밀도 부족 (20점)"
+  ]
+}

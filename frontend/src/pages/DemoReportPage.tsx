@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Loader2, ArrowLeft } from 'lucide-react';
-import { getResult } from '../lib/api';
 import type { AnalysisResult } from '../types';
 import VideoPlayer, { type VideoPlayerHandle } from '../components/Report/VideoPlayer';
 import DimensionChart from '../components/Report/DimensionChart';
@@ -30,8 +29,7 @@ const intentLabels: Record<string, string> = {
   entertainment: '엔터테인먼트',
 };
 
-export default function ReportPage() {
-  const { id } = useParams<{ id: string }>();
+export default function DemoReportPage() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -40,13 +38,28 @@ export default function ReportPage() {
   const playerRef = useRef<VideoPlayerHandle>(null);
 
   useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    getResult(id)
-      .then(setResult)
+    Promise.all([
+      fetch('/demo/recipe.json').then(r => r.json()),
+      fetch('/demo/diagnosis.json').then(r => r.json()),
+      fetch('/demo/prescriptions.json').then(r => r.json()),
+      fetch('/demo/stt.json').then(r => r.json()),
+      fetch('/demo/style.json').then(r => r.json()),
+      fetch('/demo/caption_map.json').then(r => r.json()),
+    ])
+      .then(([recipe, diagnosis, prescriptions, stt, style, caption_map]) => {
+        setResult({
+          video_recipe: recipe,
+          diagnosis,
+          prescriptions,
+          stt,
+          style,
+          caption_map,
+          video_url: null, // no video file for demo
+        });
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, []);
 
   const handleSeek = useCallback((time: number) => {
     playerRef.current?.seekTo(time);
@@ -60,7 +73,7 @@ export default function ReportPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        <span className="ml-3 text-gray-600">분석 결과 로딩 중...</span>
+        <span className="ml-3 text-gray-600">데모 데이터 로딩 중...</span>
       </div>
     );
   }
@@ -68,7 +81,7 @@ export default function ReportPage() {
   if (error || !result) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <p className="text-red-600 mb-4">{error || '결과를 찾을 수 없습니다'}</p>
+        <p className="text-red-600 mb-4">{error || '데이터를 찾을 수 없습니다'}</p>
         <Link to="/" className="text-blue-600 hover:underline flex items-center gap-1">
           <ArrowLeft className="w-4 h-4" /> 돌아가기
         </Link>
@@ -76,13 +89,11 @@ export default function ReportPage() {
     );
   }
 
-  // Extract recipe data
   const recipeData = result.video_recipe?.video_recipe || result.video_recipe || {};
   const meta = (recipeData as any).meta || {};
   const duration = meta.duration || 30;
   const videoUrl = result.video_url || null;
 
-  // Diagnosis data (from Phase 7)
   const diagnosis = result.diagnosis || {} as any;
   const dimensions = diagnosis.dimensions || [];
   const engagementScore = diagnosis.engagement_score || 0;
@@ -92,24 +103,19 @@ export default function ReportPage() {
   const strengths = diagnosis.strengths || [];
   const weaknesses = diagnosis.weaknesses || [];
 
-  // Prescriptions
   const prescriptionsData = result.prescriptions || {} as any;
   const prescriptions = prescriptionsData.prescriptions || [];
 
-  // Style
   const style = result.style || classification;
   const formatKo = (style as any).primary_format_ko || formatLabels[(style as any).primary_format || classification.format] || '?';
   const intentKo = (style as any).primary_intent_ko || intentLabels[(style as any).primary_intent || classification.intent] || '?';
   const narration = (style as any).narration_type || classification.narration_type || '?';
 
-  // Art direction
   const artDirection = (recipeData as any).art_direction || {};
-
   const narrationLabel = narration === 'voice' ? '🎤 음성' : narration === 'caption' ? '📝 캡션' : '🔇 무음';
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
       <header className="bg-white border-b sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
           <Link to="/" className="text-gray-400 hover:text-gray-600">
@@ -118,6 +124,7 @@ export default function ReportPage() {
           <div>
             <h1 className="text-lg font-bold text-gray-900">
               {meta.category ? `${meta.category}` : '영상'} 분석 리포트
+              <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">DEMO</span>
             </h1>
             <div className="flex items-center gap-3 text-xs text-gray-500">
               <span>{formatKo} × {intentKo}</span>
@@ -125,7 +132,6 @@ export default function ReportPage() {
               <span>{duration}초</span>
             </div>
           </div>
-          {/* 종합 점수 뱃지 */}
           {engagementScore > 0 && (
             <div className="ml-auto text-center">
               <div className="text-2xl font-bold text-blue-600">{Math.round(engagementScore)}</div>
@@ -137,7 +143,6 @@ export default function ReportPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* 좌측: 영상 + 5차원 차트 */}
           <div className="lg:w-[360px] lg:shrink-0 space-y-4 lg:sticky lg:top-20 lg:self-start">
             <VideoPlayer ref={playerRef} src={videoUrl} onTimeUpdate={handleTimeUpdate} />
             {dimensions.length > 0 && (
@@ -145,9 +150,7 @@ export default function ReportPage() {
             )}
           </div>
 
-          {/* 우측: 탭 콘텐츠 */}
           <div className="flex-1 min-w-0">
-            {/* 탭 네비게이션 */}
             <div className="flex gap-1 bg-white rounded-xl p-1 border mb-4 sticky top-16 z-20">
               {tabs.map((tab) => (
                 <button
@@ -164,7 +167,6 @@ export default function ReportPage() {
               ))}
             </div>
 
-            {/* 탭 콘텐츠 */}
             <div className="bg-white rounded-xl border p-5">
               {activeTab === 'appeal' && (
                 <AppealTimeline

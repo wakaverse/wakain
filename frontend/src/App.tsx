@@ -6,6 +6,7 @@ import AnalyzePage from './pages/AnalyzePage';
 import JobStatusPage from './pages/JobStatusPage';
 import ReportPage from './pages/ReportPage';
 import DashboardPage from './pages/DashboardPage';
+import DemoReportPage from './pages/DemoReportPage';
 
 export default function App() {
   return (
@@ -43,6 +44,10 @@ export default function App() {
                 <ReportPage />
               </Layout>
             }
+          />
+          <Route
+            path="/demo"
+            element={<DemoReportPage />}
           />
           <Route
             path="/dashboard"

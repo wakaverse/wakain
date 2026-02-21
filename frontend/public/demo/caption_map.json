@@ -1,0 +1,206 @@
+{
+  "caption_count": 18,
+  "total_caption_time": 35.53,
+  "narrative_flow": [
+    "hook",
+    "hook",
+    "hook",
+    "hook",
+    "problem",
+    "proof",
+    "problem",
+    "problem",
+    "problem",
+    "problem",
+    "proof",
+    "problem",
+    "problem",
+    "problem",
+    "problem",
+    "problem",
+    "problem",
+    "proof"
+  ],
+  "events": [
+    {
+      "start": 0.0,
+      "end": 1.5,
+      "duration": 1.5,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 염증가득 안색",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 염증가득 안색",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "hook"
+    },
+    {
+      "start": 1.5,
+      "end": 3.0,
+      "duration": 1.5,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 환해졌어요 독소배출 해독작용의 효과!",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 환해졌어요 독소배출 해독작용의 효과!",
+      "purpose": "benefit",
+      "font_style": "handwritten",
+      "narrative_role": "hook"
+    },
+    {
+      "start": 3.0,
+      "end": 4.5,
+      "duration": 1.5,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 아이엠그린 I am Green 100% NFC 착즙 첨가물 無 베트남산 (OEM)",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 아이엠그린 I am Green 100% NFC 착즙 첨가물 無 베트남산 (OEM)",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "hook"
+    },
+    {
+      "start": 4.5,
+      "end": 5.5,
+      "duration": 1.0,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 신선한 그린주스 첨가물 無",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 신선한 그린주스 첨가물 無",
+      "purpose": "benefit",
+      "font_style": "handwritten",
+      "narrative_role": "hook"
+    },
+    {
+      "start": 5.51,
+      "end": 7.51,
+      "duration": 2.0,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 아이엠 그린 I am Green 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 아이엠 그린 I am Green 베타카로틴 루테인 그린주스엔 꼭 있는 케일!",
+      "purpose": "benefit",
+      "font_style": "handwritten",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 7.51,
+      "end": 9.01,
+      "duration": 1.5,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 항암효과 KING 브로콜리 다크서클에만 좋은거 아니었어?",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 항암효과 KING 브로콜리 다크서클에만 좋은거 아니었어?",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "proof"
+    },
+    {
+      "start": 9.01,
+      "end": 9.51,
+      "duration": 0.5,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙~배출 심혈관 보호 0설탕 없이 달달한 이유! 사과!",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙~배출 심혈관 보호 0설탕 없이 달달한 이유! 사과!",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 9.51,
+      "end": 10.01,
+      "duration": 0.5,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 10.01,
+      "end": 10.51,
+      "duration": 0.5,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 심혈관 보호 설탕 없이 달달한 이유! 사과! 그린",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 심혈관 보호 설탕 없이 달달한 이유! 사과! 그린",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 10.51,
+      "end": 11.51,
+      "duration": 1.0,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 11.51,
+      "end": 12.01,
+      "duration": 0.5,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라 1,000mL (280kcal) 케일 40%, 브로콜리 30%, 사과 25%, 그라비올라 5% 베트남산 (OEM)",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 슈퍼푸드 해외에서 이미 유명한 그라비올라 1,000mL (280kcal) 케일 40%, 브로콜리 30%, 사과 25%, 그라비올라 5% 베트남산 (OEM)",
+      "purpose": "benefit",
+      "font_style": "handwritten",
+      "narrative_role": "proof"
+    },
+    {
+      "start": 12.01,
+      "end": 14.01,
+      "duration": 2.0,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 비타민 C, E",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 비타민 C, E",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 14.01,
+      "end": 16.52,
+      "duration": 2.51,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 아이엠그린 I am Green 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 아이엠그린 I am Green 과채섭취 권장량 3배 1일 섭취량 400g X 3배",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 16.52,
+      "end": 18.02,
+      "duration": 1.5,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 한잔 = 33kcal 아이엠그린 I am Green",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 한잔 = 33kcal 아이엠그린 I am Green",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 18.02,
+      "end": 23.52,
+      "duration": 5.5,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 묵은 독소 Bye~",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 묵은 독소 Bye~",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 23.52,
+      "end": 25.53,
+      "duration": 2.01,
+      "text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요!",
+      "full_text": "1L 대용량 100% 해독주스 몸속 찌든 독소 싹-배출 일조량 좋은 베트남 유통과정 줄여 더 저렴해졌어요!",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 25.53,
+      "end": 32.53,
+      "duration": 7.0,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 바로 착즙해 신~~~선",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 쫙-배출 바로 착즙해 신~~~선",
+      "purpose": "benefit",
+      "font_style": "handwritten",
+      "narrative_role": "problem"
+    },
+    {
+      "start": 32.53,
+      "end": 35.54,
+      "duration": 3.01,
+      "text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대 아이엠 그린 아이엠 토마토",
+      "full_text": "1L대용량 100% 해독주스 몸속 찌든 독소 싹-배출 1L 대용량 1만원대 아이엠 그린 아이엠 토마토",
+      "purpose": "benefit",
+      "font_style": "bold_impact",
+      "narrative_role": "proof"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "primary_format": "caption_text",
+  "primary_format_ko": "캡션/텍스트형",
+  "secondary_format": "ugc_vlog",
+  "secondary_format_ko": "UGC/브이로그형",
+  "primary_intent": "branding",
+  "primary_intent_ko": "브랜딩/이미지",
+  "format_confidence": 0.8,
+  "intent_confidence": 0.7,
+  "auto_classified": true,
+  "reasoning": "영상은 제품의 특징과 효능을 자막 중심으로 설명하며, 실제 마시는 장면을 통해 사용자의 경험을 보여주는 듯한 느낌을 줍니다. 주로 브랜드 인지도 향상에 초점을 맞춘 것으로 보입니다."
+}

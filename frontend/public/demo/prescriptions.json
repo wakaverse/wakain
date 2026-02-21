@@ -1,0 +1,20 @@
+{
+  "video_name": "sample1",
+  "style_label": "caption_text × branding",
+  "total_prescriptions": 1,
+  "danger_count": 0,
+  "warning_count": 0,
+  "top_3_actions": [
+    "이 스타일에 효과적인 소구를 활용하세요: brand_story, design_aesthetic, emotional"
+  ],
+  "prescriptions": [
+    {
+      "category": "appeal",
+      "severity": "info",
+      "symptom": "효과적 소구 미활용 (brand_story, design_aesthetic, emotional)",
+      "recommendation": "이 스타일에 효과적인 소구를 활용하세요: brand_story, design_aesthetic, emotional",
+      "impact": "설득력 강화 가능",
+      "priority": 5
+    }
+  ]
+}

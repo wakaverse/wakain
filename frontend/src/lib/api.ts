@@ -1,4 +1,4 @@
-import type { Job, VideoRecipe } from '../types';
+import type { Job, AnalysisResult } from '../types';
 import { supabase } from './supabase';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -85,7 +85,7 @@ export async function getJob(id: string): Promise<Job> {
   return res.json();
 }
 
-export async function getResult(id: string): Promise<VideoRecipe> {
+export async function getResult(id: string): Promise<AnalysisResult> {
   const res = await fetch(`${API_URL}/api/results/${id}`, {
     headers: await authHeaders(),
   });
@@ -93,7 +93,15 @@ export async function getResult(id: string): Promise<VideoRecipe> {
     throw new Error('결과를 찾을 수 없습니다');
   }
   const data = await res.json();
-  return data.recipe_json;
+  return {
+    video_recipe: data.recipe_json,
+    diagnosis: data.diagnosis_json || null,
+    prescriptions: data.prescriptions_json || null,
+    stt: data.stt_json || null,
+    style: data.style_json || null,
+    caption_map: data.caption_map_json || null,
+    video_url: data.video_url || null,
+  };
 }
 
 export async function listJobs(): Promise<Job[]> {
