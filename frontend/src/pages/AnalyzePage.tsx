@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useDropzone, type FileRejection } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
-import { Upload, FileVideo, X, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Upload, FileVideo, X, AlertCircle, CheckCircle2, Zap } from 'lucide-react';
 import { createJob } from '../lib/api';
+import { compressTo480p } from '../lib/videoCompress';
 
 const MAX_SIZE = 200 * 1024 * 1024;
 const ACCEPTED_TYPES = { 'video/mp4': ['.mp4'], 'video/quicktime': ['.mov'], 'video/webm': ['.webm'] };
@@ -15,7 +16,7 @@ function formatBytes(bytes: number) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
-type Phase = 'idle' | 'uploading' | 'starting';
+type Phase = 'idle' | 'compressing' | 'uploading' | 'starting';
 
 export default function AnalyzePage() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function AnalyzePage() {
   const [error, setError] = useState('');
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState(0);
+  const [compressInfo, setCompressInfo] = useState<string | null>(null);
 
   const onDrop = useCallback((accepted: File[], rejected: FileRejection[]) => {
     setError('');
@@ -44,12 +46,29 @@ export default function AnalyzePage() {
 
   async function handleSubmit() {
     if (!file) return;
-    setPhase('uploading');
-    setProgress(0);
     setError('');
+    setCompressInfo(null);
 
     try {
-      const { id } = await createJob(file, (percent) => {
+      // Step 1: Compress to 480p (browser-side)
+      setPhase('compressing');
+      setProgress(0);
+
+      const compressed = await compressTo480p(file, (p) => {
+        setProgress(Math.round(p.progress * 100));
+      });
+
+      if (compressed !== file) {
+        setCompressInfo(
+          `${formatBytes(file.size)} → ${formatBytes(compressed.size)} (${Math.round((1 - compressed.size / file.size) * 100)}% 절감)`
+        );
+      }
+
+      // Step 2: Upload compressed file
+      setPhase('uploading');
+      setProgress(0);
+
+      const { id } = await createJob(compressed, (percent) => {
         setProgress(percent);
         if (percent === 100) setPhase('starting');
       }, productName || undefined, productCategory || undefined);
@@ -69,7 +88,13 @@ export default function AnalyzePage() {
   }
 
   const busy = phase !== 'idle';
-  const statusText = phase === 'uploading' ? '업로드 중...' : phase === 'starting' ? '분석 요청 중...' : '';
+  const statusText = phase === 'compressing'
+    ? '영상 최적화 중...'
+    : phase === 'uploading'
+    ? '업로드 중...'
+    : phase === 'starting'
+    ? '분석 요청 중...'
+    : '';
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
@@ -170,21 +195,34 @@ export default function AnalyzePage() {
         </div>
       )}
 
+      {/* Compress info */}
+      {compressInfo && !busy && (
+        <div className="mt-3 flex items-center gap-2 text-emerald-600 text-xs bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+          <Zap className="w-3.5 h-3.5" />
+          영상 최적화 완료: {compressInfo}
+        </div>
+      )}
+
       {/* Progress */}
       {busy && (
         <div className="mt-6">
           <div className="flex justify-between text-sm text-gray-500 mb-2">
             <span>{statusText}</span>
-            {phase === 'uploading' && <span>{progress}%</span>}
+            {(phase === 'uploading' || phase === 'compressing') && <span>{progress}%</span>}
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-300 ${
-                phase === 'starting' ? 'bg-emerald-500' : 'bg-gray-900'
+                phase === 'starting' ? 'bg-emerald-500'
+                : phase === 'compressing' ? 'bg-amber-500'
+                : 'bg-gray-900'
               }`}
               style={{ width: phase === 'starting' ? '100%' : `${progress}%` }}
             />
           </div>
+          {phase === 'compressing' && (
+            <p className="text-xs text-gray-400 mt-1">브라우저에서 480p로 변환 중 — 업로드 속도와 분석 속도가 빨라집니다</p>
+          )}
         </div>
       )}
 
