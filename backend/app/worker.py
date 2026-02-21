@@ -79,23 +79,21 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
         if product_category:
             cmd.extend(["--product-category", product_category])
 
-        import logging
-        logger = logging.getLogger("pipeline")
-
         proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
             cwd=ANALYZER_DIR,
+            env={**__import__('os').environ, "PYTHONUNBUFFERED": "1"},
         )
 
-        # Stream output to Cloud Logging in real-time
+        # Stream output to Cloud Logging in real-time via print (stdout → Cloud Logging)
         output_lines = []
         for line in proc.stdout:
             line = line.rstrip()
             if line:
-                logger.info(f"[pipeline:{job_id[:8]}] {line}")
+                print(f"[pipeline:{job_id[:8]}] {line}", flush=True)
                 output_lines.append(line)
 
         proc.wait(timeout=600)
