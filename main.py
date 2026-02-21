@@ -31,6 +31,7 @@ from src.style_classifier import classify_style, StyleClassification
 from src.caption_mapper import build_caption_map, caption_map_to_dict
 from src.integrated_analyzer import run_integrated_analysis
 from src.prescription_engine import generate_prescriptions
+from src.marketer_judge import run_marketer_judge
 from src.frame_extractor import extract_frames
 from src.frame_quant import analyse_frame as analyse_frame_quant
 from src.frame_qual import analyse_frames_qual
@@ -383,8 +384,11 @@ def run_phase_7(
     video_path: str,
     stt_data: dict | None = None,
     style_data: dict | None = None,
+    product_name: str = "",
+    product_category: str = "",
+    product_key_factors: str = "",
 ) -> None:
-    """Run Phase 7: Caption mapping + Integrated analysis + Prescriptions."""
+    """Run Phase 7: Caption mapping + Integrated analysis + Prescriptions + Marketer Judge."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
     # Load recipe
@@ -458,6 +462,31 @@ def run_phase_7(
         for i, action in enumerate(rx_report.top_3_actions, 1):
             print(f"             {i}. {action[:80]}")
     print(f"           → {rx_path.name} ({elapsed:.1f}s)")
+
+    # Phase 7b: Marketer Judge (Gemini-powered verdict)
+    print(f"\n[Phase 7b] Running Marketer Judge (Gemini) ...")
+    frame_quals = None
+    if qual_path.exists():
+        frame_quals = json.loads(qual_path.read_text())
+
+    verdict = run_marketer_judge(
+        recipe=recipe_data,
+        diagnosis=diagnosis.to_dict(),
+        frame_quals=frame_quals,
+        stt_data=stt_data,
+        style_data=style_data,
+        caption_map=cap_map,
+        raw_temporal=raw_temporal,
+        product_name=product_name,
+        product_category=product_category,
+        product_key_factors=product_key_factors,
+    )
+    verdict_path = out / f"{video_name}_verdict.json"
+    verdict_path.write_text(json.dumps(verdict.to_dict(), indent=2, ensure_ascii=False))
+    verdict_md_path = out / f"{video_name}_verdict.md"
+    verdict_md_path.write_text(verdict.full_markdown)
+    print(f"           → Verdict: {verdict.verdict}")
+    print(f"           → {verdict_path.name}, {verdict_md_path.name}")
 
 
 def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, format_hint: str | None = None, intent_hint: str | None = None) -> None:
