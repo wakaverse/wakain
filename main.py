@@ -126,9 +126,18 @@ def run_phase_2_5(output_dir: str, video_path: str) -> TemporalAnalysis:
     quants = [FrameQuant.model_validate(d) for d in json.loads(quant_path.read_text())]
     quals = [FrameQual.model_validate(d) for d in json.loads(qual_path.read_text())]
 
+    # Load SceneDetect cut_timestamps if available
+    sd_cut_timestamps = None
+    sd_path = out / f"{video_name}_scene_detect.json"
+    if sd_path.exists():
+        sd_data = json.loads(sd_path.read_text())
+        sd_cut_timestamps = sd_data.get("cut_timestamps")
+        if sd_cut_timestamps:
+            print(f"[Phase 2.5] Using SceneDetect cuts: {len(sd_cut_timestamps)} cuts")
+
     print(f"[Phase 2.5] Running temporal analysis (local, no API) ...")
     t0 = time.perf_counter()
-    temporal = run_temporal_analysis(quants, quals)
+    temporal = run_temporal_analysis(quants, quals, cut_timestamps=sd_cut_timestamps)
     elapsed = time.perf_counter() - t0
     print(f"            → done ({elapsed:.1f}s)")
     print(f"            → attention: {temporal.attention_curve.attention_arc}, "
