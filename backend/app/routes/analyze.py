@@ -54,6 +54,8 @@ class AnalyzeRequest(BaseModel):
     r2_key: str
     filename: str
     file_size_mb: float
+    product_name: str | None = None
+    product_category: str | None = None
 
 
 # --- Endpoints ---
@@ -115,9 +117,11 @@ async def analyze_video(
         "video_name": body.filename,
         "video_size_mb": round(body.file_size_mb, 2),
         "video_url": body.r2_key,
+        "product_name": body.product_name,
+        "product_category": body.product_category,
     }).execute()
 
     # Start background analysis (worker downloads from R2)
-    background_tasks.add_task(run_analysis, job_id, body.r2_key)
+    background_tasks.add_task(run_analysis, job_id, body.r2_key, body.product_name, body.product_category)
 
     return {"job_id": job_id}

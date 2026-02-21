@@ -1,36 +1,36 @@
 {
   "classification": {
-    "format": "caption_text",
-    "format_ko": "캡션/텍스트형",
-    "intent": "branding",
-    "intent_ko": "브랜딩/이미지",
-    "secondary_format": "ugc_vlog",
+    "format": "talking_head",
+    "format_ko": "진행자형",
+    "intent": "information",
+    "intent_ko": "정보 전달",
+    "secondary_format": "caption_text",
     "narration_type": "voice"
   },
   "dimensions": [
     {
       "name": "visual_stimulus",
       "name_ko": "시각적 자극도",
-      "value": 55,
-      "weight": 0.3,
-      "weighted": 16.5,
-      "evidence": "어텐션 arc=building→peak→fade, 다양한 전환 효과"
+      "value": 50,
+      "weight": 0.15,
+      "weighted": 7.5,
+      "evidence": "어텐션 arc=building→peak→fade"
     },
     {
       "name": "persuasion_density",
       "name_ko": "설득 밀도",
       "value": 20.0,
-      "weight": 0.25,
-      "weighted": 5.0,
+      "weight": 0.2,
+      "weighted": 4.0,
       "evidence": "소구 포인트 없음"
     },
     {
       "name": "information_density",
       "name_ko": "정보 밀도",
-      "value": 72.4,
-      "weight": 0.3,
-      "weighted": 21.7,
-      "evidence": "음성 32s (91%), 캡션 18개 (36s)"
+      "value": 84.1,
+      "weight": 0.35,
+      "weighted": 29.4,
+      "evidence": "음성 26s (90%), 캡션 10개 (30s)"
     },
     {
       "name": "edit_rhythm",
@@ -38,31 +38,559 @@
       "value": 75,
       "weight": 0.1,
       "weighted": 7.5,
-      "evidence": "컷 24개, 밀도 0.69/s"
+      "evidence": "컷 16개, 밀도 0.55/s"
     },
     {
       "name": "audio_stimulus",
       "name_ko": "청각 자극도",
       "value": 85.0,
-      "weight": 0.2,
-      "weighted": 17.0,
-      "evidence": "BGM upbeat_pop, 음성 voiceover, 효과음 3개"
+      "weight": 0.15,
+      "weighted": 12.8,
+      "evidence": "BGM upbeat_pop, 음성 narration, 효과음 3개"
     }
   ],
-  "engagement_score": 67.7,
+  "engagement_score": 61.2,
   "diagnoses": [
     {
       "time_range": "전체",
       "severity": "ok",
       "finding": "텍스트 오버레이 비율 102%",
-      "prescription": "텍스트형이므로 정보 전달에 효과적입니다.",
+      "prescription": "정보 전달에 텍스트는 핵심입니다. 가독성만 유지하세요.",
       "dimension": "information_density",
+      "style_context": ""
+    },
+    {
+      "time_range": "0.0-1.2s",
+      "severity": "warning",
+      "finding": "씬 1 (hook): 집중도 11점으로 매우 낮음",
+      "prescription": "이 구간(0.0-1.2s)에 시각 자극이나 소구를 추가하세요.",
+      "dimension": "visual_stimulus",
+      "style_context": ""
+    },
+    {
+      "time_range": "12.2-13.4s",
+      "severity": "warning",
+      "finding": "씬 13 (solution): 집중도 22점으로 매우 낮음",
+      "prescription": "이 구간(12.2-13.4s)에 시각 자극이나 소구를 추가하세요.",
+      "dimension": "visual_stimulus",
+      "style_context": ""
+    },
+    {
+      "time_range": "17.2-17.9s",
+      "severity": "warning",
+      "finding": "씬 18 (solution): 집중도 23점으로 매우 낮음",
+      "prescription": "이 구간(17.2-17.9s)에 시각 자극이나 소구를 추가하세요.",
+      "dimension": "visual_stimulus",
+      "style_context": ""
+    },
+    {
+      "time_range": "22.6-24.3s",
+      "severity": "warning",
+      "finding": "씬 24 (cta): 집중도 22점으로 매우 낮음",
+      "prescription": "이 구간(22.6-24.3s)에 시각 자극이나 소구를 추가하세요.",
+      "dimension": "visual_stimulus",
+      "style_context": ""
+    },
+    {
+      "time_range": "24.8-27.8s",
+      "severity": "warning",
+      "finding": "씬 26 (cta): 집중도 16점으로 매우 낮음",
+      "prescription": "이 구간(24.8-27.8s)에 시각 자극이나 소구를 추가하세요.",
+      "dimension": "visual_stimulus",
       "style_context": ""
     }
   ],
-  "summary": "캡션/텍스트형×브랜딩/이미지 영상으로, 전반적으로 양호합니다. 강점: 정보 밀도 우수 (72점), 편집 리듬 우수 (75점).",
+  "scene_analyses": [
+    {
+      "scene_index": 1,
+      "time_range": "0.0-1.2s",
+      "role": "hook",
+      "attention": 11,
+      "appeal_count": 1,
+      "appeal_types": [
+        "myth_bust"
+      ],
+      "appeal_types_ko": [
+        "오해반박"
+      ],
+      "appeal_details": [
+        {
+          "type": "myth_bust",
+          "type_ko": "오해반박",
+          "claim": "김이 다 거기서 거기라는 오해를 깰 수 있습니다.",
+          "strength": "strong",
+          "formatted": "오해반박 (텍스트 오버레이) — 화면에 '김이 다 거기서 거기라고요?' 텍스트가 나타나며 질문을 던집니다. [0.0s]",
+          "technique": "text_overlay",
+          "technique_ko": "텍스트 오버레이",
+          "visual_description": "화면에 '김이 다 거기서 거기라고요?' 텍스트가 나타나며 질문을 던집니다."
+        }
+      ],
+      "text_count": 2,
+      "duration": 1.23,
+      "diagnosis_count": 1
+    },
+    {
+      "scene_index": 2,
+      "time_range": "1.2-2.0s",
+      "role": "solution",
+      "attention": 53,
+      "appeal_count": 1,
+      "appeal_types": [
+        "feature_demo"
+      ],
+      "appeal_types_ko": [
+        "기능시연"
+      ],
+      "appeal_details": [
+        {
+          "type": "feature_demo",
+          "type_ko": "기능시연",
+          "claim": "참기름, 명란, 와사비, 김치 4가지 특별한 맛을 제공합니다.",
+          "strength": "strong",
+          "formatted": "기능시연 (패키지/박스샷) — 다양한 맛의 태풍김 제품 패키지를 클로즈업하여 보여줍니다. [2.0s]",
+          "technique": "package_shot",
+          "technique_ko": "패키지/박스샷",
+          "visual_description": "다양한 맛의 태풍김 제품 패키지를 클로즈업하여 보여줍니다."
+        }
+      ],
+      "text_count": 2,
+      "duration": 0.8,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 3,
+      "time_range": "2.0-2.9s",
+      "role": "problem",
+      "attention": 68,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 0.84,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 4,
+      "time_range": "2.9-4.9s",
+      "role": "problem",
+      "attention": 40,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 4,
+      "duration": 2.0,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 5,
+      "time_range": "4.9-5.6s",
+      "role": "proof",
+      "attention": 46,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 0.73,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 6,
+      "time_range": "5.6-6.3s",
+      "role": "proof",
+      "attention": 72,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 0.67,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 7,
+      "time_range": "6.3-7.3s",
+      "role": "proof",
+      "attention": 70,
+      "appeal_count": 1,
+      "appeal_types": [
+        "social_proof"
+      ],
+      "appeal_types_ko": [
+        "사회적증거"
+      ],
+      "appeal_details": [
+        {
+          "type": "social_proof",
+          "type_ko": "사회적증거",
+          "claim": "일본에서 1000만 달러 이상 수출되었고, 돈키호테, 로손 등 18000개 매장에서 사랑받고 있습니다.",
+          "strength": "strong",
+          "formatted": "사회적증거 (그래프/수치) — 화면에 '1000만 달러' 텍스트와 함께 일본 대형 마트 진열대 이미지를 보여줍니다. [7.0s]",
+          "technique": "graph_number",
+          "technique_ko": "그래프/수치",
+          "visual_description": "화면에 '1000만 달러' 텍스트와 함께 일본 대형 마트 진열대 이미지를 보여줍니다."
+        }
+      ],
+      "text_count": 2,
+      "duration": 1.06,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 8,
+      "time_range": "7.3-7.9s",
+      "role": "proof",
+      "attention": 72,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 0.54,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 9,
+      "time_range": "7.9-8.8s",
+      "role": "proof",
+      "attention": 30,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 2,
+      "duration": 0.9,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 10,
+      "time_range": "8.8-10.2s",
+      "role": "proof",
+      "attention": 34,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 3,
+      "duration": 1.46,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 11,
+      "time_range": "10.2-11.0s",
+      "role": "solution",
+      "attention": 46,
+      "appeal_count": 1,
+      "appeal_types": [
+        "origin"
+      ],
+      "appeal_types_ko": [
+        "원산지"
+      ],
+      "appeal_details": [
+        {
+          "type": "origin",
+          "type_ko": "원산지",
+          "claim": "100% 국내산 명품 원초(완도+서천)만 사용합니다.",
+          "strength": "strong",
+          "formatted": "원산지 (텍스트 오버레이) — 진행자가 제품을 들고 '100% 국내산 원초 사용 (완도 + 서천)' 텍스트를 보여줍니다. [11.0s]",
+          "technique": "text_overlay",
+          "technique_ko": "텍스트 오버레이",
+          "visual_description": "진행자가 제품을 들고 '100% 국내산 원초 사용 (완도 + 서천)' 텍스트를 보여줍니다."
+        }
+      ],
+      "text_count": 1,
+      "duration": 0.8,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 12,
+      "time_range": "11.0-12.2s",
+      "role": "solution",
+      "attention": 32,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 1.14,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 13,
+      "time_range": "12.2-13.4s",
+      "role": "solution",
+      "attention": 22,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 1.23,
+      "diagnosis_count": 1
+    },
+    {
+      "scene_index": 14,
+      "time_range": "13.4-14.4s",
+      "role": "solution",
+      "attention": 68,
+      "appeal_count": 1,
+      "appeal_types": [
+        "manufacturing"
+      ],
+      "appeal_types_ko": [
+        "제조공정"
+      ],
+      "appeal_details": [
+        {
+          "type": "manufacturing",
+          "type_ko": "제조공정",
+          "claim": "두 번 구워 더욱 바삭한 식감을 자랑합니다.",
+          "strength": "strong",
+          "formatted": "제조공정 (공정 촬영) — 김이 컨베이어 벨트 위에서 구워지는 공정 과정을 보여줍니다. [13.5s]",
+          "technique": "process_shot",
+          "technique_ko": "공정 촬영",
+          "visual_description": "김이 컨베이어 벨트 위에서 구워지는 공정 과정을 보여줍니다."
+        }
+      ],
+      "text_count": 2,
+      "duration": 1.0,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 15,
+      "time_range": "14.4-15.4s",
+      "role": "solution",
+      "attention": 32,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 2,
+      "duration": 0.97,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 16,
+      "time_range": "15.4-16.6s",
+      "role": "solution",
+      "attention": 49,
+      "appeal_count": 1,
+      "appeal_types": [
+        "spec_data"
+      ],
+      "appeal_types_ko": [
+        "스펙수치"
+      ],
+      "appeal_details": [
+        {
+          "type": "spec_data",
+          "type_ko": "스펙수치",
+          "claim": "방습제 없이도 바삭함이 오래 유지됩니다.",
+          "strength": "strong",
+          "formatted": "스펙수치 (패키지/박스샷) — 방습제(실리카겔)를 보여주며 '방습제 없는데 오래오래 바삭바삭' 텍스트를 강조합니다. [16.0s]",
+          "technique": "package_shot",
+          "technique_ko": "패키지/박스샷",
+          "visual_description": "방습제(실리카겔)를 보여주며 '방습제 없는데 오래오래 바삭바삭' 텍스트를 강조합니다."
+        }
+      ],
+      "text_count": 2,
+      "duration": 1.26,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 17,
+      "time_range": "16.6-17.2s",
+      "role": "solution",
+      "attention": 75,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 0.6,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 18,
+      "time_range": "17.2-17.9s",
+      "role": "solution",
+      "attention": 23,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 0.64,
+      "diagnosis_count": 1
+    },
+    {
+      "scene_index": 19,
+      "time_range": "17.9-18.9s",
+      "role": "solution",
+      "attention": 45,
+      "appeal_count": 1,
+      "appeal_types": [
+        "lifestyle"
+      ],
+      "appeal_types_ko": [
+        "라이프스타일"
+      ],
+      "appeal_details": [
+        {
+          "type": "lifestyle",
+          "type_ko": "라이프스타일",
+          "claim": "네 가지 맛으로 밥반찬, 술안주 등 다양한 상황에 완벽하게 어울립니다.",
+          "strength": "moderate",
+          "formatted": "라이프스타일 (원재료/성분 촬영) — 진행자가 다양한 맛의 김을 들고 밥반찬과 술안주로 좋다고 말합니다. [18.5s]",
+          "technique": "ingredient_shot",
+          "technique_ko": "원재료/성분 촬영",
+          "visual_description": "진행자가 다양한 맛의 김을 들고 밥반찬과 술안주로 좋다고 말합니다."
+        }
+      ],
+      "text_count": 2,
+      "duration": 1.03,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 20,
+      "time_range": "18.9-19.9s",
+      "role": "demo",
+      "attention": 38,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 2,
+      "duration": 1.0,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 21,
+      "time_range": "19.9-20.5s",
+      "role": "demo",
+      "attention": 40,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 2,
+      "duration": 0.63,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 22,
+      "time_range": "20.5-21.4s",
+      "role": "demo",
+      "attention": 34,
+      "appeal_count": 1,
+      "appeal_types": [
+        "emotional"
+      ],
+      "appeal_types_ko": [
+        "감정호소"
+      ],
+      "appeal_details": [
+        {
+          "type": "emotional",
+          "type_ko": "감정호소",
+          "claim": "태풍김 한 장의 특별한 맛과 바삭함을 직접 경험해보세요.",
+          "strength": "strong",
+          "formatted": "감정호소 (reaction_shot) — 진행자가 김을 크게 베어 물며 과장된 바삭 소리를 내고 만족스러운 표정을 짓습니다. [21.0s]",
+          "technique": "reaction_shot",
+          "technique_ko": "reaction_shot",
+          "visual_description": "진행자가 김을 크게 베어 물며 과장된 바삭 소리를 내고 만족스러운 표정을 짓습니다."
+        }
+      ],
+      "text_count": 1,
+      "duration": 0.9,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 23,
+      "time_range": "21.4-22.6s",
+      "role": "demo",
+      "attention": 30,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 3,
+      "duration": 1.17,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 24,
+      "time_range": "22.6-24.3s",
+      "role": "cta",
+      "attention": 22,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 2,
+      "duration": 1.73,
+      "diagnosis_count": 1
+    },
+    {
+      "scene_index": 25,
+      "time_range": "24.3-24.8s",
+      "role": "cta",
+      "attention": 39,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 1,
+      "duration": 0.5,
+      "diagnosis_count": 0
+    },
+    {
+      "scene_index": 26,
+      "time_range": "24.8-27.8s",
+      "role": "cta",
+      "attention": 16,
+      "appeal_count": 1,
+      "appeal_types": [
+        "guarantee"
+      ],
+      "appeal_types_ko": [
+        "보장/환불"
+      ],
+      "appeal_details": [
+        {
+          "type": "guarantee",
+          "type_ko": "보장/환불",
+          "claim": "맛없으면 보장하겠다며 제품에 대한 강력한 자신감을 보여줍니다.",
+          "strength": "strong",
+          "formatted": "보장/환불 (텍스트 오버레이) — PD의 멘트와 함께 진행자가 '도전할게요'를 반복하며 자신감을 드러냅니다. [26.0s]",
+          "technique": "text_overlay",
+          "technique_ko": "텍스트 오버레이",
+          "visual_description": "PD의 멘트와 함께 진행자가 '도전할게요'를 반복하며 자신감을 드러냅니다."
+        }
+      ],
+      "text_count": 5,
+      "duration": 2.94,
+      "diagnosis_count": 1
+    },
+    {
+      "scene_index": 27,
+      "time_range": "27.8-29.0s",
+      "role": "cta",
+      "attention": 45,
+      "appeal_count": 0,
+      "appeal_types": [],
+      "appeal_types_ko": [],
+      "appeal_details": [],
+      "text_count": 3,
+      "duration": 1.26,
+      "diagnosis_count": 0
+    }
+  ],
+  "summary": "진행자형×정보 전달 영상으로, 5건의 개선 포인트가 있습니다. 강점: 정보 밀도 우수 (84점), 편집 리듬 우수 (75점).",
   "strengths": [
-    "정보 밀도 우수 (72점)",
+    "정보 밀도 우수 (84점)",
     "편집 리듬 우수 (75점)",
     "청각 자극도 우수 (85점)"
   ],

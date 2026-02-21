@@ -1,178 +1,242 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BarChart2, Target, Eye, Wrench, TrendingUp } from 'lucide-react';
+import { ArrowRight, Play, Sparkles } from 'lucide-react';
 
-const steps = [
-  { num: '01', title: '영상 업로드', desc: '30초면 충분합니다. MP4, MOV, WebM 지원' },
-  { num: '02', title: 'AI 자동 분석', desc: '2분 안에 소구 구조와 집중도를 분석합니다' },
-  { num: '03', title: '인사이트 리포트', desc: '마케터가 바로 쓸 수 있는 리포트로 전달합니다' },
-];
+/* ───── Verdict Mockup (분석 예시) ───── */
+function VerdictMockup() {
+  return (
+    <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-100 overflow-hidden">
+      <div className="bg-gray-50/80 border-b border-gray-100 px-4 py-2.5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#28CA41]" />
+          </div>
+          <span className="ml-2 text-[11px] text-gray-400 font-mono">WakaLab 분석 리포트</span>
+        </div>
+        <span className="text-[10px] text-gray-300">건강 착즙주스 (NFC 원액)</span>
+      </div>
+      <div className="p-5">
+        {/* 판결 */}
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-lg">✅</div>
+          <div>
+            <p className="text-[10px] text-gray-400 mb-0.5">🛑 최종 판결</p>
+            <span className="inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-md">
+              집행 권장
+            </span>
+          </div>
+        </div>
+        <p className="text-[13px] text-gray-600 leading-relaxed mb-4">
+          명확한 문제 제기-해결 구조, 핵심 성분/효능 상세 강조, 강력한 가격 혜택 제시로
+          타겟 고객의 구매 전환을 이끌 강력한 소재다.
+        </p>
 
-const values = [
-  {
-    icon: Target,
-    title: '소구 레시피',
-    desc: '설득 구조를 초 단위로 해체합니다. 어떤 소구가, 언제, 어떻게 작동하는지 파악하세요.',
-  },
-  {
-    icon: Eye,
-    title: '집중도 예측',
-    desc: '이탈 구간을 사전에 파악합니다. 시청자가 언제 관심을 잃는지 미리 알 수 있습니다.',
-  },
-  {
-    icon: Wrench,
-    title: '제작 가이드',
-    desc: '분석이 바로 제작 지시서가 됩니다. 분석 결과를 그대로 크리에이터에게 전달하세요.',
-  },
-  {
-    icon: TrendingUp,
-    title: '경쟁 비교',
-    desc: '내 영상 vs 성공 영상 벤치마크. 무엇이 다르고 무엇을 바꿔야 하는지 보여드립니다.',
-  },
-];
+        {/* 근거 */}
+        <div className="bg-gray-50 rounded-lg p-3 mb-3">
+          <p className="text-[10px] font-semibold text-gray-500 mb-1.5">🔍 판단의 근거</p>
+          <div className="space-y-1.5 text-[11px] text-gray-500 leading-relaxed">
+            <p>
+              <span className="font-mono text-gray-900">[0:00]</span> "염증가득 안색" 문제 제시 →{' '}
+              <span className="font-mono text-gray-900">[0:02]</span> "환해졌어요" 즉시 해결책으로 공감 유도
+            </p>
+            <p>
+              <span className="font-mono text-gray-900">[0:04]</span> "100% NFC 착즙 첨가물 無" 핵심 강점 노출 →
+              성분 신뢰 확보
+            </p>
+            <p>
+              <span className="font-mono text-gray-900">[0:14]</span> "과채섭취 권장량 3배", "한 잔에 단 33칼로리" 구체적 스펙 수치
+            </p>
+            <p>
+              <span className="font-mono text-gray-900">[0:30]</span> "단독 할인특가", "1L 대용량 1만원대" 파격 가격으로 구매 전환 유도
+            </p>
+          </div>
+        </div>
+
+        {/* 액션 플랜 */}
+        <div className="bg-gray-900 rounded-lg p-3">
+          <p className="text-[10px] font-semibold text-gray-400 mb-1.5">🛠️ 액션 플랜</p>
+          <div className="space-y-1.5">
+            <p className="text-[11px] text-gray-300">
+              <span className="font-mono text-white">[0:16]</span> 다이어트 구간에 허리 라인 강조 이미지 등 결과물 암시 컷 삽입
+            </p>
+            <p className="text-[11px] text-gray-300">
+              <span className="font-mono text-white">[0:00]</span> 훅 직후 안색 Before→After 전환 컷(0.5초)으로 효능 각인
+            </p>
+            <p className="text-[11px] text-gray-300">
+              <span className="font-mono text-white">[0:28]</span> CTA 직전 "한정 수량"/"오늘 마감" 긴급성 그래픽 모션 추가
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───── Feature Card ───── */
+function FeatureCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <div className="group p-6 rounded-2xl bg-white border border-gray-100 hover:border-gray-200 hover:shadow-[0_2px_20px_rgba(0,0,0,0.04)] transition-all">
+      <span className="text-2xl mb-3 block">{icon}</span>
+      <h3 className="font-semibold text-gray-900 mb-1.5 text-[15px]">{title}</h3>
+      <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left */}
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-100 rounded-full text-blue-600 text-xs font-medium mb-6">
-              <BarChart2 className="w-3.5 h-3.5" />
-              AI 숏폼 영상 분석
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-5 leading-tight tracking-tight">
-              숏폼 광고,<br />
-              감이 아니라 <span className="text-blue-600">데이터로</span>
-            </h1>
-            <p className="text-lg text-gray-500 mb-8 leading-relaxed">
-              AI가 영상을 해부해서 왜 잘 되는지,<br className="hidden sm:block" />
-              어떻게 복제하는지 알려드립니다
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                to="/analyze"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-              >
-                무료로 분석해보기
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/results/demo-001"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg border border-gray-200 transition-colors"
-              >
-                샘플 리포트 →
-              </Link>
-            </div>
-          </div>
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
+        {/* Tagline */}
+        <div className="text-center mb-14">
+          <p className="text-sm text-gray-400 font-medium tracking-wide mb-4">
+            마케터를 위한 AI 연구소
+          </p>
+          <h1 className="text-4xl sm:text-[3.25rem] font-bold text-gray-900 leading-[1.15] tracking-tight mb-5">
+            마케터가 원하는 도구,<br />
+            만들어드립니다.
+          </h1>
+          <p className="text-lg text-gray-500 max-w-lg mx-auto leading-relaxed">
+            감이 아닌 근거. 느낌이 아닌 데이터.<br />
+            WakaLab이 연구하고, 여러분이 결정합니다.
+          </p>
+        </div>
 
-          {/* Right — Report preview mockup */}
-          <div className="hidden lg:block">
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-              {/* Fake browser bar */}
-              <div className="bg-gray-50 border-b border-gray-200 px-4 py-2.5 flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-300" />
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-300" />
-                <div className="w-2.5 h-2.5 rounded-full bg-green-300" />
-                <span className="ml-2 text-xs text-gray-400 font-mono">영상 분석 리포트</span>
-              </div>
-              {/* Score card */}
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <p className="text-xs text-gray-400 mb-1">종합 점수</p>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-bold text-gray-900">82</span>
-                      <span className="text-gray-400 text-sm">/100</span>
-                      <span className="ml-1 px-2 py-0.5 bg-green-50 text-green-700 text-sm font-bold rounded-md border border-green-100">A등급</span>
+        {/* Project #1 */}
+        <div className="relative mt-4">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            {/* Left — Description */}
+            <div className="lg:pt-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-900 text-white text-[11px] font-semibold rounded-full tracking-wide mb-5">
+                <Play className="w-3 h-3 fill-current" />
+                PROJECT #1
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-[1.2] tracking-tight">
+                숏폼 영상,<br />
+                감 대신 근거로.
+              </h2>
+              <p className="text-lg text-gray-500 mb-6 leading-relaxed">
+                프레임 단위 시각 분석과 마케터 관점 진단.<br />
+                왜 팔리는지, 왜 안 팔리는지, 어떻게 고칠지.
+              </p>
+
+              {/* Mini features */}
+              <div className="space-y-3 mb-8">
+                {[
+                  { label: '판결', desc: '집행 권장 / 조건부 / 불가 — 단호하게' },
+                  { label: '근거', desc: '타임스탬프 + 실제 화면 기반 분석' },
+                  { label: '액션플랜', desc: '편집자에게 바로 전달 가능한 수정안' },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-3">
+                    <span className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-900 flex-shrink-0 mt-0.5">
+                      {item.label.charAt(0)}
+                    </span>
+                    <div>
+                      <span className="text-sm font-medium text-gray-900">{item.label}</span>
+                      <span className="text-sm text-gray-400 ml-2">{item.desc}</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400 mb-1">유지율</p>
-                    <p className="text-2xl font-bold text-gray-900">95<span className="text-sm font-normal text-gray-400">점</span></p>
-                  </div>
-                </div>
-                {/* Mini attention chart mock */}
-                <div className="h-14 bg-gray-50 rounded-lg flex items-end gap-px px-2 pb-2 mb-4 overflow-hidden">
-                  {[55,65,72,80,90,88,85,70,60,72,85,90,82,75,65,55,60,72,78,82].map((h, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-sm"
-                      style={{
-                        height: `${h}%`,
-                        backgroundColor: h < 65 ? '#fca5a5' : '#93c5fd',
-                        opacity: 0.75,
-                      }}
-                    />
-                  ))}
-                </div>
-                {/* Strengths & weaknesses */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-green-50 border border-green-100 rounded-lg p-3">
-                    <p className="text-xs text-green-600 font-semibold mb-1.5">강점</p>
-                    <p className="text-xs text-green-700 leading-relaxed">훅 즉시 진입 (0초)</p>
-                    <p className="text-xs text-green-700 leading-relaxed">소구 7종 다양</p>
-                    <p className="text-xs text-green-700 leading-relaxed">시청유지율 95%</p>
-                  </div>
-                  <div className="bg-amber-50 border border-amber-100 rounded-lg p-3">
-                    <p className="text-xs text-amber-600 font-semibold mb-1.5">개선 필요</p>
-                    <p className="text-xs text-amber-700 leading-relaxed">CTA 강도 약함</p>
-                    <p className="text-xs text-amber-700 leading-relaxed">후반 집중도 하락</p>
-                  </div>
-                </div>
+                ))}
               </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <Link
+                  to="/analyze"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-full text-sm transition-colors"
+                >
+                  영상 분석하기
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/demo"
+                  className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors"
+                >
+                  샘플 리포트 보기 →
+                </Link>
+              </div>
+            </div>
+
+            {/* Right — 분석 예시 */}
+            <div className="hidden lg:block">
+              <VerdictMockup />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison — 차별점 */}
+      <section className="bg-white border-y border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-gray-100 p-6">
+              <p className="text-sm font-semibold text-gray-400 mb-4">일반적인 영상 분석</p>
+              <ul className="space-y-2.5 text-sm text-gray-400">
+                <li>"초반 3초 후킹을 더 강하게 하세요"</li>
+                <li>"자막 가독성을 높이세요"</li>
+                <li>"종합 점수 72점입니다"</li>
+                <li className="pt-1 italic">→ 이 정도는 나도 알아</li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-gray-900 bg-gray-900 p-6">
+              <p className="text-sm font-semibold text-white mb-4">WakaLab</p>
+              <ul className="space-y-2.5 text-sm text-gray-300">
+                <li><span className="font-mono text-white">[0:04]</span> 리뷰어 멘트 구간의 정보 밀도가 낮아 이탈 예상</li>
+                <li>해당 구간에 <strong className="text-white">'3일 만에 변화'</strong> 수치 자막 추가</li>
+                <li>구매 결정 핵심인 <strong className="text-white">성분 신뢰</strong>가 10초까지 부재</li>
+                <li className="pt-1 text-gray-400 italic">→ 소름 돋는다...</li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="bg-gray-50 border-y border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-          <h2 className="text-xl font-bold text-gray-900 text-center mb-10">3단계로 끝납니다</h2>
-          <div className="grid sm:grid-cols-3 gap-8">
-            {steps.map((step) => (
-              <div key={step.num} className="flex gap-4">
-                <span className="text-3xl font-black text-blue-100 leading-none flex-shrink-0">{step.num}</span>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{step.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
-                </div>
-              </div>
-            ))}
+      <section>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
+          <p className="text-center text-sm text-gray-400 font-medium mb-10">3단계로 끝납니다</p>
+          <div className="grid sm:grid-cols-3 gap-6">
+            <FeatureCard
+              icon="📤"
+              title="영상 + 제품 정보"
+              desc="영상을 올리고, 무엇을 파는 영상인지 알려주세요."
+            />
+            <FeatureCard
+              icon="🔬"
+              title="AI 마케터 분석"
+              desc="프레임 단위 시각 분석 + 마케팅 심리 기반 진단. 약 2분."
+            />
+            <FeatureCard
+              icon="📋"
+              title="판결 + 액션플랜"
+              desc="팔리겠는가? 왜? 어떻게 고칠까? 리포트 완성."
+            />
           </div>
         </div>
       </section>
 
-      {/* Value cards */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className="text-xl font-bold text-gray-900 text-center mb-10">리포트로 얻는 것</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {values.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="p-5 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
-                <Icon className="w-5 h-5 text-blue-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-sm">{title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Bottom CTA */}
-      <section className="bg-gray-50 border-t border-gray-100">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">지금 첫 영상을 분석해보세요</h2>
-          <p className="text-gray-500 mb-6 text-sm">무료 플랜으로 월 3건 분석 가능합니다</p>
-          <Link
-            to="/analyze"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-          >
-            무료로 분석해보기
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+      <section className="border-t border-gray-100">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-20 text-center">
+          <Sparkles className="w-5 h-5 text-gray-300 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">첫 영상을 진단해보세요</h2>
+          <p className="text-gray-400 mb-8 text-sm">무료로 시작. 2분 안에 판결을 받아보세요.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              to="/analyze"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-full text-sm transition-colors"
+            >
+              영상 분석하기
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/demo"
+              className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors"
+            >
+              샘플 리포트 먼저 보기 →
+            </Link>
+          </div>
         </div>
       </section>
     </div>

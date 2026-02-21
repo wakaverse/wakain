@@ -17,3 +17,4 @@ opencv-python-headless>=4.9.0
 numpy
 scenedetect[opencv]
 matplotlib
+requests

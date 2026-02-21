@@ -455,14 +455,19 @@ class AppealPoint(BaseModel):
         # Rational appeals (이성 소구)
         "myth_bust",       # 편견 파괴 — "김이 다 거기서 거기?"
         "ingredient",      # 원재료/성분 — "국내산 원초"
-        "process",         # 제조 공정 — "두 번 구워"
-        "achievement",     # 실적/수치 — "150억 판매"
+        "process",         # 제조 공정 (legacy) — "두 번 구워"
+        "manufacturing",   # 제조 공정 — "두 번 구워", 공정 촬영
+        "achievement",     # 실적/수치 (legacy) — "150억 판매"
         "price",           # 가성비/가격 — "한 팩 990원"
         "comparison",      # 비교 우위 — "일반 김 vs 태풍김"
         "guarantee",       # 보증/리스크 제거 — "맛없으면 보장"
         "origin",          # 산지/원산지 — "통영 직송"
         "specification",   # 스펙/기능 — "18000RPM 흡입력"
+        "feature_demo",    # 기능 시연 — 제품 사용법, 동작 시연
+        "spec_data",       # 스펙 수치 — 용량, 규격, 수치 데이터
+        "track_record",    # 실적/수상 — 판매량, 인증, 수상 실적
         # Emotional appeals (감성 소구)
+        "design_aesthetic", # 디자인/심미 — 제품 디자인, 비주얼
         "sensory",         # 감각 자극 — ASMR, 먹방, 바삭 소리
         "authenticity",    # 진정성/인간미 — "사장이 직접"
         "social_proof",    # 사회적 증거 — 리뷰, 판매량

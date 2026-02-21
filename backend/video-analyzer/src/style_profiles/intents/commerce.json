@@ -1,0 +1,20 @@
+{
+  "name": "commerce",
+  "name_ko": "커머스/세일즈",
+  "description": "즉각적인 구매/전환 유도",
+  "effective_appeals": ["price", "social_proof", "guarantee", "myth_bust", "urgency", "scarcity"],
+  "weak_appeals": ["nostalgia", "authority", "design_aesthetic"],
+  "kpis": ["ctr", "cvr", "roas", "add_to_cart"],
+  "dimension_weight_overrides": {
+    "persuasion_density": 0.35
+  },
+  "threshold_overrides": {
+    "first_appeal_max_sec": 2.0,
+    "appeal_gap_max_sec": 3.0
+  },
+  "prescription_overrides": {
+    "first_appeal_late": {"level": "danger", "message": "커머스 영상에서 첫 소구가 2초 이후면 치명적입니다. Hook에서 즉시 가격/혜택을 보여주세요."},
+    "appeal_gap_3s": {"level": "danger", "message": "3초 이상 소구 공백은 구매 전환율을 크게 떨어뜨립니다. 소구를 삽입하세요."},
+    "no_cta": {"level": "danger", "message": "CTA가 없는 커머스 영상은 의미가 없습니다. 마지막에 명확한 행동 유도를 넣으세요."}
+  }
+}

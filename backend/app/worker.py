@@ -46,7 +46,7 @@ def _update_job(job_id: str, **fields) -> None:
     _supabase().table("jobs").update(fields).eq("id", job_id).execute()
 
 
-def run_analysis(job_id: str, r2_key: str) -> None:
+def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, product_category: str | None = None) -> None:
     """Download video from R2, run pipeline, persist results, clean up."""
     output_dir = str(OUTPUT_DIR / job_id)
 
@@ -66,15 +66,21 @@ def run_analysis(job_id: str, r2_key: str) -> None:
         # Use the current Python interpreter (works in both local and container)
         python_bin = sys.executable
 
+        cmd = [
+            python_bin,
+            "main.py",
+            "analyze",
+            str(video_path),
+            "--output",
+            output_dir,
+        ]
+        if product_name:
+            cmd.extend(["--product-name", product_name])
+        if product_category:
+            cmd.extend(["--product-category", product_category])
+
         result = subprocess.run(
-            [
-                python_bin,
-                "main.py",
-                "analyze",
-                str(video_path),
-                "--output",
-                output_dir,
-            ],
+            cmd,
             capture_output=True,
             text=True,
             cwd=ANALYZER_DIR,
@@ -162,6 +168,7 @@ def _load_extra_analysis(analysis_dir: Path, video_name: str) -> dict:
         "stt_json": f"{video_name}_stt.json",
         "style_json": f"{video_name}_style.json",
         "caption_map_json": f"{video_name}_caption_map.json",
+        "verdict_json": f"{video_name}_verdict.json",
     }
     for col, fname in file_map.items():
         fpath = analysis_dir / fname

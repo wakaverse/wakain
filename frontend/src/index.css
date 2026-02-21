@@ -1,1 +1,33 @@
 @import "tailwindcss";
+
+/* ── Typography ── */
+:root {
+  --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --font-display: "Space Grotesk", "Pretendard Variable", sans-serif;
+}
+
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.012em;
+  background: #fafafa;
+}
+
+/* Headings */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+/* Mono (timestamps) */
+.font-mono {
+  font-family: "SF Mono", "Space Grotesk", "Fira Code", monospace;
+  font-feature-settings: "tnum";
+  font-size: 0.9em;
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 0, 0, 0.08);
+}

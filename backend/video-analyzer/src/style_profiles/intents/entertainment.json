@@ -1,0 +1,22 @@
+{
+  "name": "entertainment",
+  "name_ko": "엔터테인먼트",
+  "description": "바이럴/공유/즐거움",
+  "effective_appeals": ["humor", "surprise", "trend", "relatability", "nostalgia"],
+  "weak_appeals": ["specification", "spec_data", "guarantee"],
+  "kpis": ["share_rate", "comment_rate", "replay_rate", "viral_coefficient"],
+  "dimension_weight_overrides": {
+    "edit_rhythm": 0.25,
+    "audio_stimulus": 0.25,
+    "persuasion_density": 0.10
+  },
+  "threshold_overrides": {
+    "first_appeal_max_sec": 1.5,
+    "appeal_gap_max_sec": 4.0
+  },
+  "prescription_overrides": {
+    "first_appeal_late": {"level": "danger", "message": "엔터테인먼트에서 1.5초 안에 흥미를 못 끌면 스크롤됩니다."},
+    "appeal_gap_3s": {"level": "warning", "message": "재미 요소 간 간격이 길면 이탈합니다. 반전/유머를 촘촘히 배치하세요."},
+    "cut_density_low": {"level": "warning", "message": "엔터테인먼트형은 빠른 리듬이 생명입니다."}
+  }
+}

@@ -26,6 +26,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from src.stt_extractor import run_stt_extraction, STTResult
+from src.style_classifier import classify_style, StyleClassification
+from src.caption_mapper import build_caption_map, caption_map_to_dict
+from src.integrated_analyzer import run_integrated_analysis
+from src.prescription_engine import generate_prescriptions
+from src.marketer_judge import run_marketer_judge
 from src.frame_extractor import extract_frames
 from src.frame_quant import analyse_frame as analyse_frame_quant
 from src.frame_qual import analyse_frames_qual
@@ -121,9 +127,18 @@ def run_phase_2_5(output_dir: str, video_path: str) -> TemporalAnalysis:
     quants = [FrameQuant.model_validate(d) for d in json.loads(quant_path.read_text())]
     quals = [FrameQual.model_validate(d) for d in json.loads(qual_path.read_text())]
 
+    # Load SceneDetect cut_timestamps if available
+    sd_cut_timestamps = None
+    sd_path = out / f"{video_name}_scene_detect.json"
+    if sd_path.exists():
+        sd_data = json.loads(sd_path.read_text())
+        sd_cut_timestamps = sd_data.get("cut_timestamps")
+        if sd_cut_timestamps:
+            print(f"[Phase 2.5] Using SceneDetect cuts: {len(sd_cut_timestamps)} cuts")
+
     print(f"[Phase 2.5] Running temporal analysis (local, no API) ...")
     t0 = time.perf_counter()
-    temporal = run_temporal_analysis(quants, quals)
+    temporal = run_temporal_analysis(quants, quals, cut_timestamps=sd_cut_timestamps)
     elapsed = time.perf_counter() - t0
     print(f"            → done ({elapsed:.1f}s)")
     print(f"            → attention: {temporal.attention_curve.attention_arc}, "
@@ -183,16 +198,32 @@ def run_phase_3(
     return scenes
 
 
-def run_phase_4(video_path: str, output_dir: str, resolution: int = 720, frame_quals: list[dict] | None = None) -> dict:
+def run_phase_4(
+    video_path: str,
+    output_dir: str,
+    resolution: int = 720,
+    frame_quals: list[dict] | None = None,
+    narration_type: str | None = None,
+    stt_transcript: str | None = None,
+    style_classification: dict | None = None,
+) -> dict:
     """Run Phase 4: full video analysis via Gemini."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
-    print(f"[Phase 4] Running video analysis (Gemini, full video upload, {resolution}p) ...")
+    track_label = f", track={narration_type}" if narration_type else ""
+    style_label = ""
+    if style_classification:
+        style_label = f", style={style_classification.get('primary_format', '?')}×{style_classification.get('primary_intent', '?')}"
+    print(f"[Phase 4] Running video analysis (Gemini, full video upload, {resolution}p{track_label}{style_label}) ...")
     if frame_quals:
         text_count = sum(1 for fq in frame_quals if fq.get("text_overlay") or fq.get("text_overlays"))
         print(f"          (OCR context: {text_count}/{len(frame_quals)} frames with text)")
     t0 = time.perf_counter()
-    analysis = run_video_analysis(video_path, resolution=resolution, frame_quals=frame_quals)
+    analysis = run_video_analysis(
+        video_path, resolution=resolution, frame_quals=frame_quals,
+        narration_type=narration_type, stt_transcript=stt_transcript,
+        style_classification=style_classification,
+    )
     print(f"          → done ({time.perf_counter() - t0:.1f}s)")
 
     # Save analysis
@@ -297,25 +328,276 @@ def run_phase_6(
     print(f"\n✅ Full pipeline complete! Recipe: {recipe_path}")
 
 
-def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720) -> None:
-    """Run all phases end-to-end."""
+def run_phase_0(video_path: str, output_dir: str) -> STTResult:
+    """Run Phase 0: STT extraction via Soniox + narration type detection."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
-    # Phase 0.5: PySceneDetect — run on original video (full fps, resolution-independent)
-    from src.scene_detect import detect_scenes
-    print(f"[Phase 0.5] Running PySceneDetect (original video, full fps) ...")
+    print(f"[Phase 0] Running STT extraction (Soniox) ...")
     t0 = time.perf_counter()
-    scene_boundaries, cut_timestamps = detect_scenes(str(video_path))
-    print(f"            → {len(scene_boundaries)} scenes, {len(cut_timestamps)} cuts ({time.perf_counter() - t0:.1f}s)")
-    sd_path = out / f"{video_name}_scene_detect.json"
-    sd_path.write_text(json.dumps({
-        "boundaries": scene_boundaries,
-        "cut_timestamps": cut_timestamps,
-    }, indent=2))
-    print(f"            → saved to {sd_path}")
+    stt_result = run_stt_extraction(video_path)
+    elapsed = time.perf_counter() - t0
+    print(f"          → narration_type: {stt_result.narration_type}")
+    print(f"          → {len(stt_result.segments)} segments, {stt_result.total_speech_sec:.1f}s speech ({elapsed:.1f}s)")
 
-    # Phase 1+2: frame extraction + quant + qual
-    run_phase_1_2(video_path, output_dir, quant_only=False, resolution=resolution)
+    # Save STT result
+    stt_path = out / f"{video_name}_stt.json"
+    stt_path.write_text(json.dumps(stt_result.to_dict(), indent=2, ensure_ascii=False))
+    print(f"          → saved to {stt_path}")
+
+    return stt_result
+
+
+def run_phase_0_1(
+    video_path: str,
+    output_dir: str,
+    format_hint: str | None = None,
+    intent_hint: str | None = None,
+) -> StyleClassification:
+    """Run Phase 0.1: style classification (Format × Intent)."""
+    out, video_name = _resolve_output_dir(output_dir, video_path)
+
+    print(f"[Phase 0.1] Running style classification ...")
+    t0 = time.perf_counter()
+    style = classify_style(video_path, format_hint=format_hint, intent_hint=intent_hint)
+    elapsed = time.perf_counter() - t0
+
+    from src.style_classifier import FORMAT_LABELS_KO, INTENT_LABELS_KO
+    fmt_ko = FORMAT_LABELS_KO.get(style.primary_format, style.primary_format)
+    int_ko = INTENT_LABELS_KO.get(style.primary_intent, style.primary_intent)
+    print(f"            → format: {style.primary_format} ({fmt_ko})")
+    if style.secondary_format:
+        fmt2_ko = FORMAT_LABELS_KO.get(style.secondary_format, "")
+        print(f"            → format2: {style.secondary_format} ({fmt2_ko})")
+    print(f"            → intent: {style.primary_intent} ({int_ko})")
+    print(f"            → {'auto' if style.auto_classified else 'manual'} ({elapsed:.1f}s)")
+
+    # Save
+    style_path = out / f"{video_name}_style.json"
+    style_path.write_text(json.dumps(style.to_dict(), indent=2, ensure_ascii=False))
+    print(f"            → saved to {style_path}")
+
+    return style
+
+
+def run_phase_7(
+    output_dir: str,
+    video_path: str,
+    stt_data: dict | None = None,
+    style_data: dict | None = None,
+    product_name: str = "",
+    product_category: str = "",
+    product_key_factors: str = "",
+) -> None:
+    """Run Phase 7: Caption mapping + Integrated analysis + Prescriptions + Marketer Judge."""
+    out, video_name = _resolve_output_dir(output_dir, video_path)
+
+    # Load recipe
+    recipe_path = out / f"{video_name}_video_recipe.json"
+    if not recipe_path.exists():
+        print(f"[Phase 7] ⚠️  Recipe 없음 ({recipe_path.name}). Phase 6을 먼저 실행하세요.")
+        return
+    recipe_data = json.loads(recipe_path.read_text())
+    recipe = recipe_data.get("video_recipe", recipe_data)
+
+    # Load STT/Style from disk if not provided
+    if stt_data is None:
+        stt_path = out / f"{video_name}_stt.json"
+        if stt_path.exists():
+            stt_data = json.loads(stt_path.read_text())
+    if style_data is None:
+        style_path = out / f"{video_name}_style.json"
+        if style_path.exists():
+            style_data = json.loads(style_path.read_text())
+
+    t0 = time.perf_counter()
+
+    # C-8: Caption mapping
+    print(f"[Phase 7] Building caption map ...")
+    qual_path = out / f"{video_name}_frame_qual.json"
+    cap_map = None
+    if qual_path.exists():
+        frame_quals = json.loads(qual_path.read_text())
+        events = build_caption_map(frame_quals)
+        cap_map = caption_map_to_dict(events)
+        cap_path = out / f"{video_name}_caption_map.json"
+        cap_path.write_text(json.dumps(cap_map, indent=2, ensure_ascii=False))
+        print(f"           → {cap_map['caption_count']} caption events → {cap_path.name}")
+    else:
+        print(f"           → frame_qual 없음, 캡션 매핑 스킵")
+
+    # Load raw temporal for dimension calculations
+    temporal_path = out / f"{video_name}_temporal.json"
+    raw_temporal = None
+    if temporal_path.exists():
+        raw_temporal = json.loads(temporal_path.read_text())
+
+    # C-9: Integrated analysis
+    print(f"[Phase 7] Running integrated analysis (3-stage) ...")
+    diagnosis = run_integrated_analysis(
+        recipe, stt_data=stt_data, style_data=style_data,
+        caption_map=cap_map, raw_temporal=raw_temporal,
+    )
+    diag_path = out / f"{video_name}_diagnosis.json"
+    diag_path.write_text(json.dumps(diagnosis.to_dict(), indent=2, ensure_ascii=False))
+    print(f"           → {len(diagnosis.diagnoses)} findings, engagement={diagnosis.engagement_score:.1f}")
+    print(f"           → {diag_path.name}")
+
+    # C-10: Prescriptions
+    print(f"[Phase 7] Generating prescriptions ...")
+    from src.style_profiles import get_merged_profile
+    fmt_key = (style_data or {}).get("primary_format", "caption_text")
+    int_key = (style_data or {}).get("primary_intent", "commerce")
+    profile = get_merged_profile(fmt_key, int_key)
+
+    rx_report = generate_prescriptions(
+        recipe, profile, stt_data=stt_data, caption_map=cap_map, video_name=video_name,
+    )
+    rx_path = out / f"{video_name}_prescriptions.json"
+    rx_path.write_text(json.dumps(rx_report.to_dict(), indent=2, ensure_ascii=False))
+    elapsed = time.perf_counter() - t0
+    print(f"           → {rx_report.total_prescriptions} prescriptions "
+          f"(🔴{rx_report.danger_count} ⚠️{rx_report.warning_count})")
+    if rx_report.top_3_actions:
+        print(f"           → Top 3:")
+        for i, action in enumerate(rx_report.top_3_actions, 1):
+            print(f"             {i}. {action[:80]}")
+    print(f"           → {rx_path.name} ({elapsed:.1f}s)")
+
+    # Phase 7b: Marketer Judge (Gemini-powered verdict)
+    print(f"\n[Phase 7b] Running Marketer Judge (Gemini) ...")
+    frame_quals = None
+    if qual_path.exists():
+        frame_quals = json.loads(qual_path.read_text())
+
+    verdict = run_marketer_judge(
+        recipe=recipe_data,
+        diagnosis=diagnosis.to_dict(),
+        frame_quals=frame_quals,
+        stt_data=stt_data,
+        style_data=style_data,
+        caption_map=cap_map,
+        raw_temporal=raw_temporal,
+        product_name=product_name,
+        product_category=product_category,
+        product_key_factors=product_key_factors,
+    )
+    verdict_path = out / f"{video_name}_verdict.json"
+    verdict_path.write_text(json.dumps(verdict.to_dict(), indent=2, ensure_ascii=False))
+    verdict_md_path = out / f"{video_name}_verdict.md"
+    verdict_md_path.write_text(verdict.full_markdown)
+    print(f"           → Verdict: {verdict.verdict}")
+    print(f"           → {verdict_path.name}, {verdict_md_path.name}")
+
+
+def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, format_hint: str | None = None, intent_hint: str | None = None, product_name: str = "", product_category: str = "") -> None:
+    """Run all phases end-to-end."""
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from src.scene_detect import detect_scenes
+
+    out, video_name = _resolve_output_dir(output_dir, video_path)
+
+    # ── Parallel Phase 0 + 0.1 + 0.5 + frame extraction ──────────────────
+    print(f"\n{'='*60}")
+    print(f"[Parallel] Phase 0 (STT) + 0.1 (Style) + 0.5 (SceneDetect) + Frame extraction")
+    print(f"{'='*60}")
+    t_parallel = time.perf_counter()
+
+    stt_result = None
+    style = None
+    scene_boundaries = None
+    cut_timestamps = None
+    frames = None
+    parallel_errors = []
+
+    def _do_stt():
+        return run_phase_0(video_path, output_dir)
+
+    def _do_style():
+        return run_phase_0_1(video_path, output_dir, format_hint=format_hint, intent_hint=intent_hint)
+
+    def _do_scene_detect():
+        print(f"[Phase 0.5] Running PySceneDetect (original video, full fps) ...")
+        t0 = time.perf_counter()
+        sb, ct = detect_scenes(str(video_path))
+        elapsed = time.perf_counter() - t0
+        print(f"            → {len(sb)} scenes, {len(ct)} cuts ({elapsed:.1f}s)")
+        sd_path = out / f"{video_name}_scene_detect.json"
+        sd_path.write_text(json.dumps({
+            "boundaries": sb,
+            "cut_timestamps": ct,
+        }, indent=2))
+        print(f"            → saved to {sd_path}")
+        return sb, ct
+
+    def _do_frames():
+        print(f"[Phase 0+1] Extracting frames at 2fps ({resolution}p) + quant ...")
+        t0 = time.perf_counter()
+        _frames = extract_frames(video_path, max_dimension=resolution)
+        print(f"            → {len(_frames)} frames extracted ({time.perf_counter() - t0:.1f}s)")
+
+        # Phase 1: quant (OpenCV) — runs in same thread, no API calls
+        t1 = time.perf_counter()
+        quants = []
+        for i, frame in enumerate(_frames):
+            prev_bgr = _frames[i - 1].image if i > 0 else None
+            q = analyse_frame_quant(frame.image, frame.timestamp, prev_bgr)
+            quants.append(q)
+        print(f"[Phase 1]   → quant done ({time.perf_counter() - t1:.1f}s)")
+
+        # Save quant
+        quant_path = out / f"{video_name}_frame_quant.json"
+        quant_path.write_text(json.dumps([q.model_dump() for q in quants], indent=2, ensure_ascii=False))
+        return _frames, quants
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        fut_stt = executor.submit(_do_stt)
+        fut_style = executor.submit(_do_style)
+        fut_sd = executor.submit(_do_scene_detect)
+        fut_frames = executor.submit(_do_frames)
+
+        for fut in as_completed([fut_stt, fut_style, fut_sd, fut_frames]):
+            try:
+                if fut is fut_stt:
+                    stt_result = fut.result()
+                    if stt_result.narration_type == "silent" and not stt_result.segments:
+                        print("  ℹ️  STT: 음성 없음 (silent). 캡션 트랙으로 분석합니다.")
+                elif fut is fut_style:
+                    style = fut.result()
+                    if style.format_confidence == 0.0:
+                        print("  ⚠️  Style 분류 신뢰도 0%. 결과를 확인하세요.")
+                elif fut is fut_sd:
+                    scene_boundaries, cut_timestamps = fut.result()
+                elif fut is fut_frames:
+                    frames, quants_early = fut.result()
+            except Exception as e:
+                parallel_errors.append(str(e))
+                print(f"  ❌ Parallel task error: {e}")
+
+    if parallel_errors:
+        raise RuntimeError(f"Parallel phase failures: {'; '.join(parallel_errors)}")
+
+    elapsed_parallel = time.perf_counter() - t_parallel
+    print(f"\n[Parallel] All done in {elapsed_parallel:.1f}s (was sequential before)")
+    print(f"{'='*60}\n")
+
+    # ── Phase 2: frame_qual (Gemini Flash) — needs frames from parallel ───
+    print(f"[Phase 2] Running frame_qual (Gemini Flash) ...")
+    t0 = time.perf_counter()
+    jpeg_frames = [(f.timestamp, f.jpeg_bytes) for f in frames]
+    quals = asyncio.run(analyse_frames_qual(jpeg_frames, quants_early))
+    print(f"          → done ({time.perf_counter() - t0:.1f}s)")
+
+    # Save qual + combined
+    qual_path = out / f"{video_name}_frame_qual.json"
+    qual_data = [q.model_dump() for q in quals]
+    qual_path.write_text(json.dumps(qual_data, indent=2, ensure_ascii=False))
+
+    combined = [
+        FrameAnalysis(quant=q, qual=ql).model_dump()
+        for q, ql in zip(quants_early, quals)
+    ]
+    combined_path = out / f"{video_name}_frames.json"
+    combined_path.write_text(json.dumps(combined, indent=2, ensure_ascii=False))
 
     # Phase 2.5: temporal analysis (local, no API)
     temporal = run_phase_2_5(output_dir, video_path)
@@ -330,14 +612,23 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720) -
     if _qual_path4.exists():
         _frame_quals4 = json.loads(_qual_path4.read_text())
 
-    # Phase 4: video analysis (Gemini)
-    video_analysis = run_phase_4(video_path, output_dir, resolution=resolution, frame_quals=_frame_quals4)
+    # Phase 4: video analysis (Gemini) — with STT + style context
+    video_analysis = run_phase_4(
+        video_path, output_dir, resolution=resolution, frame_quals=_frame_quals4,
+        narration_type=stt_result.narration_type,
+        stt_transcript=stt_result.full_transcript,
+        style_classification=style.to_dict(),
+    )
 
     # Phase 5: scene merger — merge Phase 3 + Phase 4 (local, no API)
     merged_scenes = run_phase_5(output_dir, video_path, scenes=scenes, video_analysis=video_analysis)
 
     # Phase 6: recipe builder (includes temporal profile + production guide)
     run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal)
+
+    # Phase 7: Integrated analysis + prescriptions (C-8, C-9, C-10)
+    run_phase_7(output_dir, video_path, stt_data=stt_result.to_dict(), style_data=style.to_dict(),
+                product_name=product_name, product_category=product_category)
 
 
 # ── compare 서브커맨드 ──────────────────────────────────────────────────────────
@@ -412,8 +703,15 @@ def cmd_report(args: argparse.Namespace) -> None:
 
 def cmd_analyze(args: argparse.Namespace) -> None:
     """analyze 서브커맨드: 영상 분석 파이프라인 실행."""
+    fmt_hint = getattr(args, 'fmt', None)
+    intent_hint = getattr(args, 'intent', None)
+
     if args.quant_only:
         run_phase_1_2(args.video, args.output, quant_only=True)
+    elif args.phase == "0":
+        run_phase_0(args.video, args.output)
+    elif args.phase == "0.1":
+        run_phase_0_1(args.video, args.output, format_hint=fmt_hint, intent_hint=intent_hint)
     elif args.phase == "1":
         run_phase_1_2(args.video, args.output, quant_only=True, resolution=args.resolution)
     elif args.phase == "2":
@@ -423,13 +721,41 @@ def cmd_analyze(args: argparse.Namespace) -> None:
     elif args.phase == "3":
         run_phase_3(args.output, args.video)
     elif args.phase == "4":
-        run_phase_4(args.video, args.output, resolution=args.resolution)
+        # Load Phase 0/0.1 results from disk if available
+        _out4, _vn4 = _resolve_output_dir(args.output, args.video)
+        _stt_path = _out4 / f"{_vn4}_stt.json"
+        _style_path = _out4 / f"{_vn4}_style.json"
+        _qual_path = _out4 / f"{_vn4}_frame_qual.json"
+        _nt, _st, _sc, _fq = None, None, None, None
+        if _stt_path.exists():
+            _stt_data = json.loads(_stt_path.read_text())
+            _nt = _stt_data.get("narration_type")
+            _st = _stt_data.get("full_transcript")
+            print(f"  ℹ️  Loaded STT: narration_type={_nt}, {_stt_data.get('segment_count', 0)} segments")
+        else:
+            print(f"  ⚠️  STT 결과 없음 ({_stt_path.name}). Phase 0을 먼저 실행하세요.")
+        if _style_path.exists():
+            _sc = json.loads(_style_path.read_text())
+            print(f"  ℹ️  Loaded style: {_sc.get('primary_format', '?')} × {_sc.get('primary_intent', '?')}")
+        else:
+            print(f"  ⚠️  Style 분류 없음 ({_style_path.name}). Phase 0.1을 먼저 실행하세요.")
+        if _qual_path.exists():
+            _fq = json.loads(_qual_path.read_text())
+        run_phase_4(args.video, args.output, resolution=args.resolution,
+                    frame_quals=_fq, narration_type=_nt, stt_transcript=_st,
+                    style_classification=_sc)
     elif args.phase == "5":
         run_phase_5(args.output, args.video)
     elif args.phase == "6":
         run_phase_6(args.output, args.video)
+    elif args.phase == "7":
+        run_phase_7(args.output, args.video)
     else:
-        run_full_pipeline(args.video, args.output, resolution=args.resolution)
+        product_name = getattr(args, 'product_name', '') or ''
+        product_category = getattr(args, 'product_category', '') or ''
+        run_full_pipeline(args.video, args.output, resolution=args.resolution,
+                          format_hint=fmt_hint, intent_hint=intent_hint,
+                          product_name=product_name, product_category=product_category)
 
 
 def main() -> None:
@@ -458,12 +784,31 @@ Examples:
         help="Run only Phase 1 (OpenCV quant) — no Gemini API calls",
     )
     analyze_parser.add_argument(
-        "--phase", type=str, choices=["1", "2", "2.5", "3", "4", "5", "6"],
+        "--phase", type=str, choices=["0", "0.1", "1", "2", "2.5", "3", "4", "5", "6", "7"],
         help="Run only a specific phase (assumes previous phase data exists)",
     )
     analyze_parser.add_argument(
         "--resolution", type=int, choices=[480, 720], default=720,
         help="Frame/video resolution: 720 (default) or 480 (faster/smaller)",
+    )
+    analyze_parser.add_argument(
+        "--format", dest="fmt", type=str, default=None,
+        choices=["talking_head", "ugc_vlog", "caption_text", "product_demo",
+                 "asmr_mood", "comparison", "story_problem", "listicle", "entertainment"],
+        help="Manual video format (default: Auto)",
+    )
+    analyze_parser.add_argument(
+        "--intent", type=str, default=None,
+        choices=["commerce", "branding", "information", "entertainment"],
+        help="Manual video intent (default: Auto)",
+    )
+    analyze_parser.add_argument(
+        "--product-name", type=str, default="",
+        help="Product name for verdict analysis",
+    )
+    analyze_parser.add_argument(
+        "--product-category", type=str, default="",
+        help="Product category for verdict analysis",
     )
 
     # ── compare 서브커맨드 ──────────────────────────────────────────────────────
@@ -507,7 +852,7 @@ Examples:
         legacy_parser.add_argument("video")
         legacy_parser.add_argument("--output", "-o", default="output")
         legacy_parser.add_argument("--quant-only", action="store_true")
-        legacy_parser.add_argument("--phase", type=str, choices=["1", "2", "2.5", "3", "4", "5", "6"])
+        legacy_parser.add_argument("--phase", type=str, choices=["0", "0.1", "1", "2", "2.5", "3", "4", "5", "6", "7"])
         legacy_parser.add_argument("--resolution", type=int, choices=[480, 720], default=720)
 
         # 원래 sys.argv에서 파싱

@@ -17,6 +17,8 @@ async function authHeaders(): Promise<Record<string, string>> {
 export async function createJob(
   file: File,
   onProgress?: (percent: number) => void,
+  productName?: string,
+  productCategory?: string,
 ): Promise<{ id: string }> {
   const headers = await authHeaders();
 
@@ -65,6 +67,8 @@ export async function createJob(
       r2_key,
       filename: file.name,
       file_size_mb: file.size / (1024 * 1024),
+      product_name: productName || null,
+      product_category: productCategory || null,
     }),
   });
   if (!analyzeRes.ok) {
@@ -100,6 +104,7 @@ export async function getResult(id: string): Promise<AnalysisResult> {
     stt: data.stt_json || null,
     style: data.style_json || null,
     caption_map: data.caption_map_json || null,
+    verdict: data.verdict_json || null,
     video_url: data.video_url || null,
   };
 }

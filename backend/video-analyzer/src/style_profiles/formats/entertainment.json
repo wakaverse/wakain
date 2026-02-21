@@ -1,0 +1,30 @@
+{
+  "name": "entertainment",
+  "name_ko": "엔터테인먼트형",
+  "description": "반전/유머/밈 중심",
+  "dimension_weights": {
+    "visual_stimulus": 0.25,
+    "persuasion_density": 0.15,
+    "information_density": 0.10,
+    "edit_rhythm": 0.25,
+    "audio_stimulus": 0.25
+  },
+  "key_metrics": ["twist_timing", "humor_density", "replay_factor", "share_potential"],
+  "less_important_metrics": ["information_density", "specification"],
+  "effective_appeals": ["humor", "surprise", "trend", "relatability"],
+  "weak_appeals": ["specification", "spec_data", "price"],
+  "recommended_structure": ["hook", "twist_1", "twist_2", "twist_3", "cta"],
+  "prescriptions": {
+    "cut_density_low": {"level": "warning", "message": "엔터테인먼트형은 빠른 편집 리듬이 핵심입니다."},
+    "cut_density_high": {"level": "ok", "message": "빠른 전환이 유머와 반전 효과를 극대화합니다."},
+    "appeal_gap_3s": {"level": "info", "message": "반전 빌드업 구간이면 괜찮습니다."},
+    "first_appeal_late": {"level": "warning", "message": "첫 웃음/호기심 포인트를 빨리 던져야 이탈을 막습니다."},
+    "text_heavy": {"level": "info", "message": "밈 텍스트는 효과적이지만, 너무 많으면 템포가 느려집니다."}
+  },
+  "thresholds": {
+    "first_appeal_max_sec": 2.0,
+    "appeal_gap_max_sec": 4.0,
+    "cut_density_min": 0.3,
+    "cut_density_max": 2.0
+  }
+}
