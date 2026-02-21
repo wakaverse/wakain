@@ -64,13 +64,19 @@ export async function compressTo480p(
     }
 
     const vt = videoTrack as unknown as { displayHeight: number; displayWidth: number };
-    if (vt.displayHeight <= TARGET_HEIGHT) {
-      console.log(`[videoCompress] Already ${vt.displayHeight}p, skipping`);
+    const shortEdge = Math.min(vt.displayWidth, vt.displayHeight);
+    if (shortEdge <= TARGET_HEIGHT) {
+      console.log(`[videoCompress] Short edge ${shortEdge}p already ≤ ${TARGET_HEIGHT}p, skipping`);
       onProgress?.({ phase: 'skipped', progress: 1 });
       return file;
     }
 
-    console.log(`[videoCompress] ${vt.displayWidth}x${vt.displayHeight} → 480p`);
+    // Resize by short edge = 480, preserve aspect ratio
+    const scale = TARGET_HEIGHT / shortEdge;
+    const outW = Math.round(vt.displayWidth * scale / 2) * 2;  // even number for H.264
+    const outH = Math.round(vt.displayHeight * scale / 2) * 2;
+
+    console.log(`[videoCompress] ${vt.displayWidth}x${vt.displayHeight} → ${outW}x${outH}`);
 
     // Set up output
     const target = new BufferTarget();
@@ -81,7 +87,8 @@ export async function compressTo480p(
       input,
       output,
       video: {
-        height: TARGET_HEIGHT,
+        width: outW,
+        height: outH,
         codec: 'avc', // H.264 for maximum compatibility
         bitrate: TARGET_BITRATE,
       },
