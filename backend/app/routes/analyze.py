@@ -114,6 +114,7 @@ async def analyze_video(
         "status": "pending",
         "video_name": body.filename,
         "video_size_mb": round(body.file_size_mb, 2),
+        "video_url": body.r2_key,
     }).execute()
 
     # Start background analysis (worker downloads from R2)

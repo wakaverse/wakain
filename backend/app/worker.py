@@ -111,6 +111,10 @@ def run_analysis(job_id: str, r2_key: str) -> None:
 
         recipe_json = json.loads(recipe_path.read_text(encoding="utf-8"))
 
+        # Load additional analysis files (optional — may not exist)
+        analysis_dir = recipe_path.parent
+        extra = _load_extra_analysis(analysis_dir, video_name)
+
         # Build a lightweight summary for fast loading
         summary = _build_summary(recipe_json)
 
@@ -119,6 +123,7 @@ def run_analysis(job_id: str, r2_key: str) -> None:
             "job_id": job_id,
             "recipe_json": recipe_json,
             "summary_json": summary,
+            **extra,
         }).execute()
 
         # Mark job completed
@@ -144,11 +149,28 @@ def run_analysis(job_id: str, r2_key: str) -> None:
             Path(video_path).unlink(missing_ok=True)
         except Exception:
             pass
-        # Clean up video from R2 (privacy)
-        try:
-            _s3().delete_object(Bucket=R2_BUCKET_NAME, Key=r2_key)
-        except Exception:
-            pass
+        # Keep video in R2 for frontend video player
+        # (presigned GET URLs are generated on demand by the results endpoint)
+
+
+def _load_extra_analysis(analysis_dir: Path, video_name: str) -> dict:
+    """Load optional analysis JSON files produced by the pipeline."""
+    extra: dict = {}
+    file_map = {
+        "diagnosis_json": f"{video_name}_diagnosis.json",
+        "prescriptions_json": f"{video_name}_prescriptions.json",
+        "stt_json": f"{video_name}_stt.json",
+        "style_json": f"{video_name}_style.json",
+        "caption_map_json": f"{video_name}_caption_map.json",
+    }
+    for col, fname in file_map.items():
+        fpath = analysis_dir / fname
+        if fpath.exists():
+            try:
+                extra[col] = json.loads(fpath.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+    return extra
 
 
 def _build_summary(recipe_json: dict) -> dict:

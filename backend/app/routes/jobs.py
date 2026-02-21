@@ -1,7 +1,16 @@
+import boto3
+from botocore.config import Config as BotoConfig
 from fastapi import APIRouter, Depends, HTTPException
 from supabase import create_client
 
-from app.config import SUPABASE_URL, SUPABASE_SERVICE_KEY
+from app.config import (
+    SUPABASE_URL,
+    SUPABASE_SERVICE_KEY,
+    R2_ACCESS_KEY_ID,
+    R2_SECRET_ACCESS_KEY,
+    R2_BUCKET_NAME,
+    R2_ENDPOINT,
+)
 from app.auth import get_current_user
 
 router = APIRouter()
@@ -9,6 +18,17 @@ router = APIRouter()
 
 def get_supabase():
     return create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+
+def _s3():
+    return boto3.client(
+        "s3",
+        endpoint_url=R2_ENDPOINT,
+        aws_access_key_id=R2_ACCESS_KEY_ID,
+        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        config=BotoConfig(signature_version="s3v4"),
+        region_name="auto",
+    )
 
 
 @router.get("/jobs")
@@ -47,4 +67,22 @@ async def get_result(job_id: str, user: dict = Depends(get_current_user)):
     )
     if not response.data:
         raise HTTPException(status_code=404, detail="Result not found")
-    return response.data
+
+    result = response.data
+
+    # Generate presigned video URL from the R2 key stored in jobs.video_url
+    job_resp = supabase.table("jobs").select("video_url").eq("id", job_id).single().execute()
+    r2_key = job_resp.data.get("video_url") if job_resp.data else None
+    if r2_key and r2_key.startswith("uploads/"):
+        try:
+            result["video_url"] = _s3().generate_presigned_url(
+                "get_object",
+                Params={"Bucket": R2_BUCKET_NAME, "Key": r2_key},
+                ExpiresIn=3600,
+            )
+        except Exception:
+            result["video_url"] = None
+    else:
+        result["video_url"] = None
+
+    return result

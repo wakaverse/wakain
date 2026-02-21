@@ -153,9 +153,18 @@ export interface VideoRecipe {
     };
     art_direction: {
       tone_and_manner: string;
+      heading_font?: string;
+      body_font?: string;
+      font_color_system?: string[];
       highlight_method: string;
       brand_colors: string[];
+      background_style?: string;
+      color_temperature?: string;
       graphic_style: string;
+      recurring_elements?: string[];
+      text_position_pattern?: string;
+      frame_composition_rule?: string;
+      visual_consistency?: string;
       style_reference: string;
     };
     effectiveness_assessment: {
@@ -171,4 +180,116 @@ export interface VideoRecipe {
     dropoff_analysis: DropoffAnalysis;
     performance_metrics: PerformanceMetrics;
   };
+}
+
+// ─── New analysis data types ───
+
+export interface DiagnosisDimension {
+  name: string;
+  name_ko: string;
+  value: number;
+  weight: number;
+  weighted: number;
+  evidence: string;
+}
+
+export interface DiagnosisEntry {
+  time_range: string;
+  severity: 'ok' | 'warning' | 'danger';
+  finding: string;
+  prescription: string;
+  dimension: string;
+  style_context: string;
+}
+
+export interface Diagnosis {
+  classification: {
+    format: string;
+    format_ko: string;
+    intent: string;
+    intent_ko: string;
+    secondary_format: string;
+    narration_type: string;
+  };
+  dimensions: DiagnosisDimension[];
+  engagement_score: number;
+  diagnoses: DiagnosisEntry[];
+  summary: string;
+  strengths: string[];
+  weaknesses: string[];
+}
+
+export interface Prescription {
+  category: string;
+  severity: 'info' | 'warning' | 'danger';
+  symptom: string;
+  recommendation: string;
+  impact: string;
+  priority: number;
+}
+
+export interface Prescriptions {
+  video_name: string;
+  style_label: string;
+  total_prescriptions: number;
+  danger_count: number;
+  warning_count: number;
+  top_3_actions: string[];
+  prescriptions: Prescription[];
+}
+
+export interface SttSegment {
+  text: string;
+  start: number;
+  end: number;
+  words?: Array<{ word: string; start: number; end: number }>;
+}
+
+export interface Stt {
+  narration_type: string;
+  total_speech_sec: number;
+  full_transcript: string;
+  segment_count: number;
+  segments: SttSegment[];
+}
+
+export interface Style {
+  primary_format: string;
+  primary_format_ko: string;
+  secondary_format: string;
+  secondary_format_ko: string;
+  primary_intent: string;
+  primary_intent_ko: string;
+  format_confidence: number;
+  intent_confidence: number;
+  auto_classified: boolean;
+  reasoning: string;
+}
+
+export interface CaptionEvent {
+  start: number;
+  end: number;
+  duration: number;
+  text: string;
+  full_text: string;
+  purpose: string;
+  font_style: string;
+  narrative_role: string;
+}
+
+export interface CaptionMap {
+  caption_count: number;
+  total_caption_time: number;
+  narrative_flow: string[];
+  events: CaptionEvent[];
+}
+
+export interface AnalysisResult {
+  video_recipe: VideoRecipe;
+  diagnosis: Diagnosis | null;
+  prescriptions: Prescriptions | null;
+  stt: Stt | null;
+  style: Style | null;
+  caption_map: CaptionMap | null;
+  video_url: string | null;
 }
