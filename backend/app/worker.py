@@ -79,21 +79,34 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
         if product_category:
             cmd.extend(["--product-category", product_category])
 
-        result = subprocess.run(
+        import logging
+        logger = logging.getLogger("pipeline")
+
+        proc = subprocess.Popen(
             cmd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
             cwd=ANALYZER_DIR,
-            timeout=600,  # 10 min hard limit
         )
 
-        if result.returncode != 0:
-            error_msg = result.stderr[-2000:] if result.stderr else "Pipeline exited non-zero"
+        # Stream output to Cloud Logging in real-time
+        output_lines = []
+        for line in proc.stdout:
+            line = line.rstrip()
+            if line:
+                logger.info(f"[pipeline:{job_id[:8]}] {line}")
+                output_lines.append(line)
+
+        proc.wait(timeout=600)
+
+        if proc.returncode != 0:
+            error_msg = "\n".join(output_lines[-50:]) or "Pipeline exited non-zero"
             _update_job(
                 job_id,
                 status="failed",
                 completed_at=_now(),
-                error_message=error_msg,
+                error_message=error_msg[-2000:],
             )
             return
 
