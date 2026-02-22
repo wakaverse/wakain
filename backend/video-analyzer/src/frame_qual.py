@@ -20,8 +20,8 @@ from google.genai import types
 from .schemas import FrameQual, FrameQuant
 
 MODEL = "gemini-2.5-flash"
-MAX_CONCURRENCY = 10  # simultaneous API calls
-REQUEST_DELAY = 0.3   # seconds between requests
+MAX_CONCURRENCY = 20  # simultaneous API calls (Tier 3: 2000 RPM)
+REQUEST_DELAY = 0.1   # seconds between requests
 
 SYSTEM_INSTRUCTION = """\
 You are a shortform marketing video analyst. You analyse individual frames
@@ -143,20 +143,57 @@ async def analyse_frames_qual(
 ) -> list[FrameQual]:
     """Analyse all frames in parallel with throttling.
 
+    Stagnant frames (low visual change) are skipped and inherit the previous
+    frame's result with updated timestamp — saves ~5-15% of API calls.
+
     Parameters
     ----------
     jpeg_frames : list of (timestamp, jpeg_bytes)
     quants : list of FrameQuant matching each frame
-    concurrency : max simultaneous API calls (default 10)
+    concurrency : max simultaneous API calls (default 20)
     """
     client = _make_client()
     semaphore = asyncio.Semaphore(concurrency)
 
+    # Identify stagnant frames to skip (copy from previous)
+    skip_indices: set[int] = set()
+    for i, q in enumerate(quants):
+        if i > 0 and q.is_stagnant and q.color_diff < 3.0 and q.edge_diff < 3.0:
+            skip_indices.add(i)
+
+    if skip_indices:
+        print(f"  Skipping {len(skip_indices)} stagnant frames (will copy from previous)")
+
+    # Create tasks only for non-skipped frames
+    active_indices = [i for i in range(len(jpeg_frames)) if i not in skip_indices]
     tasks = [
-        analyse_frame_qual(client, semaphore, jpeg_bytes, timestamp, quant)
-        for (timestamp, jpeg_bytes), quant in zip(jpeg_frames, quants)
+        analyse_frame_qual(client, semaphore, jpeg_frames[i][1], jpeg_frames[i][0], quants[i])
+        for i in active_indices
     ]
 
-    results = await asyncio.gather(*tasks)
-    # Sort by timestamp to maintain order
-    return sorted(results, key=lambda q: q.timestamp)
+    active_results = await asyncio.gather(*tasks)
+
+    # Build result map: index → FrameQual
+    result_map: dict[int, FrameQual] = {}
+    for idx, result in zip(active_indices, active_results):
+        result_map[idx] = result
+
+    # Fill in skipped frames by copying previous result with updated timestamp
+    all_results: list[FrameQual] = []
+    for i in range(len(jpeg_frames)):
+        if i in result_map:
+            all_results.append(result_map[i])
+        elif all_results:
+            # Copy previous result with new timestamp
+            prev = all_results[-1]
+            copied = prev.model_copy(update={"timestamp": jpeg_frames[i][0]})
+            all_results.append(copied)
+        else:
+            # Edge case: first frame is stagnant (shouldn't happen)
+            # Force analyse it
+            result = await analyse_frame_qual(
+                client, semaphore, jpeg_frames[i][1], jpeg_frames[i][0], quants[i]
+            )
+            all_results.append(result)
+
+    return sorted(all_results, key=lambda q: q.timestamp)
