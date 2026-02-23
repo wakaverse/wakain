@@ -8,14 +8,14 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Install Python deps
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy video-analyzer code (bundled at build time)
-COPY video-analyzer/ /app/video-analyzer/
+COPY analyzer/ /app/video-analyzer/
 
 # Copy backend app
-COPY app/ /app/app/
+COPY backend/app/ /app/app/
 
 # Expose Cloud Run default port
 EXPOSE 8080

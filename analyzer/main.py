@@ -489,163 +489,56 @@ def run_phase_7(
     print(f"           → {verdict_path.name}, {verdict_md_path.name}")
 
 
-def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, format_hint: str | None = None, intent_hint: str | None = None, product_name: str = "", product_category: str = "") -> None:
+def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, format_hint: str | None = None, intent_hint: str | None = None) -> None:
     """Run all phases end-to-end."""
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-    from src.scene_detect import detect_scenes
-
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
-    # ── Parallel Phase 0 + 0.1 + 0.5 + frame extraction ──────────────────
-    print(f"\n{'='*60}")
-    print(f"[Parallel] Phase 0 (STT) + 0.1 (Style) + 0.5 (SceneDetect) + Frame extraction")
-    print(f"{'='*60}")
-    t_parallel = time.perf_counter()
+    # Phase 0: STT extraction (Soniox)
+    stt_result = run_phase_0(video_path, output_dir)
+    if stt_result.narration_type == "silent" and not stt_result.segments:
+        print("  ℹ️  STT: 음성 없음 (silent). 캡션 트랙으로 분석합니다.")
 
-    stt_result = None
-    style = None
-    scene_boundaries = None
-    cut_timestamps = None
-    frames = None
-    parallel_errors = []
+    # Phase 0.1: Style classification (Format × Intent)
+    style = run_phase_0_1(video_path, output_dir, format_hint=format_hint, intent_hint=intent_hint)
+    if style.format_confidence == 0.0:
+        print("  ⚠️  Style 분류 신뢰도 0%. 결과를 확인하세요.")
 
-    def _do_stt():
-        return run_phase_0(video_path, output_dir)
+    # Phase 0.5: PySceneDetect — run on original video (full fps, resolution-independent)
+    from src.scene_detect import detect_scenes
+    print(f"[Phase 0.5] Running PySceneDetect (original video, full fps) ...")
+    t0 = time.perf_counter()
+    scene_boundaries, cut_timestamps = detect_scenes(str(video_path))
+    print(f"            → {len(scene_boundaries)} scenes, {len(cut_timestamps)} cuts ({time.perf_counter() - t0:.1f}s)")
+    sd_path = out / f"{video_name}_scene_detect.json"
+    sd_path.write_text(json.dumps({
+        "boundaries": scene_boundaries,
+        "cut_timestamps": cut_timestamps,
+    }, indent=2))
+    print(f"            → saved to {sd_path}")
 
-    def _do_style():
-        return run_phase_0_1(video_path, output_dir, format_hint=format_hint, intent_hint=intent_hint)
-
-    def _do_scene_detect():
-        print(f"[Phase 0.5] Running PySceneDetect (original video, full fps) ...")
-        t0 = time.perf_counter()
-        sb, ct = detect_scenes(str(video_path))
-        elapsed = time.perf_counter() - t0
-        print(f"            → {len(sb)} scenes, {len(ct)} cuts ({elapsed:.1f}s)")
-        sd_path = out / f"{video_name}_scene_detect.json"
-        sd_path.write_text(json.dumps({
-            "boundaries": sb,
-            "cut_timestamps": ct,
-        }, indent=2))
-        print(f"            → saved to {sd_path}")
-        return sb, ct
-
-    def _do_frames():
-        print(f"[Phase 0+1] Extracting frames at 2fps ({resolution}p) + quant ...")
-        t0 = time.perf_counter()
-        _frames = extract_frames(video_path, max_dimension=resolution)
-        print(f"            → {len(_frames)} frames extracted ({time.perf_counter() - t0:.1f}s)")
-
-        # Phase 1: quant (OpenCV) — runs in same thread, no API calls
-        t1 = time.perf_counter()
-        quants = []
-        for i, frame in enumerate(_frames):
-            prev_bgr = _frames[i - 1].image if i > 0 else None
-            q = analyse_frame_quant(frame.image, frame.timestamp, prev_bgr)
-            quants.append(q)
-        print(f"[Phase 1]   → quant done ({time.perf_counter() - t1:.1f}s)")
-
-        # Save quant
-        quant_path = out / f"{video_name}_frame_quant.json"
-        quant_path.write_text(json.dumps([q.model_dump() for q in quants], indent=2, ensure_ascii=False))
-        return _frames, quants
-
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        fut_stt = executor.submit(_do_stt)
-        fut_style = executor.submit(_do_style)
-        fut_sd = executor.submit(_do_scene_detect)
-        fut_frames = executor.submit(_do_frames)
-
-        for fut in as_completed([fut_stt, fut_style, fut_sd, fut_frames]):
-            try:
-                if fut is fut_stt:
-                    stt_result = fut.result()
-                    if stt_result.narration_type == "silent" and not stt_result.segments:
-                        print("  ℹ️  STT: 음성 없음 (silent). 캡션 트랙으로 분석합니다.")
-                elif fut is fut_style:
-                    style = fut.result()
-                    if style.format_confidence == 0.0:
-                        print("  ⚠️  Style 분류 신뢰도 0%. 결과를 확인하세요.")
-                elif fut is fut_sd:
-                    scene_boundaries, cut_timestamps = fut.result()
-                elif fut is fut_frames:
-                    frames, quants_early = fut.result()
-            except Exception as e:
-                parallel_errors.append(str(e))
-                print(f"  ❌ Parallel task error: {e}")
-
-    if parallel_errors:
-        raise RuntimeError(f"Parallel phase failures: {'; '.join(parallel_errors)}")
-
-    elapsed_parallel = time.perf_counter() - t_parallel
-    print(f"\n[Parallel] All done in {elapsed_parallel:.1f}s (was sequential before)")
-    print(f"{'='*60}\n")
-
-    # ── Phase 2 + Phase 4: 병렬 실행 (둘 다 Gemini API 호출, 서로 독립적) ───
-    print(f"\n{'='*60}")
-    print(f"[Parallel] Phase 2 (frame_qual) + Phase 4 (video analysis) — 동시 실행")
-    print(f"{'='*60}")
-    t_phase24 = time.perf_counter()
-
-    quals = None
-    video_analysis = None
-    phase24_errors = []
-
-    def _do_phase2():
-        """Phase 2: frame_qual (Gemini Flash) — 프레임별 OCR + 어필 분석"""
-        print(f"[Phase 2] Running frame_qual (Gemini Flash) ...")
-        _t0 = time.perf_counter()
-        _jpeg_frames = [(f.timestamp, f.jpeg_bytes) for f in frames]
-        _quals = asyncio.run(analyse_frames_qual(_jpeg_frames, quants_early))
-        print(f"[Phase 2] → done ({time.perf_counter() - _t0:.1f}s)")
-
-        # Save qual + combined
-        _qual_path = out / f"{video_name}_frame_qual.json"
-        _qual_data = [q.model_dump() for q in _quals]
-        _qual_path.write_text(json.dumps(_qual_data, indent=2, ensure_ascii=False))
-
-        _combined = [
-            FrameAnalysis(quant=q, qual=ql).model_dump()
-            for q, ql in zip(quants_early, _quals)
-        ]
-        _combined_path = out / f"{video_name}_frames.json"
-        _combined_path.write_text(json.dumps(_combined, indent=2, ensure_ascii=False))
-        return _quals
-
-    def _do_phase4():
-        """Phase 4: video analysis (Gemini) — 풀영상 업로드 분석 (frame_qual 없이 실행)"""
-        return run_phase_4(
-            video_path, output_dir, resolution=resolution, frame_quals=None,
-            narration_type=stt_result.narration_type,
-            stt_transcript=stt_result.full_transcript,
-            style_classification=style.to_dict(),
-        )
-
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        fut_p2 = executor.submit(_do_phase2)
-        fut_p4 = executor.submit(_do_phase4)
-
-        for fut in as_completed([fut_p2, fut_p4]):
-            try:
-                if fut is fut_p2:
-                    quals = fut.result()
-                elif fut is fut_p4:
-                    video_analysis = fut.result()
-            except Exception as e:
-                phase24_errors.append(str(e))
-                print(f"  ❌ Phase 2/4 error: {e}")
-
-    if phase24_errors:
-        raise RuntimeError(f"Phase 2/4 failures: {'; '.join(phase24_errors)}")
-
-    elapsed_phase24 = time.perf_counter() - t_phase24
-    print(f"\n[Parallel] Phase 2+4 done in {elapsed_phase24:.1f}s (was sequential ~{elapsed_phase24*1.7:.0f}s before)")
-    print(f"{'='*60}\n")
+    # Phase 1+2: frame extraction + quant + qual
+    run_phase_1_2(video_path, output_dir, quant_only=False, resolution=resolution)
 
     # Phase 2.5: temporal analysis (local, no API)
     temporal = run_phase_2_5(output_dir, video_path)
 
     # Phase 3: scene aggregator (local, no API)
     scenes = run_phase_3(output_dir, video_path, temporal=temporal)
+
+    # Load frame_qual results for Phase 4 OCR context
+    _out4, _vn4 = _resolve_output_dir(output_dir, video_path)
+    _qual_path4 = _out4 / f"{_vn4}_frame_qual.json"
+    _frame_quals4 = None
+    if _qual_path4.exists():
+        _frame_quals4 = json.loads(_qual_path4.read_text())
+
+    # Phase 4: video analysis (Gemini) — with STT + style context
+    video_analysis = run_phase_4(
+        video_path, output_dir, resolution=resolution, frame_quals=_frame_quals4,
+        narration_type=stt_result.narration_type,
+        stt_transcript=stt_result.full_transcript,
+        style_classification=style.to_dict(),
+    )
 
     # Phase 5: scene merger — merge Phase 3 + Phase 4 (local, no API)
     merged_scenes = run_phase_5(output_dir, video_path, scenes=scenes, video_analysis=video_analysis)
@@ -654,8 +547,7 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, f
     run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal)
 
     # Phase 7: Integrated analysis + prescriptions (C-8, C-9, C-10)
-    run_phase_7(output_dir, video_path, stt_data=stt_result.to_dict(), style_data=style.to_dict(),
-                product_name=product_name, product_category=product_category)
+    run_phase_7(output_dir, video_path, stt_data=stt_result.to_dict(), style_data=style.to_dict())
 
 
 # ── compare 서브커맨드 ──────────────────────────────────────────────────────────
@@ -778,11 +670,7 @@ def cmd_analyze(args: argparse.Namespace) -> None:
     elif args.phase == "7":
         run_phase_7(args.output, args.video)
     else:
-        product_name = getattr(args, 'product_name', '') or ''
-        product_category = getattr(args, 'product_category', '') or ''
-        run_full_pipeline(args.video, args.output, resolution=args.resolution,
-                          format_hint=fmt_hint, intent_hint=intent_hint,
-                          product_name=product_name, product_category=product_category)
+        run_full_pipeline(args.video, args.output, resolution=args.resolution, format_hint=fmt_hint, intent_hint=intent_hint)
 
 
 def main() -> None:
@@ -828,14 +716,6 @@ Examples:
         "--intent", type=str, default=None,
         choices=["commerce", "branding", "information", "entertainment"],
         help="Manual video intent (default: Auto)",
-    )
-    analyze_parser.add_argument(
-        "--product-name", type=str, default="",
-        help="Product name for verdict analysis",
-    )
-    analyze_parser.add_argument(
-        "--product-category", type=str, default="",
-        help="Product category for verdict analysis",
     )
 
     # ── compare 서브커맨드 ──────────────────────────────────────────────────────

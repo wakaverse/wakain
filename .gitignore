@@ -4,3 +4,8 @@ backend/uploads/
 backend/output/
 backend/__pycache__/
 frontend/.env
+
+# Analyzer
+analyzer/output/
+analyzer/samples/
+analyzer/.env

@@ -1,0 +1,14 @@
+.git
+.gitignore
+frontend/
+*.md
+backend/.env
+backend/uploads/
+backend/output/
+backend/venv/
+analyzer/output/
+analyzer/samples/
+analyzer/.env
+analyzer/__pycache__/
+analyzer/src/__pycache__/
+.wrangler/
