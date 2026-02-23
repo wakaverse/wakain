@@ -52,6 +52,7 @@ export default function DemoReportPage() {
           stt,
           style,
           caption_map,
+          verdict: null,
           video_url: null, // no video file for demo
         });
       })

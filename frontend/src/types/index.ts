@@ -291,5 +291,6 @@ export interface AnalysisResult {
   stt: Stt | null;
   style: Style | null;
   caption_map: CaptionMap | null;
+  verdict: Record<string, unknown> | null;
   video_url: string | null;
 }

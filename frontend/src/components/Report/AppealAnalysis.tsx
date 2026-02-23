@@ -84,7 +84,6 @@ function AttentionBar({ value }: { value: number }) {
 }
 
 function AppealItem({ appeal, onSeek }: { appeal: Appeal & { time: number }; onSeek: (t: number) => void }) {
-  const visual = isVisualAppeal(appeal);
   return (
     <div
       className="flex items-start gap-2 py-1.5 cursor-pointer hover:bg-gray-50 rounded px-1.5 -mx-1.5 transition-colors"
