@@ -5,16 +5,14 @@ import { getResult } from '../lib/api';
 import type { AnalysisResult } from '../types';
 import VideoPlayer, { type VideoPlayerHandle } from '../components/Report/VideoPlayer';
 import DimensionChart from '../components/Report/DimensionChart';
-import AppealTimeline from '../components/Report/AppealTimeline';
-import SceneCards from '../components/Report/SceneCards';
+import AppealAnalysis from '../components/Report/AppealAnalysis';
 import DiagnosisPanel from '../components/Report/DiagnosisPanel';
 import ArtDirectionPanel from '../components/Report/ArtDirectionPanel';
 
-type TabId = 'appeal' | 'scenes' | 'diagnosis' | 'art';
+type TabId = 'appeal' | 'diagnosis' | 'art';
 
 const tabs: { id: TabId; label: string; icon: string }[] = [
-  { id: 'appeal', label: '소구 흐름도', icon: '📌' },
-  { id: 'scenes', label: '씬 카드', icon: '🎬' },
+  { id: 'appeal', label: '소구 분석', icon: '📌' },
   { id: 'diagnosis', label: '진단서', icon: '🩺' },
   { id: 'art', label: '아트 디렉션', icon: '🎨' },
 ];
@@ -167,16 +165,9 @@ export default function ReportPage() {
             {/* 탭 콘텐츠 */}
             <div className="bg-white rounded-xl border p-5">
               {activeTab === 'appeal' && (
-                <AppealTimeline
+                <AppealAnalysis
                   scenes={sceneAnalyses}
                   duration={duration}
-                  onSeek={handleSeek}
-                  currentTime={currentTime}
-                />
-              )}
-              {activeTab === 'scenes' && (
-                <SceneCards
-                  scenes={sceneAnalyses}
                   onSeek={handleSeek}
                   currentTime={currentTime}
                 />
