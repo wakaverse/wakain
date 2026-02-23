@@ -580,45 +580,72 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, f
     print(f"\n[Parallel] All done in {elapsed_parallel:.1f}s (was sequential before)")
     print(f"{'='*60}\n")
 
-    # ── Phase 2: frame_qual (Gemini Flash) — needs frames from parallel ───
-    print(f"[Phase 2] Running frame_qual (Gemini Flash) ...")
-    t0 = time.perf_counter()
-    jpeg_frames = [(f.timestamp, f.jpeg_bytes) for f in frames]
-    quals = asyncio.run(analyse_frames_qual(jpeg_frames, quants_early))
-    print(f"          → done ({time.perf_counter() - t0:.1f}s)")
+    # ── Phase 2 + Phase 4: 병렬 실행 (둘 다 Gemini API 호출, 서로 독립적) ───
+    print(f"\n{'='*60}")
+    print(f"[Parallel] Phase 2 (frame_qual) + Phase 4 (video analysis) — 동시 실행")
+    print(f"{'='*60}")
+    t_phase24 = time.perf_counter()
 
-    # Save qual + combined
-    qual_path = out / f"{video_name}_frame_qual.json"
-    qual_data = [q.model_dump() for q in quals]
-    qual_path.write_text(json.dumps(qual_data, indent=2, ensure_ascii=False))
+    quals = None
+    video_analysis = None
+    phase24_errors = []
 
-    combined = [
-        FrameAnalysis(quant=q, qual=ql).model_dump()
-        for q, ql in zip(quants_early, quals)
-    ]
-    combined_path = out / f"{video_name}_frames.json"
-    combined_path.write_text(json.dumps(combined, indent=2, ensure_ascii=False))
+    def _do_phase2():
+        """Phase 2: frame_qual (Gemini Flash) — 프레임별 OCR + 어필 분석"""
+        print(f"[Phase 2] Running frame_qual (Gemini Flash) ...")
+        _t0 = time.perf_counter()
+        _jpeg_frames = [(f.timestamp, f.jpeg_bytes) for f in frames]
+        _quals = asyncio.run(analyse_frames_qual(_jpeg_frames, quants_early))
+        print(f"[Phase 2] → done ({time.perf_counter() - _t0:.1f}s)")
+
+        # Save qual + combined
+        _qual_path = out / f"{video_name}_frame_qual.json"
+        _qual_data = [q.model_dump() for q in _quals]
+        _qual_path.write_text(json.dumps(_qual_data, indent=2, ensure_ascii=False))
+
+        _combined = [
+            FrameAnalysis(quant=q, qual=ql).model_dump()
+            for q, ql in zip(quants_early, _quals)
+        ]
+        _combined_path = out / f"{video_name}_frames.json"
+        _combined_path.write_text(json.dumps(_combined, indent=2, ensure_ascii=False))
+        return _quals
+
+    def _do_phase4():
+        """Phase 4: video analysis (Gemini) — 풀영상 업로드 분석 (frame_qual 없이 실행)"""
+        return run_phase_4(
+            video_path, output_dir, resolution=resolution, frame_quals=None,
+            narration_type=stt_result.narration_type,
+            stt_transcript=stt_result.full_transcript,
+            style_classification=style.to_dict(),
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        fut_p2 = executor.submit(_do_phase2)
+        fut_p4 = executor.submit(_do_phase4)
+
+        for fut in as_completed([fut_p2, fut_p4]):
+            try:
+                if fut is fut_p2:
+                    quals = fut.result()
+                elif fut is fut_p4:
+                    video_analysis = fut.result()
+            except Exception as e:
+                phase24_errors.append(str(e))
+                print(f"  ❌ Phase 2/4 error: {e}")
+
+    if phase24_errors:
+        raise RuntimeError(f"Phase 2/4 failures: {'; '.join(phase24_errors)}")
+
+    elapsed_phase24 = time.perf_counter() - t_phase24
+    print(f"\n[Parallel] Phase 2+4 done in {elapsed_phase24:.1f}s (was sequential ~{elapsed_phase24*1.7:.0f}s before)")
+    print(f"{'='*60}\n")
 
     # Phase 2.5: temporal analysis (local, no API)
     temporal = run_phase_2_5(output_dir, video_path)
 
     # Phase 3: scene aggregator (local, no API)
     scenes = run_phase_3(output_dir, video_path, temporal=temporal)
-
-    # Load frame_qual results for Phase 4 OCR context
-    _out4, _vn4 = _resolve_output_dir(output_dir, video_path)
-    _qual_path4 = _out4 / f"{_vn4}_frame_qual.json"
-    _frame_quals4 = None
-    if _qual_path4.exists():
-        _frame_quals4 = json.loads(_qual_path4.read_text())
-
-    # Phase 4: video analysis (Gemini) — with STT + style context
-    video_analysis = run_phase_4(
-        video_path, output_dir, resolution=resolution, frame_quals=_frame_quals4,
-        narration_type=stt_result.narration_type,
-        stt_transcript=stt_result.full_transcript,
-        style_classification=style.to_dict(),
-    )
 
     # Phase 5: scene merger — merge Phase 3 + Phase 4 (local, no API)
     merged_scenes = run_phase_5(output_dir, video_path, scenes=scenes, video_analysis=video_analysis)
