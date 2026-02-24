@@ -79,33 +79,59 @@ def merge_analysis(
     duration = aggregated_scenes[-1].time_range[1] if aggregated_scenes else 0.0
 
     if duration > 0:
-        all_ts: list[float] = []
+        # 카테고리별로 정규화 감지 — 한 카테고리라도 정규화되어 있으면 전체 rescale
+        needs_rescale = False
+
+        # Check scene_roles timestamps
+        sr_ts = []
         for sr in video_analysis.get("scene_roles", []):
-            if "start" in sr:
-                all_ts.append(float(sr["start"]))
-            if "end" in sr:
-                all_ts.append(float(sr["end"]))
+            if "start" in sr: sr_ts.append(float(sr["start"]))
+            if "end" in sr: sr_ts.append(float(sr["end"]))
+        if sr_ts and max(sr_ts) <= 1.0 and duration > 2.0:
+            needs_rescale = True
+            print(f"  ⚠️ scene_roles normalized (max={max(sr_ts):.2f} for {duration:.1f}s)")
+
+        # Check transcript timestamps
+        tx_ts = []
         for seg in video_analysis.get("audio", {}).get("voice", {}).get("transcript", []):
-            if "start" in seg:
-                all_ts.append(float(seg["start"]))
-            if "end" in seg:
-                all_ts.append(float(seg["end"]))
-        for te in video_analysis.get("text_effects", []):
-            if "time" in te:
-                all_ts.append(float(te["time"]))
+            if "start" in seg: tx_ts.append(float(seg["start"]))
+            if "end" in seg: tx_ts.append(float(seg["end"]))
+        if tx_ts and max(tx_ts) <= 1.0 and duration > 2.0:
+            needs_rescale = True
+            print(f"  ⚠️ transcript normalized (max={max(tx_ts):.2f} for {duration:.1f}s)")
+
+        # Check text_effects timestamps
+        te_ts = [float(te["time"]) for te in video_analysis.get("text_effects", []) if "time" in te]
+        if te_ts and max(te_ts) <= 1.0 and duration > 2.0:
+            needs_rescale = True
+            print(f"  ⚠️ text_effects normalized (max={max(te_ts):.2f} for {duration:.1f}s)")
+
+        # Check appeal timestamps (독립 감지 — 다른 카테고리가 정상이어도 appeal만 정규화될 수 있음)
+        ap_ts = []
         for ap in video_analysis.get("persuasion_analysis", {}).get("appeal_points", []):
             vp = ap.get("visual_proof", {})
             if vp.get("timestamp") is not None:
-                all_ts.append(float(vp["timestamp"]))
+                ap_ts.append(float(vp["timestamp"]))
+        if ap_ts and max(ap_ts) <= 1.0 and duration > 2.0:
+            needs_rescale = True
+            print(f"  ⚠️ appeal_points normalized (max={max(ap_ts):.2f} for {duration:.1f}s)")
 
-        if all_ts:
-            max_ts = max(all_ts)
-            if max_ts < duration * 0.1:
-                print(
-                    f"  ⚠️ Detected normalized timestamps "
-                    f"(max={max_ts:.2f}s for {duration:.1f}s video). Rescaling..."
-                )
-                video_analysis = _rescale_timestamps(video_analysis, duration)
+        # 전체가 정규화된 경우 → 전체 rescale
+        sr_normalized = sr_ts and max(sr_ts) <= 1.0 and duration > 2.0
+        ap_normalized = ap_ts and max(ap_ts) <= 1.0 and duration > 2.0
+
+        if sr_normalized:
+            # scene_roles도 정규화 → 전체 rescale
+            print(f"  → Rescaling ALL timestamps to {duration:.1f}s ...")
+            video_analysis = _rescale_timestamps(video_analysis, duration)
+        elif ap_normalized:
+            # appeal만 정규화 (scene_roles는 정상) → appeal만 rescale
+            print(f"  → Rescaling appeal timestamps only to {duration:.1f}s ...")
+            video_analysis = copy.deepcopy(video_analysis)
+            for ap in video_analysis.get("persuasion_analysis", {}).get("appeal_points", []):
+                vp = ap.get("visual_proof", {})
+                if vp.get("timestamp") is not None:
+                    vp["timestamp"] = float(vp["timestamp"]) * duration
 
     scene_roles = video_analysis.get("scene_roles", [])
     transcript = (
