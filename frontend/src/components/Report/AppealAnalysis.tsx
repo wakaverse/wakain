@@ -10,6 +10,7 @@ interface Appeal {
   technique_ko?: string;
   timestamp?: number;
   strength?: string;
+  source?: 'visual' | 'script' | 'both';
 }
 
 interface SceneAnalysis {
@@ -65,8 +66,14 @@ function parseTimeRange(tr: string): [number, number] {
   return [0, 0];
 }
 
-function isVisualAppeal(a: Appeal): boolean {
-  return !!a.technique && !['text_overlay', 'caption', 'narration', 'none', ''].includes(a.technique);
+type AppealSource = 'visual' | 'script' | 'both';
+
+function getAppealSource(a: Appeal): AppealSource {
+  // source 필드가 있으면 그대로 사용 (Phase 4 신규)
+  if (a.source) return a.source;
+  // 기존 데이터 호환: technique 기반 추론
+  if (!a.technique || ['text_overlay', 'caption', 'narration', 'none', ''].includes(a.technique)) return 'script';
+  return 'visual';
 }
 
 function AttentionBar({ value }: { value: number }) {
@@ -106,11 +113,14 @@ function AppealItem({ appeal, onSeek }: { appeal: Appeal & { time: number }; onS
 export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }: Props) {
   // 전체 통계
   let totalVisual = 0;
-  let totalText = 0;
+  let totalScript = 0;
+  let totalBoth = 0;
   scenes.forEach(s => {
     (s.appeal_details || []).forEach(a => {
-      if (isVisualAppeal(a)) totalVisual++;
-      else totalText++;
+      const src = getAppealSource(a);
+      if (src === 'visual') totalVisual++;
+      else if (src === 'script') totalScript++;
+      else totalBoth++;
     });
   });
 
@@ -156,14 +166,18 @@ export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }
       </div>
 
       {/* 소구 요약 */}
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <div className="flex-1 bg-blue-50 rounded-lg px-3 py-2 text-center">
           <div className="text-lg font-bold text-blue-700">{totalVisual}</div>
-          <div className="text-[11px] text-blue-500">🎬 비주얼 소구</div>
+          <div className="text-[11px] text-blue-500">🎬 비주얼</div>
         </div>
         <div className="flex-1 bg-amber-50 rounded-lg px-3 py-2 text-center">
-          <div className="text-lg font-bold text-amber-700">{totalText}</div>
-          <div className="text-[11px] text-amber-500">📝 텍스트 소구</div>
+          <div className="text-lg font-bold text-amber-700">{totalScript}</div>
+          <div className="text-[11px] text-amber-500">🎤 대본</div>
+        </div>
+        <div className="flex-1 bg-purple-50 rounded-lg px-3 py-2 text-center">
+          <div className="text-lg font-bold text-purple-700">{totalBoth}</div>
+          <div className="text-[11px] text-purple-500">🔗 복합</div>
         </div>
         <div className="flex-1 bg-gray-50 rounded-lg px-3 py-2 text-center">
           <div className="text-lg font-bold text-gray-700">{scenes.length}</div>
@@ -180,9 +194,10 @@ export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }
             ...a,
             time: a.timestamp ?? start,
           }));
-          const visualAppeals = appeals.filter(a => isVisualAppeal(a));
-          const textAppeals = appeals.filter(a => !isVisualAppeal(a));
-          const hasAppeals = visualAppeals.length > 0 || textAppeals.length > 0;
+          const visualAppeals = appeals.filter(a => getAppealSource(a) === 'visual');
+          const scriptAppeals = appeals.filter(a => getAppealSource(a) === 'script');
+          const bothAppeals = appeals.filter(a => getAppealSource(a) === 'both');
+          const hasAppeals = appeals.length > 0;
 
           return (
             <div
@@ -200,12 +215,15 @@ export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }
                 </span>
                 <span className="text-[11px] text-gray-400">{s.time_range}</span>
                 <span className="text-[11px] text-gray-400">({s.duration.toFixed(1)}s)</span>
-                <div className="ml-auto flex items-center gap-2">
+                <div className="ml-auto flex items-center gap-1.5">
                   {visualAppeals.length > 0 && (
-                    <span className="text-[11px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">🎬 {visualAppeals.length}</span>
+                    <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">🎬{visualAppeals.length}</span>
                   )}
-                  {textAppeals.length > 0 && (
-                    <span className="text-[11px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded">📝 {textAppeals.length}</span>
+                  {scriptAppeals.length > 0 && (
+                    <span className="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded">🎤{scriptAppeals.length}</span>
+                  )}
+                  {bothAppeals.length > 0 && (
+                    <span className="text-[10px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded">🔗{bothAppeals.length}</span>
                   )}
                 </div>
               </div>
@@ -222,7 +240,7 @@ export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }
                     <div>
                       <div className="text-[11px] font-semibold text-blue-600 mb-1 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                        비주얼 소구
+                        비주얼 소구 — 화면으로 전달
                       </div>
                       <div className="border-l-2 border-blue-200 pl-2 space-y-0.5">
                         {visualAppeals.map((a, i) => (
@@ -231,14 +249,27 @@ export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }
                       </div>
                     </div>
                   )}
-                  {textAppeals.length > 0 && (
+                  {scriptAppeals.length > 0 && (
                     <div>
                       <div className="text-[11px] font-semibold text-amber-600 mb-1 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                        텍스트(대본) 소구
+                        대본 소구 — 나레이션/음성으로 전달
                       </div>
                       <div className="border-l-2 border-amber-200 pl-2 space-y-0.5">
-                        {textAppeals.map((a, i) => (
+                        {scriptAppeals.map((a, i) => (
+                          <AppealItem key={i} appeal={a} onSeek={onSeek} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {bothAppeals.length > 0 && (
+                    <div>
+                      <div className="text-[11px] font-semibold text-purple-600 mb-1 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                        복합 소구 — 화면 + 음성 동시 전달
+                      </div>
+                      <div className="border-l-2 border-purple-200 pl-2 space-y-0.5">
+                        {bothAppeals.map((a, i) => (
                           <AppealItem key={i} appeal={a} onSeek={onSeek} />
                         ))}
                       </div>

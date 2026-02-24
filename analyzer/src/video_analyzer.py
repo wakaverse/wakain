@@ -105,6 +105,10 @@ For persuasion_analysis (소구 분석 — CRITICAL):
     - emotional (감정): 감동, 유머, 공감 등 감정 자극
   - For each: what specific claim is made? How is it VISUALLY proven? (closeup/slow_motion/process_shot/graph_number/etc.)
   - Rate each appeal's strength (strong/moderate/weak) based on how convincingly it's delivered
+  - **source** (CRITICAL): Classify where this appeal comes from:
+    - "visual" — 화면/영상으로만 전달 (텍스트 오버레이, 제품 클로즈업, 비포/애프터 등)
+    - "script" — 음성 대본/나레이션으로만 전달 (말로만 언급, 화면에 증거 없음)
+    - "both" — 음성 + 화면 동시 전달 (나레이션에서 언급하면서 화면으로도 보여줌)
 - **product_emphasis**: How is the product visually highlighted?
   - When does it first appear? How much screen time? How many hero/close-up shots?
   - What visual techniques are used? (closeup/zoom_in/texture_detail/steam_sizzle/before_after/etc.)
@@ -426,8 +430,9 @@ _RESPONSE_SCHEMA = {
                                 "narration_sync", "text_only", "sfx_emphasis", "music_beat", "silent", "independent",
                             ]},
                             "strength": {"type": "STRING", "enum": ["strong", "moderate", "weak"]},
+                            "source": {"type": "STRING", "enum": ["visual", "script", "both"]},
                         },
-                        "required": ["type", "claim", "visual_proof", "audio_sync", "strength"],
+                        "required": ["type", "claim", "visual_proof", "audio_sync", "strength", "source"],
                     },
                 },
                 "product_emphasis": {
