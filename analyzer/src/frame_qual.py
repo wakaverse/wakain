@@ -19,7 +19,7 @@ from google.genai import types
 
 from .schemas import FrameQual, FrameQuant
 
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-2.5-flash-lite"
 MAX_CONCURRENCY = 10  # simultaneous API calls
 REQUEST_DELAY = 0.3   # seconds between requests
 
@@ -67,19 +67,8 @@ For artwork analysis:
 
 
 def _build_prompt(quant: FrameQuant) -> str:
-    """Build the text prompt with quant context."""
-    parts: list[str] = []
-
-    parts.append("## Frame Quantitative Data (auto-measured)")
-    parts.append("```json")
-    parts.append(quant.model_dump_json(indent=2))
-    parts.append("```")
-
-    parts.append(
-        "\nAnalyse the frame image above together with the quantitative data. "
-        "Return a JSON object matching the FrameQual schema."
-    )
-    return "\n".join(parts)
+    """Build the text prompt (quant context removed for lite model)."""
+    return "Analyse the frame image above. Return a JSON object matching the FrameQual schema."
 
 
 def _make_client() -> genai.Client:

@@ -645,6 +645,65 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, p
     # Phase 5: scene merger — merge Phase 3 + Phase 4 (local, no API)
     merged_scenes = run_phase_5(output_dir, video_path, scenes=scenes, video_analysis=video_analysis)
 
+    # ── Phase 5.5: Appeal Structure ─────────────────────────────────────
+    print("[Phase 5.5] Building appeal structure (scenes + groups) ...")
+    from src.appeal_clusterer import cluster_appeals_into_scenes, summarize_scenes, group_scenes
+
+    # Extract appeals from Phase 4 persuasion_analysis
+    _pa = video_analysis.get("persuasion_analysis", {})
+    _appeals = _pa.get("appeal_points", []) if isinstance(_pa, dict) else []
+
+    # Load temporal data for text_dwell / transition_texture
+    temporal_path_55 = out / f"{video_name}_temporal.json"
+    _temporal_raw = json.loads(temporal_path_55.read_text()) if temporal_path_55.exists() else {}
+
+    # STT segments
+    stt_path_55 = out / f"{video_name}_stt.json"
+    _stt_segs = []
+    if stt_path_55.exists():
+        _stt_segs = json.loads(stt_path_55.read_text()).get("segments", [])
+
+    # Frame quals
+    qual_path_55 = out / f"{video_name}_frame_qual.json"
+    _fq_list = json.loads(qual_path_55.read_text()) if qual_path_55.exists() else []
+
+    # Cut boundaries from SceneDetect
+    _cut_ts = _temporal_raw.get("cut_rhythm", {}).get("cut_timestamps", [])
+    if not _cut_ts and scene_boundaries:
+        _cut_boundaries = list(scene_boundaries)
+    else:
+        _video_dur = max((fq.get("timestamp", 0) for fq in _fq_list), default=30.0) + 0.5 if _fq_list else 30.0
+        _cut_boundaries = []
+        _prev = 0.0
+        for ct in _cut_ts:
+            _cut_boundaries.append((_prev, ct))
+            _prev = ct
+        _cut_boundaries.append((_prev, _video_dur))
+
+    t_55 = time.perf_counter()
+    appeal_scenes = cluster_appeals_into_scenes(
+        appeals=_appeals,
+        cut_boundaries=_cut_boundaries,
+        stt_segments=_stt_segs,
+        text_dwell_items=_temporal_raw.get("text_dwell", {}).get("items", []),
+        transition_events=_temporal_raw.get("transition_texture", {}).get("events", []),
+        frame_quals=_fq_list,
+    )
+    print(f"          → {len(appeal_scenes)} scenes clustered")
+
+    # Product info from Phase 0.1
+    _product_path = out / f"{video_name}_product.json"
+    _product_info = json.loads(_product_path.read_text()) if _product_path.exists() else {}
+
+    appeal_scenes = summarize_scenes(appeal_scenes, _product_info)
+    appeal_groups = group_scenes(appeal_scenes, _product_info)
+    print(f"          → {len(appeal_groups)} groups formed ({time.perf_counter() - t_55:.1f}s)")
+
+    appeal_structure = {"scenes": appeal_scenes, "groups": appeal_groups}
+    appeal_struct_path = out / f"{video_name}_appeal_structure.json"
+    appeal_struct_path.write_text(json.dumps(appeal_structure, indent=2, ensure_ascii=False))
+    print(f"          → saved to {appeal_struct_path}")
+
     # Phase 6: recipe builder (includes temporal profile + production guide)
     run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal)
 
