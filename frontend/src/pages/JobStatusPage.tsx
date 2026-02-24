@@ -69,7 +69,7 @@ export default function JobStatusPage() {
               <div className="absolute inset-0 rounded-full border-2 border-blue-200 animate-ping" />
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">분석 중{dots}</h2>
-            <p className="text-gray-500 text-sm mb-6">AI가 영상을 분석하고 있습니다. 약 2분 소요됩니다.</p>
+            <p className="text-gray-500 text-sm mb-6">AI가 영상을 분석하고 있습니다. 약 3~4분 소요됩니다.</p>
             <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
               <div className="h-full bg-blue-600 rounded-full animate-pulse w-3/4" />
             </div>

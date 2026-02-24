@@ -236,7 +236,7 @@ export default function AnalyzePage() {
       </button>
 
       <p className="mt-4 text-center text-xs text-gray-400">
-        무료 플랜 기준 월 3건 · 분석 소요 시간 약 2분
+        무료 플랜 기준 월 3건 · 분석 소요 시간 약 3~4분
       </p>
     </div>
   );

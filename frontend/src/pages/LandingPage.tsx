@@ -205,7 +205,7 @@ export default function LandingPage() {
             <FeatureCard
               icon="🔬"
               title="AI 마케터 분석"
-              desc="프레임 단위 시각 분석 + 마케팅 심리 기반 진단. 약 2분."
+              desc="프레임 단위 시각 분석 + 마케팅 심리 기반 진단. 약 3분."
             />
             <FeatureCard
               icon="📋"
@@ -221,7 +221,7 @@ export default function LandingPage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-20 text-center">
           <Sparkles className="w-5 h-5 text-gray-300 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">첫 영상을 진단해보세요</h2>
-          <p className="text-gray-400 mb-8 text-sm">무료로 시작. 2분 안에 판결을 받아보세요.</p>
+          <p className="text-gray-400 mb-8 text-sm">무료로 시작. 3분 안에 판결을 받아보세요.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/analyze"
