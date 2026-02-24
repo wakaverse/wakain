@@ -114,20 +114,20 @@ export default function LandingPage() {
                 PROJECT #1
               </span>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-[1.2] tracking-tight">
-                숏폼 영상,<br />
-                감 대신 근거로.
+                숏폼을<br />
+                해킹합니다.
               </h2>
               <p className="text-lg text-gray-500 mb-6 leading-relaxed">
-                프레임 단위 시각 분석과 마케터 관점 진단.<br />
-                왜 팔리는지, 왜 안 팔리는지, 어떻게 고칠지.
+                팔리는 영상의 구조를 프레임 단위로 해부합니다.<br />
+                소구, 타이밍, 설득 — 전부 데이터로 증명합니다.
               </p>
 
               {/* Mini features */}
               <div className="space-y-3 mb-8">
                 {[
-                  { label: '판결', desc: '집행 권장 / 조건부 / 불가 — 단호하게' },
-                  { label: '근거', desc: '타임스탬프 + 실제 화면 기반 분석' },
-                  { label: '액션플랜', desc: '편집자에게 바로 전달 가능한 수정안' },
+                  { label: '해부', desc: '프레임 단위 비주얼·대본·소구 분리 분석' },
+                  { label: '판결', desc: '이 영상, 팔릴까? — 근거와 함께 단호하게' },
+                  { label: '처방', desc: '타임스탬프 기반, 편집자에게 바로 전달 가능' },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-3">
                     <span className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-900 flex-shrink-0 mt-0.5">
