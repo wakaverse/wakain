@@ -484,7 +484,7 @@ def run_phase_7(
 
     verdict = run_marketer_judge(
         recipe=recipe_data,
-        diagnosis=diagnosis.to_dict(),
+        diagnosis=diagnosis_result,
         frame_quals=frame_quals,
         stt_data=stt_data,
         style_data=product_data,
