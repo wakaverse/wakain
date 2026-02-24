@@ -182,24 +182,20 @@ CAPTION_TRACK_SUPPLEMENT = """
 - ⚠️ 화면에 나타나는 모든 텍스트 메시지를 소구로 분석하세요. 텍스트 하나하나가 소구입니다!
 """
 
-STYLE_CONTEXT_TEMPLATE = """
-## 영상 스타일 컨텍스트
-- 형식(Format): {format_ko} ({format_key})
-- 의도(Intent): {intent_ko} ({intent_key})
-{secondary_line}
-이 스타일에 맞는 관점으로 분석하세요. 예를 들어:
-- 핵심 지표: {key_metrics}
-- 유효한 소구: {effective_appeals}
-- 권장 구조: {structure}
+CATEGORY_CONTEXT_TEMPLATE = """
+## 제품 카테고리 컨텍스트
+- 카테고리: {category_ko} ({category_key})
+- 제품: {product_name}
+{category_hint}
 """
 
 
 def _build_track_supplement(
     narration_type: str | None = None,
     stt_transcript: str | None = None,
-    style_classification: dict | None = None,
+    product_scan: dict | None = None,
 ) -> str:
-    """Build additional prompt context based on narration type and style."""
+    """Build additional prompt context based on narration type and product scan."""
     parts = []
 
     # Track supplement
@@ -208,34 +204,23 @@ def _build_track_supplement(
     elif narration_type in ("caption", "silent"):
         parts.append(CAPTION_TRACK_SUPPLEMENT)
 
-    # Style context
-    if style_classification:
-        from .style_classifier import FORMAT_LABELS_KO, INTENT_LABELS_KO
-        from .style_profiles import get_merged_profile
+    # Category context from product scan
+    if product_scan:
+        from .product_scanner import CATEGORY_LABELS_KO
+        from .style_profiles import get_category_profile
 
-        fmt_key = style_classification.get("primary_format", "")
-        int_key = style_classification.get("primary_intent", "")
-        fmt_ko = FORMAT_LABELS_KO.get(fmt_key, fmt_key)
-        int_ko = INTENT_LABELS_KO.get(int_key, int_key)
+        category_key = product_scan.get("category", "general")
+        category_ko = CATEGORY_LABELS_KO.get(category_key, category_key)
+        product_name = product_scan.get("product_name") or "미확인"
 
-        sec_fmt = style_classification.get("secondary_format")
-        secondary_line = ""
-        if sec_fmt:
-            sec_ko = FORMAT_LABELS_KO.get(sec_fmt, sec_fmt)
-            secondary_line = f"- 보조 형식: {sec_ko} ({sec_fmt})\n"
+        profile = get_category_profile(category_key)
+        category_hint = profile.get("phase4a_hint", "")
 
-        profile = get_merged_profile(fmt_key, int_key)
-        key_metrics = ", ".join(profile.get("key_metrics", []))
-        effective = ", ".join(profile.get("effective_appeals", []))
-        structure = " → ".join(profile.get("recommended_structure", []))
-
-        parts.append(STYLE_CONTEXT_TEMPLATE.format(
-            format_ko=fmt_ko, format_key=fmt_key,
-            intent_ko=int_ko, intent_key=int_key,
-            secondary_line=secondary_line,
-            key_metrics=key_metrics,
-            effective_appeals=effective,
-            structure=structure,
+        parts.append(CATEGORY_CONTEXT_TEMPLATE.format(
+            category_ko=category_ko,
+            category_key=category_key,
+            product_name=product_name,
+            category_hint=category_hint,
         ))
 
     return "\n".join(parts)
@@ -653,7 +638,7 @@ async def analyse_video(
     frame_quals: list[dict] | None = None,
     narration_type: str | None = None,
     stt_transcript: str | None = None,
-    style_classification: dict | None = None,
+    product_scan: dict | None = None,
 ) -> dict:
     """Upload video to Gemini and get full analysis (audio, structure, product, effectiveness)."""
     client = _make_client()
@@ -693,7 +678,7 @@ Be specific and detailed. Use Korean for script_summary, hook_line, cta_line, pe
         track_supplement = _build_track_supplement(
             narration_type=narration_type,
             stt_transcript=stt_transcript,
-            style_classification=style_classification,
+            product_scan=product_scan,
         )
         if track_supplement:
             prompt += "\n" + track_supplement
@@ -854,7 +839,7 @@ def run_video_analysis(
     frame_quals: list[dict] | None = None,
     narration_type: str | None = None,
     stt_transcript: str | None = None,
-    style_classification: dict | None = None,
+    product_scan: dict | None = None,
 ) -> dict:
     """Sync wrapper for analyse_video."""
     return asyncio.run(analyse_video(
@@ -863,5 +848,5 @@ def run_video_analysis(
         frame_quals=frame_quals,
         narration_type=narration_type,
         stt_transcript=stt_transcript,
-        style_classification=style_classification,
+        product_scan=product_scan,
     ))

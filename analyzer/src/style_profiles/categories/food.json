@@ -1,0 +1,19 @@
+{
+  "category": "food",
+  "category_ko": "식품",
+  "key_appeals": ["ingredient", "manufacturing", "origin", "authenticity", "feature_demo"],
+  "phase4a_hint": "식품 영상 — 원재료 품질, 맛/식감 묘사, 제조 공정, 원산지 소구에 집중 분석",
+  "phase4c_hint": "식품 카테고리 공감 트리거: 맛 궁금증(curiosity), 건강 불안(fear→relief), 향수(nostalgia)",
+  "purchase_factors": "맛, 원재료 품질, 가격 대비 양, 브랜드 신뢰도",
+  "dimension_weights": {
+    "visual_stimulus": 0.10,
+    "persuasion_density": 0.20,
+    "edit_rhythm": 0.08,
+    "audio_stimulus": 0.12,
+    "information_density": 0.10,
+    "persona_fit": 0.10,
+    "empathy_trigger": 0.08,
+    "narrative_structure": 0.08,
+    "retention_design": 0.14
+  }
+}

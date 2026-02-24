@@ -1,0 +1,19 @@
+{
+  "category": "beauty",
+  "category_ko": "뷰티",
+  "key_appeals": ["design_aesthetic", "social_proof", "ingredient", "feature_demo", "authenticity"],
+  "phase4a_hint": "뷰티 영상 — 피부/메이크업 비포애프터, 텍스처 클로즈업, 성분, 사용감 소구에 집중",
+  "phase4c_hint": "뷰티 카테고리 공감 트리거: 욕망(desire), 사회적증거(belonging), 자부심(pride)",
+  "purchase_factors": "성분 안전성, 사용 후 효과, 가격, 브랜드/인플루언서 추천",
+  "dimension_weights": {
+    "visual_stimulus": 0.15,
+    "persuasion_density": 0.15,
+    "edit_rhythm": 0.08,
+    "audio_stimulus": 0.08,
+    "information_density": 0.10,
+    "persona_fit": 0.10,
+    "empathy_trigger": 0.10,
+    "narrative_structure": 0.08,
+    "retention_design": 0.16
+  }
+}

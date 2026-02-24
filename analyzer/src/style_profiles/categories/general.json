@@ -1,0 +1,19 @@
+{
+  "category": "general",
+  "category_ko": "일반",
+  "key_appeals": ["feature_demo", "social_proof", "price", "authenticity", "comparison"],
+  "phase4a_hint": "일반 카테고리 — 균형 잡힌 소구 분석",
+  "phase4c_hint": "다양한 공감 트리거를 균형 있게 분석",
+  "purchase_factors": "제품의 핵심 가치와 차별점",
+  "dimension_weights": {
+    "visual_stimulus": 0.11,
+    "persuasion_density": 0.15,
+    "edit_rhythm": 0.09,
+    "audio_stimulus": 0.09,
+    "information_density": 0.12,
+    "persona_fit": 0.09,
+    "empathy_trigger": 0.09,
+    "narrative_structure": 0.09,
+    "retention_design": 0.17
+  }
+}

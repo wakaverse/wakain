@@ -27,7 +27,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.stt_extractor import run_stt_extraction, STTResult
-from src.style_classifier import classify_style, StyleClassification
+from src.product_scanner import scan_product, ProductScanResult
 from src.caption_mapper import build_caption_map, caption_map_to_dict
 from src.integrated_analyzer import run_integrated_analysis
 from src.prescription_engine import generate_prescriptions
@@ -205,16 +205,16 @@ def run_phase_4(
     frame_quals: list[dict] | None = None,
     narration_type: str | None = None,
     stt_transcript: str | None = None,
-    style_classification: dict | None = None,
+    product_scan: dict | None = None,
 ) -> dict:
     """Run Phase 4: full video analysis via Gemini."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
 
     track_label = f", track={narration_type}" if narration_type else ""
-    style_label = ""
-    if style_classification:
-        style_label = f", style={style_classification.get('primary_format', '?')}×{style_classification.get('primary_intent', '?')}"
-    print(f"[Phase 4] Running video analysis (Gemini, full video upload, {resolution}p{track_label}{style_label}) ...")
+    cat_label = ""
+    if product_scan:
+        cat_label = f", category={product_scan.get('category', '?')}"
+    print(f"[Phase 4] Running video analysis (Gemini, full video upload, {resolution}p{track_label}{cat_label}) ...")
     if frame_quals:
         text_count = sum(1 for fq in frame_quals if fq.get("text_overlay") or fq.get("text_overlays"))
         print(f"          (OCR context: {text_count}/{len(frame_quals)} frames with text)")
@@ -222,7 +222,7 @@ def run_phase_4(
     analysis = run_video_analysis(
         video_path, resolution=resolution, frame_quals=frame_quals,
         narration_type=narration_type, stt_transcript=stt_transcript,
-        style_classification=style_classification,
+        product_scan=product_scan,
     )
     print(f"          → done ({time.perf_counter() - t0:.1f}s)")
 
@@ -351,43 +351,30 @@ def run_phase_0(video_path: str, output_dir: str) -> STTResult:
     return stt_result
 
 
-def run_phase_0_1(
-    video_path: str,
-    output_dir: str,
-    format_hint: str | None = None,
-    intent_hint: str | None = None,
-) -> StyleClassification:
-    """Run Phase 0.1: style classification (Format × Intent)."""
+def run_phase_0_1(video_path: str, output_dir: str) -> ProductScanResult:
+    """Run Phase 0.1: Product scanning."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
-
-    print(f"[Phase 0.1] Running style classification ...")
+    print(f"[Phase 0.1] Scanning product & category ...")
     t0 = time.perf_counter()
-    style = classify_style(video_path, format_hint=format_hint, intent_hint=intent_hint)
+    result = scan_product(video_path)
     elapsed = time.perf_counter() - t0
+    print(f"            → category: {result.category} ({result.category_ko})")
+    if result.product_name:
+        print(f"            → product: {result.product_name}")
+    print(f"            → is_marketing: {result.is_marketing_video}")
+    print(f"            → ({elapsed:.1f}s)")
 
-    from src.style_classifier import FORMAT_LABELS_KO, INTENT_LABELS_KO
-    fmt_ko = FORMAT_LABELS_KO.get(style.primary_format, style.primary_format)
-    int_ko = INTENT_LABELS_KO.get(style.primary_intent, style.primary_intent)
-    print(f"            → format: {style.primary_format} ({fmt_ko})")
-    if style.secondary_format:
-        fmt2_ko = FORMAT_LABELS_KO.get(style.secondary_format, "")
-        print(f"            → format2: {style.secondary_format} ({fmt2_ko})")
-    print(f"            → intent: {style.primary_intent} ({int_ko})")
-    print(f"            → {'auto' if style.auto_classified else 'manual'} ({elapsed:.1f}s)")
-
-    # Save
-    style_path = out / f"{video_name}_style.json"
-    style_path.write_text(json.dumps(style.to_dict(), indent=2, ensure_ascii=False))
-    print(f"            → saved to {style_path}")
-
-    return style
+    product_path = out / f"{video_name}_product.json"
+    product_path.write_text(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
+    print(f"            → saved to {product_path}")
+    return result
 
 
 def run_phase_7(
     output_dir: str,
     video_path: str,
     stt_data: dict | None = None,
-    style_data: dict | None = None,
+    product_data: dict | None = None,
     product_name: str = "",
     product_category: str = "",
     product_key_factors: str = "",
@@ -408,10 +395,15 @@ def run_phase_7(
         stt_path = out / f"{video_name}_stt.json"
         if stt_path.exists():
             stt_data = json.loads(stt_path.read_text())
-    if style_data is None:
-        style_path = out / f"{video_name}_style.json"
-        if style_path.exists():
-            style_data = json.loads(style_path.read_text())
+    if product_data is None:
+        product_path = out / f"{video_name}_product.json"
+        if product_path.exists():
+            product_data = json.loads(product_path.read_text())
+        else:
+            # Backward compat: try old style.json
+            style_path = out / f"{video_name}_style.json"
+            if style_path.exists():
+                product_data = json.loads(style_path.read_text())
 
     t0 = time.perf_counter()
 
@@ -438,7 +430,7 @@ def run_phase_7(
     # C-9: Integrated analysis
     print(f"[Phase 7] Running integrated analysis (3-stage) ...")
     diagnosis = run_integrated_analysis(
-        recipe, stt_data=stt_data, style_data=style_data,
+        recipe, stt_data=stt_data, product_data=product_data,
         caption_map=cap_map, raw_temporal=raw_temporal,
     )
     diag_path = out / f"{video_name}_diagnosis.json"
@@ -448,10 +440,9 @@ def run_phase_7(
 
     # C-10: Prescriptions
     print(f"[Phase 7] Generating prescriptions ...")
-    from src.style_profiles import get_merged_profile
-    fmt_key = (style_data or {}).get("primary_format", "caption_text")
-    int_key = (style_data or {}).get("primary_intent", "commerce")
-    profile = get_merged_profile(fmt_key, int_key)
+    from src.style_profiles import get_category_profile
+    category_key = (product_data or {}).get("category", "general")
+    profile = get_category_profile(category_key)
 
     rx_report = generate_prescriptions(
         recipe, profile, stt_data=stt_data, caption_map=cap_map, video_name=video_name,
@@ -478,7 +469,7 @@ def run_phase_7(
         diagnosis=diagnosis.to_dict(),
         frame_quals=frame_quals,
         stt_data=stt_data,
-        style_data=style_data,
+        style_data=product_data,
         caption_map=cap_map,
         raw_temporal=raw_temporal,
         product_name=product_name,
@@ -493,7 +484,7 @@ def run_phase_7(
     print(f"           → {verdict_path.name}, {verdict_md_path.name}")
 
 
-def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, format_hint: str | None = None, intent_hint: str | None = None, product_name: str = "", product_category: str = "") -> None:
+def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, product_name: str = "", product_category: str = "") -> None:
     """Run all phases end-to-end."""
     from concurrent.futures import ThreadPoolExecutor, as_completed
     from src.scene_detect import detect_scenes
@@ -516,8 +507,8 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, f
     def _do_stt():
         return run_phase_0(video_path, output_dir)
 
-    def _do_style():
-        return run_phase_0_1(video_path, output_dir, format_hint=format_hint, intent_hint=intent_hint)
+    def _do_product_scan():
+        return run_phase_0_1(video_path, output_dir)
 
     def _do_scene_detect():
         print(f"[Phase 0.5] Running PySceneDetect (original video, full fps) ...")
@@ -555,7 +546,7 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, f
 
     with ThreadPoolExecutor(max_workers=4) as executor:
         fut_stt = executor.submit(_do_stt)
-        fut_style = executor.submit(_do_style)
+        fut_style = executor.submit(_do_product_scan)
         fut_sd = executor.submit(_do_scene_detect)
         fut_frames = executor.submit(_do_frames)
 
@@ -566,9 +557,9 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, f
                     if stt_result.narration_type == "silent" and not stt_result.segments:
                         print("  ℹ️  STT: 음성 없음 (silent). 캡션 트랙으로 분석합니다.")
                 elif fut is fut_style:
-                    style = fut.result()
-                    if style.format_confidence == 0.0:
-                        print("  ⚠️  Style 분류 신뢰도 0%. 결과를 확인하세요.")
+                    product_scan = fut.result()
+                    if product_scan.category_confidence == 0.0:
+                        print("  ⚠️  제품 스캔 신뢰도 0%. 결과를 확인하세요.")
                 elif fut is fut_sd:
                     scene_boundaries, cut_timestamps = fut.result()
                 elif fut is fut_frames:
@@ -621,7 +612,7 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, f
             video_path, output_dir, resolution=resolution, frame_quals=None,
             narration_type=stt_result.narration_type,
             stt_transcript=stt_result.full_transcript,
-            style_classification=style.to_dict(),
+            product_scan=product_scan.to_dict(),
         )
 
     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -658,7 +649,7 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, f
     run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal)
 
     # Phase 7: Integrated analysis + prescriptions (C-8, C-9, C-10)
-    run_phase_7(output_dir, video_path, stt_data=stt_result.to_dict(), style_data=style.to_dict(),
+    run_phase_7(output_dir, video_path, stt_data=stt_result.to_dict(), product_data=product_scan.to_dict(),
                 product_name=product_name, product_category=product_category)
 
 
@@ -734,15 +725,12 @@ def cmd_report(args: argparse.Namespace) -> None:
 
 def cmd_analyze(args: argparse.Namespace) -> None:
     """analyze 서브커맨드: 영상 분석 파이프라인 실행."""
-    fmt_hint = getattr(args, 'fmt', None)
-    intent_hint = getattr(args, 'intent', None)
-
     if args.quant_only:
         run_phase_1_2(args.video, args.output, quant_only=True)
     elif args.phase == "0":
         run_phase_0(args.video, args.output)
     elif args.phase == "0.1":
-        run_phase_0_1(args.video, args.output, format_hint=fmt_hint, intent_hint=intent_hint)
+        run_phase_0_1(args.video, args.output)
     elif args.phase == "1":
         run_phase_1_2(args.video, args.output, quant_only=True, resolution=args.resolution)
     elif args.phase == "2":
@@ -755,7 +743,7 @@ def cmd_analyze(args: argparse.Namespace) -> None:
         # Load Phase 0/0.1 results from disk if available
         _out4, _vn4 = _resolve_output_dir(args.output, args.video)
         _stt_path = _out4 / f"{_vn4}_stt.json"
-        _style_path = _out4 / f"{_vn4}_style.json"
+        _style_path = _out4 / f"{_vn4}_product.json"
         _qual_path = _out4 / f"{_vn4}_frame_qual.json"
         _nt, _st, _sc, _fq = None, None, None, None
         if _stt_path.exists():
@@ -767,14 +755,20 @@ def cmd_analyze(args: argparse.Namespace) -> None:
             print(f"  ⚠️  STT 결과 없음 ({_stt_path.name}). Phase 0을 먼저 실행하세요.")
         if _style_path.exists():
             _sc = json.loads(_style_path.read_text())
-            print(f"  ℹ️  Loaded style: {_sc.get('primary_format', '?')} × {_sc.get('primary_intent', '?')}")
+            print(f"  ℹ️  Loaded product scan: category={_sc.get('category', '?')}")
         else:
-            print(f"  ⚠️  Style 분류 없음 ({_style_path.name}). Phase 0.1을 먼저 실행하세요.")
+            # Backward compat: try old style.json
+            _old_style = _out4 / f"{_vn4}_style.json"
+            if _old_style.exists():
+                _sc = json.loads(_old_style.read_text())
+                print(f"  ℹ️  Loaded legacy style: {_sc.get('primary_format', '?')}")
+            else:
+                print(f"  ⚠️  제품 스캔 없음 ({_style_path.name}). Phase 0.1을 먼저 실행하세요.")
         if _qual_path.exists():
             _fq = json.loads(_qual_path.read_text())
         run_phase_4(args.video, args.output, resolution=args.resolution,
                     frame_quals=_fq, narration_type=_nt, stt_transcript=_st,
-                    style_classification=_sc)
+                    product_scan=_sc)
     elif args.phase == "5":
         run_phase_5(args.output, args.video)
     elif args.phase == "6":
@@ -785,7 +779,6 @@ def cmd_analyze(args: argparse.Namespace) -> None:
         product_name = getattr(args, 'product_name', '') or ''
         product_category = getattr(args, 'product_category', '') or ''
         run_full_pipeline(args.video, args.output, resolution=args.resolution,
-                          format_hint=fmt_hint, intent_hint=intent_hint,
                           product_name=product_name, product_category=product_category)
 
 
@@ -821,17 +814,6 @@ Examples:
     analyze_parser.add_argument(
         "--resolution", type=int, choices=[480, 720], default=720,
         help="Frame/video resolution: 720 (default) or 480 (faster/smaller)",
-    )
-    analyze_parser.add_argument(
-        "--format", dest="fmt", type=str, default=None,
-        choices=["talking_head", "ugc_vlog", "caption_text", "product_demo",
-                 "asmr_mood", "comparison", "story_problem", "listicle", "entertainment"],
-        help="Manual video format (default: Auto)",
-    )
-    analyze_parser.add_argument(
-        "--intent", type=str, default=None,
-        choices=["commerce", "branding", "information", "entertainment"],
-        help="Manual video intent (default: Auto)",
     )
     analyze_parser.add_argument(
         "--product-name", type=str, default="",

@@ -64,8 +64,8 @@ def _build_evidence_summary(
         "appeal_points": (r.get("persuasion_analysis") or {}).get("appeal_points", []),
         "narration_type": (stt_data or {}).get("narration_type"),
         "stt_transcript": (stt_data or {}).get("full_transcript", "")[:800],
-        "style_format_ko": (style_data or {}).get("primary_format_ko"),
-        "style_intent_ko": (style_data or {}).get("primary_intent_ko"),
+        "product_category": (style_data or {}).get("category") or (style_data or {}).get("primary_format_ko"),
+        "product_name": (style_data or {}).get("product_name"),
         "dimensions": diagnosis.get("dimensions", []),
         "scene_analyses": diagnosis.get("scene_analyses", []),
         "strengths": diagnosis.get("strengths", []),
@@ -261,15 +261,21 @@ def run_marketer_judge(
     if not fmt:
         fmt = (style_data or {}).get("primary_format_ko", "캡션/텍스트형")
     
-    # Auto-detect product from recipe if not provided
+    # Auto-detect product from product_data (style_data) or recipe
+    if not product_name:
+        product_name = (style_data or {}).get("product_name") or ""
     if not product_name:
         meta = recipe.get("video_recipe", recipe).get("meta", {})
         product_name = meta.get("sub_category") or meta.get("category") or "제품"
     if not product_category:
+        product_category = (style_data or {}).get("category") or ""
+    if not product_category:
         meta = recipe.get("video_recipe", recipe).get("meta", {})
         product_category = meta.get("category") or "일반"
     if not product_key_factors:
-        product_key_factors = "제품의 핵심 가치와 차별점"
+        from .style_profiles import get_category_profile
+        profile = get_category_profile(product_category)
+        product_key_factors = profile.get("purchase_factors", "제품의 핵심 가치와 차별점")
     
     prompt = _build_prompt(
         evidence_data, frame_timeline,

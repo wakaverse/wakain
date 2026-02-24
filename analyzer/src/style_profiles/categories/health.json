@@ -1,0 +1,19 @@
+{
+  "category": "health",
+  "category_ko": "건강",
+  "key_appeals": ["ingredient", "authority", "track_record", "guarantee", "spec_data"],
+  "phase4a_hint": "건강 영상 — 성분/효능, 전문가 권위, 임상 데이터, 안전성 인증 소구에 집중",
+  "phase4c_hint": "건강 카테고리 공감 트리거: 공포/불안(fear), 안도(relief), 고통공감(pain_empathy)",
+  "purchase_factors": "효능/효과, 성분 안전성, 전문가/기관 인증, 가격, 부작용",
+  "dimension_weights": {
+    "visual_stimulus": 0.08,
+    "persuasion_density": 0.20,
+    "edit_rhythm": 0.06,
+    "audio_stimulus": 0.08,
+    "information_density": 0.18,
+    "persona_fit": 0.12,
+    "empathy_trigger": 0.10,
+    "narrative_structure": 0.06,
+    "retention_design": 0.12
+  }
+}

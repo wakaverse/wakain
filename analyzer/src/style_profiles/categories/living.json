@@ -1,0 +1,19 @@
+{
+  "category": "living",
+  "category_ko": "리빙",
+  "key_appeals": ["lifestyle", "design_aesthetic", "feature_demo", "price", "comparison"],
+  "phase4a_hint": "리빙 영상 — 인테리어 매칭, 실사용 편의성, 디자인 감성, 공간 활용 소구에 집중",
+  "phase4c_hint": "리빙 카테고리 공감 트리거: 욕망(desire), 고통공감(pain_empathy), 안도(relief)",
+  "purchase_factors": "디자인, 실용성, 가격, 공간 적합성, 소재/내구성",
+  "dimension_weights": {
+    "visual_stimulus": 0.15,
+    "persuasion_density": 0.15,
+    "edit_rhythm": 0.08,
+    "audio_stimulus": 0.08,
+    "information_density": 0.10,
+    "persona_fit": 0.08,
+    "empathy_trigger": 0.10,
+    "narrative_structure": 0.10,
+    "retention_design": 0.16
+  }
+}

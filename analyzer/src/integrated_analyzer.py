@@ -68,11 +68,8 @@ class DiagnosisItem:
 class IntegratedDiagnosis:
     """Full 3-stage integrated analysis result."""
     # Stage 1: Classification
-    format_key: str
-    format_ko: str
-    intent_key: str
-    intent_ko: str
-    secondary_format: str | None = None
+    category_key: str
+    category_ko: str
     narration_type: str = "voice"
 
     # Stage 2: Dimension scores
@@ -90,11 +87,8 @@ class IntegratedDiagnosis:
     def to_dict(self) -> dict:
         return {
             "classification": {
-                "format": self.format_key,
-                "format_ko": self.format_ko,
-                "intent": self.intent_key,
-                "intent_ko": self.intent_ko,
-                "secondary_format": self.secondary_format,
+                "category": self.category_key,
+                "category_ko": self.category_ko,
                 "narration_type": self.narration_type,
             },
             "dimensions": [d.to_dict() for d in self.dimensions],
@@ -1100,33 +1094,36 @@ def _analyze_scenes(recipe: dict, profile: dict, duration: float, stt_data: dict
 def run_integrated_analysis(
     recipe: dict,
     stt_data: dict | None = None,
-    style_data: dict | None = None,
+    product_data: dict | None = None,
     caption_map: dict | None = None,
     raw_temporal: dict | None = None,
+    *,
+    style_data: dict | None = None,  # backward compat
 ) -> IntegratedDiagnosis:
     """Run 3-stage integrated analysis.
 
     Args:
         recipe: VideoRecipe dict (from Phase 6 or partial)
         stt_data: Phase 0 STT result dict
-        style_data: Phase 0.1 style classification dict
+        product_data: Phase 0.1 product scan dict
         caption_map: C-8 caption map dict
+        style_data: DEPRECATED — backward compat, falls back to product_data
 
     Returns:
         IntegratedDiagnosis with all three stages.
     """
-    from .style_classifier import FORMAT_LABELS_KO, INTENT_LABELS_KO
-    from .style_profiles import get_merged_profile
+    # Backward compatibility: if product_data not provided, try style_data
+    if product_data is None and style_data is not None:
+        product_data = style_data
+    from .product_scanner import CATEGORY_LABELS_KO
+    from .style_profiles import get_category_profile
 
     # ── Stage 1: Classification ──────────────────────────────────────────
-    fmt_key = (style_data or {}).get("primary_format", "caption_text")
-    int_key = (style_data or {}).get("primary_intent", "commerce")
-    fmt_ko = FORMAT_LABELS_KO.get(fmt_key, fmt_key)
-    int_ko = INTENT_LABELS_KO.get(int_key, int_key)
-    sec_fmt = (style_data or {}).get("secondary_format")
+    category_key = (product_data or {}).get("category", "general")
+    category_ko = CATEGORY_LABELS_KO.get(category_key, category_key)
     nar_type = (stt_data or {}).get("narration_type", "silent")
 
-    profile = get_merged_profile(fmt_key, int_key)
+    profile = get_category_profile(category_key)
     weights = profile.get("dimension_weights", {})
 
     duration = (recipe.get("meta") or {}).get("duration", 30)
@@ -1198,21 +1195,18 @@ def run_integrated_analysis(
     warning_count = sum(1 for dx in diagnoses if dx.severity == "warning")
 
     if danger_count > 0:
-        summary = f"{fmt_ko}×{int_ko} 영상으로, 즉시 개선이 필요한 위험 요소가 {danger_count}건 발견되었습니다."
+        summary = f"{category_ko} 카테고리 영상으로, 즉시 개선이 필요한 위험 요소가 {danger_count}건 발견되었습니다."
     elif warning_count > 0:
-        summary = f"{fmt_ko}×{int_ko} 영상으로, {warning_count}건의 개선 포인트가 있습니다."
+        summary = f"{category_ko} 카테고리 영상으로, {warning_count}건의 개선 포인트가 있습니다."
     else:
-        summary = f"{fmt_ko}×{int_ko} 영상으로, 전반적으로 양호합니다."
+        summary = f"{category_ko} 카테고리 영상으로, 전반적으로 양호합니다."
 
     if strengths:
         summary += f" 강점: {', '.join(strengths[:2])}."
 
     return IntegratedDiagnosis(
-        format_key=fmt_key,
-        format_ko=fmt_ko,
-        intent_key=int_key,
-        intent_ko=int_ko,
-        secondary_format=sec_fmt,
+        category_key=category_key,
+        category_ko=category_ko,
         narration_type=nar_type,
         dimensions=dimensions,
         engagement_score=engagement,

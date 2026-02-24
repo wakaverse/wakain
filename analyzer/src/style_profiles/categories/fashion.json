@@ -1,0 +1,19 @@
+{
+  "category": "fashion",
+  "category_ko": "패션",
+  "key_appeals": ["design_aesthetic", "lifestyle", "social_proof", "price", "feature_demo"],
+  "phase4a_hint": "패션 영상 — 착용 핏, 스타일링 조합, 소재감, 사이즈 정보 소구에 집중",
+  "phase4c_hint": "패션 카테고리 공감 트리거: 욕망(desire), 소속감(belonging), FOMO",
+  "purchase_factors": "디자인, 핏감, 소재, 가격, 트렌드 부합",
+  "dimension_weights": {
+    "visual_stimulus": 0.18,
+    "persuasion_density": 0.12,
+    "edit_rhythm": 0.10,
+    "audio_stimulus": 0.08,
+    "information_density": 0.08,
+    "persona_fit": 0.10,
+    "empathy_trigger": 0.10,
+    "narrative_structure": 0.08,
+    "retention_design": 0.16
+  }
+}

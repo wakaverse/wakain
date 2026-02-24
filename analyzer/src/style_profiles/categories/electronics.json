@@ -1,0 +1,19 @@
+{
+  "category": "electronics",
+  "category_ko": "전자기기",
+  "key_appeals": ["spec_data", "feature_demo", "comparison", "price", "track_record"],
+  "phase4a_hint": "전자기기 영상 — 스펙 수치, 기능 시연, 경쟁 제품 비교, 실사용 편의성 소구에 집중",
+  "phase4c_hint": "전자기기 카테고리 공감 트리거: 호기심(curiosity), 고통공감(pain_empathy), 자부심(pride)",
+  "purchase_factors": "성능 스펙, 가격, 브랜드 신뢰도, 실사용 후기, A/S",
+  "dimension_weights": {
+    "visual_stimulus": 0.10,
+    "persuasion_density": 0.18,
+    "edit_rhythm": 0.08,
+    "audio_stimulus": 0.08,
+    "information_density": 0.18,
+    "persona_fit": 0.08,
+    "empathy_trigger": 0.06,
+    "narrative_structure": 0.08,
+    "retention_design": 0.16
+  }
+}

@@ -1,4 +1,9 @@
-"""Phase 0.1: Video style classification — Format × Intent 2-axis system.
+"""DEPRECATED: Phase 0.1 Style Classifier — replaced by product_scanner.py.
+
+This module is kept for backward compatibility with existing _style.json files.
+New code should use product_scanner.scan_product() instead.
+
+Original: Phase 0.1: Video style classification — Format × Intent 2-axis system.
 
 Classifies video by:
   - Format (how it's made): talking_head, ugc_vlog, caption_text, product_demo,

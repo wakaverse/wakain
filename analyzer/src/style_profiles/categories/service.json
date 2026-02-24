@@ -1,0 +1,19 @@
+{
+  "category": "service",
+  "category_ko": "서비스",
+  "key_appeals": ["feature_demo", "social_proof", "price", "guarantee", "comparison"],
+  "phase4a_hint": "서비스 영상 — UI/UX 시연, 사용자 후기, 요금제 비교, 무료체험 소구에 집중",
+  "phase4c_hint": "서비스 카테고리 공감 트리거: 고통공감(pain_empathy), FOMO, 안도(relief)",
+  "purchase_factors": "기능, 가격/요금제, 사용 편의성, 고객 후기, 무료체험",
+  "dimension_weights": {
+    "visual_stimulus": 0.08,
+    "persuasion_density": 0.18,
+    "edit_rhythm": 0.08,
+    "audio_stimulus": 0.08,
+    "information_density": 0.16,
+    "persona_fit": 0.08,
+    "empathy_trigger": 0.08,
+    "narrative_structure": 0.10,
+    "retention_design": 0.16
+  }
+}
