@@ -8,6 +8,7 @@ import DimensionChart from '../components/Report/DimensionChart';
 import AppealAnalysis from '../components/Report/AppealAnalysis';
 import DiagnosisPanel from '../components/Report/DiagnosisPanel';
 import ArtDirectionPanel from '../components/Report/ArtDirectionPanel';
+import DiagnosisCards from '../components/Report/DiagnosisCards';
 import PersuasionStructure from '../components/Report/PersuasionStructure';
 import AppealTimelineBar from '../components/Report/AppealTimelineBar';
 
@@ -195,18 +196,22 @@ export default function ReportPage() {
                 )
               )}
               {activeTab === 'scores' && (
-                <div className="space-y-6">
-                  {dimensions.length > 0 && (
-                    <DimensionChart dimensions={dimensions} engagementScore={engagementScore} />
-                  )}
-                  <DiagnosisPanel
-                    strengths={strengths}
-                    weaknesses={weaknesses}
-                    diagnoses={diagnoses}
-                    prescriptions={prescriptions}
-                    onSeek={handleSeek}
-                  />
-                </div>
+                (result.diagnosis as any)?.axes ? (
+                  <DiagnosisCards diagnosis={result.diagnosis as any} />
+                ) : (
+                  <div className="space-y-6">
+                    {dimensions.length > 0 && (
+                      <DimensionChart dimensions={dimensions} engagementScore={engagementScore} />
+                    )}
+                    <DiagnosisPanel
+                      strengths={strengths}
+                      weaknesses={weaknesses}
+                      diagnoses={diagnoses}
+                      prescriptions={prescriptions}
+                      onSeek={handleSeek}
+                    />
+                  </div>
+                )
               )}
               {activeTab === 'art' && (
                 <ArtDirectionPanel art={artDirection} />

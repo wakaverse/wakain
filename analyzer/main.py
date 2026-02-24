@@ -434,15 +434,26 @@ def run_phase_7(
     if temporal_path.exists():
         raw_temporal = json.loads(temporal_path.read_text())
 
-    # C-9: Integrated analysis
-    print(f"[Phase 7] Running integrated analysis (3-stage) ...")
-    diagnosis = run_integrated_analysis(
-        recipe, stt_data=stt_data, product_data=product_data,
-        caption_map=cap_map, raw_temporal=raw_temporal,
+    # C-9: 3-axis diagnosis (replaces integrated_analyzer)
+    print(f"[Phase 7] Running 3-axis diagnosis ...")
+    from src.diagnosis_engine import run_diagnosis
+
+    # Load appeal structure
+    appeal_struct_path = out / f"{video_name}_appeal_structure.json"
+    appeal_structure = {}
+    if appeal_struct_path.exists():
+        appeal_structure = json.loads(appeal_struct_path.read_text())
+
+    diagnosis_result = run_diagnosis(
+        appeal_structure=appeal_structure,
+        product_info=product_data or {},
+        recipe=recipe,
+        stt_data=stt_data,
+        caption_map=cap_map,
     )
     diag_path = out / f"{video_name}_diagnosis.json"
-    diag_path.write_text(json.dumps(diagnosis.to_dict(), indent=2, ensure_ascii=False))
-    print(f"           → {len(diagnosis.diagnoses)} findings, engagement={diagnosis.engagement_score:.1f}")
+    diag_path.write_text(json.dumps(diagnosis_result, indent=2, ensure_ascii=False))
+    print(f"           → overall_score={diagnosis_result['overall_score']}, {len(diagnosis_result['axes'])} axes")
     print(f"           → {diag_path.name}")
 
     # C-10: Prescriptions

@@ -309,6 +309,28 @@ export interface AppealStructure {
   groups: AppealGroup[];
 }
 
+// ─── 3-axis Diagnosis (Phase 7 v2) ───
+
+export interface DiagnosisAxisEntry {
+  severity: 'ok' | 'warning' | 'danger';
+  finding: string;
+  recommendation: string;
+}
+
+export interface DiagnosisAxis {
+  id: string;
+  name: string;
+  score: number;
+  facts: Record<string, unknown>;
+  diagnoses: DiagnosisAxisEntry[];
+}
+
+export interface DiagnosisResult {
+  axes: DiagnosisAxis[];
+  overall_score: number;
+  top_3_actions: string[];
+}
+
 export interface AnalysisResult {
   video_recipe: VideoRecipe;
   diagnosis: Diagnosis | null;
