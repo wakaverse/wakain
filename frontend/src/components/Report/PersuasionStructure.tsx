@@ -404,157 +404,9 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
                 {group.scene_ids.map(sid => {
                   const scene = sceneMap.get(sid);
                   if (!scene) return null;
-                  const sceneOpen = openScenes.has(sid);
-                  const rhythmProfile = findRhythmProfile(scene.time_range, recipeSceneCards);
                   return (
                     <div key={sid} className="ml-4 bg-white rounded-xl border border-gray-100 overflow-hidden">
-                      <div
-                        className="p-3 cursor-pointer hover:bg-gray-50 transition-all duration-200"
-                        onClick={() => { toggleScene(sid); onSeek(scene.time_range[0]); }}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <span className="font-semibold text-sm text-gray-900">
-                              {scene.persuasion_intent || `씬 ${sid}`}
-                            </span>
-                            {scene.stt_text && (
-                              <p className="text-xs text-gray-500 italic mt-1 line-clamp-2">
-                                🎤 "{scene.stt_text}"
-                              </p>
-                            )}
-                            {(() => {
-                              const scriptAppeals = scene.appeals.filter(a => a.source === 'script');
-                              const visualAppeals = scene.appeals.filter(a => a.source === 'visual');
-                              const otherAppeals = scene.appeals.filter(a => a.source !== 'script' && a.source !== 'visual');
-                              return (
-                                <div className="flex gap-1.5 mt-1.5 flex-wrap">
-                                  {scriptAppeals.length > 0 && (
-                                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
-                                      🎤 대본 ×{scriptAppeals.length}
-                                    </span>
-                                  )}
-                                  {visualAppeals.length > 0 && (
-                                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
-                                      🎬 비주얼 ×{visualAppeals.length}
-                                    </span>
-                                  )}
-                                  {otherAppeals.length > 0 && (
-                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                                      🔗 복합 ×{otherAppeals.length}
-                                    </span>
-                                  )}
-                                </div>
-                              );
-                            })()}
-                            {rhythmProfile && (
-                              <div className="flex gap-2 mt-1.5 text-[10px] text-gray-400">
-                                <span>🎬 컷 {rhythmProfile.cut_count}개</span>
-                                <span>⚡ 밀도 {rhythmProfile.cut_density.toFixed(1)}/s</span>
-                                <span>🔍 줌 {rhythmProfile.zoom_events}</span>
-                                <span>🎨 색변 {rhythmProfile.color_shifts}</span>
-                                <span className={`font-medium ${
-                                  rhythmProfile.tempo_level === 'high' ? 'text-red-500' :
-                                  rhythmProfile.tempo_level === 'low' ? 'text-blue-500' : 'text-amber-500'
-                                }`}>
-                                  템포 {rhythmProfile.tempo_level === 'high' ? '빠름' : rhythmProfile.tempo_level === 'low' ? '느림' : '보통'}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            <span className="text-xs text-gray-400">{formatRange(scene.time_range)}</span>
-                            <span className={`text-gray-400 text-sm transition-transform duration-200 ${sceneOpen ? 'rotate-180' : ''}`}>▾</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Level 3: Cuts */}
-                      <div className={`transition-all duration-200 ${sceneOpen ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
-                        <div className="px-3 pb-3 space-y-2">
-                          {scene.cuts.map(cut => {
-                            const isCurrent = isCurrentCut(cut.time_range);
-                            const cutAppeals = scene.appeals.filter(a =>
-                              a.visual_proof.timestamp >= cut.time_range[0] &&
-                              a.visual_proof.timestamp < cut.time_range[1]
-                            );
-                            const cutTranscript = getCutTranscript(cut.time_range, stt);
-                            return (
-                              <div
-                                key={cut.cut_id}
-                                className={`ml-4 p-2.5 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 ${
-                                  isCurrent ? 'ring-2 ring-gray-900 bg-gray-50' : 'bg-white border border-gray-50'
-                                }`}
-                                onClick={() => onSeek(cut.time_range[0])}
-                              >
-                                <div className="flex items-start gap-3">
-                                  <div className="w-10 h-10 bg-gray-900 rounded flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                    {cut.cut_id}
-                                  </div>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-sm font-medium text-gray-900">컷{cut.cut_id}</span>
-                                      <span className="text-xs text-gray-400">{formatRange(cut.time_range)}</span>
-                                    </div>
-                                    {cutTranscript && (
-                                      <p className="text-xs text-gray-500 italic mt-0.5 line-clamp-2">
-                                        💬 &ldquo;{cutTranscript}&rdquo;
-                                      </p>
-                                    )}
-                                    {/* Script appeals */}
-                                    {cutAppeals.filter(a => a.source === 'script').map((appeal, i) => (
-                                      <p key={`s${i}`} className="text-xs text-gray-600 mt-1">
-                                        <span className="inline-flex items-center gap-1">
-                                          <span className="text-amber-600">🎤</span>
-                                          <span className="text-amber-700 font-medium">{getAppealTypeKo(appeal.type)}</span>
-                                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${strengthStyle[appeal.strength] || ''}`}>
-                                            {strengthLabel[appeal.strength] || ''}
-                                          </span>
-                                          {appeal.visual_proof?.technique && appeal.visual_proof.technique !== 'none' && (
-                                            <span className="text-[10px] text-gray-400">({appeal.visual_proof.technique})</span>
-                                          )}
-                                          <span className="text-gray-500">: {appeal.claim}</span>
-                                        </span>
-                                      </p>
-                                    ))}
-                                    {/* Visual appeals */}
-                                    {cutAppeals.filter(a => a.source === 'visual').map((appeal, i) => (
-                                      <p key={`v${i}`} className="text-xs text-gray-600 mt-1">
-                                        <span className="inline-flex items-center gap-1">
-                                          <span className="text-blue-600">🎬</span>
-                                          <span className="text-blue-700 font-medium">{getAppealTypeKo(appeal.type)}</span>
-                                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${strengthStyle[appeal.strength] || ''}`}>
-                                            {strengthLabel[appeal.strength] || ''}
-                                          </span>
-                                          {appeal.visual_proof?.technique && appeal.visual_proof.technique !== 'none' && (
-                                            <span className="text-[10px] text-gray-400">({appeal.visual_proof.technique})</span>
-                                          )}
-                                          <span className="text-gray-500">: {appeal.claim}</span>
-                                        </span>
-                                      </p>
-                                    ))}
-                                    {/* Legacy "both" fallback */}
-                                    {cutAppeals.filter(a => a.source === 'both' || !a.source).map((appeal, i) => (
-                                      <p key={`b${i}`} className="text-xs text-gray-600 mt-1">
-                                        <span className="inline-flex items-center gap-1">
-                                          <span className="text-purple-600">🔗</span>
-                                          <span className="text-purple-700 font-medium">{getAppealTypeKo(appeal.type)}</span>
-                                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${strengthStyle[appeal.strength] || ''}`}>
-                                            {strengthLabel[appeal.strength] || ''}
-                                          </span>
-                                          {appeal.visual_proof?.technique && appeal.visual_proof.technique !== 'none' && (
-                                            <span className="text-[10px] text-gray-400">({appeal.visual_proof.technique})</span>
-                                          )}
-                                          <span className="text-gray-500">: {appeal.claim}</span>
-                                        </span>
-                                      </p>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
+                      {renderSceneContent(scene, sid)}
                     </div>
                   );
                 })}
@@ -563,6 +415,8 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
           </div>
         );
       })}
+        </>
+      )}
     </div>
   );
 }
