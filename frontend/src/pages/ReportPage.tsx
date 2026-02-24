@@ -170,6 +170,7 @@ export default function ReportPage() {
                   duration={duration}
                   onSeek={handleSeek}
                   currentTime={currentTime}
+                  hookAnalysis={(diagnosis as any)?.hook_analysis || null}
                 />
               )}
               {activeTab === 'diagnosis' && (

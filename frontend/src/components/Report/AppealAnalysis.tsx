@@ -13,6 +13,12 @@ interface Appeal {
   source?: 'visual' | 'script' | 'both';
 }
 
+interface TranscriptSeg {
+  start: number;
+  end: number;
+  text: string;
+}
+
 interface SceneAnalysis {
   scene_index: number;
   time_range: string;
@@ -20,8 +26,25 @@ interface SceneAnalysis {
   attention: number;
   appeal_count: number;
   appeal_details?: Appeal[];
+  transcript?: TranscriptSeg[];
+  evaluation?: string;
   text_count?: number;
   duration: number;
+}
+
+interface HookAnalysis {
+  window_sec: number;
+  appeal_count: number;
+  first_appeal_time: number | null;
+  appeal_sequence: Array<{ type: string; type_ko: string; source: string; timestamp: number | null; claim: string }>;
+  hook_type: string;
+  hook_type_ko: string;
+  source_breakdown: { visual: number; script: number; both: number };
+  product_in_hook: boolean;
+  product_first_appear: number | null;
+  verdict: string;
+  verdict_ko: string;
+  verdict_detail: string;
 }
 
 interface Props {
@@ -29,6 +52,7 @@ interface Props {
   duration: number;
   onSeek: (time: number) => void;
   currentTime: number;
+  hookAnalysis?: HookAnalysis | null;
 }
 
 const roleColors: Record<string, string> = {
@@ -110,7 +134,78 @@ function AppealItem({ appeal, onSeek }: { appeal: Appeal & { time: number }; onS
   );
 }
 
-export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }: Props) {
+function HookCard({ hook, onSeek }: { hook: HookAnalysis; onSeek: (t: number) => void }) {
+  const verdictColors: Record<string, string> = {
+    strong: 'bg-emerald-50 border-emerald-200',
+    good: 'bg-yellow-50 border-yellow-200',
+    moderate: 'bg-yellow-50 border-yellow-200',
+    weak: 'bg-red-50 border-red-200',
+  };
+
+  return (
+    <div className={`rounded-xl border-2 p-4 ${verdictColors[hook.verdict] || 'bg-gray-50 border-gray-200'}`}>
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+          🎯 훅 해부 <span className="text-[11px] font-normal text-gray-400">(0-{hook.window_sec}초)</span>
+        </h4>
+        <span className="text-sm font-bold">{hook.verdict_ko}</span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        <div className="text-center bg-white/60 rounded-lg py-1.5">
+          <div className="text-lg font-bold text-gray-800">
+            {hook.first_appeal_time !== null ? `${hook.first_appeal_time.toFixed(1)}s` : '-'}
+          </div>
+          <div className="text-[10px] text-gray-500">⏱ 첫 소구</div>
+        </div>
+        <div className="text-center bg-white/60 rounded-lg py-1.5">
+          <div className="text-lg font-bold text-gray-800">{hook.appeal_count}</div>
+          <div className="text-[10px] text-gray-500">📊 소구 수</div>
+        </div>
+        <div className="text-center bg-white/60 rounded-lg py-1.5">
+          <div className="text-lg font-bold text-gray-800">{hook.hook_type_ko.split('형')[0]}</div>
+          <div className="text-[10px] text-gray-500">🪝 훅 유형</div>
+        </div>
+      </div>
+
+      {/* Appeal sequence */}
+      {hook.appeal_sequence.length > 0 && (
+        <div className="mb-3">
+          <div className="text-[11px] font-semibold text-gray-500 mb-1.5">소구 흐름</div>
+          <div className="flex flex-wrap gap-1.5">
+            {hook.appeal_sequence.map((a, i) => {
+              const srcIcon = a.source === 'visual' ? '🎬' : a.source === 'script' ? '🎤' : a.source === 'both' ? '🔗' : '📌';
+              return (
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-white/80 rounded-md text-[11px] text-gray-700 cursor-pointer hover:bg-white transition-colors"
+                  onClick={() => a.timestamp != null && onSeek(a.timestamp)}
+                  title={a.claim}
+                >
+                  {srcIcon} {a.type_ko || a.type}
+                  {i < hook.appeal_sequence.length - 1 && <span className="text-gray-300 ml-1">→</span>}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Verdict detail */}
+      <p className="text-xs text-gray-600 leading-relaxed">{hook.verdict_detail}</p>
+
+      {/* Product visibility */}
+      <div className="mt-2 text-[11px] text-gray-500">
+        {hook.product_in_hook
+          ? `✅ 제품 ${hook.product_first_appear?.toFixed(1)}초에 등장`
+          : `⚠️ 3초 내 제품 미등장${hook.product_first_appear != null ? ` (${hook.product_first_appear.toFixed(1)}초에 첫 등장)` : ''}`
+        }
+      </div>
+    </div>
+  );
+}
+
+export default function AppealAnalysis({ scenes, duration, onSeek, currentTime, hookAnalysis }: Props) {
   // 전체 통계
   let totalVisual = 0;
   let totalScript = 0;
@@ -164,6 +259,11 @@ export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }
           ))}
         </div>
       </div>
+
+      {/* 훅 분석 카드 */}
+      {hookAnalysis && hookAnalysis.appeal_count > 0 && (
+        <HookCard hook={hookAnalysis} onSeek={onSeek} />
+      )}
 
       {/* 소구 요약 */}
       <div className="flex gap-2">
@@ -233,6 +333,29 @@ export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }
                 <AttentionBar value={s.attention} />
               </div>
 
+              {/* 스크립트(대본) */}
+              {(s.transcript && s.transcript.length > 0) && (
+                <div className="px-4 pb-2">
+                  <div className="text-[11px] font-semibold text-gray-400 mb-1 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+                    대본
+                  </div>
+                  <div className="bg-gray-50 rounded-lg px-3 py-2 space-y-1">
+                    {s.transcript.map((seg, i) => (
+                      <p key={i} className="text-xs text-gray-600 leading-relaxed">
+                        <span
+                          className="font-mono text-[10px] text-gray-400 cursor-pointer hover:text-gray-600"
+                          onClick={() => onSeek(seg.start)}
+                        >
+                          {seg.start.toFixed(1)}s
+                        </span>
+                        {' '}<span className="text-gray-700">{seg.text}</span>
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* 소구 상세 — 비주얼/텍스트 분리 */}
               {hasAppeals && (
                 <div className="px-4 pb-3 space-y-2">
@@ -280,8 +403,20 @@ export default function AppealAnalysis({ scenes, duration, onSeek, currentTime }
 
               {/* 소구 없는 씬 */}
               {!hasAppeals && (
-                <div className="px-4 pb-3 text-[11px] text-gray-300 italic">
-                  감지된 소구 없음
+                <div className="px-4 pb-3 text-[11px] text-gray-400 italic">
+                  {s.evaluation || '감지된 소구 없음'}
+                </div>
+              )}
+
+              {/* 평가 의견 */}
+              {hasAppeals && s.evaluation && (
+                <div className="px-4 pb-3">
+                  <div className="bg-gray-50 rounded-lg px-3 py-2">
+                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                      <span className="font-semibold text-gray-600">💬 평가</span>{' '}
+                      {s.evaluation}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

@@ -82,6 +82,7 @@ class IntegratedDiagnosis:
     # Stage 3: Diagnosis items
     diagnoses: list[DiagnosisItem] = field(default_factory=list)
     scene_analyses: list[dict] = field(default_factory=list)  # per-scene analysis
+    hook_analysis: dict = field(default_factory=dict)  # first 3s hook analysis
     summary: str = ""  # 1-2 sentence overall diagnosis (Korean)
     strengths: list[str] = field(default_factory=list)
     weaknesses: list[str] = field(default_factory=list)
@@ -100,6 +101,7 @@ class IntegratedDiagnosis:
             "engagement_score": round(self.engagement_score, 1),
             "diagnoses": [d.to_dict() for d in self.diagnoses],
             "scene_analyses": self.scene_analyses,
+            "hook_analysis": self.hook_analysis,
             "summary": self.summary,
             "strengths": self.strengths,
             "weaknesses": self.weaknesses,
@@ -713,6 +715,85 @@ def _generate_diagnoses(
 # ── Main entry point ─────────────────────────────────────────────────────────
 
 
+def _evaluate_scene_appeals(
+    scene_index: int,
+    role: str,
+    appeals: list[dict],
+    s_dur: float,
+    s_start: float,
+    duration: float,
+    effective_appeals: set,
+    has_transcript: bool,
+) -> str:
+    """Generate a concise evaluation comment for a scene's appeals."""
+    if not appeals and s_dur < 0.8:
+        return ""  # Very short scene, skip
+
+    # Role expectations
+    role_expectations = {
+        "hook": "시청자의 즉각적인 관심을 끌어야 하는 구간",
+        "demo": "제품/기능을 구체적으로 보여줘야 하는 구간",
+        "proof": "주장을 뒷받침할 증거가 필요한 구간",
+        "solution": "문제의 해결책을 제시해야 하는 구간",
+        "cta": "행동을 유도해야 하는 구간",
+        "recap": "핵심 메시지를 정리하는 구간",
+        "problem": "문제/공감을 제기하는 구간",
+    }
+
+    parts = []
+
+    # 1. No appeals
+    if not appeals:
+        expectation = role_expectations.get(role, "")
+        if role in ("hook", "cta", "demo"):
+            parts.append(f"소구 없음 — {expectation}인데 설득 포인트가 빠져있습니다.")
+            if role == "cta":
+                parts.append("가격, 긴급성, 보장 등 행동 유도 소구를 추가하세요.")
+            elif role == "hook":
+                parts.append("문제제기, 충격적 수치, 강한 감정 등 즉각적인 소구가 필요합니다.")
+        else:
+            parts.append(f"소구 없음 — 정보 전달이나 전환 역할의 구간입니다.")
+        return " ".join(parts)
+
+    # 2. Appeal effectiveness
+    appeal_types = [a.get("type", "") for a in appeals]
+    effective_count = sum(1 for t in appeal_types if t in effective_appeals)
+    ineffective = [a for a in appeals if a.get("type", "") not in effective_appeals and a.get("type", "")]
+
+    if effective_count == len(appeals) and len(appeals) >= 2:
+        parts.append(f"소구 {len(appeals)}개 모두 이 스타일에 효과적인 유형입니다.")
+    elif effective_count > 0:
+        parts.append(f"소구 {len(appeals)}개 중 {effective_count}개가 효과적.")
+        if ineffective:
+            ineff_names = [a.get("type_ko", a.get("type", "")) for a in ineffective[:2]]
+            parts.append(f"{', '.join(ineff_names)}은(는) 이 스타일에서 효과가 낮을 수 있습니다.")
+    elif appeals:
+        parts.append(f"소구 {len(appeals)}개가 있으나 스타일에 최적화된 소구 유형이 아닙니다.")
+
+    # 3. Source diversity
+    sources = [a.get("source", "") for a in appeals]
+    visual_only = all(s == "visual" for s in sources if s)
+    script_only = all(s == "script" for s in sources if s)
+    has_both = any(s == "both" for s in sources)
+
+    if has_both:
+        parts.append("화면+음성 동시 전달(복합 소구)이 있어 설득력이 높습니다.")
+    elif visual_only and has_transcript:
+        parts.append("비주얼만으로 전달 — 나레이션과 연동하면 설득력이 강화됩니다.")
+    elif script_only:
+        parts.append("음성으로만 전달 — 화면에 텍스트/이미지 증거를 추가하면 효과적입니다.")
+
+    # 4. Role-specific advice
+    if role == "hook" and len(appeals) < 2:
+        parts.append("훅 구간은 최소 2개 이상의 빠른 소구가 권장됩니다.")
+    elif role == "cta":
+        cta_types = {"price", "urgency", "guarantee"}
+        if not any(t in cta_types for t in appeal_types):
+            parts.append("CTA 구간에 가격/긴급성/보장 소구가 없습니다 — 구매 전환을 위해 추가를 권장합니다.")
+
+    return " ".join(parts)
+
+
 def _analyze_scenes(recipe: dict, profile: dict, duration: float) -> list[dict]:
     from .appeal_labels import appeal_ko, technique_ko, format_appeal
     """Analyze each scene individually, generating per-scene diagnostics.
@@ -844,6 +925,38 @@ def _analyze_scenes(recipe: dict, profile: dict, duration: float) -> list[dict]:
                     detail["visual_description"] = vp.get("description", "")
                 appeal_details.append(detail)
 
+        # Extract transcript segments
+        transcript_segs = sc.get("transcript_segments", [])
+        transcript_texts = []
+        for seg in transcript_segs:
+            if isinstance(seg, dict):
+                transcript_texts.append({
+                    "start": seg.get("start", 0),
+                    "end": seg.get("end", 0),
+                    "text": seg.get("text", ""),
+                })
+
+        # Extract source from appeals
+        for detail in appeal_details:
+            # Find matching appeal to get source
+            for a in appeals:
+                if isinstance(a, dict) and a.get("type") == detail.get("type") and a.get("claim") == detail.get("claim"):
+                    detail["source"] = a.get("source", "")
+                    detail["timestamp"] = a.get("visual_proof", {}).get("timestamp") if isinstance(a.get("visual_proof"), dict) else None
+                    break
+
+        # Scene evaluation comment
+        eval_comment = _evaluate_scene_appeals(
+            scene_index=i + 1,
+            role=role,
+            appeals=appeal_details,
+            s_dur=s_dur,
+            s_start=s_start,
+            duration=duration,
+            effective_appeals=effective_appeals,
+            has_transcript=len(transcript_texts) > 0,
+        )
+
         results.append({
             "scene_index": i + 1,
             "time_range": f"{s_start:.1f}-{s_end:.1f}s",
@@ -853,9 +966,11 @@ def _analyze_scenes(recipe: dict, profile: dict, duration: float) -> list[dict]:
             "appeal_types": appeal_types,
             "appeal_types_ko": [appeal_ko(t) for t in appeal_types],
             "appeal_details": appeal_details,
+            "transcript": transcript_texts,
             "text_count": len(text_overlays),
             "duration": round(s_dur, 2),
             "diagnoses": scene_diags,
+            "evaluation": eval_comment,
         })
 
     return results
@@ -935,6 +1050,9 @@ def run_integrated_analysis(
         for dx in sa.get("diagnoses", []):
             diagnoses.append(DiagnosisItem(**dx))
 
+    # Hook analysis (first 3 seconds)
+    hook_analysis = _analyze_hook(scene_analyses, recipe, duration)
+
     # Strip per-scene diagnoses from scene_analyses (avoid duplication in output)
     scene_analyses_clean = []
     for sa in scene_analyses:
@@ -975,7 +1093,131 @@ def run_integrated_analysis(
         engagement_score=engagement,
         diagnoses=diagnoses,
         scene_analyses=scene_analyses_clean,
+        hook_analysis=hook_analysis,
         summary=summary,
         strengths=strengths,
         weaknesses=weaknesses,
     )
+
+
+def _analyze_hook(scene_analyses: list[dict], recipe: dict, duration: float) -> dict:
+    """Analyze the first 3 seconds (hook) — appeal structure, timing, verdict."""
+    HOOK_WINDOW = 3.0  # seconds
+
+    # Collect all appeals within first 3s
+    hook_appeals = []
+    hook_transcript = []
+    hook_scenes = []
+
+    for sa in scene_analyses:
+        tr = sa.get("time_range", "0.0-0.0s")
+        match = __import__("re").match(r"([\d.]+)-([\d.]+)", tr)
+        if not match:
+            continue
+        s_start, s_end = float(match.group(1)), float(match.group(2))
+
+        # Scene overlaps with first 3 seconds?
+        if s_start >= HOOK_WINDOW:
+            continue
+
+        hook_scenes.append(sa)
+
+        for a in (sa.get("appeal_details") or []):
+            ts = a.get("timestamp")
+            if ts is not None and float(ts) <= HOOK_WINDOW:
+                hook_appeals.append(a)
+            elif ts is None and s_start < HOOK_WINDOW:
+                hook_appeals.append(a)
+
+        for seg in (sa.get("transcript") or []):
+            if seg.get("start", 0) < HOOK_WINDOW:
+                hook_transcript.append(seg)
+
+    # First appeal time
+    first_appeal_time = None
+    for a in hook_appeals:
+        ts = a.get("timestamp")
+        if ts is not None:
+            if first_appeal_time is None or float(ts) < first_appeal_time:
+                first_appeal_time = float(ts)
+
+    # Appeal sequence
+    appeal_sequence = []
+    sorted_appeals = sorted(hook_appeals, key=lambda a: float(a.get("timestamp", 0) or 0))
+    for a in sorted_appeals:
+        appeal_sequence.append({
+            "type": a.get("type", ""),
+            "type_ko": a.get("type_ko", ""),
+            "source": a.get("source", ""),
+            "timestamp": a.get("timestamp"),
+            "claim": a.get("claim", "")[:60],
+        })
+
+    # Hook type detection
+    hook_type = "unknown"
+    hook_type_ko = "미분류"
+    if hook_appeals:
+        first_type = sorted_appeals[0].get("type", "") if sorted_appeals else ""
+        first_claim = (sorted_appeals[0].get("claim", "") if sorted_appeals else "").lower()
+
+        if first_type == "myth_bust" or "?" in first_claim or "진짜" in first_claim:
+            hook_type, hook_type_ko = "question", "질문/문제제기형"
+        elif first_type == "emotional" or first_type == "nostalgia":
+            hook_type, hook_type_ko = "emotion", "감정/공감형"
+        elif first_type in ("price", "urgency", "guarantee"):
+            hook_type, hook_type_ko = "benefit", "혜택/긴급형"
+        elif first_type in ("spec_data", "track_record", "social_proof"):
+            hook_type, hook_type_ko = "proof", "증거/수치형"
+        elif first_type in ("feature_demo", "ingredient", "manufacturing"):
+            hook_type, hook_type_ko = "demo", "시연/소개형"
+        else:
+            hook_type, hook_type_ko = "visual", "비주얼 임팩트형"
+
+    # Source breakdown
+    visual_count = sum(1 for a in hook_appeals if a.get("source") == "visual")
+    script_count = sum(1 for a in hook_appeals if a.get("source") == "script")
+    both_count = sum(1 for a in hook_appeals if a.get("source") == "both")
+
+    # Verdict
+    verdict = "weak"
+    verdict_ko = "⚠️ 약함"
+    verdict_detail = ""
+
+    if len(hook_appeals) >= 3 and first_appeal_time is not None and first_appeal_time <= 1.0:
+        verdict = "strong"
+        verdict_ko = "🟢 강력"
+        verdict_detail = f"1초 내 첫 소구, 3초 내 {len(hook_appeals)}개 소구로 강력하게 시청자를 잡습니다."
+    elif len(hook_appeals) >= 2 and first_appeal_time is not None and first_appeal_time <= 2.0:
+        verdict = "good"
+        verdict_ko = "🟡 양호"
+        verdict_detail = f"2초 내 첫 소구, {len(hook_appeals)}개 소구. 충분하지만 더 빠른 어필이 가능합니다."
+    elif len(hook_appeals) >= 1:
+        verdict = "moderate"
+        verdict_ko = "🟡 보통"
+        verdict_detail = f"3초 내 {len(hook_appeals)}개 소구. 첫 소구가 {first_appeal_time:.1f}초로 다소 늦습니다."
+    else:
+        verdict_detail = "3초 내 감지된 소구가 없습니다. 훅 구간에 강력한 소구를 추가하세요."
+
+    # Product visibility in first 3s
+    product_first = recipe.get("persuasion_analysis", {}).get("product_emphasis", {}).get("first_appear")
+    product_in_hook = product_first is not None and float(product_first) <= HOOK_WINDOW
+
+    return {
+        "window_sec": HOOK_WINDOW,
+        "appeal_count": len(hook_appeals),
+        "first_appeal_time": first_appeal_time,
+        "appeal_sequence": appeal_sequence,
+        "hook_type": hook_type,
+        "hook_type_ko": hook_type_ko,
+        "source_breakdown": {
+            "visual": visual_count,
+            "script": script_count,
+            "both": both_count,
+        },
+        "product_in_hook": product_in_hook,
+        "product_first_appear": float(product_first) if product_first is not None else None,
+        "transcript": hook_transcript,
+        "verdict": verdict,
+        "verdict_ko": verdict_ko,
+        "verdict_detail": verdict_detail,
+    }
