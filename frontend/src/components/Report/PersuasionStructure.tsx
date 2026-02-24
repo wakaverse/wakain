@@ -82,8 +82,47 @@ function findRhythmProfile(sceneTimeRange: [number, number], recipeSceneCards: a
 function getCutTranscript(cutTimeRange: [number, number], stt: Stt | null): string {
   if (!stt?.segments) return '';
   const [start, end] = cutTimeRange;
-  const matching = stt.segments.filter(seg => seg.start < end && seg.end > start);
-  return matching.map(seg => seg.text).join(' ').trim();
+
+  // Word-level slicing: only show words that fall within the cut's time range
+  const words: string[] = [];
+  for (const seg of stt.segments) {
+    if (seg.end <= start || seg.start >= end) continue;
+
+    // If segment has word-level timing, slice precisely
+    if (seg.words && seg.words.length > 0) {
+      for (const w of seg.words) {
+        // Word overlaps with cut time range
+        if (w.end > start && w.start < end) {
+          words.push(w.word);
+        }
+      }
+    } else {
+      // Fallback: estimate by position ratio within the segment
+      const segDur = seg.end - seg.start;
+      if (segDur <= 0) { words.push(seg.text); continue; }
+
+      const overlapStart = Math.max(start, seg.start);
+      const overlapEnd = Math.min(end, seg.end);
+      const overlapRatio = (overlapEnd - overlapStart) / segDur;
+
+      if (overlapRatio > 0.6) {
+        // Most of the segment is in this cut — show full text
+        words.push(seg.text);
+      } else {
+        // Partial — approximate by splitting text
+        const text = seg.text;
+        const chars = text.length;
+        const startRatio = Math.max(0, (overlapStart - seg.start) / segDur);
+        const endRatio = Math.min(1, (overlapEnd - seg.start) / segDur);
+        const sliceStart = Math.floor(startRatio * chars);
+        const sliceEnd = Math.ceil(endRatio * chars);
+        const sliced = text.slice(sliceStart, sliceEnd).trim();
+        if (sliced) words.push(sliced);
+      }
+    }
+  }
+
+  return words.join(' ').trim();
 }
 
 export default function PersuasionStructure({ appealStructure, sceneCards, stt, onSeek, currentTime, recipe }: Props) {
