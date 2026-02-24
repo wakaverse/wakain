@@ -14,7 +14,7 @@ type TabId = 'structure' | 'scores' | 'art';
 
 const tabs: { id: TabId; label: string; icon: string }[] = [
   { id: 'structure', label: '설득 구조', icon: '🎯' },
-  { id: 'scores', label: '점수 상세', icon: '📊' },
+  { id: 'scores', label: '진단서', icon: '💊' },
   { id: 'art', label: '아트 디렉션', icon: '🎨' },
 ];
 
