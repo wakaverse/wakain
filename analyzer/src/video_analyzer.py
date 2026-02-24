@@ -843,8 +843,7 @@ Be specific and detailed. Use Korean for script_summary, hook_line, cta_line, pe
                 else:
                     raise RuntimeError(f"Video analysis failed after {max_retries} retries: {e}") from e
 
-        # Phase 4b: Art direction (separate call, same uploaded file)
-        print("  Analysing art direction...")
+        # Phase 4b + 4c: Art direction & Engagement analysis (parallel)
         artwork_context = _aggregate_artwork_context(frame_quals) if frame_quals else ""
         art_context_block = f"""
 {artwork_context}
@@ -870,38 +869,6 @@ Return a JSON object with art_direction containing:
 - visual_consistency: high/medium/low
 - style_reference: what this style resembles in Korean"""
 
-        for attempt in range(max_retries):
-            try:
-                art_response = await client.aio.models.generate_content(
-                    model=MODEL,
-                    contents=[
-                        types.Part.from_uri(
-                            file_uri=uploaded_file.uri,
-                            mime_type=uploaded_file.mime_type,
-                        ),
-                        types.Part.from_text(text=art_prompt),
-                    ],
-                    config=types.GenerateContentConfig(
-                        system_instruction=SYSTEM_INSTRUCTION,
-                        response_mime_type="application/json",
-                        response_schema=_ART_DIRECTION_SCHEMA,
-                        temperature=0.1,
-                    ),
-                )
-                art_data = json.loads(art_response.text)
-                result["art_direction"] = art_data.get("art_direction", art_data)
-                print("  ✓ Art direction complete")
-                break
-            except Exception as e:
-                wait = 2 ** attempt * 5
-                if attempt < max_retries - 1:
-                    print(f"  ⚠ Art direction retry {attempt+1}/{max_retries} ({type(e).__name__}), waiting {wait}s...")
-                    await asyncio.sleep(wait)
-                else:
-                    print(f"  ⚠ Art direction failed after {max_retries} retries, skipping: {e}")
-
-        # Phase 4c: Engagement analysis (empathy, narrative, retention — separate call)
-        print("  Analysing engagement factors...")
         engagement_prompt = """Analyse this shortform marketing video's engagement factors.
 
 Return a JSON with:
@@ -911,37 +878,84 @@ Return a JSON with:
 
 Focus on what makes viewers FEEL, STAY, and SHARE."""
 
-        for attempt in range(max_retries):
-            try:
-                eng_response = await client.aio.models.generate_content(
-                    model=MODEL,
-                    contents=[
-                        types.Part.from_uri(
-                            file_uri=uploaded_file.uri,
-                            mime_type=uploaded_file.mime_type,
+        async def _do_4b():
+            for attempt in range(max_retries):
+                try:
+                    art_response = await client.aio.models.generate_content(
+                        model=MODEL,
+                        contents=[
+                            types.Part.from_uri(
+                                file_uri=uploaded_file.uri,
+                                mime_type=uploaded_file.mime_type,
+                            ),
+                            types.Part.from_text(text=art_prompt),
+                        ],
+                        config=types.GenerateContentConfig(
+                            system_instruction=SYSTEM_INSTRUCTION,
+                            response_mime_type="application/json",
+                            response_schema=_ART_DIRECTION_SCHEMA,
+                            temperature=0.1,
                         ),
-                        types.Part.from_text(text=engagement_prompt),
-                    ],
-                    config=types.GenerateContentConfig(
-                        system_instruction=SYSTEM_INSTRUCTION,
-                        response_mime_type="application/json",
-                        response_schema=_ENGAGEMENT_SCHEMA,
-                        temperature=0.1,
-                    ),
-                )
-                eng_data = json.loads(eng_response.text)
-                result["empathy_triggers"] = eng_data.get("empathy_triggers", [])
-                result["narrative_analysis"] = eng_data.get("narrative_analysis", {})
-                result["retention_analysis"] = eng_data.get("retention_analysis", {})
-                print("  ✓ Engagement analysis complete")
-                break
-            except Exception as e:
-                wait = 2 ** attempt * 5
-                if attempt < max_retries - 1:
-                    print(f"  ⚠ Engagement retry {attempt+1}/{max_retries} ({type(e).__name__}), waiting {wait}s...")
-                    await asyncio.sleep(wait)
-                else:
-                    print(f"  ⚠ Engagement analysis failed after {max_retries} retries, skipping: {e}")
+                    )
+                    art_data = json.loads(art_response.text)
+                    print("  ✓ Art direction complete")
+                    return ("art", art_data)
+                except Exception as e:
+                    wait = 2 ** attempt * 5
+                    if attempt < max_retries - 1:
+                        print(f"  ⚠ Art direction retry {attempt+1}/{max_retries} ({type(e).__name__}), waiting {wait}s...")
+                        await asyncio.sleep(wait)
+                    else:
+                        print(f"  ⚠ Art direction failed after {max_retries} retries, skipping: {e}")
+                        return ("art", None)
+
+        async def _do_4c():
+            for attempt in range(max_retries):
+                try:
+                    eng_response = await client.aio.models.generate_content(
+                        model=MODEL,
+                        contents=[
+                            types.Part.from_uri(
+                                file_uri=uploaded_file.uri,
+                                mime_type=uploaded_file.mime_type,
+                            ),
+                            types.Part.from_text(text=engagement_prompt),
+                        ],
+                        config=types.GenerateContentConfig(
+                            system_instruction=SYSTEM_INSTRUCTION,
+                            response_mime_type="application/json",
+                            response_schema=_ENGAGEMENT_SCHEMA,
+                            temperature=0.1,
+                        ),
+                    )
+                    eng_data = json.loads(eng_response.text)
+                    print("  ✓ Engagement analysis complete")
+                    return ("eng", eng_data)
+                except Exception as e:
+                    wait = 2 ** attempt * 5
+                    if attempt < max_retries - 1:
+                        print(f"  ⚠ Engagement retry {attempt+1}/{max_retries} ({type(e).__name__}), waiting {wait}s...")
+                        await asyncio.sleep(wait)
+                    else:
+                        print(f"  ⚠ Engagement analysis failed after {max_retries} retries, skipping: {e}")
+                        return ("eng", None)
+
+        print("  Analysing art direction + engagement (parallel)...")
+        parallel_results = await asyncio.gather(_do_4b(), _do_4c(), return_exceptions=True)
+
+        for res in parallel_results:
+            if isinstance(res, Exception):
+                print(f"  ⚠ Parallel task failed: {res}")
+                continue
+            tag, data = res
+            if data is None:
+                continue
+            if tag == "art":
+                result["art_direction"] = data.get("art_direction", data)
+            elif tag == "eng":
+                result["empathy_triggers"] = data.get("empathy_triggers", [])
+                result["narrative_analysis"] = data.get("narrative_analysis", {})
+                result["retention_analysis"] = data.get("retention_analysis", {})
 
         return result
     finally:
