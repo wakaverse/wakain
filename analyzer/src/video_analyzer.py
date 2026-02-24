@@ -38,10 +38,7 @@ effectiveness. Respond with valid JSON matching the requested schema exactly.
 For audio analysis:
 - Listen carefully to music, voice, and sound effects
 - Identify music genre, energy, BPM range, beat synchronisation with cuts
-- **CRITICAL: Produce a full timestamped transcript of ALL spoken words.**
-  Each segment should have start/end times (seconds) and the exact text spoken.
-  Use the original language (Korean). Split at natural sentence/phrase boundaries.
-  Example: {"start": 0.0, "end": 1.5, "text": "김이 다 거기서 거기라고요?"}
+- Do NOT produce a transcript (transcript is provided separately via STT).
 - Summarise the voice script in Korean
 - Note any sound effects used
 
@@ -292,21 +289,8 @@ _RESPONSE_SCHEMA = {
                         "script_summary": {"type": "STRING"},
                         "hook_line": {"type": "STRING"},
                         "cta_line": {"type": "STRING"},
-                        "transcript": {
-                            "type": "ARRAY",
-                            "items": {
-                                "type": "OBJECT",
-                                "properties": {
-                                    "start": {"type": "NUMBER"},
-                                    "end": {"type": "NUMBER"},
-                                    "text": {"type": "STRING"},
-                                    "speaker": {"type": "STRING"},
-                                },
-                                "required": ["start", "end", "text"],
-                            },
-                        },
                     },
-                    "required": ["type", "tone", "language", "script_summary", "hook_line", "cta_line", "transcript"],
+                    "required": ["type", "tone", "language", "script_summary", "hook_line", "cta_line"],
                 },
                 "sfx": {
                     "type": "OBJECT",
@@ -614,7 +598,7 @@ async def analyse_video(
 Return a JSON object with these sections:
 1. meta: platform, duration, aspect_ratio, category, sub_category, target_audience
 2. structure: type, scene_sequence (role + duration + technique for each), hook_time, product_first_appear, cta_start
-3. audio: music (genre, energy, BPM, beat_sync), voice (type, tone, script_summary, hook_line, cta_line, **transcript with timestamps**), sfx, audio_visual_sync
+3. audio: music (genre, energy, BPM, beat_sync), voice (type, tone, script_summary, hook_line, cta_line), sfx, audio_visual_sync
 4. product_strategy: reveal_timing, demonstration_method, key_benefit, pricing, social_proof, urgency, brand_visibility
 5. effectiveness_assessment: ratings for hook, flow, clarity, CTA, replay + standout elements + weak points
 6. text_effects: list every on-screen text animation (time, content, entrance, exit, emphasis, sync_with)

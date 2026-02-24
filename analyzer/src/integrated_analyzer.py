@@ -925,23 +925,13 @@ def _analyze_scenes(recipe: dict, profile: dict, duration: float, stt_data: dict
                     detail["visual_description"] = vp.get("description", "")
                 appeal_details.append(detail)
 
-        # Extract transcript segments — from scene data or fallback to STT
-        transcript_segs = sc.get("transcript_segments", [])
+        # Extract transcript segments from Phase 0 Soniox STT
         transcript_texts = []
-        for seg in transcript_segs:
-            if isinstance(seg, dict):
-                transcript_texts.append({
-                    "start": seg.get("start", 0),
-                    "end": seg.get("end", 0),
-                    "text": seg.get("text", ""),
-                })
-
-        # Fallback: if no transcript from Phase 4, use Phase 0 STT segments
-        if not transcript_texts and stt_data:
+        if stt_data:
             for seg in stt_data.get("segments", []):
                 seg_start = seg.get("start", 0)
                 seg_end = seg.get("end", 0)
-                # Overlap check
+                # Overlap check with scene boundaries
                 if seg_end > s_start and seg_start < s_end and seg.get("text", "").strip():
                     transcript_texts.append({
                         "start": seg_start,

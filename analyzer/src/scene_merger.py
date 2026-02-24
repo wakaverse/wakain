@@ -34,13 +34,6 @@ def _rescale_timestamps(video_analysis: dict, duration: float) -> dict:
         if "end" in sr:
             sr["end"] = float(sr["end"]) * duration
 
-    transcript = va.get("audio", {}).get("voice", {}).get("transcript", [])
-    for seg in transcript:
-        if "start" in seg:
-            seg["start"] = float(seg["start"]) * duration
-        if "end" in seg:
-            seg["end"] = float(seg["end"]) * duration
-
     for te in va.get("text_effects", []):
         if "time" in te:
             te["time"] = float(te["time"]) * duration
@@ -90,15 +83,6 @@ def merge_analysis(
         if sr_ts and max(sr_ts) <= 1.0 and duration > 2.0:
             needs_rescale = True
             print(f"  ⚠️ scene_roles normalized (max={max(sr_ts):.2f} for {duration:.1f}s)")
-
-        # Check transcript timestamps
-        tx_ts = []
-        for seg in video_analysis.get("audio", {}).get("voice", {}).get("transcript", []):
-            if "start" in seg: tx_ts.append(float(seg["start"]))
-            if "end" in seg: tx_ts.append(float(seg["end"]))
-        if tx_ts and max(tx_ts) <= 1.0 and duration > 2.0:
-            needs_rescale = True
-            print(f"  ⚠️ transcript normalized (max={max(tx_ts):.2f} for {duration:.1f}s)")
 
         # Check text_effects timestamps
         te_ts = [float(te["time"]) for te in video_analysis.get("text_effects", []) if "time" in te]
