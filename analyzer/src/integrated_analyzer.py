@@ -389,90 +389,296 @@ def _calc_information_density(
     return min(100, max(0, score)), ", ".join(parts)
 
 
-def _calc_edit_rhythm(data: dict, duration: float) -> tuple[float, str]:
-    """Calculate edit rhythm score with continuous curve + rhythm analysis.
+def _calc_edit_rhythm(data: dict, duration: float, scenes: list[dict] | None = None) -> tuple[float, str]:
+    """Calculate edit rhythm score using 10-layer, 3-axis analysis.
 
-    Factors:
-      1. Cut density (50%) — bell curve centered on 0.5/s optimal
-      2. Rhythm pattern (20%) — accelerating/decelerating/varied > flat
-      3. Interval consistency (15%) — std dev of intervals (moderate variation best)
-      4. Cut count adequacy (15%) — enough cuts for the duration
+    Axes:
+      1. Tempo adequacy (30%) — weighted event density across 10 layers
+      2. Dynamic range  (35%) — tempo curve peaks/valleys/CV
+      3. Structure fit   (35%) — scene role vs tempo alignment
     """
-    if "cut_rhythm" in data:
-        cut_rhythm = data.get("cut_rhythm") or {}
-    else:
-        temporal = data.get("temporal_profile") or {}
-        cut_rhythm = temporal.get("cut_rhythm") or {}
-
-    total_cuts = cut_rhythm.get("total_cuts", 0)
-    cut_density = total_cuts / max(duration, 1)
-    intervals = cut_rhythm.get("intervals", [])
-    pattern = cut_rhythm.get("pattern", "unknown")
-
-    evidence_parts = [f"컷 {total_cuts}개, 밀도 {cut_density:.2f}/s"]
-
-    # --- Factor 1: Density bell curve (50%) ---
-    # Optimal: 0.5/s = 100, falls off as gaussian
     import math
-    optimal = 0.55
-    sigma = 0.35
-    density_score = 100 * math.exp(-((cut_density - optimal) ** 2) / (2 * sigma ** 2))
 
-    # --- Factor 2: Rhythm pattern (20%) ---
-    pattern_scores = {
-        "accelerating": 80, "decelerating": 75, "varied": 85,
-        "rhythmic": 90, "regular": 70, "irregular": 55,
-        "slow": 40, "flat": 35, "unknown": 50,
-    }
-    pattern_score = pattern_scores.get(pattern, 50)
-    if pattern != "unknown":
-        evidence_parts.append(f"패턴 {pattern}")
+    dur = max(duration, 1.0)
 
-    # --- Factor 3: Interval consistency (15%) ---
-    if len(intervals) >= 2:
-        import statistics
-        mean_iv = statistics.mean(intervals)
-        std_iv = statistics.stdev(intervals)
-        cv = std_iv / max(mean_iv, 0.01)  # coefficient of variation
-        # Moderate variation (cv 0.3~0.7) is best — too uniform = boring, too chaotic = jarring
-        if 0.3 <= cv <= 0.7:
-            consistency_score = 85
-        elif 0.15 <= cv < 0.3:
-            consistency_score = 70  # a bit too uniform
-        elif 0.7 < cv <= 1.0:
-            consistency_score = 65  # a bit chaotic
-        elif cv < 0.15:
-            consistency_score = 55  # monotonous
-        else:
-            consistency_score = 45  # very chaotic
-        evidence_parts.append(f"CV {cv:.2f}")
-    else:
-        consistency_score = 30  # not enough data
+    # ── Helper: safe nested get ──────────────────────────────────────────
+    def _g(d: dict | None, *keys, default=None):
+        cur = d
+        for k in keys:
+            if not isinstance(cur, dict):
+                return default
+            cur = cur.get(k)
+        return cur if cur is not None else default
 
-    # --- Factor 4: Cut count adequacy (30%) ---
-    # Expect roughly 1 cut per 1.5-2 seconds for well-edited shortform
-    expected_cuts = duration / 1.75
-    adequacy = total_cuts / max(expected_cuts, 1)
-    if adequacy >= 1.0:
-        adequacy_score = 90 + min(10, (adequacy - 1.0) * 20)  # 90~100
-    elif adequacy >= 0.6:
-        adequacy_score = 50 + (adequacy - 0.6) * 100  # 50~90
-    elif adequacy >= 0.3:
-        adequacy_score = 20 + (adequacy - 0.3) * 100  # 20~50
-    else:
-        adequacy_score = max(5, adequacy / 0.3 * 20)  # 0~20
-    adequacy_score = min(100, adequacy_score)
-    evidence_parts.append(f"적정성 {adequacy:.0%}")
+    # ── Resolve data sources ─────────────────────────────────────────────
+    cut_rhythm = _g(data, "cut_rhythm", default={}) or _g(data, "temporal_profile", "cut_rhythm", default={})
+    transition_texture = _g(data, "transition_texture", default={})
+    zoom_events = _g(data, "zoom_events", default=[])
+    playback_speed = _g(data, "playback_speed", default=[])
+    color_curve = _g(data, "color_change_curve", default={})
+    color_shifts = _g(color_curve, "shifts", default=[]) if isinstance(color_curve, dict) else []
+    visual_journey = _g(data, "visual_journey", default={})
+    vj_transitions = _g(visual_journey, "transitions", default=[]) if isinstance(visual_journey, dict) else []
+    text_dwell = _g(data, "text_dwell", default={})
+    exposure_curve = _g(data, "exposure_curve", default={})
+    exposure_segments = _g(exposure_curve, "segments", default=[]) if isinstance(exposure_curve, dict) else []
+    broll_segments = _g(data, "broll_segments", default=[])
 
-    # --- Weighted combination ---
-    score = (
-        density_score * 0.35 +
-        pattern_score * 0.15 +
-        consistency_score * 0.15 +
-        adequacy_score * 0.35
+    # ── Axis 1: Tempo adequacy (30%) ─────────────────────────────────────
+    total_cuts = _g(cut_rhythm, "total_cuts", default=0) if isinstance(cut_rhythm, dict) else 0
+    cuts_density = total_cuts / dur
+
+    # transition texture: hard_cut ratio as tension indicator
+    type_counts = _g(transition_texture, "type_counts", default={}) if isinstance(transition_texture, dict) else {}
+    total_transitions = sum(type_counts.values()) if isinstance(type_counts, dict) else 0
+    hard_cut_ratio = (type_counts.get("hard_cut", 0) / max(total_transitions, 1)) if total_transitions else 0.5
+
+    zooms_density = len(zoom_events) / dur if isinstance(zoom_events, list) else 0
+
+    # playback_speed: non-normal time coverage
+    speed_time = 0.0
+    if isinstance(playback_speed, list):
+        for seg in playback_speed:
+            if isinstance(seg, dict) and seg.get("type", "normal") != "normal":
+                tr = seg.get("time_range") or [0, 0]
+                if isinstance(tr, list) and len(tr) >= 2:
+                    speed_time += max(0, tr[1] - tr[0])
+    speed_ratio = speed_time / dur
+
+    shifts_density = len(color_shifts) / dur if isinstance(color_shifts, list) else 0
+    vj_density = len(vj_transitions) / dur if isinstance(vj_transitions, list) else 0
+    texts_per_sec = _g(text_dwell, "texts_per_second", default=0) if isinstance(text_dwell, dict) else 0
+    exposure_density = max(0, len(exposure_segments) - 1) / dur if isinstance(exposure_segments, list) and len(exposure_segments) > 1 else 0
+    broll_density = len(broll_segments) / dur if isinstance(broll_segments, list) else 0
+
+    weighted_density = (
+        cuts_density * 0.25 +
+        hard_cut_ratio * 0.10 +
+        zooms_density * 0.10 +
+        speed_ratio * 0.05 +
+        shifts_density * 0.15 +
+        vj_density * 0.15 +
+        texts_per_sec * 0.10 +
+        exposure_density * 0.05 +
+        broll_density * 0.05
     )
 
-    return min(100, max(0, round(score, 1))), ", ".join(evidence_parts)
+    optimal_density = 1.5
+    sigma_density = 0.8
+    tempo_score = 100 * math.exp(-((weighted_density - optimal_density) ** 2) / (2 * sigma_density ** 2))
+
+    # ── Axis 2: Dynamic range (35%) ──────────────────────────────────────
+    # Collect all event timestamps
+    timestamps: list[float] = []
+
+    # cut timestamps
+    cut_ts = _g(cut_rhythm, "cut_timestamps", default=[]) if isinstance(cut_rhythm, dict) else []
+    if isinstance(cut_ts, list):
+        timestamps.extend(t for t in cut_ts if isinstance(t, (int, float)))
+
+    # zoom events
+    if isinstance(zoom_events, list):
+        for ev in zoom_events:
+            tr = ev.get("time_range") if isinstance(ev, dict) else None
+            if isinstance(tr, list) and len(tr) >= 1 and isinstance(tr[0], (int, float)):
+                timestamps.append(tr[0])
+
+    # color shifts
+    if isinstance(color_shifts, list):
+        for sh in color_shifts:
+            ts = sh.get("timestamp") if isinstance(sh, dict) else None
+            if isinstance(ts, (int, float)):
+                timestamps.append(ts)
+
+    # visual journey transitions
+    if isinstance(vj_transitions, list):
+        for tr_item in vj_transitions:
+            ts = tr_item.get("timestamp") if isinstance(tr_item, dict) else None
+            if isinstance(ts, (int, float)):
+                timestamps.append(ts)
+
+    # transition texture events
+    tt_events = _g(transition_texture, "events", default=[]) if isinstance(transition_texture, dict) else []
+    if isinstance(tt_events, list):
+        for ev in tt_events:
+            ts = ev.get("timestamp") if isinstance(ev, dict) else None
+            if isinstance(ts, (int, float)):
+                timestamps.append(ts)
+
+    # text dwell items
+    td_items = _g(text_dwell, "items", default=[]) if isinstance(text_dwell, dict) else []
+    if isinstance(td_items, list):
+        for it in td_items:
+            ts = it.get("first_appear") if isinstance(it, dict) else None
+            if isinstance(ts, (int, float)):
+                timestamps.append(ts)
+
+    # exposure segments (skip first)
+    if isinstance(exposure_segments, list):
+        for seg in exposure_segments[1:]:
+            tr = seg.get("time_range") if isinstance(seg, dict) else None
+            if isinstance(tr, list) and len(tr) >= 1 and isinstance(tr[0], (int, float)):
+                timestamps.append(tr[0])
+
+    # broll segments
+    if isinstance(broll_segments, list):
+        for seg in broll_segments:
+            tr = seg.get("time_range") if isinstance(seg, dict) else None
+            if isinstance(tr, list) and len(tr) >= 1 and isinstance(tr[0], (int, float)):
+                timestamps.append(tr[0])
+
+    # playback speed non-normal
+    if isinstance(playback_speed, list):
+        for seg in playback_speed:
+            if isinstance(seg, dict) and seg.get("type", "normal") != "normal":
+                tr = seg.get("time_range") or [0, 0]
+                if isinstance(tr, list) and len(tr) >= 1 and isinstance(tr[0], (int, float)):
+                    timestamps.append(tr[0])
+
+    total_events = len(timestamps)
+
+    # Build 2-second window histogram
+    window_size = 2.0
+    n_windows = max(1, int(math.ceil(dur / window_size)))
+    window_counts = [0] * n_windows
+    for ts in timestamps:
+        idx = min(int(ts / window_size), n_windows - 1)
+        if 0 <= idx < n_windows:
+            window_counts[idx] += 1
+
+    if n_windows >= 2 and total_events >= 2:
+        max_w = max(window_counts)
+        nonzero_windows = [w for w in window_counts if w > 0]
+        min_nz = min(nonzero_windows) if nonzero_windows else 0
+
+        # Peak-Valley ratio
+        pv_ratio = max_w / max(min_nz, 0.5)
+        if 2.0 <= pv_ratio <= 4.0:
+            pv_score = 100.0
+        elif pv_ratio < 2.0:
+            pv_score = max(0, pv_ratio / 2.0 * 100)
+        else:
+            pv_score = max(0, 100 - (pv_ratio - 4.0) * 15)
+
+        # Peak count (windows above mean + 0.5*std)
+        mean_w = sum(window_counts) / n_windows
+        variance = sum((w - mean_w) ** 2 for w in window_counts) / n_windows
+        std_w = math.sqrt(variance)
+        threshold = mean_w + 0.5 * std_w
+        peak_count = sum(1 for w in window_counts if w > threshold)
+
+        # Scale peaks: optimal 2-4 per 30s
+        expected_peaks_low = max(1, 2 * dur / 30)
+        expected_peaks_high = max(2, 4 * dur / 30)
+        if expected_peaks_low <= peak_count <= expected_peaks_high:
+            peak_score = 100.0
+        elif peak_count < expected_peaks_low:
+            peak_score = max(0, peak_count / max(expected_peaks_low, 1) * 100)
+        else:
+            peak_score = max(0, 100 - (peak_count - expected_peaks_high) * 20)
+
+        # CV
+        cv = (std_w / max(mean_w, 0.01))
+        if 0.3 <= cv <= 0.7:
+            cv_score = 100.0
+        elif cv < 0.3:
+            cv_score = max(0, cv / 0.3 * 100)
+        else:
+            cv_score = max(0, 100 - (cv - 0.7) * 80)
+
+        dynamic_score = (pv_score + peak_score + cv_score) / 3.0
+    else:
+        peak_count = 0
+        cv = 0.0
+        dynamic_score = 30.0  # insufficient data
+
+    # ── Axis 3: Structure fit (35%) ──────────────────────────────────────
+    ROLE_TEMPO_EXPECTATION = {
+        "hook": "high",
+        "problem": "medium",
+        "solution": "medium_high",
+        "demo": "medium",
+        "proof": "medium",
+        "cta": "low_or_high",
+        "transition": "any",
+        "brand_intro": "medium",
+        "recap": "medium_high",
+        "body": "medium",
+    }
+
+    if scenes and isinstance(scenes, list) and n_windows >= 1:
+        overall_mean = sum(window_counts) / n_windows if n_windows else 1
+
+        def _scene_tempo(scene: dict) -> float:
+            tr = scene.get("time_range") or scene.get("timeRange") or [0, dur]
+            if isinstance(tr, list) and len(tr) >= 2:
+                s_start, s_end = tr[0], tr[1]
+            else:
+                return overall_mean
+            w_start = max(0, int(s_start / window_size))
+            w_end = min(n_windows, int(math.ceil(s_end / window_size)))
+            if w_end <= w_start:
+                return overall_mean
+            return sum(window_counts[w_start:w_end]) / (w_end - w_start)
+
+        def _matches(expectation: str, scene_tempo: float, avg: float) -> bool:
+            if avg <= 0:
+                return True
+            ratio = scene_tempo / max(avg, 0.01)
+            if expectation == "high":
+                return ratio >= 1.3
+            elif expectation == "medium_high":
+                return ratio >= 0.9
+            elif expectation == "medium":
+                return 0.7 <= ratio <= 1.3
+            elif expectation == "low_or_high":
+                return ratio <= 0.5 or ratio >= 1.3
+            elif expectation == "any":
+                return True
+            return 0.7 <= ratio <= 1.3
+
+        weighted_match = 0.0
+        total_weight = 0.0
+        for sc in scenes:
+            if not isinstance(sc, dict):
+                continue
+            tr = sc.get("time_range") or sc.get("timeRange") or [0, 0]
+            sc_dur = (tr[1] - tr[0]) if isinstance(tr, list) and len(tr) >= 2 else 0
+            if sc_dur <= 0:
+                continue
+            role = (sc.get("role") or sc.get("type") or "body").lower()
+            expectation = ROLE_TEMPO_EXPECTATION.get(role, "medium")
+            sc_tempo = _scene_tempo(sc)
+            if _matches(expectation, sc_tempo, overall_mean):
+                weighted_match += sc_dur * 100
+            else:
+                # Partial credit based on how close
+                ratio = sc_tempo / max(overall_mean, 0.01)
+                partial = max(20, 100 - abs(ratio - 1.0) * 80)
+                weighted_match += sc_dur * partial
+            total_weight += sc_dur
+
+        match_pct = (weighted_match / max(total_weight, 1))
+        structure_score = min(100, match_pct)
+    else:
+        match_pct = 70.0
+        structure_score = 70.0
+
+    # ── Final score ──────────────────────────────────────────────────────
+    score = tempo_score * 0.30 + dynamic_score * 0.35 + structure_score * 0.35
+
+    # Evidence
+    cuts = total_cuts
+    zooms = len(zoom_events) if isinstance(zoom_events, list) else 0
+    shifts = len(color_shifts) if isinstance(color_shifts, list) else 0
+    vj = len(vj_transitions) if isinstance(vj_transitions, list) else 0
+    evidence = (
+        f"템포 {weighted_density:.1f}/s, peak {peak_count}개, CV {cv:.2f}, "
+        f"구조일치 {match_pct:.0f}%, 이벤트 {total_events}개"
+        f"(컷{cuts}+줌{zooms}+색변{shifts}+시선{vj})"
+    )
+
+    return min(100, max(0, round(score, 1))), evidence
 
 
 def _calc_audio_stimulus(recipe: dict) -> tuple[float, str]:
@@ -1138,7 +1344,7 @@ def run_integrated_analysis(
         "visual_stimulus": lambda: _calc_visual_stimulus(temporal_source, scenes_dicts),
         "persuasion_density": lambda: _calc_persuasion_density(recipe, scenes_dicts, duration, nar_type),
         "information_density": lambda: _calc_information_density(recipe, caption_map, stt_data, duration),
-        "edit_rhythm": lambda: _calc_edit_rhythm(temporal_source, duration),
+        "edit_rhythm": lambda: _calc_edit_rhythm(temporal_source, duration, scenes_dicts),
         "audio_stimulus": lambda: _calc_audio_stimulus(recipe),
         "persona_fit": lambda: _calc_persona_fit(recipe, scenes_dicts),
         "empathy_trigger": lambda: _calc_empathy_trigger(recipe, duration),
