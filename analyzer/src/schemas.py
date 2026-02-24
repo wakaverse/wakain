@@ -325,9 +325,7 @@ class Meta(BaseModel):
     platform: Literal["tiktok", "reels", "shorts", "ad"]
     duration: float
     aspect_ratio: Literal["9:16", "1:1", "16:9"]
-    category: Literal[
-        "beauty", "food", "tech", "fashion", "health", "home", "finance", "education"
-    ]
+    category: str  # food/beauty/fashion/electronics/living/health/service/general/tech/home/finance/education
     sub_category: str
     target_audience: str
     product_name: str = ""
