@@ -69,12 +69,24 @@ def cluster_appeals_into_scenes(
         score = 0
         boundary_t = cuts[i][1]
 
-        # Speech continuity: STT segment spans the boundary
+        # Speech continuity: STT segment spans the boundary OR gap < 0.5s
+        speech_continuous = False
         for seg in stt_segments:
             s, e = seg.get("start", 0), seg.get("end", 0)
             if s < boundary_t < e:
-                score += 3
+                speech_continuous = True
                 break
+        if not speech_continuous:
+            # Check if a segment ends just before boundary and another starts just after
+            for j, seg in enumerate(stt_segments):
+                seg_end = seg.get("end", 0)
+                if abs(seg_end - boundary_t) < 0.5 and j + 1 < len(stt_segments):
+                    next_start = stt_segments[j + 1].get("start", 0)
+                    if abs(next_start - boundary_t) < 0.5:
+                        speech_continuous = True
+                        break
+        if speech_continuous:
+            score += 3
 
         # Caption continuity: text_dwell item spans boundary
         for item in text_dwell_items:
@@ -118,7 +130,7 @@ def cluster_appeals_into_scenes(
     for i in range(len(cuts) - 1):
         merged_start = cuts[current_cuts[0]][0]
         candidate_end = cuts[i + 1][1]
-        if merge_scores[i] >= 3 and (candidate_end - merged_start) <= 5.0:
+        if merge_scores[i] >= 2 and (candidate_end - merged_start) <= 5.0:
             current_cuts.append(i + 1)
         else:
             scenes.append(_build_scene(len(scenes) + 1, current_cuts, cuts, cut_appeals,
