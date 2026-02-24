@@ -712,7 +712,7 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, p
     print(f"          → saved to {appeal_struct_path}")
 
     # Phase 6: recipe builder (includes temporal profile + production guide)
-    run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal, product_data=product_data)
+    run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal, product_data=product_scan.to_dict())
 
     # Phase 7: Integrated analysis + prescriptions (C-8, C-9, C-10)
     run_phase_7(output_dir, video_path, stt_data=stt_result.to_dict(), product_data=product_scan.to_dict(),
