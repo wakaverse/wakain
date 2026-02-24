@@ -332,6 +332,16 @@ export interface DiagnosisResult {
   top_3_actions: string[];
 }
 
+export interface MarketingVerdict {
+  verdict: string;            // "집행 권장" | "조건부 집행" | "집행 불가"
+  verdict_summary: string;
+  evidence: string;
+  action_plan: string;
+  full_markdown: string;
+  product_name: string;
+  product_category: string;
+}
+
 export interface AnalysisResult {
   video_recipe: VideoRecipe;
   diagnosis: Diagnosis | null;
@@ -339,7 +349,7 @@ export interface AnalysisResult {
   stt: Stt | null;
   style: Style | null;
   caption_map: CaptionMap | null;
-  verdict: Record<string, unknown> | null;
+  verdict: MarketingVerdict | null;
   video_url: string | null;
   appeal_structure: AppealStructure | null;
 }

@@ -314,7 +314,7 @@ def summarize_scenes(scenes: list[dict], product_info: dict) -> list[dict]:
         model=MODEL,
         contents=[prompt],
         config=types.GenerateContentConfig(
-            temperature=0.2,
+            temperature=0.0,
             response_mime_type="application/json",
         ),
     )
@@ -372,7 +372,7 @@ def group_scenes(scenes: list[dict], product_info: dict) -> list[dict]:
         model=MODEL,
         contents=[prompt],
         config=types.GenerateContentConfig(
-            temperature=0.3,
+            temperature=0.0,
             response_mime_type="application/json",
         ),
     )

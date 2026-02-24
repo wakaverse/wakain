@@ -9,14 +9,15 @@ import AppealAnalysis from '../components/Report/AppealAnalysis';
 import DiagnosisPanel from '../components/Report/DiagnosisPanel';
 import ArtDirectionPanel from '../components/Report/ArtDirectionPanel';
 import DiagnosisCards from '../components/Report/DiagnosisCards';
+import DiagnosisTab from '../components/Report/DiagnosisTab';
 import PersuasionStructure from '../components/Report/PersuasionStructure';
 import AppealTimelineBar from '../components/Report/AppealTimelineBar';
 
-type TabId = 'structure' | 'scores' | 'art';
+type TabId = 'structure' | 'diagnosis' | 'art';
 
 const tabs: { id: TabId; label: string; icon: string }[] = [
   { id: 'structure', label: '설득 구조', icon: '🎯' },
-  { id: 'scores', label: '점수 상세', icon: '📊' },
+  { id: 'diagnosis', label: '진단서', icon: '💊' },
   { id: 'art', label: '아트 디렉션', icon: '🎨' },
 ];
 
@@ -196,23 +197,14 @@ export default function ReportPage() {
                   />
                 )
               )}
-              {activeTab === 'scores' && (
-                (result.diagnosis as any)?.axes ? (
-                  <DiagnosisCards diagnosis={result.diagnosis as any} />
-                ) : (
-                  <div className="space-y-6">
-                    {dimensions.length > 0 && (
-                      <DimensionChart dimensions={dimensions} engagementScore={engagementScore} />
-                    )}
-                    <DiagnosisPanel
-                      strengths={strengths}
-                      weaknesses={weaknesses}
-                      diagnoses={diagnoses}
-                      prescriptions={prescriptions}
-                      onSeek={handleSeek}
-                    />
-                  </div>
-                )
+              {activeTab === 'diagnosis' && (
+                <DiagnosisTab
+                  verdict={result.verdict}
+                  prescriptions={result.prescriptions}
+                  diagnosis={(result.diagnosis as any)?.axes ? result.diagnosis as any : null}
+                  overallScore={engagementScore}
+                  onSeek={handleSeek}
+                />
               )}
               {activeTab === 'art' && (
                 <ArtDirectionPanel art={artDirection} />
