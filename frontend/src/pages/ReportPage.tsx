@@ -184,6 +184,7 @@ export default function ReportPage() {
                     stt={result.stt}
                     onSeek={handleSeek}
                     currentTime={currentTime}
+                    recipe={result.video_recipe as unknown as Record<string, unknown>}
                   />
                 ) : (
                   <AppealAnalysis

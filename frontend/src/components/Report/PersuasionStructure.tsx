@@ -7,7 +7,28 @@ interface Props {
   stt: Stt | null;
   onSeek: (time: number) => void;
   currentTime: number;
+  recipe?: Record<string, unknown>;
 }
+
+const APPEAL_TYPE_KO: Record<string, string> = {
+  myth_bust: '오해반박', ingredient: '원재료/성분', manufacturing: '제조공정',
+  track_record: '실적/수상', price: '가격/혜택', comparison: '비교우위',
+  guarantee: '보장/환불', origin: '원산지', feature_demo: '기능시연',
+  spec_data: '스펙수치', design_aesthetic: '디자인감성', authenticity: '진정성/리얼',
+  social_proof: '사회적증거', urgency: '긴급/한정', lifestyle: '라이프스타일',
+  nostalgia: '향수/추억', authority: '권위/전문가', emotional: '감정호소',
+};
+
+function getAppealTypeKo(type: string): string {
+  return APPEAL_TYPE_KO[type] || type;
+}
+
+const strengthStyle: Record<string, string> = {
+  strong: 'bg-green-100 text-green-700',
+  moderate: 'bg-amber-100 text-amber-700',
+  weak: 'bg-red-100 text-red-700',
+};
+const strengthLabel: Record<string, string> = { strong: '강', moderate: '중', weak: '약' };
 
 function formatTime(t: number): string {
   return t.toFixed(1) + 's';
@@ -17,7 +38,31 @@ function formatRange(r: [number, number]): string {
   return `${formatTime(r[0])}-${formatTime(r[1])}`;
 }
 
-export default function PersuasionStructure({ appealStructure, sceneCards, onSeek, currentTime }: Props) {
+function findRhythmProfile(sceneTimeRange: [number, number], recipeSceneCards: any[]): any | null {
+  if (!recipeSceneCards) return null;
+  const matching = recipeSceneCards.filter((sc: any) => {
+    const [s1, e1] = sceneTimeRange;
+    const [s2, e2] = sc.time_range || [0, 0];
+    return s1 < e2 && s2 < e1;
+  });
+  if (!matching.length) return null;
+  return {
+    cut_count: matching.reduce((sum: number, sc: any) => sum + (sc.rhythm_profile?.cut_count || 0), 0),
+    cut_density: matching.reduce((sum: number, sc: any) => sum + (sc.rhythm_profile?.cut_density || 0), 0) / matching.length,
+    zoom_events: matching.reduce((sum: number, sc: any) => sum + (sc.rhythm_profile?.zoom_events || 0), 0),
+    color_shifts: matching.reduce((sum: number, sc: any) => sum + (sc.rhythm_profile?.color_shifts || 0), 0),
+    tempo_level: matching[0]?.rhythm_profile?.tempo_level || 'medium',
+  };
+}
+
+function getCutTranscript(cutTimeRange: [number, number], stt: Stt | null): string {
+  if (!stt?.segments) return '';
+  const [start, end] = cutTimeRange;
+  const matching = stt.segments.filter(seg => seg.start < end && seg.end > start);
+  return matching.map(seg => seg.text).join(' ').trim();
+}
+
+export default function PersuasionStructure({ appealStructure, sceneCards, stt, onSeek, currentTime, recipe }: Props) {
   const [openGroups, setOpenGroups] = useState<Set<number>>(new Set());
   const [openScenes, setOpenScenes] = useState<Set<number>>(new Set());
 
@@ -26,6 +71,11 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
     appealStructure.scenes.forEach(s => m.set(s.scene_id, s));
     return m;
   }, [appealStructure.scenes]);
+
+  const recipeSceneCards = useMemo(() => {
+    const vr = recipe?.video_recipe as any;
+    return vr?.scene_cards || (recipe as any)?.scene_cards || [];
+  }, [recipe]);
 
   // sceneCards available for future cut-level detail enrichment
   void sceneCards;
@@ -109,6 +159,7 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                   const scene = sceneMap.get(sid);
                   if (!scene) return null;
                   const sceneOpen = openScenes.has(sid);
+                  const rhythmProfile = findRhythmProfile(scene.time_range, recipeSceneCards);
                   return (
                     <div key={sid} className="ml-4 bg-white rounded-xl border border-gray-100 overflow-hidden">
                       <div
@@ -149,6 +200,20 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                                 </div>
                               );
                             })()}
+                            {rhythmProfile && (
+                              <div className="flex gap-2 mt-1.5 text-[10px] text-gray-400">
+                                <span>🎬 컷 {rhythmProfile.cut_count}개</span>
+                                <span>⚡ 밀도 {rhythmProfile.cut_density.toFixed(1)}/s</span>
+                                <span>🔍 줌 {rhythmProfile.zoom_events}</span>
+                                <span>🎨 색변 {rhythmProfile.color_shifts}</span>
+                                <span className={`font-medium ${
+                                  rhythmProfile.tempo_level === 'high' ? 'text-red-500' :
+                                  rhythmProfile.tempo_level === 'low' ? 'text-blue-500' : 'text-amber-500'
+                                }`}>
+                                  템포 {rhythmProfile.tempo_level === 'high' ? '빠름' : rhythmProfile.tempo_level === 'low' ? '느림' : '보통'}
+                                </span>
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <span className="text-xs text-gray-400">{formatRange(scene.time_range)}</span>
@@ -162,12 +227,11 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                         <div className="px-3 pb-3 space-y-2">
                           {scene.cuts.map(cut => {
                             const isCurrent = isCurrentCut(cut.time_range);
-                            // Find matching appeals for this cut's time range
                             const cutAppeals = scene.appeals.filter(a =>
                               a.visual_proof.timestamp >= cut.time_range[0] &&
                               a.visual_proof.timestamp < cut.time_range[1]
                             );
-                            // Find matching scene card cut info
+                            const cutTranscript = getCutTranscript(cut.time_range, stt);
                             return (
                               <div
                                 key={cut.cut_id}
@@ -177,20 +241,31 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                                 onClick={() => onSeek(cut.time_range[0])}
                               >
                                 <div className="flex items-start gap-3">
-                                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs shrink-0">
-                                    🖼
+                                  <div className="w-10 h-10 bg-gray-900 rounded flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    {cut.cut_id}
                                   </div>
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-2">
                                       <span className="text-sm font-medium text-gray-900">컷{cut.cut_id}</span>
                                       <span className="text-xs text-gray-400">{formatRange(cut.time_range)}</span>
                                     </div>
+                                    {cutTranscript && (
+                                      <p className="text-xs text-gray-500 italic mt-0.5 line-clamp-2">
+                                        💬 &ldquo;{cutTranscript}&rdquo;
+                                      </p>
+                                    )}
                                     {/* Script appeals */}
                                     {cutAppeals.filter(a => a.source === 'script').map((appeal, i) => (
                                       <p key={`s${i}`} className="text-xs text-gray-600 mt-1">
                                         <span className="inline-flex items-center gap-1">
                                           <span className="text-amber-600">🎤</span>
-                                          <span className="text-amber-700 font-medium">{appeal.type}</span>
+                                          <span className="text-amber-700 font-medium">{getAppealTypeKo(appeal.type)}</span>
+                                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${strengthStyle[appeal.strength] || ''}`}>
+                                            {strengthLabel[appeal.strength] || ''}
+                                          </span>
+                                          {appeal.visual_proof?.technique && appeal.visual_proof.technique !== 'none' && (
+                                            <span className="text-[10px] text-gray-400">({appeal.visual_proof.technique})</span>
+                                          )}
                                           <span className="text-gray-500">: {appeal.claim}</span>
                                         </span>
                                       </p>
@@ -200,7 +275,13 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                                       <p key={`v${i}`} className="text-xs text-gray-600 mt-1">
                                         <span className="inline-flex items-center gap-1">
                                           <span className="text-blue-600">🎬</span>
-                                          <span className="text-blue-700 font-medium">{appeal.type}</span>
+                                          <span className="text-blue-700 font-medium">{getAppealTypeKo(appeal.type)}</span>
+                                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${strengthStyle[appeal.strength] || ''}`}>
+                                            {strengthLabel[appeal.strength] || ''}
+                                          </span>
+                                          {appeal.visual_proof?.technique && appeal.visual_proof.technique !== 'none' && (
+                                            <span className="text-[10px] text-gray-400">({appeal.visual_proof.technique})</span>
+                                          )}
                                           <span className="text-gray-500">: {appeal.claim}</span>
                                         </span>
                                       </p>
@@ -210,7 +291,13 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                                       <p key={`b${i}`} className="text-xs text-gray-600 mt-1">
                                         <span className="inline-flex items-center gap-1">
                                           <span className="text-purple-600">🔗</span>
-                                          <span className="text-purple-700 font-medium">{appeal.type}</span>
+                                          <span className="text-purple-700 font-medium">{getAppealTypeKo(appeal.type)}</span>
+                                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${strengthStyle[appeal.strength] || ''}`}>
+                                            {strengthLabel[appeal.strength] || ''}
+                                          </span>
+                                          {appeal.visual_proof?.technique && appeal.visual_proof.technique !== 'none' && (
+                                            <span className="text-[10px] text-gray-400">({appeal.visual_proof.technique})</span>
+                                          )}
                                           <span className="text-gray-500">: {appeal.claim}</span>
                                         </span>
                                       </p>
