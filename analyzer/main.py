@@ -319,10 +319,14 @@ def run_phase_6(
     recipe = build_recipe(scenes, video_analysis, quants=quants, quals=quals, temporal=temporal)
     print(f"          → done ({time.perf_counter() - t0:.1f}s)")
 
-    # Save recipe
+    # Save recipe (inject engagement data from Phase 4c)
+    recipe_dict = recipe.model_dump()
+    for key in ("empathy_triggers", "narrative_analysis", "retention_analysis"):
+        if key in video_analysis:
+            recipe_dict[key] = video_analysis[key]
     recipe_path = out / f"{video_name}_video_recipe.json"
     recipe_path.write_text(
-        json.dumps({"video_recipe": recipe.model_dump()}, indent=2, ensure_ascii=False)
+        json.dumps({"video_recipe": recipe_dict}, indent=2, ensure_ascii=False)
     )
     print(f"          → saved to {recipe_path}")
     print(f"\n✅ Full pipeline complete! Recipe: {recipe_path}")

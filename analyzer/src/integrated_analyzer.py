@@ -627,7 +627,7 @@ def _calc_persona_fit(recipe: dict, scenes: list[dict]) -> tuple[float, str]:
 
 def _calc_empathy_trigger(recipe: dict, duration: float) -> tuple[float, str]:
     """Calculate empathy trigger score from Gemini empathy_triggers data."""
-    triggers = recipe.get("persuasion_analysis", {}).get("empathy_triggers", [])
+    triggers = recipe.get("empathy_triggers", []) or recipe.get("persuasion_analysis", {}).get("empathy_triggers", [])
     if not triggers:
         return 20.0, "공감 트리거 미감지"
 

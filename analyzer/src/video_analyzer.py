@@ -479,58 +479,11 @@ _RESPONSE_SCHEMA = {
                 ]},
                 "appeal_layering": {"type": "STRING"},
                 "persuasion_summary": {"type": "STRING"},
-                "empathy_triggers": {
-                    "type": "ARRAY",
-                    "items": {
-                        "type": "OBJECT",
-                        "properties": {
-                            "trigger_type": {"type": "STRING", "enum": ["pain_empathy", "desire", "belonging", "fomo", "curiosity", "humor", "nostalgia", "fear", "pride", "relief"]},
-                            "timestamp": {"type": "NUMBER"},
-                            "description": {"type": "STRING"},
-                            "intensity": {"type": "STRING", "enum": ["strong", "moderate", "weak"]},
-                        },
-                        "required": ["trigger_type", "timestamp", "description", "intensity"],
-                    },
-                },
             },
-            "required": ["presenter", "video_style", "appeal_points", "product_emphasis", "primary_appeal", "appeal_layering", "persuasion_summary", "empathy_triggers"],
-        },
-        "narrative_analysis": {
-            "type": "OBJECT",
-            "properties": {
-                "pattern": {"type": "STRING", "enum": ["problem_solution", "reversal", "comparison", "listicle", "storytelling", "direct_pitch", "challenge", "tutorial"]},
-                "tension_arc": {"type": "STRING", "enum": ["rising", "flat", "peak_valley", "steady_build", "frontloaded"]},
-                "resolution_satisfaction": {"type": "STRING", "enum": ["strong", "moderate", "weak", "none"]},
-                "curiosity_gap": {"type": "BOOLEAN"},
-                "loop_structure": {"type": "BOOLEAN"},
-            },
-            "required": ["pattern", "tension_arc", "resolution_satisfaction", "curiosity_gap", "loop_structure"],
-        },
-        "retention_analysis": {
-            "type": "OBJECT",
-            "properties": {
-                "hook_strength": {"type": "STRING", "enum": ["irresistible", "strong", "moderate", "weak"]},
-                "drop_off_risks": {
-                    "type": "ARRAY",
-                    "items": {
-                        "type": "OBJECT",
-                        "properties": {
-                            "timestamp": {"type": "NUMBER"},
-                            "reason": {"type": "STRING"},
-                            "severity": {"type": "STRING", "enum": ["high", "medium", "low"]},
-                        },
-                        "required": ["timestamp", "reason", "severity"],
-                    },
-                },
-                "rewatch_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
-                "share_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
-                "comment_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
-                "completion_likelihood": {"type": "STRING", "enum": ["very_high", "high", "medium", "low"]},
-            },
-            "required": ["hook_strength", "drop_off_risks", "rewatch_triggers", "share_triggers", "comment_triggers", "completion_likelihood"],
+            "required": ["presenter", "video_style", "appeal_points", "product_emphasis", "primary_appeal", "appeal_layering", "persuasion_summary"],
         },
     },
-    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis", "narrative_analysis", "retention_analysis"],
+    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis"],
 }
 
 # Separate schema for art_direction (to stay under Gemini schema complexity limit)
@@ -569,6 +522,61 @@ _ART_DIRECTION_SCHEMA = {
         },
     },
     "required": ["art_direction"],
+}
+
+# Separate schema for engagement analysis (empathy, narrative, retention)
+_ENGAGEMENT_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
+        "empathy_triggers": {
+            "type": "ARRAY",
+            "items": {
+                "type": "OBJECT",
+                "properties": {
+                    "trigger_type": {"type": "STRING", "enum": ["pain_empathy", "desire", "belonging", "fomo", "curiosity", "humor", "nostalgia", "fear", "pride", "relief"]},
+                    "timestamp": {"type": "NUMBER"},
+                    "description": {"type": "STRING"},
+                    "intensity": {"type": "STRING", "enum": ["strong", "moderate", "weak"]},
+                },
+                "required": ["trigger_type", "timestamp", "description", "intensity"],
+            },
+        },
+        "narrative_analysis": {
+            "type": "OBJECT",
+            "properties": {
+                "pattern": {"type": "STRING", "enum": ["problem_solution", "reversal", "comparison", "listicle", "storytelling", "direct_pitch", "challenge", "tutorial"]},
+                "tension_arc": {"type": "STRING", "enum": ["rising", "flat", "peak_valley", "steady_build", "frontloaded"]},
+                "resolution_satisfaction": {"type": "STRING", "enum": ["strong", "moderate", "weak", "none"]},
+                "curiosity_gap": {"type": "BOOLEAN"},
+                "loop_structure": {"type": "BOOLEAN"},
+            },
+            "required": ["pattern", "tension_arc", "resolution_satisfaction", "curiosity_gap", "loop_structure"],
+        },
+        "retention_analysis": {
+            "type": "OBJECT",
+            "properties": {
+                "hook_strength": {"type": "STRING", "enum": ["irresistible", "strong", "moderate", "weak"]},
+                "drop_off_risks": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "timestamp": {"type": "NUMBER"},
+                            "reason": {"type": "STRING"},
+                            "severity": {"type": "STRING", "enum": ["high", "medium", "low"]},
+                        },
+                        "required": ["timestamp", "reason", "severity"],
+                    },
+                },
+                "rewatch_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "share_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "comment_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "completion_likelihood": {"type": "STRING", "enum": ["very_high", "high", "medium", "low"]},
+            },
+            "required": ["hook_strength", "drop_off_risks", "rewatch_triggers", "share_triggers", "comment_triggers", "completion_likelihood"],
+        },
+    },
+    "required": ["empathy_triggers", "narrative_analysis", "retention_analysis"],
 }
 
 
@@ -789,6 +797,49 @@ Return a JSON object with art_direction containing:
                     await asyncio.sleep(wait)
                 else:
                     print(f"  ⚠ Art direction failed after {max_retries} retries, skipping: {e}")
+
+        # Phase 4c: Engagement analysis (empathy, narrative, retention — separate call)
+        print("  Analysing engagement factors...")
+        engagement_prompt = """Analyse this shortform marketing video's engagement factors.
+
+Return a JSON with:
+1. empathy_triggers: emotional triggers used (pain_empathy/desire/belonging/fomo/curiosity/humor/nostalgia/fear/pride/relief) with timestamp, description (Korean), intensity
+2. narrative_analysis: narrative pattern, tension arc, resolution satisfaction, curiosity gap, loop structure
+3. retention_analysis: hook strength, drop-off risk points, rewatch/share/comment triggers, completion likelihood
+
+Focus on what makes viewers FEEL, STAY, and SHARE."""
+
+        for attempt in range(max_retries):
+            try:
+                eng_response = await client.aio.models.generate_content(
+                    model=MODEL,
+                    contents=[
+                        types.Part.from_uri(
+                            file_uri=uploaded_file.uri,
+                            mime_type=uploaded_file.mime_type,
+                        ),
+                        types.Part.from_text(text=engagement_prompt),
+                    ],
+                    config=types.GenerateContentConfig(
+                        system_instruction=SYSTEM_INSTRUCTION,
+                        response_mime_type="application/json",
+                        response_schema=_ENGAGEMENT_SCHEMA,
+                        temperature=0.1,
+                    ),
+                )
+                eng_data = json.loads(eng_response.text)
+                result["empathy_triggers"] = eng_data.get("empathy_triggers", [])
+                result["narrative_analysis"] = eng_data.get("narrative_analysis", {})
+                result["retention_analysis"] = eng_data.get("retention_analysis", {})
+                print("  ✓ Engagement analysis complete")
+                break
+            except Exception as e:
+                wait = 2 ** attempt * 5
+                if attempt < max_retries - 1:
+                    print(f"  ⚠ Engagement retry {attempt+1}/{max_retries} ({type(e).__name__}), waiting {wait}s...")
+                    await asyncio.sleep(wait)
+                else:
+                    print(f"  ⚠ Engagement analysis failed after {max_retries} retries, skipping: {e}")
 
         return result
     finally:
