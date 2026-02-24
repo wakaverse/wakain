@@ -89,6 +89,7 @@ export async function compressTo480p(
       video: {
         width: outW,
         height: outH,
+        fit: 'contain',
         codec: 'avc', // H.264 for maximum compatibility
         bitrate: TARGET_BITRATE,
       },
