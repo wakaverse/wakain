@@ -178,6 +178,7 @@ def _load_extra_analysis(analysis_dir: Path, video_name: str) -> dict:
         "prescriptions_json": f"{video_name}_prescriptions.json",
         "stt_json": f"{video_name}_stt.json",
         "product_json": f"{video_name}_product.json",
+        "appeal_structure_json": f"{video_name}_appeal_structure.json",
         "style_json": f"{video_name}_style.json",  # backward compat
         "caption_map_json": f"{video_name}_caption_map.json",
         "verdict_json": f"{video_name}_verdict.json",

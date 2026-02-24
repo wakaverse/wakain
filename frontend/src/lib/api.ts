@@ -106,6 +106,7 @@ export async function getResult(id: string): Promise<AnalysisResult> {
     caption_map: data.caption_map_json || null,
     verdict: data.verdict_json || null,
     video_url: data.video_url || null,
+    appeal_structure: data.appeal_structure_json || null,
   };
 }
 

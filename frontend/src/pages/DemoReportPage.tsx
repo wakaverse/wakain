@@ -7,12 +7,14 @@ import DimensionChart from '../components/Report/DimensionChart';
 import AppealAnalysis from '../components/Report/AppealAnalysis';
 import DiagnosisPanel from '../components/Report/DiagnosisPanel';
 import ArtDirectionPanel from '../components/Report/ArtDirectionPanel';
+import PersuasionStructure from '../components/Report/PersuasionStructure';
+import AppealTimelineBar from '../components/Report/AppealTimelineBar';
 
-type TabId = 'appeal' | 'diagnosis' | 'art';
+type TabId = 'structure' | 'scores' | 'art';
 
 const tabs: { id: TabId; label: string; icon: string }[] = [
-  { id: 'appeal', label: '소구 분석', icon: '📌' },
-  { id: 'diagnosis', label: '진단서', icon: '🩺' },
+  { id: 'structure', label: '설득 구조', icon: '🎯' },
+  { id: 'scores', label: '점수 상세', icon: '📊' },
   { id: 'art', label: '아트 디렉션', icon: '🎨' },
 ];
 
@@ -31,7 +33,7 @@ export default function DemoReportPage() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<TabId>('appeal');
+  const [activeTab, setActiveTab] = useState<TabId>('structure');
   const [currentTime, setCurrentTime] = useState(0);
   const playerRef = useRef<VideoPlayerHandle>(null);
 
@@ -54,6 +56,7 @@ export default function DemoReportPage() {
           caption_map,
           verdict: null,
           video_url: null, // no video file for demo
+          appeal_structure: null,
         });
       })
       .catch((e) => setError(e.message))
@@ -144,6 +147,15 @@ export default function DemoReportPage() {
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="lg:w-[360px] lg:shrink-0 space-y-4 lg:sticky lg:top-20 lg:self-start">
             <VideoPlayer ref={playerRef} src={videoUrl} onTimeUpdate={handleTimeUpdate} />
+            {result.appeal_structure && (
+              <AppealTimelineBar
+                groups={result.appeal_structure.groups}
+                scenes={result.appeal_structure.scenes}
+                duration={duration}
+                currentTime={currentTime}
+                onSeek={handleSeek}
+              />
+            )}
             {dimensions.length > 0 && (
               <DimensionChart dimensions={dimensions} engagementScore={engagementScore} />
             )}
@@ -167,23 +179,38 @@ export default function DemoReportPage() {
             </div>
 
             <div className="bg-white rounded-xl border p-5">
-              {activeTab === 'appeal' && (
-                <AppealAnalysis
-                  scenes={sceneAnalyses}
-                  duration={duration}
-                  onSeek={handleSeek}
-                  currentTime={currentTime}
-                  hookAnalysis={(diagnosis as any)?.hook_analysis || null}
-                />
+              {activeTab === 'structure' && (
+                result.appeal_structure ? (
+                  <PersuasionStructure
+                    appealStructure={result.appeal_structure}
+                    sceneCards={(recipeData as any).scenes || []}
+                    stt={result.stt}
+                    onSeek={handleSeek}
+                    currentTime={currentTime}
+                  />
+                ) : (
+                  <AppealAnalysis
+                    scenes={sceneAnalyses}
+                    duration={duration}
+                    onSeek={handleSeek}
+                    currentTime={currentTime}
+                    hookAnalysis={(diagnosis as any)?.hook_analysis || null}
+                  />
+                )
               )}
-              {activeTab === 'diagnosis' && (
-                <DiagnosisPanel
-                  strengths={strengths}
-                  weaknesses={weaknesses}
-                  diagnoses={diagnoses}
-                  prescriptions={prescriptions}
-                  onSeek={handleSeek}
-                />
+              {activeTab === 'scores' && (
+                <div className="space-y-6">
+                  {dimensions.length > 0 && (
+                    <DimensionChart dimensions={dimensions} engagementScore={engagementScore} />
+                  )}
+                  <DiagnosisPanel
+                    strengths={strengths}
+                    weaknesses={weaknesses}
+                    diagnoses={diagnoses}
+                    prescriptions={prescriptions}
+                    onSeek={handleSeek}
+                  />
+                </div>
               )}
               {activeTab === 'art' && (
                 <ArtDirectionPanel art={artDirection} />

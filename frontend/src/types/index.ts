@@ -284,6 +284,30 @@ export interface CaptionMap {
   events: CaptionEvent[];
 }
 
+// Appeal Structure (Phase 5.5 output)
+export interface AppealScene {
+  scene_id: number;
+  time_range: [number, number];
+  cuts: Array<{ cut_id: number; time_range: [number, number] }>;
+  appeals: AppealPoint[];
+  stt_text: string;
+  caption_text: string;
+  persuasion_intent?: string;
+}
+
+export interface AppealGroup {
+  group_id: number;
+  name: string;
+  description: string;
+  scene_ids: number[];
+  color: string;
+}
+
+export interface AppealStructure {
+  scenes: AppealScene[];
+  groups: AppealGroup[];
+}
+
 export interface AnalysisResult {
   video_recipe: VideoRecipe;
   diagnosis: Diagnosis | null;
@@ -293,4 +317,5 @@ export interface AnalysisResult {
   caption_map: CaptionMap | null;
   verdict: Record<string, unknown> | null;
   video_url: string | null;
+  appeal_structure: AppealStructure | null;
 }
