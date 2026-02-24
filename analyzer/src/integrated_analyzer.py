@@ -794,7 +794,7 @@ def _evaluate_scene_appeals(
     return " ".join(parts)
 
 
-def _analyze_scenes(recipe: dict, profile: dict, duration: float) -> list[dict]:
+def _analyze_scenes(recipe: dict, profile: dict, duration: float, stt_data: dict | None = None) -> list[dict]:
     from .appeal_labels import appeal_ko, technique_ko, format_appeal
     """Analyze each scene individually, generating per-scene diagnostics.
 
@@ -925,7 +925,7 @@ def _analyze_scenes(recipe: dict, profile: dict, duration: float) -> list[dict]:
                     detail["visual_description"] = vp.get("description", "")
                 appeal_details.append(detail)
 
-        # Extract transcript segments
+        # Extract transcript segments — from scene data or fallback to STT
         transcript_segs = sc.get("transcript_segments", [])
         transcript_texts = []
         for seg in transcript_segs:
@@ -935,6 +935,19 @@ def _analyze_scenes(recipe: dict, profile: dict, duration: float) -> list[dict]:
                     "end": seg.get("end", 0),
                     "text": seg.get("text", ""),
                 })
+
+        # Fallback: if no transcript from Phase 4, use Phase 0 STT segments
+        if not transcript_texts and stt_data:
+            for seg in stt_data.get("segments", []):
+                seg_start = seg.get("start", 0)
+                seg_end = seg.get("end", 0)
+                # Overlap check
+                if seg_end > s_start and seg_start < s_end and seg.get("text", "").strip():
+                    transcript_texts.append({
+                        "start": seg_start,
+                        "end": seg_end,
+                        "text": seg.get("text", ""),
+                    })
 
         # Extract source from appeals
         for detail in appeal_details:
@@ -1044,7 +1057,7 @@ def run_integrated_analysis(
     diagnoses = _generate_diagnoses(dimensions, recipe, profile, stt_data, caption_map, duration, raw_temporal=raw_temporal)
 
     # ── Scene-level analysis ─────────────────────────────────────────
-    scene_analyses = _analyze_scenes(recipe, profile, duration)
+    scene_analyses = _analyze_scenes(recipe, profile, duration, stt_data=stt_data)
     # Merge scene-level diagnoses into main list
     for sa in scene_analyses:
         for dx in sa.get("diagnoses", []):
