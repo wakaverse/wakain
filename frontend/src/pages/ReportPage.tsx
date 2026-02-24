@@ -90,13 +90,6 @@ export default function ReportPage() {
   const engagementScore = diagnosis.overall_score || diagnosis.engagement_score || 0;
   const classification = diagnosis.classification || {};
   const sceneAnalyses = diagnosis.scene_analyses || [];
-  const diagnoses = diagnosis.diagnoses || [];
-  const strengths = diagnosis.strengths || [];
-  const weaknesses = diagnosis.weaknesses || [];
-
-  // Prescriptions
-  const prescriptionsData = result.prescriptions || {} as any;
-  const prescriptions = prescriptionsData.prescriptions || [];
 
   // Style
   const style = result.style || classification;
