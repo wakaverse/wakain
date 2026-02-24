@@ -49,20 +49,20 @@ function FactsGrid({ axis }: { axis: DiagnosisAxis }) {
   if (axis.id === 'appeal_structure') {
     return (
       <div className="space-y-2 text-sm text-gray-700">
-        {facts.aida_coverage && <AidaCoverage coverage={facts.aida_coverage as Record<string, boolean>} />}
+        {facts.aida_coverage ? <AidaCoverage coverage={facts.aida_coverage as Record<string, boolean>} /> : null}
         <div className="flex flex-wrap gap-2">
-          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">그룹 {facts.group_count as number}개</span>
-          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">씬 {facts.scene_count as number}개</span>
-          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">소구 {facts.total_appeals as number}개</span>
+          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">그룹 {String(facts.group_count ?? 0)}개</span>
+          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">씬 {String(facts.scene_count ?? 0)}개</span>
+          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">소구 {String(facts.total_appeals ?? 0)}개</span>
           {(facts.empty_gaps as any[])?.length > 0 && (
             <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs">빈 구간 {(facts.empty_gaps as any[]).length}개</span>
           )}
         </div>
-        {facts.source_ratio && (
+        {facts.source_ratio ? (
           <div className="text-xs text-gray-500">
             대본 {Math.round(((facts.source_ratio as any).script || 0) * 100)}% / 비주얼 {Math.round(((facts.source_ratio as any).visual || 0) * 100)}%
           </div>
-        )}
+        ) : null}
       </div>
     );
   }
@@ -74,8 +74,8 @@ function FactsGrid({ axis }: { axis: DiagnosisAxis }) {
     return (
       <div className="space-y-2 text-sm text-gray-700">
         <div className="flex flex-wrap gap-2">
-          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">{facts.category as string}</span>
-          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">유형 {facts.type_diversity as number}종 사용</span>
+          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">{String(facts.category ?? '')}</span>
+          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">유형 {String(facts.type_diversity ?? 0)}종 사용</span>
         </div>
         {mustCov && (
           <div className="flex flex-wrap gap-1 items-center">
@@ -110,7 +110,7 @@ function FactsGrid({ axis }: { axis: DiagnosisAxis }) {
     return (
       <div className="space-y-2 text-sm text-gray-700">
         <div className="flex flex-wrap gap-2">
-          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">완급 변화 {facts.dynamic_changes as number}회</span>
+          <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs">완급 변화 {String(facts.dynamic_changes ?? 0)}회</span>
           {(facts.overload_scenes as any[])?.length > 0 && (
             <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs">과부하 씬 {(facts.overload_scenes as any[]).length}개</span>
           )}

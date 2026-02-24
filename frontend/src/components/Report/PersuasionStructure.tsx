@@ -364,8 +364,7 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
       ) : (
         /* Group View */
         <>
-
-      {appealStructure.groups.map(group => {
+          {appealStructure.groups.map(group => {
         const isOpen = openGroups.has(group.group_id);
         const stats = getGroupStats(group);
         const range = getGroupTimeRange(group);
@@ -414,7 +413,7 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
             </div>
           </div>
         );
-      })}
+          })}
         </>
       )}
     </div>
