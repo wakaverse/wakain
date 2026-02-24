@@ -62,12 +62,6 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
     return { sceneCount: scenes.length, appealCount, duration };
   };
 
-  const getAppealTypeCounts = (appeals: { type: string }[]): Map<string, number> => {
-    const counts = new Map<string, number>();
-    appeals.forEach(a => counts.set(a.type, (counts.get(a.type) || 0) + 1));
-    return counts;
-  };
-
   const isCurrentCut = (range: [number, number]) =>
     currentTime >= range[0] && currentTime < range[1];
 
@@ -115,7 +109,6 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                   const scene = sceneMap.get(sid);
                   if (!scene) return null;
                   const sceneOpen = openScenes.has(sid);
-                  const typeCounts = getAppealTypeCounts(scene.appeals);
                   return (
                     <div key={sid} className="ml-4 bg-white rounded-xl border border-gray-100 overflow-hidden">
                       <div
@@ -132,13 +125,30 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                                 🎤 "{scene.stt_text}"
                               </p>
                             )}
-                            <div className="flex gap-1.5 mt-1.5 flex-wrap">
-                              {Array.from(typeCounts.entries()).map(([type, count]) => (
-                                <span key={type} className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                                  {type} ×{count}
-                                </span>
-                              ))}
-                            </div>
+                            {(() => {
+                              const scriptAppeals = scene.appeals.filter(a => a.source === 'script');
+                              const visualAppeals = scene.appeals.filter(a => a.source === 'visual');
+                              const otherAppeals = scene.appeals.filter(a => a.source !== 'script' && a.source !== 'visual');
+                              return (
+                                <div className="flex gap-1.5 mt-1.5 flex-wrap">
+                                  {scriptAppeals.length > 0 && (
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">
+                                      🎤 대본 ×{scriptAppeals.length}
+                                    </span>
+                                  )}
+                                  {visualAppeals.length > 0 && (
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                                      🎬 비주얼 ×{visualAppeals.length}
+                                    </span>
+                                  )}
+                                  {otherAppeals.length > 0 && (
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                                      🔗 복합 ×{otherAppeals.length}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <span className="text-xs text-gray-400">{formatRange(scene.time_range)}</span>
@@ -175,9 +185,34 @@ export default function PersuasionStructure({ appealStructure, sceneCards, onSee
                                       <span className="text-sm font-medium text-gray-900">컷{cut.cut_id}</span>
                                       <span className="text-xs text-gray-400">{formatRange(cut.time_range)}</span>
                                     </div>
-                                    {cutAppeals.map((appeal, i) => (
-                                      <p key={i} className="text-xs text-gray-600 mt-1">
-                                        → {appeal.type}: {appeal.claim}
+                                    {/* Script appeals */}
+                                    {cutAppeals.filter(a => a.source === 'script').map((appeal, i) => (
+                                      <p key={`s${i}`} className="text-xs text-gray-600 mt-1">
+                                        <span className="inline-flex items-center gap-1">
+                                          <span className="text-amber-600">🎤</span>
+                                          <span className="text-amber-700 font-medium">{appeal.type}</span>
+                                          <span className="text-gray-500">: {appeal.claim}</span>
+                                        </span>
+                                      </p>
+                                    ))}
+                                    {/* Visual appeals */}
+                                    {cutAppeals.filter(a => a.source === 'visual').map((appeal, i) => (
+                                      <p key={`v${i}`} className="text-xs text-gray-600 mt-1">
+                                        <span className="inline-flex items-center gap-1">
+                                          <span className="text-blue-600">🎬</span>
+                                          <span className="text-blue-700 font-medium">{appeal.type}</span>
+                                          <span className="text-gray-500">: {appeal.claim}</span>
+                                        </span>
+                                      </p>
+                                    ))}
+                                    {/* Legacy "both" fallback */}
+                                    {cutAppeals.filter(a => a.source === 'both' || !a.source).map((appeal, i) => (
+                                      <p key={`b${i}`} className="text-xs text-gray-600 mt-1">
+                                        <span className="inline-flex items-center gap-1">
+                                          <span className="text-purple-600">🔗</span>
+                                          <span className="text-purple-700 font-medium">{appeal.type}</span>
+                                          <span className="text-gray-500">: {appeal.claim}</span>
+                                        </span>
                                       </p>
                                     ))}
                                   </div>

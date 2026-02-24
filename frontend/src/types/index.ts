@@ -24,6 +24,7 @@ export interface AppealPoint {
   };
   audio_sync: string;
   strength: 'strong' | 'moderate' | 'weak';
+  source?: 'visual' | 'script' | 'both';
 }
 
 export interface TranscriptSegment {

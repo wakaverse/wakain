@@ -108,10 +108,20 @@ For persuasion_analysis (소구 분석 — CRITICAL):
     - emotional (감정): 감동, 유머, 공감 등 감정 자극
   - For each: what specific claim is made? How is it VISUALLY proven? (closeup/slow_motion/process_shot/graph_number/etc.)
   - Rate each appeal's strength (strong/moderate/weak) based on how convincingly it's delivered
-  - **source** (CRITICAL): Classify where this appeal comes from:
-    - "visual" — 화면/영상으로만 전달 (텍스트 오버레이, 제품 클로즈업, 비포/애프터 등)
-    - "script" — 음성 대본/나레이션으로만 전달 (말로만 언급, 화면에 증거 없음)
-    - "both" — 음성 + 화면 동시 전달 (나레이션에서 언급하면서 화면으로도 보여줌)
+  - **source** (CRITICAL — 소구 분리 규칙):
+    ⚠️ "both"를 사용하지 마세요! 대신 같은 시점이라도 대본 소구와 비주얼 소구를 **별도 항목으로 분리**하세요.
+    - "script" — 음성 대본/나레이션으로 전달되는 설득 포인트
+      - claim에는 실제 말한 내용 기반으로 작성
+      - 예: "300만원 날릴 뻔했어요" → source=script, type=price
+    - "visual" — 화면 구성/장면/텍스트 오버레이로 전달되는 설득 포인트  
+      - claim에는 화면에서 보이는 것 기반으로 작성
+      - 예: 깨진 타일 클로즈업 → source=visual, type=emotional, claim="깨진 타일 클로즈업으로 문제 심각성 시각화"
+      - 예: 제품 사용 장면 → source=visual, type=feature_demo, claim="주사기형 도포 장면으로 사용 편의성 시각화"
+    - 같은 컷에서 나레이션이 "이 제품 좋아요"라고 말하면서 화면에 제품 클로즈업이 보이면:
+      → {source: "script", type: "...", claim: "나레이션 내용 기반"}
+      → {source: "visual", type: "...", claim: "화면 장면 기반"}
+      두 개 별도 항목으로!
+    - 모든 컷에 최소 1개의 visual 소구가 있어야 합니다 (화면에 아무것도 안 보이는 컷은 없으니까)
 - **product_emphasis**: How is the product visually highlighted?
   - When does it first appear? How much screen time? How many hero/close-up shots?
   - What visual techniques are used? (closeup/zoom_in/texture_detail/steam_sizzle/before_after/etc.)
@@ -160,7 +170,7 @@ VOICE_TRACK_SUPPLEMENT = """
 - 음성 흐름(어조, 속도, 강조)이 소구 전달에 미치는 영향을 평가하세요
 - 텍스트 오버레이는 보조 역할로 평가하세요
 - 내레이션과 시각 요소의 싱크를 중점 분석하세요
-- ⚠️ 나레이션에서 언급하는 모든 설득 포인트를 appeal_points에 포함하세요 (source="script" 또는 "both")
+- ⚠️ 나레이션에서 언급하는 모든 설득 포인트를 appeal_points에 포함하세요 (source="script"), 화면 소구는 별도로 source="visual"
   - 예: "3년 연속 1위" → track_record (source=script)
   - 예: "지금 할인 중" → price (source=script)
   - 화면에 증거가 없어도 나레이션 소구는 반드시 포함!
@@ -430,7 +440,7 @@ _RESPONSE_SCHEMA = {
                                 "narration_sync", "text_only", "sfx_emphasis", "music_beat", "silent", "independent",
                             ]},
                             "strength": {"type": "STRING", "enum": ["strong", "moderate", "weak"]},
-                            "source": {"type": "STRING", "enum": ["visual", "script", "both"]},
+                            "source": {"type": "STRING", "enum": ["visual", "script"]},
                         },
                         "required": ["type", "claim", "visual_proof", "audio_sync", "strength", "source"],
                     },
