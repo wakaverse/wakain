@@ -632,6 +632,106 @@ def _upload_video(client: genai.Client, video_path: Path) -> types.File:
     return uploaded
 
 
+def _aggregate_artwork_context(frame_quals: list[dict]) -> str:
+    """Aggregate Phase 2 artwork data into text context for Phase 4b prompt."""
+    if not frame_quals:
+        return ""
+
+    from collections import Counter
+
+    total = len(frame_quals)
+    artworks = [f.get('artwork') for f in frame_quals if f.get('artwork')]
+    if not artworks:
+        return ""
+
+    art_count = len(artworks)
+
+    # Typography
+    font_families = Counter()
+    font_colors = Counter()
+    font_weights = Counter()
+    font_sizes = Counter()
+    outline_count = 0
+    shadow_count = 0
+    bg_count = 0
+    highlight_techniques = Counter()
+
+    for a in artworks:
+        typo = a.get('typography')
+        if not typo:
+            continue
+        if typo.get('font_family'): font_families[typo['font_family']] += 1
+        if typo.get('font_color'): font_colors[typo['font_color']] += 1
+        if typo.get('font_weight'): font_weights[typo['font_weight']] += 1
+        if typo.get('font_size_ratio'): font_sizes[typo['font_size_ratio']] += 1
+        if typo.get('has_outline'): outline_count += 1
+        if typo.get('has_shadow'): shadow_count += 1
+        if typo.get('has_background'): bg_count += 1
+        ht = typo.get('highlight_technique')
+        if ht and ht != 'none': highlight_techniques[ht] += 1
+
+    # Graphic elements
+    graphic_counts = Counter()
+    for a in artworks:
+        for elem in (a.get('graphic_elements') or []):
+            if elem != 'none':
+                graphic_counts[elem] += 1
+
+    # Layout zones
+    zone_counts = {'top': Counter(), 'middle': Counter(), 'bottom': Counter()}
+    for a in artworks:
+        lz = a.get('layout_zones') or {}
+        for zone in ['top', 'middle', 'bottom']:
+            if lz.get(zone):
+                zone_counts[zone][lz[zone]] += 1
+
+    # Color design
+    bg_colors = Counter()
+    accent_colors = Counter()
+    contrast_levels = Counter()
+    for a in artworks:
+        cd = a.get('color_design') or {}
+        if cd.get('primary_bg_color'): bg_colors[cd['primary_bg_color']] += 1
+        if cd.get('accent_color'): accent_colors[cd['accent_color']] += 1
+        if cd.get('contrast_level'): contrast_levels[cd['contrast_level']] += 1
+
+    # Build text
+    lines = ["## 프레임별 실측 아트워크 데이터 (Phase 2 분석 결과, {}/{} 프레임)".format(art_count, total)]
+
+    lines.append("\n[타이포그래피]")
+    if font_families:
+        lines.append(f"- 주 폰트: {font_families.most_common(3)}")
+    if font_weights:
+        lines.append(f"- 굵기: {font_weights.most_common(3)}")
+    if font_colors:
+        lines.append(f"- 폰트 색상 빈도: {font_colors.most_common(5)}")
+    if font_sizes:
+        lines.append(f"- 폰트 크기: {font_sizes.most_common(3)}")
+    lines.append(f"- 외곽선: {outline_count}/{art_count}프레임, 그림자: {shadow_count}/{art_count}프레임, 배경박스: {bg_count}/{art_count}프레임")
+    if highlight_techniques:
+        lines.append(f"- 하이라이트 기법: {highlight_techniques.most_common(5)}")
+
+    if graphic_counts:
+        lines.append("\n[그래픽 요소]")
+        for elem, cnt in graphic_counts.most_common(10):
+            lines.append(f"- {elem}: {cnt}회")
+
+    lines.append("\n[레이아웃]")
+    for zone in ['top', 'middle', 'bottom']:
+        if zone_counts[zone]:
+            lines.append(f"- {zone}: {zone_counts[zone].most_common(3)}")
+
+    if bg_colors:
+        lines.append("\n[컬러]")
+        lines.append(f"- 배경 주색: {bg_colors.most_common(3)}")
+        if accent_colors:
+            lines.append(f"- 액센트: {accent_colors.most_common(3)}")
+        if contrast_levels:
+            lines.append(f"- 대비: {contrast_levels.most_common(3)}")
+
+    return "\n".join(lines)
+
+
 async def analyse_video(
     video_path: str | Path,
     resolution: int = 720,
@@ -735,8 +835,15 @@ Be specific and detailed. Use Korean for script_summary, hook_line, cta_line, pe
 
         # Phase 4b: Art direction (separate call, same uploaded file)
         print("  Analysing art direction...")
-        art_prompt = """Analyse this shortform marketing video's visual identity and art direction.
+        artwork_context = _aggregate_artwork_context(frame_quals) if frame_quals else ""
+        art_context_block = f"""
+{artwork_context}
 
+위 실측 데이터를 근거로 삼고, 영상을 직접 확인하여 아트 디렉션을 분석해주세요.
+실측 데이터와 영상이 일치하지 않으면 영상 기준으로 판단하세요.
+""" if artwork_context else ""
+        art_prompt = f"""Analyse this shortform marketing video's visual identity and art direction.
+{art_context_block}
 Return a JSON object with art_direction containing:
 - tone_and_manner: overall visual tone in Korean (e.g. '깔끔하고 신뢰감 있는 정보형')
 - heading_font: primary heading font family (gothic/rounded/serif/handwritten/display)
