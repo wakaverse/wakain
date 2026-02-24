@@ -281,6 +281,7 @@ def run_phase_6(
     scenes: list[Scene] | None = None,
     video_analysis: dict | None = None,
     temporal: TemporalAnalysis | None = None,
+    product_data: dict | None = None,
 ) -> None:
     """Run Phase 6: recipe builder — merge Track 1 + Track 2 + temporal."""
     out, video_name = _resolve_output_dir(output_dir, video_path)
@@ -314,9 +315,15 @@ def run_phase_6(
                 json.loads(temporal_path.read_text())
             )
 
+    # Load product_info if not provided
+    if product_data is None:
+        product_path = out / f"{video_name}_product.json"
+        if product_path.exists():
+            product_data = json.loads(product_path.read_text())
+
     print(f"[Phase 6] Building video recipe ...")
     t0 = time.perf_counter()
-    recipe = build_recipe(scenes, video_analysis, quants=quants, quals=quals, temporal=temporal)
+    recipe = build_recipe(scenes, video_analysis, quants=quants, quals=quals, temporal=temporal, product_info=product_data)
     print(f"          → done ({time.perf_counter() - t0:.1f}s)")
 
     # Save recipe (inject engagement data from Phase 4c)
@@ -705,7 +712,7 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, p
     print(f"          → saved to {appeal_struct_path}")
 
     # Phase 6: recipe builder (includes temporal profile + production guide)
-    run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal)
+    run_phase_6(output_dir, video_path, scenes=merged_scenes, video_analysis=video_analysis, temporal=temporal, product_data=product_data)
 
     # Phase 7: Integrated analysis + prescriptions (C-8, C-9, C-10)
     run_phase_7(output_dir, video_path, stt_data=stt_result.to_dict(), product_data=product_scan.to_dict(),

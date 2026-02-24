@@ -25,6 +25,7 @@ from .schemas import (
     ProductStrategy,
     Scene,
     SceneCard,
+    SceneRhythmProfile,
     SceneSequenceItem,
     SceneTimingGuide,
     SFX,
@@ -468,15 +469,90 @@ def _build_production_guide(
     )
 
 
+def _compute_scene_rhythm(
+    scene: Scene,
+    temporal: TemporalAnalysis,
+    global_cut_density: float,
+) -> SceneRhythmProfile:
+    """Compute rhythm profile for a single scene from temporal data."""
+    s_start, s_end = scene.time_range
+    scene_dur = scene.duration or (s_end - s_start)
+
+    # Cuts in range
+    cuts_in = [t for t in temporal.cut_rhythm.cut_timestamps if s_start <= t <= s_end]
+    cut_count = len(cuts_in)
+    cut_density = round(cut_count / max(scene_dur, 0.1), 3)
+
+    # Zoom events
+    zoom_count = sum(1 for z in temporal.zoom_events if s_start <= z.time_range[0] <= s_end)
+
+    # Color shifts
+    color_shifts = sum(1 for sh in temporal.color_change_curve.shifts if s_start <= sh.timestamp <= s_end)
+
+    # Visual journey transitions
+    shot_transitions = sum(1 for tr in temporal.visual_journey.transitions if s_start <= tr.timestamp <= s_end)
+
+    # Text dwell items appearing
+    text_changes = sum(1 for t in temporal.text_dwell.items if s_start <= t.first_appear <= s_end)
+
+    # Speed changes (non-normal segments overlapping)
+    speed_changes = sum(
+        1 for seg in temporal.playback_speed
+        if seg.type != "normal" and seg.time_range[0] <= s_end and seg.time_range[1] >= s_start
+    )
+
+    # Transition types
+    trans_types: dict[str, int] = {}
+    for ev in temporal.transition_texture.events:
+        if s_start <= ev.timestamp <= s_end:
+            trans_types[ev.type] = trans_types.get(ev.type, 0) + 1
+
+    # Average attention
+    attn_pts = [p for p in temporal.attention_curve.points if s_start <= p.timestamp <= s_end]
+    avg_attention = round(sum(p.score for p in attn_pts) / len(attn_pts), 1) if attn_pts else 0.0
+
+    # Tempo level
+    if global_cut_density > 0:
+        ratio = cut_density / global_cut_density
+        if ratio >= 1.3:
+            tempo_level = "high"
+        elif ratio <= 0.7:
+            tempo_level = "low"
+        else:
+            tempo_level = "medium"
+    else:
+        tempo_level = "medium"
+
+    return SceneRhythmProfile(
+        cut_count=cut_count,
+        cut_density=cut_density,
+        zoom_events=zoom_count,
+        color_shifts=color_shifts,
+        shot_transitions=shot_transitions,
+        text_changes=text_changes,
+        speed_changes=speed_changes,
+        transition_types=trans_types,
+        avg_attention=avg_attention,
+        tempo_level=tempo_level,
+    )
+
+
 def _build_scene_cards(
     scenes: list[Scene],
     production_guide: Optional["ProductionGuide"] = None,
+    temporal: TemporalAnalysis | None = None,
 ) -> list[SceneCard]:
     """Build SceneCards by merging scenes with production_guide scene guides."""
     guide_map: dict[int, SceneTimingGuide] = {}
     if production_guide:
         for g in production_guide.scene_guides:
             guide_map[g.scene_id] = g
+
+    # Global cut density for tempo_level calculation
+    global_cut_density = 0.0
+    if temporal:
+        total_dur = sum(s.duration for s in scenes)
+        global_cut_density = len(temporal.cut_rhythm.cut_timestamps) / max(total_dur, 0.1)
 
     cards: list[SceneCard] = []
     for scene in scenes:
@@ -538,6 +614,14 @@ def _build_scene_cards(
             elif any(e in elems for e in ("gradient_overlay", "pattern_bg")):
                 graphic_style = "info_graphic"
 
+        # Rhythm profile from temporal data
+        rhythm_profile = None
+        if temporal:
+            try:
+                rhythm_profile = _compute_scene_rhythm(scene, temporal, global_cut_density)
+            except Exception:
+                pass
+
         cards.append(SceneCard(
             scene_id=scene.scene_id,
             time_range=scene.time_range,
@@ -563,6 +647,7 @@ def _build_scene_cards(
             font_style=font_style,
             narration=narration,
             sound_direction="BGM 유지",
+            rhythm_profile=rhythm_profile,
         ))
 
     return cards
@@ -651,18 +736,23 @@ def build_recipe(
     quants: list[FrameQuant] | None = None,
     quals: list[FrameQual] | None = None,
     temporal: TemporalAnalysis | None = None,
+    product_info: dict | None = None,
 ) -> VideoRecipe:
     """Merge scene data (Track 1) + video analysis (Track 2) into VideoRecipe."""
 
-    # ── Meta (from Track 2) ──────────────────────────────────────────────
+    # ── Meta (from Track 2, enriched with Phase 0.1 product_info) ───────
     raw_meta = video_analysis.get("meta", {})
+    pi = product_info or {}
     meta = Meta(
         platform=_normalize(raw_meta.get("platform", "ad"), _PLATFORM_MAP, "ad"),
         duration=raw_meta.get("duration", sum(s.duration for s in scenes)),
         aspect_ratio=raw_meta.get("aspect_ratio", "9:16"),
-        category=_normalize(raw_meta.get("category", "food"), _CATEGORY_MAP, "food"),
-        sub_category=raw_meta.get("sub_category", ""),
+        category=pi.get("category") or _normalize(raw_meta.get("category", "food"), _CATEGORY_MAP, "food"),
+        sub_category=pi.get("sub_category", "") or raw_meta.get("sub_category", ""),
         target_audience=raw_meta.get("target_audience", ""),
+        product_name=pi.get("product_name", ""),
+        product_brand=pi.get("brand", ""),
+        product_category=pi.get("category", ""),
     )
 
     # ── Structure (from Track 2, enriched with Track 1 scenes) ───────────
@@ -752,17 +842,19 @@ def build_recipe(
         ),
     )
 
-    # ── Effectiveness assessment (from Track 2) ──────────────────────────
-    raw_ea = video_analysis.get("effectiveness_assessment", {})
-    effectiveness = EffectivenessAssessment(
-        hook_rating=raw_ea.get("hook_rating", ""),
-        flow_rating=raw_ea.get("flow_rating", ""),
-        message_clarity=raw_ea.get("message_clarity", ""),
-        cta_strength=raw_ea.get("cta_strength", ""),
-        replay_factor=raw_ea.get("replay_factor", ""),
-        standout_elements=raw_ea.get("standout_elements", raw_ea.get("strengths", [])),
-        weak_points=raw_ea.get("weak_points", raw_ea.get("weaknesses", [])),
-    )
+    # ── Effectiveness assessment (deprecated — Phase 4 data, kept for frontend compat)
+    effectiveness: EffectivenessAssessment | None = None
+    raw_ea = video_analysis.get("effectiveness_assessment")
+    if raw_ea:
+        effectiveness = EffectivenessAssessment(
+            hook_rating=raw_ea.get("hook_rating", ""),
+            flow_rating=raw_ea.get("flow_rating", ""),
+            message_clarity=raw_ea.get("message_clarity", ""),
+            cta_strength=raw_ea.get("cta_strength", ""),
+            replay_factor=raw_ea.get("replay_factor", ""),
+            standout_elements=raw_ea.get("standout_elements", raw_ea.get("strengths", [])),
+            weak_points=raw_ea.get("weak_points", raw_ea.get("weaknesses", [])),
+        )
 
     # ── Persuasion analysis (from Track 2) ─────────────────────────────
     raw_pa = video_analysis.get("persuasion_analysis")
@@ -850,7 +942,7 @@ def build_recipe(
         production_guide = _build_production_guide(scenes, temporal)
 
     # ── Scene cards (scenes + production_guide merged) ───────────────────
-    scene_cards = _build_scene_cards(scenes, production_guide)
+    scene_cards = _build_scene_cards(scenes, production_guide, temporal=temporal)
 
     # ── Drop-off analysis ────────────────────────────────────────────────
     dropoff_analysis: Optional[DropOffAnalysis] = None

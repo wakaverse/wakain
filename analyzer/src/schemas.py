@@ -330,6 +330,9 @@ class Meta(BaseModel):
     ]
     sub_category: str
     target_audience: str
+    product_name: str = ""
+    product_brand: str = ""
+    product_category: str = ""
 
 
 class SceneSequenceItem(BaseModel):
@@ -762,6 +765,20 @@ class TemporalProfile(BaseModel):
     product_human_balance: str
 
 
+class SceneRhythmProfile(BaseModel):
+    """씬 구간의 리듬 프로파일"""
+    cut_count: int = 0
+    cut_density: float = 0.0
+    zoom_events: int = 0
+    color_shifts: int = 0
+    shot_transitions: int = 0
+    text_changes: int = 0
+    speed_changes: int = 0
+    transition_types: dict[str, int] = Field(default_factory=dict)
+    avg_attention: float = 0.0
+    tempo_level: str = ""
+
+
 class SceneCard(BaseModel):
     """씬별 통합 제작 지시서 / Integrated Scene Production Brief"""
     scene_id: int
@@ -800,6 +817,9 @@ class SceneCard(BaseModel):
     # Audio (오디오)
     narration: Optional[str] = None
     sound_direction: str
+
+    # Rhythm (리듬 프로파일)
+    rhythm_profile: Optional[SceneRhythmProfile] = None
 
 
 class DropOffZone(BaseModel):
@@ -843,7 +863,7 @@ class VideoRecipe(BaseModel):
     product_strategy: ProductStrategy
     persuasion_analysis: Optional[PersuasionAnalysis] = None
     art_direction: Optional[ArtDirection] = None
-    effectiveness_assessment: EffectivenessAssessment
+    effectiveness_assessment: Optional[EffectivenessAssessment] = None
     scenes: list[Scene]
     temporal_profile: Optional[TemporalProfile] = None
     production_guide: Optional[ProductionGuide] = None
