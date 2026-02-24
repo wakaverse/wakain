@@ -82,7 +82,13 @@ For persuasion_analysis (소구 분석 — CRITICAL):
 - **presenter**: Who presents the video? (founder/reviewer/narrator/customer/expert/character/none)
   - Is their face shown? What gives them credibility?
 - **video_style**: Overall style (pitch/demo/mukbang/comparison/vlog/review/info/story/challenge)
-- **appeal_points**: List EVERY persuasion/appeal point in order of appearance:
+- **appeal_points**: List EVERY persuasion/appeal point in order of appearance.
+  ⚠️ IMPORTANT: Extract AT LEAST one appeal per scene/segment. A 30-second video should have 10-20+ appeals.
+  Include appeals from ALL sources:
+    - Visual appeals (product shots, demos, before/after, etc.)
+    - Script/narration appeals (spoken claims, benefits mentioned verbally)
+    - Text overlay appeals (on-screen text making claims)
+  Do NOT skip scenes — every scene communicates something. If a scene shows a product feature, that's feature_demo. If narration mentions a benefit, that's an appeal even without visual proof.
   - Types (rational) — 각 정의를 정확히 따를 것:
     - myth_bust (오해반박): 흔한 오해나 편견을 깨는 소구
     - ingredient (원재료): 원재료/성분의 품질·희귀성 강조
@@ -137,6 +143,10 @@ VOICE_TRACK_SUPPLEMENT = """
 - 음성 흐름(어조, 속도, 강조)이 소구 전달에 미치는 영향을 평가하세요
 - 텍스트 오버레이는 보조 역할로 평가하세요
 - 내레이션과 시각 요소의 싱크를 중점 분석하세요
+- ⚠️ 나레이션에서 언급하는 모든 설득 포인트를 appeal_points에 포함하세요 (source="script" 또는 "both")
+  - 예: "3년 연속 1위" → track_record (source=script)
+  - 예: "지금 할인 중" → price (source=script)
+  - 화면에 증거가 없어도 나레이션 소구는 반드시 포함!
 
 [STT 전문]
 {stt_transcript}
@@ -152,6 +162,7 @@ CAPTION_TRACK_SUPPLEMENT = """
 - 타이포그래피 분석 강화: 크기, 색상, 강조 방식이 메시지 강도를 나타냄
 - BGM/효과음의 역할을 더 비중 있게 평가하세요
 - appeal_points의 claim은 실제 화면 텍스트 내용 기반으로 작성하세요
+- ⚠️ 화면에 나타나는 모든 텍스트 메시지를 소구로 분석하세요. 텍스트 하나하나가 소구입니다!
 """
 
 STYLE_CONTEXT_TEMPLATE = """
