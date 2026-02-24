@@ -86,7 +86,7 @@ def cluster_appeals_into_scenes(
                         speech_continuous = True
                         break
         if speech_continuous:
-            score += 3
+            score += 2
 
         # Caption continuity: text_dwell item spans boundary
         for item in text_dwell_items:
@@ -123,14 +123,16 @@ def cluster_appeals_into_scenes(
 
         merge_scores.append(score)
 
-    # 3. Build scenes by merging (threshold >= 3, max 5s)
+    # 3. Build scenes by merging (threshold >= 3, max 8s)
+    MERGE_THRESHOLD = 3
+    MAX_SCENE_SEC = 8.0
     scenes: list[dict] = []
     current_cuts = [0]
 
     for i in range(len(cuts) - 1):
         merged_start = cuts[current_cuts[0]][0]
         candidate_end = cuts[i + 1][1]
-        if merge_scores[i] >= 2 and (candidate_end - merged_start) <= 5.0:
+        if merge_scores[i] >= MERGE_THRESHOLD and (candidate_end - merged_start) <= MAX_SCENE_SEC:
             current_cuts.append(i + 1)
         else:
             scenes.append(_build_scene(len(scenes) + 1, current_cuts, cuts, cut_appeals,
@@ -142,9 +144,8 @@ def cluster_appeals_into_scenes(
         scenes.append(_build_scene(len(scenes) + 1, current_cuts, cuts, cut_appeals,
                                    stt_segments, text_dwell_items))
 
-    # 4. Constraints: absorb short (<1s) and empty scenes
+    # 4. Constraints: absorb short (<1s) scenes only; keep empty scenes for diagnosis
     scenes = _absorb_short_scenes(scenes, merge_scores, cuts)
-    scenes = _absorb_empty_scenes(scenes)
 
     # Re-number
     for i, s in enumerate(scenes):
