@@ -463,7 +463,9 @@ def run_phase_7(
     profile = get_category_profile(category_key)
 
     rx_report = generate_prescriptions(
-        recipe, profile, stt_data=stt_data, caption_map=cap_map, video_name=video_name,
+        recipe_data, profile, diagnosis=diagnosis_result,
+        appeal_structure=appeal_structure, stt_data=stt_data,
+        caption_map=cap_map, video_name=video_name,
     )
     rx_path = out / f"{video_name}_prescriptions.json"
     rx_path.write_text(json.dumps(rx_report.to_dict(), indent=2, ensure_ascii=False))

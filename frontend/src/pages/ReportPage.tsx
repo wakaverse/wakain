@@ -83,10 +83,10 @@ export default function ReportPage() {
   const duration = meta.duration || 30;
   const videoUrl = result.video_url || null;
 
-  // Diagnosis data (from Phase 7)
+  // Diagnosis data (from Phase 7) — supports both old (integrated_analyzer) and new (diagnosis_engine)
   const diagnosis = result.diagnosis || {} as any;
   const dimensions = diagnosis.dimensions || [];
-  const engagementScore = diagnosis.engagement_score || 0;
+  const engagementScore = diagnosis.overall_score || diagnosis.engagement_score || 0;
   const classification = diagnosis.classification || {};
   const sceneAnalyses = diagnosis.scene_analyses || [];
   const diagnoses = diagnosis.diagnoses || [];

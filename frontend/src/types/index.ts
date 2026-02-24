@@ -226,6 +226,7 @@ export interface Prescription {
   symptom: string;
   recommendation: string;
   impact: string;
+  time_range?: string;
   priority: number;
 }
 

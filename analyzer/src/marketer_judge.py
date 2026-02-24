@@ -66,11 +66,16 @@ def _build_evidence_summary(
         "stt_transcript": (stt_data or {}).get("full_transcript", "")[:800],
         "product_category": (style_data or {}).get("category") or (style_data or {}).get("primary_format_ko"),
         "product_name": (style_data or {}).get("product_name"),
+        # Support both old (integrated_analyzer) and new (diagnosis_engine) formats
+        "axes": diagnosis.get("axes", []),
+        "overall_score": diagnosis.get("overall_score", 0),
+        "top_3_actions": diagnosis.get("top_3_actions", []),
+        # Legacy fields (backward compat)
         "dimensions": diagnosis.get("dimensions", []),
         "scene_analyses": diagnosis.get("scene_analyses", []),
         "strengths": diagnosis.get("strengths", []),
         "weaknesses": diagnosis.get("weaknesses", []),
-        "engagement_score": diagnosis.get("engagement_score", 0),
+        "engagement_score": diagnosis.get("engagement_score", diagnosis.get("overall_score", 0)),
         "caption_events": [
             {"time": round(e["start"], 1), "text": e["text"], "role": e["narrative_role"]}
             for e in (caption_map or {}).get("events", [])[:25]
