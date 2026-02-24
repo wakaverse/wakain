@@ -3,23 +3,65 @@
   "name_ko": "나열형",
   "description": "여러 제품/항목 나열 소개",
   "dimension_weights": {
-    "visual_stimulus": 0.25,
-    "persuasion_density": 0.25,
-    "information_density": 0.30,
-    "edit_rhythm": 0.15,
-    "audio_stimulus": 0.05
+    "visual_stimulus": 0.19,
+    "persuasion_density": 0.19,
+    "information_density": 0.228,
+    "edit_rhythm": 0.114,
+    "audio_stimulus": 0.038,
+    "persona_fit": 0.06,
+    "empathy_trigger": 0.06,
+    "narrative_structure": 0.06,
+    "retention_design": 0.06
   },
-  "key_metrics": ["item_count", "item_pacing", "visual_variety", "information_density"],
-  "less_important_metrics": ["narrative_arc", "emotional_curve"],
-  "effective_appeals": ["comparison", "specification", "price", "social_proof"],
-  "weak_appeals": ["emotional", "nostalgia"],
-  "recommended_structure": ["hook_count", "item_1", "item_2", "item_n", "best_pick", "cta"],
+  "key_metrics": [
+    "item_count",
+    "item_pacing",
+    "visual_variety",
+    "information_density"
+  ],
+  "less_important_metrics": [
+    "narrative_arc",
+    "emotional_curve"
+  ],
+  "effective_appeals": [
+    "comparison",
+    "specification",
+    "price",
+    "social_proof"
+  ],
+  "weak_appeals": [
+    "emotional",
+    "nostalgia"
+  ],
+  "recommended_structure": [
+    "hook_count",
+    "item_1",
+    "item_2",
+    "item_n",
+    "best_pick",
+    "cta"
+  ],
   "prescriptions": {
-    "cut_density_low": {"level": "warning", "message": "항목 전환이 느리면 지루해집니다. 한 항목당 3-5초를 유지하세요."},
-    "cut_density_high": {"level": "ok", "message": "나열형은 빠른 전환이 효과적입니다."},
-    "appeal_gap_3s": {"level": "warning", "message": "항목 간 전환에서 소구가 끊기지 않도록 하세요."},
-    "first_appeal_late": {"level": "warning", "message": "'몇 가지 소개' 같은 프레이밍을 빨리 보여주세요."},
-    "text_heavy": {"level": "ok", "message": "나열형은 텍스트가 핵심입니다."}
+    "cut_density_low": {
+      "level": "warning",
+      "message": "항목 전환이 느리면 지루해집니다. 한 항목당 3-5초를 유지하세요."
+    },
+    "cut_density_high": {
+      "level": "ok",
+      "message": "나열형은 빠른 전환이 효과적입니다."
+    },
+    "appeal_gap_3s": {
+      "level": "warning",
+      "message": "항목 간 전환에서 소구가 끊기지 않도록 하세요."
+    },
+    "first_appeal_late": {
+      "level": "warning",
+      "message": "'몇 가지 소개' 같은 프레이밍을 빨리 보여주세요."
+    },
+    "text_heavy": {
+      "level": "ok",
+      "message": "나열형은 텍스트가 핵심입니다."
+    }
   },
   "thresholds": {
     "first_appeal_max_sec": 2.0,

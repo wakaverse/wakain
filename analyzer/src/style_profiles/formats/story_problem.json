@@ -3,23 +3,62 @@
   "name_ko": "스토리/문제해결형",
   "description": "문제→해결 서사 구조",
   "dimension_weights": {
-    "visual_stimulus": 0.20,
-    "persuasion_density": 0.30,
-    "information_density": 0.25,
-    "edit_rhythm": 0.15,
-    "audio_stimulus": 0.10
+    "visual_stimulus": 0.152,
+    "persuasion_density": 0.228,
+    "information_density": 0.19,
+    "edit_rhythm": 0.114,
+    "audio_stimulus": 0.076,
+    "persona_fit": 0.06,
+    "empathy_trigger": 0.06,
+    "narrative_structure": 0.06,
+    "retention_design": 0.06
   },
-  "key_metrics": ["narrative_arc", "problem_clarity", "solution_timing", "emotional_curve"],
-  "less_important_metrics": ["typography_quality"],
-  "effective_appeals": ["myth_bust", "fear", "social_proof", "guarantee"],
-  "weak_appeals": ["design_aesthetic", "sensory"],
-  "recommended_structure": ["problem_empathy", "solution", "proof", "cta"],
+  "key_metrics": [
+    "narrative_arc",
+    "problem_clarity",
+    "solution_timing",
+    "emotional_curve"
+  ],
+  "less_important_metrics": [
+    "typography_quality"
+  ],
+  "effective_appeals": [
+    "myth_bust",
+    "fear",
+    "social_proof",
+    "guarantee"
+  ],
+  "weak_appeals": [
+    "design_aesthetic",
+    "sensory"
+  ],
+  "recommended_structure": [
+    "problem_empathy",
+    "solution",
+    "proof",
+    "cta"
+  ],
   "prescriptions": {
-    "cut_density_low": {"level": "info", "message": "스토리 전개에 집중하는 구간이면 괜찮습니다."},
-    "cut_density_high": {"level": "info", "message": "해결 과정에서의 빠른 전환은 효과적입니다."},
-    "appeal_gap_3s": {"level": "warning", "message": "문제→해결 전환 구간에서 소구 공백이 생기지 않도록 하세요."},
-    "first_appeal_late": {"level": "info", "message": "문제 제기가 곧 소구입니다. 공감 유도가 충분하면 괜찮습니다."},
-    "text_heavy": {"level": "info", "message": "문제/해결 포인트를 텍스트로 강조하는 것은 효과적입니다."}
+    "cut_density_low": {
+      "level": "info",
+      "message": "스토리 전개에 집중하는 구간이면 괜찮습니다."
+    },
+    "cut_density_high": {
+      "level": "info",
+      "message": "해결 과정에서의 빠른 전환은 효과적입니다."
+    },
+    "appeal_gap_3s": {
+      "level": "warning",
+      "message": "문제→해결 전환 구간에서 소구 공백이 생기지 않도록 하세요."
+    },
+    "first_appeal_late": {
+      "level": "info",
+      "message": "문제 제기가 곧 소구입니다. 공감 유도가 충분하면 괜찮습니다."
+    },
+    "text_heavy": {
+      "level": "info",
+      "message": "문제/해결 포인트를 텍스트로 강조하는 것은 효과적입니다."
+    }
   },
   "thresholds": {
     "first_appeal_max_sec": 3.0,

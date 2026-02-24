@@ -3,23 +3,62 @@
   "name_ko": "비교형",
   "description": "A vs B 직접 비교",
   "dimension_weights": {
-    "visual_stimulus": 0.25,
-    "persuasion_density": 0.30,
-    "information_density": 0.25,
-    "edit_rhythm": 0.10,
-    "audio_stimulus": 0.10
+    "visual_stimulus": 0.19,
+    "persuasion_density": 0.228,
+    "information_density": 0.19,
+    "edit_rhythm": 0.076,
+    "audio_stimulus": 0.076,
+    "persona_fit": 0.06,
+    "empathy_trigger": 0.06,
+    "narrative_structure": 0.06,
+    "retention_design": 0.06
   },
-  "key_metrics": ["comparison_clarity", "before_after_contrast", "visual_split", "data_presentation"],
-  "less_important_metrics": ["audio_quality"],
-  "effective_appeals": ["comparison", "spec_data", "social_proof", "myth_bust"],
-  "weak_appeals": ["nostalgia", "lifestyle"],
-  "recommended_structure": ["before", "after", "difference_highlight", "cta"],
+  "key_metrics": [
+    "comparison_clarity",
+    "before_after_contrast",
+    "visual_split",
+    "data_presentation"
+  ],
+  "less_important_metrics": [
+    "audio_quality"
+  ],
+  "effective_appeals": [
+    "comparison",
+    "spec_data",
+    "social_proof",
+    "myth_bust"
+  ],
+  "weak_appeals": [
+    "nostalgia",
+    "lifestyle"
+  ],
+  "recommended_structure": [
+    "before",
+    "after",
+    "difference_highlight",
+    "cta"
+  ],
   "prescriptions": {
-    "cut_density_low": {"level": "warning", "message": "비교 영상은 빠른 전환으로 차이를 부각해야 합니다."},
-    "cut_density_high": {"level": "ok", "message": "A/B 전환이 빠를수록 차이가 선명합니다."},
-    "appeal_gap_3s": {"level": "warning", "message": "비교 없는 구간이 길면 설득력이 약해집니다."},
-    "first_appeal_late": {"level": "warning", "message": "'기존 것'의 문제점을 빨리 보여주세요."},
-    "text_heavy": {"level": "ok", "message": "스펙 비교 텍스트는 효과적입니다."}
+    "cut_density_low": {
+      "level": "warning",
+      "message": "비교 영상은 빠른 전환으로 차이를 부각해야 합니다."
+    },
+    "cut_density_high": {
+      "level": "ok",
+      "message": "A/B 전환이 빠를수록 차이가 선명합니다."
+    },
+    "appeal_gap_3s": {
+      "level": "warning",
+      "message": "비교 없는 구간이 길면 설득력이 약해집니다."
+    },
+    "first_appeal_late": {
+      "level": "warning",
+      "message": "'기존 것'의 문제점을 빨리 보여주세요."
+    },
+    "text_heavy": {
+      "level": "ok",
+      "message": "스펙 비교 텍스트는 효과적입니다."
+    }
   },
   "thresholds": {
     "first_appeal_max_sec": 2.0,

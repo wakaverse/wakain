@@ -3,25 +3,70 @@
   "name_ko": "UGC/브이로그형",
   "description": "실사용자 리얼 후기, 일상 느낌",
   "dimension_weights": {
-    "visual_stimulus": 0.15,
-    "persuasion_density": 0.20,
-    "information_density": 0.25,
-    "edit_rhythm": 0.10,
-    "audio_stimulus": 0.30
+    "visual_stimulus": 0.114,
+    "persuasion_density": 0.152,
+    "information_density": 0.19,
+    "edit_rhythm": 0.076,
+    "audio_stimulus": 0.228,
+    "persona_fit": 0.06,
+    "empathy_trigger": 0.06,
+    "narrative_structure": 0.06,
+    "retention_design": 0.06
   },
-  "key_metrics": ["authenticity", "face_ratio", "natural_tone", "speaker_expression"],
-  "less_important_metrics": ["cut_density", "art_direction_consistency"],
-  "effective_appeals": ["authenticity", "social_proof", "lifestyle"],
-  "weak_appeals": ["specification", "comparison"],
-  "recommended_structure": ["daily", "discovery", "experience", "review"],
+  "key_metrics": [
+    "authenticity",
+    "face_ratio",
+    "natural_tone",
+    "speaker_expression"
+  ],
+  "less_important_metrics": [
+    "cut_density",
+    "art_direction_consistency"
+  ],
+  "effective_appeals": [
+    "authenticity",
+    "social_proof",
+    "lifestyle"
+  ],
+  "weak_appeals": [
+    "specification",
+    "comparison"
+  ],
+  "recommended_structure": [
+    "daily",
+    "discovery",
+    "experience",
+    "review"
+  ],
   "prescriptions": {
-    "cut_density_low": {"level": "ok", "message": "적절합니다. UGC는 느긋한 편집이 자연스럽습니다."},
-    "cut_density_high": {"level": "warning", "message": "편집이 빠르면 광고 느낌이 납니다. 자연스러움을 유지하세요."},
-    "appeal_gap_3s": {"level": "info", "message": "자연스러운 전환 구간이면 괜찮습니다."},
-    "first_appeal_late": {"level": "ok", "message": "일상 도입부로 적절합니다."},
-    "no_bgm": {"level": "ok", "message": "오히려 진정성이 강화됩니다."},
-    "art_direction_inconsistent": {"level": "ok", "message": "리얼리티 느낌으로 긍정적입니다."},
-    "text_heavy": {"level": "warning", "message": "텍스트가 많으면 광고 느낌이 날 수 있습니다."}
+    "cut_density_low": {
+      "level": "ok",
+      "message": "적절합니다. UGC는 느긋한 편집이 자연스럽습니다."
+    },
+    "cut_density_high": {
+      "level": "warning",
+      "message": "편집이 빠르면 광고 느낌이 납니다. 자연스러움을 유지하세요."
+    },
+    "appeal_gap_3s": {
+      "level": "info",
+      "message": "자연스러운 전환 구간이면 괜찮습니다."
+    },
+    "first_appeal_late": {
+      "level": "ok",
+      "message": "일상 도입부로 적절합니다."
+    },
+    "no_bgm": {
+      "level": "ok",
+      "message": "오히려 진정성이 강화됩니다."
+    },
+    "art_direction_inconsistent": {
+      "level": "ok",
+      "message": "리얼리티 느낌으로 긍정적입니다."
+    },
+    "text_heavy": {
+      "level": "warning",
+      "message": "텍스트가 많으면 광고 느낌이 날 수 있습니다."
+    }
   },
   "thresholds": {
     "first_appeal_max_sec": 8.0,

@@ -116,6 +116,10 @@ DIMENSION_KO = {
     "information_density": "정보 밀도",
     "edit_rhythm": "편집 리듬",
     "audio_stimulus": "청각 자극도",
+    "persona_fit": "페르소나 적합성",
+    "empathy_trigger": "공감 트리거",
+    "narrative_structure": "서사 구조",
+    "retention_design": "리텐션 설계",
 }
 
 
@@ -591,6 +595,120 @@ def _calc_audio_stimulus(recipe: dict) -> tuple[float, str]:
     return min(100, max(0, round(score, 1))), ", ".join(parts) if parts else "오디오 정보 부족"
 
 
+def _calc_persona_fit(recipe: dict, scenes: list[dict]) -> tuple[float, str]:
+    """Calculate persona-product fit score."""
+    presenter = recipe.get("persuasion_analysis", {}).get("presenter", {})
+    category = recipe.get("meta", {}).get("category", "")
+    p_type = presenter.get("type", "none")
+    face = presenter.get("face_shown", False)
+    cred = presenter.get("credibility_factor", "")
+
+    base_scores = {"founder": 60, "expert": 70, "reviewer": 65, "customer": 55, "narrator": 45, "character": 50, "none": 25}
+    score = base_scores.get(p_type, 40)
+
+    fit_matrix = {
+        ("food", "reviewer"): 15, ("food", "customer"): 15, ("food", "founder"): 10,
+        ("tech", "expert"): 15, ("tech", "founder"): 15, ("tech", "reviewer"): 10,
+        ("beauty", "reviewer"): 15, ("beauty", "expert"): 10, ("beauty", "customer"): 10,
+        ("health", "expert"): 20, ("health", "founder"): 10,
+        ("fashion", "character"): 15, ("fashion", "reviewer"): 10,
+    }
+    score += fit_matrix.get((category, p_type), 0)
+
+    if face:
+        score += 15
+    if cred and len(cred) > 10:
+        score += 10
+
+    score = min(100, max(0, score))
+    evidence = f"화자={p_type}, 얼굴노출={'O' if face else 'X'}, 카테고리={category}"
+    return score, evidence
+
+
+def _calc_empathy_trigger(recipe: dict, duration: float) -> tuple[float, str]:
+    """Calculate empathy trigger score from Gemini empathy_triggers data."""
+    triggers = recipe.get("persuasion_analysis", {}).get("empathy_triggers", [])
+    if not triggers:
+        return 20.0, "공감 트리거 미감지"
+
+    count = len(triggers)
+    types_used = set(t.get("trigger_type") for t in triggers)
+    diversity = len(types_used)
+
+    intensity_map = {"strong": 1.0, "moderate": 0.6, "weak": 0.3}
+    intensity_score = sum(intensity_map.get(t.get("intensity", "weak"), 0.3) for t in triggers) / count
+
+    score = min(40, count * 8) + min(25, diversity * 8) + intensity_score * 35
+    score = min(100, max(0, score))
+
+    evidence = f"트리거 {count}개, 유형 {diversity}종, 평균강도 {intensity_score:.1f}"
+    return score, evidence
+
+
+def _calc_narrative_structure(recipe: dict, scenes: list[dict], duration: float) -> tuple[float, str]:
+    """Calculate narrative structure effectiveness score."""
+    narrative = recipe.get("narrative_analysis", {})
+    structure_type = recipe.get("structure", {}).get("type", "")
+
+    pattern = narrative.get("pattern", structure_type or "direct_pitch")
+    tension = narrative.get("tension_arc", "flat")
+    resolution = narrative.get("resolution_satisfaction", "none")
+    curiosity_gap = narrative.get("curiosity_gap", False)
+    loop = narrative.get("loop_structure", False)
+
+    pattern_scores = {
+        "problem_solution": 70, "reversal": 75, "comparison": 65,
+        "storytelling": 70, "challenge": 60, "tutorial": 55,
+        "listicle": 50, "direct_pitch": 40,
+    }
+    score = pattern_scores.get(pattern, 45)
+
+    tension_bonus = {"rising": 10, "peak_valley": 15, "steady_build": 10, "frontloaded": 5, "flat": -10}
+    score += tension_bonus.get(tension, 0)
+
+    res_bonus = {"strong": 10, "moderate": 5, "weak": 0, "none": -5}
+    score += res_bonus.get(resolution, 0)
+
+    if curiosity_gap:
+        score += 10
+    if loop:
+        score += 5
+
+    score = min(100, max(0, score))
+    evidence = f"패턴={pattern}, 텐션={tension}, 해결={resolution}, 호기심갭={'O' if curiosity_gap else 'X'}"
+    return score, evidence
+
+
+def _calc_retention_design(recipe: dict, duration: float) -> tuple[float, str]:
+    """Calculate retention design score from Gemini retention_analysis data."""
+    retention = recipe.get("retention_analysis", {})
+
+    hook = retention.get("hook_strength", "weak")
+    drops = retention.get("drop_off_risks", [])
+    rewatch = retention.get("rewatch_triggers", [])
+    share = retention.get("share_triggers", [])
+    comment = retention.get("comment_triggers", [])
+    completion = retention.get("completion_likelihood", "low")
+
+    hook_scores = {"irresistible": 30, "strong": 25, "moderate": 15, "weak": 5}
+    score = hook_scores.get(hook, 10)
+
+    high_drops = sum(1 for d in drops if d.get("severity") == "high")
+    med_drops = sum(1 for d in drops if d.get("severity") == "medium")
+    score -= high_drops * 10 + med_drops * 5
+
+    score += min(20, len(rewatch) * 7)
+    score += min(15, len(share) * 5)
+    score += min(10, len(comment) * 4)
+
+    comp_scores = {"very_high": 25, "high": 20, "medium": 10, "low": 0}
+    score += comp_scores.get(completion, 0)
+
+    score = min(100, max(0, score))
+    evidence = f"훅={hook}, 이탈위험={len(drops)}개, 재시청트리거={len(rewatch)}, 공유트리거={len(share)}"
+    return score, evidence
+
+
 # ── Stage 3: Diagnosis engine ────────────────────────────────────────────────
 
 
@@ -1025,6 +1143,10 @@ def run_integrated_analysis(
         "information_density": lambda: _calc_information_density(recipe, caption_map, stt_data, duration),
         "edit_rhythm": lambda: _calc_edit_rhythm(temporal_source, duration),
         "audio_stimulus": lambda: _calc_audio_stimulus(recipe),
+        "persona_fit": lambda: _calc_persona_fit(recipe, scenes_dicts),
+        "empathy_trigger": lambda: _calc_empathy_trigger(recipe, duration),
+        "narrative_structure": lambda: _calc_narrative_structure(recipe, scenes_dicts, duration),
+        "retention_design": lambda: _calc_retention_design(recipe, duration),
     }
 
     dimensions: list[DimensionScore] = []

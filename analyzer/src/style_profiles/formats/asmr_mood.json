@@ -3,24 +3,67 @@
   "name_ko": "ASMR/감성형",
   "description": "시각+청각 감성 자극, 무드 중심",
   "dimension_weights": {
-    "visual_stimulus": 0.25,
-    "persuasion_density": 0.10,
-    "information_density": 0.10,
-    "edit_rhythm": 0.15,
-    "audio_stimulus": 0.40
+    "visual_stimulus": 0.19,
+    "persuasion_density": 0.076,
+    "information_density": 0.076,
+    "edit_rhythm": 0.114,
+    "audio_stimulus": 0.304,
+    "persona_fit": 0.06,
+    "empathy_trigger": 0.06,
+    "narrative_structure": 0.06,
+    "retention_design": 0.06
   },
-  "key_metrics": ["audio_quality", "color_mood", "visual_consistency", "sensory_immersion"],
-  "less_important_metrics": ["information_density", "appeal_density"],
-  "effective_appeals": ["sensory", "lifestyle", "design_aesthetic"],
-  "weak_appeals": ["track_record", "spec_data", "price"],
-  "recommended_structure": ["mood_intro", "sensory_peak", "product_reveal", "brand_close"],
+  "key_metrics": [
+    "audio_quality",
+    "color_mood",
+    "visual_consistency",
+    "sensory_immersion"
+  ],
+  "less_important_metrics": [
+    "information_density",
+    "appeal_density"
+  ],
+  "effective_appeals": [
+    "sensory",
+    "lifestyle",
+    "design_aesthetic"
+  ],
+  "weak_appeals": [
+    "track_record",
+    "spec_data",
+    "price"
+  ],
+  "recommended_structure": [
+    "mood_intro",
+    "sensory_peak",
+    "product_reveal",
+    "brand_close"
+  ],
   "prescriptions": {
-    "cut_density_low": {"level": "ok", "message": "느린 편집이 감성 몰입에 도움됩니다."},
-    "cut_density_high": {"level": "danger", "message": "빠른 편집은 감성/ASMR 무드를 깨뜨립니다."},
-    "appeal_gap_3s": {"level": "ok", "message": "감성형은 소구 없는 무드 구간이 오히려 효과적입니다."},
-    "first_appeal_late": {"level": "ok", "message": "감성 도입부가 길어도 무드 설정에 도움됩니다."},
-    "no_bgm": {"level": "info", "message": "ASMR이면 실제 소리가 BGM 역할을 합니다."},
-    "text_heavy": {"level": "warning", "message": "텍스트가 많으면 감성 몰입을 방해합니다."}
+    "cut_density_low": {
+      "level": "ok",
+      "message": "느린 편집이 감성 몰입에 도움됩니다."
+    },
+    "cut_density_high": {
+      "level": "danger",
+      "message": "빠른 편집은 감성/ASMR 무드를 깨뜨립니다."
+    },
+    "appeal_gap_3s": {
+      "level": "ok",
+      "message": "감성형은 소구 없는 무드 구간이 오히려 효과적입니다."
+    },
+    "first_appeal_late": {
+      "level": "ok",
+      "message": "감성 도입부가 길어도 무드 설정에 도움됩니다."
+    },
+    "no_bgm": {
+      "level": "info",
+      "message": "ASMR이면 실제 소리가 BGM 역할을 합니다."
+    },
+    "text_heavy": {
+      "level": "warning",
+      "message": "텍스트가 많으면 감성 몰입을 방해합니다."
+    }
   },
   "thresholds": {
     "first_appeal_max_sec": 10.0,

@@ -120,6 +120,26 @@ For persuasion_analysis (소구 분석 — CRITICAL):
 - **appeal_layering**: How do appeals build on each other? Describe the sequence in Korean.
 - **persuasion_summary**: 1-2 sentence summary of the overall persuasion strategy in Korean.
 
+For empathy_triggers (within persuasion_analysis):
+- Identify ALL emotional/empathy triggers used in the video
+- Types: pain_empathy (고통공감 "이거 겪어봤죠?"), desire (욕망자극 "이렇게 될 수 있다"), belonging (소속감 "다들 이거 써"), fomo (놓치면 손해), curiosity (호기심 "이게 된다고?"), humor (유머), nostalgia (향수), fear (공포/불안), pride (자부심), relief (안도)
+- Note timestamp, description, and intensity for each
+
+For narrative_analysis:
+- Identify the narrative pattern (problem_solution/reversal/comparison/listicle/storytelling/direct_pitch/challenge/tutorial)
+- Assess tension arc: does the video build tension? (rising/flat/peak_valley/steady_build/frontloaded)
+- Resolution satisfaction: how satisfying is the conclusion?
+- Curiosity gap: does it create "I need to know" feeling?
+- Loop structure: does it encourage rewatching?
+
+For retention_analysis:
+- Hook strength: how irresistible is the first 1-3 seconds?
+- Drop-off risks: identify moments where viewers might leave (timestamp + reason)
+- Rewatch triggers: what makes viewers want to watch again?
+- Share triggers: what makes viewers want to share?
+- Comment triggers: what provokes comments?
+- Completion likelihood: will viewers watch to the end?
+
 ## 텍스트 오버레이 영상 대응 (나레이션 없는 영상)
 만약 영상에 나레이션/음성이 없거나 극히 적고, 텍스트 오버레이가 주요 정보 전달 수단인 경우:
 - voice.type은 "none"으로, voice.script_summary에는 "텍스트 오버레이 기반 영상"으로 기재
@@ -459,11 +479,58 @@ _RESPONSE_SCHEMA = {
                 ]},
                 "appeal_layering": {"type": "STRING"},
                 "persuasion_summary": {"type": "STRING"},
+                "empathy_triggers": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "trigger_type": {"type": "STRING", "enum": ["pain_empathy", "desire", "belonging", "fomo", "curiosity", "humor", "nostalgia", "fear", "pride", "relief"]},
+                            "timestamp": {"type": "NUMBER"},
+                            "description": {"type": "STRING"},
+                            "intensity": {"type": "STRING", "enum": ["strong", "moderate", "weak"]},
+                        },
+                        "required": ["trigger_type", "timestamp", "description", "intensity"],
+                    },
+                },
             },
-            "required": ["presenter", "video_style", "appeal_points", "product_emphasis", "primary_appeal", "appeal_layering", "persuasion_summary"],
+            "required": ["presenter", "video_style", "appeal_points", "product_emphasis", "primary_appeal", "appeal_layering", "persuasion_summary", "empathy_triggers"],
+        },
+        "narrative_analysis": {
+            "type": "OBJECT",
+            "properties": {
+                "pattern": {"type": "STRING", "enum": ["problem_solution", "reversal", "comparison", "listicle", "storytelling", "direct_pitch", "challenge", "tutorial"]},
+                "tension_arc": {"type": "STRING", "enum": ["rising", "flat", "peak_valley", "steady_build", "frontloaded"]},
+                "resolution_satisfaction": {"type": "STRING", "enum": ["strong", "moderate", "weak", "none"]},
+                "curiosity_gap": {"type": "BOOLEAN"},
+                "loop_structure": {"type": "BOOLEAN"},
+            },
+            "required": ["pattern", "tension_arc", "resolution_satisfaction", "curiosity_gap", "loop_structure"],
+        },
+        "retention_analysis": {
+            "type": "OBJECT",
+            "properties": {
+                "hook_strength": {"type": "STRING", "enum": ["irresistible", "strong", "moderate", "weak"]},
+                "drop_off_risks": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "timestamp": {"type": "NUMBER"},
+                            "reason": {"type": "STRING"},
+                            "severity": {"type": "STRING", "enum": ["high", "medium", "low"]},
+                        },
+                        "required": ["timestamp", "reason", "severity"],
+                    },
+                },
+                "rewatch_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "share_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "comment_triggers": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "completion_likelihood": {"type": "STRING", "enum": ["very_high", "high", "medium", "low"]},
+            },
+            "required": ["hook_strength", "drop_off_risks", "rewatch_triggers", "share_triggers", "comment_triggers", "completion_likelihood"],
         },
     },
-    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis"],
+    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis", "narrative_analysis", "retention_analysis"],
 }
 
 # Separate schema for art_direction (to stay under Gemini schema complexity limit)

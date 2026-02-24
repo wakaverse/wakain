@@ -3,24 +3,67 @@
   "name_ko": "진행자형",
   "description": "사람이 카메라를 보며 말하는 형식",
   "dimension_weights": {
-    "visual_stimulus": 0.15,
-    "persuasion_density": 0.35,
-    "information_density": 0.25,
-    "edit_rhythm": 0.10,
-    "audio_stimulus": 0.15
+    "visual_stimulus": 0.114,
+    "persuasion_density": 0.266,
+    "information_density": 0.19,
+    "edit_rhythm": 0.076,
+    "audio_stimulus": 0.114,
+    "persona_fit": 0.06,
+    "empathy_trigger": 0.06,
+    "narrative_structure": 0.06,
+    "retention_design": 0.06
   },
-  "key_metrics": ["narration_flow", "speaker_expression", "first_appeal_time", "appeal_density"],
-  "less_important_metrics": ["art_direction_consistency"],
-  "effective_appeals": ["social_proof", "authenticity", "authority", "myth_bust"],
-  "weak_appeals": ["design_aesthetic", "sensory"],
-  "recommended_structure": ["hook", "problem", "solution", "proof", "cta"],
+  "key_metrics": [
+    "narration_flow",
+    "speaker_expression",
+    "first_appeal_time",
+    "appeal_density"
+  ],
+  "less_important_metrics": [
+    "art_direction_consistency"
+  ],
+  "effective_appeals": [
+    "social_proof",
+    "authenticity",
+    "authority",
+    "myth_bust"
+  ],
+  "weak_appeals": [
+    "design_aesthetic",
+    "sensory"
+  ],
+  "recommended_structure": [
+    "hook",
+    "problem",
+    "solution",
+    "proof",
+    "cta"
+  ],
   "prescriptions": {
-    "cut_density_low": {"level": "info", "message": "진행자형은 빠른 편집이 필수는 아닙니다. 내레이션 흐름에 집중하세요."},
-    "cut_density_high": {"level": "warning", "message": "컷이 너무 잦으면 진행자의 신뢰감이 떨어집니다."},
-    "appeal_gap_3s": {"level": "warning", "message": "내레이션 흐름에서 3초 이상 소구 공백은 집중도를 떨어뜨립니다."},
-    "first_appeal_late": {"level": "warning", "message": "첫 소구가 늦습니다. 오프닝 멘트에 핵심 메시지를 담으세요."},
-    "no_bgm": {"level": "info", "message": "BGM이 없어도 괜찮지만, 가벼운 배경음악은 몰입도를 높여줍니다."},
-    "text_heavy": {"level": "info", "message": "자막이 많은 것은 접근성에 도움됩니다."}
+    "cut_density_low": {
+      "level": "info",
+      "message": "진행자형은 빠른 편집이 필수는 아닙니다. 내레이션 흐름에 집중하세요."
+    },
+    "cut_density_high": {
+      "level": "warning",
+      "message": "컷이 너무 잦으면 진행자의 신뢰감이 떨어집니다."
+    },
+    "appeal_gap_3s": {
+      "level": "warning",
+      "message": "내레이션 흐름에서 3초 이상 소구 공백은 집중도를 떨어뜨립니다."
+    },
+    "first_appeal_late": {
+      "level": "warning",
+      "message": "첫 소구가 늦습니다. 오프닝 멘트에 핵심 메시지를 담으세요."
+    },
+    "no_bgm": {
+      "level": "info",
+      "message": "BGM이 없어도 괜찮지만, 가벼운 배경음악은 몰입도를 높여줍니다."
+    },
+    "text_heavy": {
+      "level": "info",
+      "message": "자막이 많은 것은 접근성에 도움됩니다."
+    }
   },
   "thresholds": {
     "first_appeal_max_sec": 3.0,

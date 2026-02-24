@@ -3,24 +3,67 @@
   "name_ko": "데모/언박싱형",
   "description": "제품 기능 시연, 언박싱",
   "dimension_weights": {
-    "visual_stimulus": 0.30,
-    "persuasion_density": 0.25,
-    "information_density": 0.25,
-    "edit_rhythm": 0.10,
-    "audio_stimulus": 0.10
+    "visual_stimulus": 0.228,
+    "persuasion_density": 0.19,
+    "information_density": 0.19,
+    "edit_rhythm": 0.076,
+    "audio_stimulus": 0.076,
+    "persona_fit": 0.06,
+    "empathy_trigger": 0.06,
+    "narrative_structure": 0.06,
+    "retention_design": 0.06
   },
-  "key_metrics": ["demo_sequence", "closeup_frequency", "feature_coverage", "product_visibility"],
-  "less_important_metrics": ["narration_flow"],
-  "effective_appeals": ["feature_demo", "spec_data", "comparison", "sensory"],
-  "weak_appeals": ["nostalgia", "emotional"],
-  "recommended_structure": ["hook", "unbox_reveal", "demo", "feature_highlight", "cta"],
+  "key_metrics": [
+    "demo_sequence",
+    "closeup_frequency",
+    "feature_coverage",
+    "product_visibility"
+  ],
+  "less_important_metrics": [
+    "narration_flow"
+  ],
+  "effective_appeals": [
+    "feature_demo",
+    "spec_data",
+    "comparison",
+    "sensory"
+  ],
+  "weak_appeals": [
+    "nostalgia",
+    "emotional"
+  ],
+  "recommended_structure": [
+    "hook",
+    "unbox_reveal",
+    "demo",
+    "feature_highlight",
+    "cta"
+  ],
   "prescriptions": {
-    "cut_density_low": {"level": "warning", "message": "데모 영상은 다양한 앵글과 클로즈업이 필요합니다."},
-    "cut_density_high": {"level": "info", "message": "기능 시연 시 빠른 전환은 효과적이지만, 핵심 기능은 충분히 보여주세요."},
-    "appeal_gap_3s": {"level": "warning", "message": "기능 시연 없이 3초가 지나면 집중력이 떨어집니다."},
-    "first_appeal_late": {"level": "warning", "message": "제품을 빨리 보여주세요. 언박싱이라도 기대감을 만들어야 합니다."},
-    "no_bgm": {"level": "info", "message": "실제 소리(ASMR)가 중요한 경우 BGM 없이도 괜찮습니다."},
-    "text_heavy": {"level": "info", "message": "스펙 정보를 텍스트로 보여주는 것은 효과적입니다."}
+    "cut_density_low": {
+      "level": "warning",
+      "message": "데모 영상은 다양한 앵글과 클로즈업이 필요합니다."
+    },
+    "cut_density_high": {
+      "level": "info",
+      "message": "기능 시연 시 빠른 전환은 효과적이지만, 핵심 기능은 충분히 보여주세요."
+    },
+    "appeal_gap_3s": {
+      "level": "warning",
+      "message": "기능 시연 없이 3초가 지나면 집중력이 떨어집니다."
+    },
+    "first_appeal_late": {
+      "level": "warning",
+      "message": "제품을 빨리 보여주세요. 언박싱이라도 기대감을 만들어야 합니다."
+    },
+    "no_bgm": {
+      "level": "info",
+      "message": "실제 소리(ASMR)가 중요한 경우 BGM 없이도 괜찮습니다."
+    },
+    "text_heavy": {
+      "level": "info",
+      "message": "스펙 정보를 텍스트로 보여주는 것은 효과적입니다."
+    }
   },
   "thresholds": {
     "first_appeal_max_sec": 3.0,
