@@ -205,8 +205,8 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
           onClick={() => { toggleScene(sid); onSeek(scene.time_range[0]); }}
         >
           <div className="flex items-start justify-between">
-            <div>
-              <span className="font-semibold text-sm text-gray-900">
+            <div className="flex-1 min-w-0">
+              <span className="font-semibold text-sm text-gray-900 line-clamp-1">
                 {scene.persuasion_intent || `씬 ${sid}`}
               </span>
               {scene.stt_text && (
@@ -446,6 +446,10 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
                   if (!scene) return null;
                   return (
                     <div key={sid} className="ml-4 bg-white rounded-xl border border-gray-100 overflow-hidden">
+                      <div className="flex items-center gap-2 px-3 pt-2">
+                        <span className="text-xs font-bold text-gray-500">씬{sid}</span>
+                        <span className="text-[10px] text-gray-400">{formatRange(scene.time_range)}</span>
+                      </div>
                       {renderSceneContent(scene, sid)}
                     </div>
                   );
