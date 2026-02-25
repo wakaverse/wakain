@@ -91,8 +91,6 @@ export default function ReportPage() {
 
   // Style
   const style = result.style || classification;
-  const formatKo = (style as any).primary_format_ko || formatLabels[(style as any).primary_format || classification.format] || '?';
-  const intentKo = (style as any).primary_intent_ko || intentLabels[(style as any).primary_intent || classification.intent] || '?';
   const narration = (style as any).narration_type || classification.narration_type || '?';
 
   // Art direction
