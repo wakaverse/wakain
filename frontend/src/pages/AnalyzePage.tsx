@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useDropzone, type FileRejection } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
-import { Upload, FileVideo, X, AlertCircle, CheckCircle2, Zap } from 'lucide-react';
-import { createJob } from '../lib/api';
+import { Upload, FileVideo, X, AlertCircle, CheckCircle2, Zap, Link2 } from 'lucide-react';
+import { createJob, createJobFromUrl } from '../lib/api';
 import { compressTo480p } from '../lib/videoCompress';
 
 const MAX_SIZE = 200 * 1024 * 1024;
@@ -16,11 +16,14 @@ function formatBytes(bytes: number) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
-type Phase = 'idle' | 'compressing' | 'uploading' | 'starting';
+type Phase = 'idle' | 'compressing' | 'uploading' | 'starting' | 'downloading';
+type InputMode = 'file' | 'url';
 
 export default function AnalyzePage() {
   const navigate = useNavigate();
+  const [inputMode, setInputMode] = useState<InputMode>('file');
   const [file, setFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState('');
   const [productName, setProductName] = useState('');
   const [productCategory, setProductCategory] = useState('');
   const [error, setError] = useState('');
@@ -45,34 +48,46 @@ export default function AnalyzePage() {
   });
 
   async function handleSubmit() {
-    if (!file) return;
+    if (inputMode === 'file' && !file) return;
+    if (inputMode === 'url' && !videoUrl.trim()) return;
     setError('');
     setCompressInfo(null);
 
     try {
-      // Step 1: Compress to 480p (browser-side)
-      setPhase('compressing');
-      setProgress(0);
-
-      const compressed = await compressTo480p(file, (p) => {
-        setProgress(Math.round(p.progress * 100));
-      });
-
-      if (compressed !== file) {
-        setCompressInfo(
-          `${formatBytes(file.size)} → ${formatBytes(compressed.size)} (${Math.round((1 - compressed.size / file.size) * 100)}% 절감)`
+      if (inputMode === 'url') {
+        // URL mode: server downloads the video
+        setPhase('downloading');
+        setProgress(0);
+        const { id } = await createJobFromUrl(
+          videoUrl.trim(),
+          productName || undefined,
+          productCategory || undefined,
         );
+        navigate(`/jobs/${id}`);
+      } else {
+        // File mode: browser compress + upload
+        setPhase('compressing');
+        setProgress(0);
+
+        const compressed = await compressTo480p(file!, (p) => {
+          setProgress(Math.round(p.progress * 100));
+        });
+
+        if (compressed !== file) {
+          setCompressInfo(
+            `${formatBytes(file!.size)} → ${formatBytes(compressed.size)} (${Math.round((1 - compressed.size / file!.size) * 100)}% 절감)`
+          );
+        }
+
+        setPhase('uploading');
+        setProgress(0);
+
+        const { id } = await createJob(compressed, (percent) => {
+          setProgress(percent);
+          if (percent === 100) setPhase('starting');
+        }, productName || undefined, productCategory || undefined);
+        navigate(`/jobs/${id}`);
       }
-
-      // Step 2: Upload compressed file
-      setPhase('uploading');
-      setProgress(0);
-
-      const { id } = await createJob(compressed, (percent) => {
-        setProgress(percent);
-        if (percent === 100) setPhase('starting');
-      }, productName || undefined, productCategory || undefined);
-      navigate(`/jobs/${id}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : '';
       if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
@@ -80,7 +95,7 @@ export default function AnalyzePage() {
       } else if (msg.includes('401') || msg.includes('Unauthorized')) {
         setError('로그인이 필요합니다.');
       } else {
-        setError(msg || '업로드 중 오류가 발생했습니다.');
+        setError(msg || '오류가 발생했습니다.');
       }
       setPhase('idle');
       setProgress(0);
@@ -92,9 +107,13 @@ export default function AnalyzePage() {
     ? '영상 최적화 중...'
     : phase === 'uploading'
     ? '업로드 중...'
+    : phase === 'downloading'
+    ? '서버에서 영상 다운로드 중...'
     : phase === 'starting'
     ? '분석 요청 중...'
     : '';
+
+  const canSubmit = inputMode === 'file' ? !!file : !!videoUrl.trim();
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
@@ -103,8 +122,48 @@ export default function AnalyzePage() {
         <p className="text-gray-500 text-sm">숏폼 영상을 업로드하면 AI가 자동으로 분석합니다</p>
       </div>
 
-      {/* Dropzone */}
-      <div
+      {/* Input mode tabs */}
+      <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-6">
+        <button
+          onClick={() => { setInputMode('file'); setError(''); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            inputMode === 'file' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <FileVideo className="w-4 h-4" />
+          파일 업로드
+        </button>
+        <button
+          onClick={() => { setInputMode('url'); setError(''); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            inputMode === 'url' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <Link2 className="w-4 h-4" />
+          URL 입력
+        </button>
+      </div>
+
+      {/* URL input */}
+      {inputMode === 'url' && !busy && (
+        <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center">
+          <Link2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-700 font-medium mb-4">동영상 URL을 입력하세요</p>
+          <input
+            type="url"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            placeholder="https://example.com/video.mp4"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gray-400 transition-colors"
+          />
+          <p className="text-xs text-gray-400 mt-3">
+            직접 링크(.mp4, .mov, .webm)를 지원합니다 · 최대 200MB
+          </p>
+        </div>
+      )}
+
+      {/* Dropzone (file mode only) */}
+      {inputMode === 'file' && <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all ${
           isDragActive ? 'border-gray-400 bg-gray-50'
@@ -139,10 +198,10 @@ export default function AnalyzePage() {
             )}
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Product info */}
-      {file && !busy && (
+      {canSubmit && !busy && (
         <div className="mt-6 space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">제품명 <span className="text-gray-400 font-normal">(선택)</span></label>
@@ -177,7 +236,7 @@ export default function AnalyzePage() {
       )}
 
       {/* File info bar */}
-      {file && !busy && (
+      {inputMode === 'file' && file && !busy && (
         <div className="mt-4 flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
           <div className="flex items-center gap-3">
             <FileVideo className="w-5 h-5 text-gray-600" />
@@ -209,6 +268,7 @@ export default function AnalyzePage() {
           <div className="flex justify-between text-sm text-gray-500 mb-2">
             <span>{statusText}</span>
             {(phase === 'uploading' || phase === 'compressing') && <span>{progress}%</span>}
+            {phase === 'downloading' && <span className="animate-pulse">⏳</span>}
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
@@ -217,7 +277,7 @@ export default function AnalyzePage() {
                 : phase === 'compressing' ? 'bg-amber-500'
                 : 'bg-gray-900'
               }`}
-              style={{ width: phase === 'starting' ? '100%' : `${progress}%` }}
+              style={{ width: (phase === 'starting' || phase === 'downloading') ? '100%' : `${progress}%` }}
             />
           </div>
           {phase === 'compressing' && (
@@ -229,7 +289,7 @@ export default function AnalyzePage() {
       {/* Submit */}
       <button
         onClick={handleSubmit}
-        disabled={!file || busy}
+        disabled={!canSubmit || busy}
         className="mt-6 w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-full text-sm transition-colors"
       >
         {busy ? statusText : '분석 시작'}

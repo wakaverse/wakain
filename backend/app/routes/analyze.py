@@ -2,6 +2,7 @@ import uuid
 from pathlib import Path
 
 import boto3
+import httpx
 from botocore.config import Config as BotoConfig
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
@@ -54,6 +55,12 @@ class AnalyzeRequest(BaseModel):
     r2_key: str
     filename: str
     file_size_mb: float
+    product_name: str | None = None
+    product_category: str | None = None
+
+
+class AnalyzeUrlRequest(BaseModel):
+    video_url: str
     product_name: str | None = None
     product_category: str | None = None
 
@@ -125,3 +132,82 @@ async def analyze_video(
     background_tasks.add_task(run_analysis, job_id, body.r2_key, body.product_name, body.product_category)
 
     return {"job_id": job_id}
+
+
+MAX_URL_FILE_SIZE = 200 * 1024 * 1024  # 200MB
+
+
+@router.post("/analyze-url")
+async def analyze_video_url(
+    body: AnalyzeUrlRequest,
+    background_tasks: BackgroundTasks,
+    user: dict = Depends(get_current_user),
+):
+    """Download video from URL, upload to R2, then start analysis."""
+    url = body.video_url.strip()
+    if not url.startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail="유효한 URL을 입력해주세요.")
+
+    # Extract filename from URL
+    url_path = url.split("?")[0]
+    filename = url_path.split("/")[-1] or "video.mp4"
+    suffix = Path(filename).suffix.lower()
+    if not suffix:
+        filename += ".mp4"
+        suffix = ".mp4"
+    if suffix not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"지원하지 않는 파일 형식 '{suffix}'. 지원: {', '.join(ALLOWED_EXTENSIONS)}",
+        )
+
+    # Download video from URL
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=120.0) as client:
+            # HEAD check first
+            head = await client.head(url)
+            content_length = int(head.headers.get("content-length", 0))
+            if content_length > MAX_URL_FILE_SIZE:
+                raise HTTPException(status_code=413, detail="파일이 너무 큽니다. 최대 200MB.")
+
+            # Download
+            resp = await client.get(url)
+            resp.raise_for_status()
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=400, detail=f"영상 다운로드 실패: HTTP {e.response.status_code}")
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=400, detail=f"영상 다운로드 실패: {str(e)[:100]}")
+
+    video_bytes = resp.content
+    file_size_mb = len(video_bytes) / (1024 * 1024)
+
+    if len(video_bytes) > MAX_URL_FILE_SIZE:
+        raise HTTPException(status_code=413, detail="파일이 너무 큽니다. 최대 200MB.")
+
+    # Upload to R2
+    r2_key = f"uploads/{uuid.uuid4()}/{filename}"
+    s3 = get_s3_client()
+    s3.put_object(
+        Bucket=R2_BUCKET_NAME,
+        Key=r2_key,
+        Body=video_bytes,
+        ContentType=resp.headers.get("content-type", "video/mp4"),
+    )
+
+    # Create job
+    job_id = str(uuid.uuid4())
+    supabase = get_supabase()
+    supabase.table("jobs").insert({
+        "id": job_id,
+        "user_id": user["id"],
+        "status": "pending",
+        "video_name": filename,
+        "video_size_mb": round(file_size_mb, 2),
+        "video_url": r2_key,
+        "product_name": body.product_name,
+        "product_category": body.product_category,
+    }).execute()
+
+    background_tasks.add_task(run_analysis, job_id, r2_key, body.product_name, body.product_category)
+
+    return {"job_id": job_id, "filename": filename, "file_size_mb": round(file_size_mb, 2)}

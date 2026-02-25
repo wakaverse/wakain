@@ -89,6 +89,32 @@ export async function getJob(id: string): Promise<Job> {
   return res.json();
 }
 
+/**
+ * Start analysis from a video URL (server-side download).
+ */
+export async function createJobFromUrl(
+  videoUrl: string,
+  productName?: string,
+  productCategory?: string,
+): Promise<{ id: string }> {
+  const headers = await authHeaders();
+  const res = await fetch(`${API_URL}/api/analyze-url`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      video_url: videoUrl,
+      product_name: productName || null,
+      product_category: productCategory || null,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'URL 분석 시작에 실패했습니다' }));
+    throw new Error(err.detail || 'URL 분석 시작에 실패했습니다');
+  }
+  const data = await res.json();
+  return { id: data.job_id };
+}
+
 export async function getResult(id: string): Promise<AnalysisResult> {
   const res = await fetch(`${API_URL}/api/results/${id}`, {
     headers: await authHeaders(),

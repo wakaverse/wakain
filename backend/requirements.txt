@@ -18,3 +18,4 @@ numpy
 scenedetect[opencv]
 matplotlib
 requests
+httpx>=0.27
