@@ -423,7 +423,9 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
                   />
                   <div>
                     <span className="font-bold text-gray-900">{group.name}</span>
-                    <p className="text-sm text-gray-500 mt-0.5">{group.description}</p>
+                    {!isOpen && group.description && (
+                      <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">{group.description}</p>
+                    )}
                     <p className="text-xs text-gray-400 mt-1">
                       씬 {stats.sceneCount}개 · 소구 {stats.appealCount}개 · {stats.duration.toFixed(1)}s
                     </p>
