@@ -403,7 +403,11 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
       ) : (
         /* Group View */
         <>
-          {appealStructure.groups.map(group => {
+          {[...appealStructure.groups].sort((a, b) => {
+            const aRange = getGroupTimeRange(a);
+            const bRange = getGroupTimeRange(b);
+            return aRange[0] - bRange[0];
+          }).map(group => {
         const isOpen = openGroups.has(group.group_id);
         const stats = getGroupStats(group);
         const range = getGroupTimeRange(group);
@@ -441,7 +445,11 @@ export default function PersuasionStructure({ appealStructure, sceneCards, stt, 
             {/* Level 2: Scenes */}
             <div className={`transition-all duration-200 ${isOpen ? 'max-h-[5000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
               <div className="px-4 pb-4 space-y-2">
-                {group.scene_ids.map(sid => {
+                {[...group.scene_ids].sort((a, b) => {
+                  const sa = sceneMap.get(a);
+                  const sb = sceneMap.get(b);
+                  return (sa?.time_range[0] || 0) - (sb?.time_range[0] || 0);
+                }).map(sid => {
                   const scene = sceneMap.get(sid);
                   if (!scene) return null;
                   return (
