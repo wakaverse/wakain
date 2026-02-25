@@ -352,17 +352,22 @@ def group_scenes(scenes: list[dict], product_info: dict) -> list[dict]:
     prompt = (
         "당신은 마케팅 전략 분석 전문가입니다.\n\n"
         f"[제품]: {product_str}\n\n"
-        "[씬 요약]\n" + summary_block + "\n\n"
-        "마케팅 프레임워크(AIDA, PAS 등)를 참고하여 위 씬들을 설득 전략 그룹으로 묶어주세요.\n"
-        "각 그룹에 이름과 설명을 붙여주세요.\n\n"
+        "[씬 요약 (시간순)]\n" + summary_block + "\n\n"
+        "이 영상의 설득 내러티브를 분석하세요.\n"
+        "마케팅 프레임워크(AIDA, PAS 등)를 참고하여 위 씬들을 설득 전략 단계로 나누세요.\n\n"
+        "⚠️ 핵심 규칙:\n"
+        "- 그룹은 반드시 시간순으로 연속된 씬만 포함해야 합니다.\n"
+        "- 예: [1,2,3]은 가능, [1,3,5]는 불가능 (2,4를 건너뜀).\n"
+        "- 모든 씬은 정확히 하나의 그룹에 포함되어야 합니다.\n"
+        "- 그룹도 시간순으로 정렬하세요 (그룹1이 가장 먼저).\n\n"
         'JSON 응답:\n'
         '{\n'
         '  "groups": [\n'
         '    {\n'
         '      "group_id": 1,\n'
-        '      "name": "주의 환기",\n'
+        '      "name": "문제 제기 및 공감대 형성",\n'
         '      "description": "문제 상황으로 시선을 포착하고 공감을 유도",\n'
-        '      "scene_ids": [1],\n'
+        '      "scene_ids": [1, 2],\n'
         '      "color": "#FF6B6B"\n'
         '    }\n'
         '  ]\n'
@@ -384,4 +389,69 @@ def group_scenes(scenes: list[dict], product_info: dict) -> list[dict]:
     except Exception:
         groups = []
 
+    # Post-process: enforce consecutive scene_ids
+    groups = _enforce_consecutive_groups(groups, scenes)
+
     return groups
+
+
+def _enforce_consecutive_groups(groups: list[dict], scenes: list[dict]) -> list[dict]:
+    """Ensure each group contains only consecutive scene_ids in time order."""
+    all_scene_ids = sorted(s["scene_id"] for s in scenes)
+    if not groups or not all_scene_ids:
+        return groups
+
+    # Split non-consecutive groups
+    new_groups = []
+    gid = 1
+    for g in groups:
+        sids = sorted(g.get("scene_ids", []))
+        if not sids:
+            continue
+
+        # Check if consecutive
+        runs = []
+        current_run = [sids[0]]
+        for i in range(1, len(sids)):
+            if sids[i] == current_run[-1] + 1:
+                current_run.append(sids[i])
+            else:
+                runs.append(current_run)
+                current_run = [sids[i]]
+        runs.append(current_run)
+
+        for run in runs:
+            new_groups.append({
+                **g,
+                "group_id": gid,
+                "scene_ids": run,
+            })
+            gid += 1
+
+    # Sort groups by first scene_id
+    new_groups.sort(key=lambda g: g["scene_ids"][0])
+
+    # Re-number
+    for i, g in enumerate(new_groups):
+        g["group_id"] = i + 1
+
+    # Check all scenes are covered; add missing ones to nearest group
+    covered = set()
+    for g in new_groups:
+        covered.update(g["scene_ids"])
+
+    for sid in all_scene_ids:
+        if sid not in covered:
+            # Find the group whose last scene_id is closest before this one
+            best_group = None
+            for g in new_groups:
+                if g["scene_ids"][-1] == sid - 1:
+                    best_group = g
+                    break
+            if best_group:
+                best_group["scene_ids"].append(sid)
+            elif new_groups:
+                # Append to last group
+                new_groups[-1]["scene_ids"].append(sid)
+
+    return new_groups
