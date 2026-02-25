@@ -406,9 +406,14 @@ def aggregate_scenes(
 
     scenes: list[Scene] = []
 
+    # Build timestamp→qual lookup (quals may be fewer than quants due to batch failures)
+    _qual_by_ts = {round(q.timestamp, 2): q for q in quals}
+
     for scene_idx, frame_indices in enumerate(groups):
-        grp_quants = [quants[i] for i in frame_indices]
-        grp_quals = [quals[i] for i in frame_indices]
+        grp_quants = [quants[i] for i in frame_indices if i < len(quants)]
+        grp_quals = [_qual_by_ts[round(quants[i].timestamp, 2)]
+                     for i in frame_indices
+                     if i < len(quants) and round(quants[i].timestamp, 2) in _qual_by_ts]
 
         if scene_boundaries and scene_idx < len(scene_boundaries):
             ts_start = scene_boundaries[scene_idx][0]

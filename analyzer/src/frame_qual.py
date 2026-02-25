@@ -117,6 +117,23 @@ async def _analyse_batch(
                     if j < len(data):
                         item = data[j]
                         item["timestamp"] = ts
+                        # Fill defaults for commonly missing fields
+                        item.setdefault("color_mood", "bold_contrast")
+                        item.setdefault("attention_element", "main subject")
+                        item.setdefault("shot_type", "medium")
+                        item.setdefault("subject_type", "lifestyle_scene")
+                        if item.get("composition") is None:
+                            item["composition"] = {"layout": "center", "visual_weight": "center", "depth": "flat"}
+                        if item.get("product_presentation") is None:
+                            item["product_presentation"] = {"visibility": "hidden", "angle": "front", "context": "studio"}
+                        if item.get("human_element") is None:
+                            item["human_element"] = {"role": "none", "emotion": "neutral", "eye_contact": False, "gesture": "none"}
+                        if item.get("artwork") is not None:
+                            aw = item["artwork"]
+                            if aw.get("layout_zones") is None:
+                                aw["layout_zones"] = {"top": "empty", "middle": "empty", "bottom": "empty", "text_product_overlap": False}
+                            if aw.get("color_design") is None:
+                                aw["color_design"] = {"primary_color": "#000000", "text_bg_contrast": "medium", "color_harmony": "monochrome"}
                         results.append((ts, item))
                     else:
                         print(f"  ⚠ Batch missing frame {ts}s (got {len(data)}/{len(batch)})")
