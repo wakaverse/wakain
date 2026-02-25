@@ -161,7 +161,7 @@ async def analyse_frames_qual(
     if failed:
         fail_ratio = failed / len(results_raw) if results_raw else 0
         print(f"  ⚠ {failed}/{len(results_raw)} frames failed ({fail_ratio:.0%})")
-        if fail_ratio >= 0.5:
+        if fail_ratio >= 0.3:
             raise RuntimeError(
                 f"프레임 분석 {failed}/{len(results_raw)}개 실패 ({fail_ratio:.0%}). "
                 f"AI 서버가 일시적으로 과부하 상태입니다. 잠시 후 다시 시도해주세요."
