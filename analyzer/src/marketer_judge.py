@@ -32,6 +32,8 @@ class MarketingVerdict:
     full_markdown: str
     product_name: str = ""
     product_category: str = ""
+    hook_analysis: str = ""
+    keyword_analysis: str = ""
 
     def to_dict(self) -> dict:
         return {
@@ -39,6 +41,8 @@ class MarketingVerdict:
             "verdict_summary": self.verdict_summary,
             "evidence": self.evidence,
             "action_plan": self.action_plan,
+            "hook_analysis": self.hook_analysis,
+            "keyword_analysis": self.keyword_analysis,
             "full_markdown": self.full_markdown,
             "product_name": self.product_name,
             "product_category": self.product_category,
@@ -160,46 +164,67 @@ def _build_prompt(
 
 ## 출력 형식 (Markdown)
 
-### 1. 🛑 최종 판결: 이 영상으로 {product_name}이(가) 팔리겠는가?
+### 1. 🎣 3초 훅 진단
+* 0~3초 구간의 프레임 데이터를 분석하여 시청자 이탈 방지력을 평가해.
+* 현재 0~3초에 보이는 것(프레임 데이터 인용)과 들리는 것(STT)을 구체적으로 서술.
+* 점수: [강력 / 보통 / 약함 / 없음] 중 택 1.
+* 개선안: 이 제품의 3초 훅으로 가장 효과적인 오프닝을 구체적으로 제안(텍스트, 비주얼, 사운드 각각).
+
+### 2. 🛑 최종 판결: 이 영상으로 {product_name}이(가) 팔리겠는가?
 * [집행 권장 / 조건부 집행 / 집행 불가] 중 하나를 선택.
 * 이유를 1~2줄의 강력한 마케팅 언어로 요약.
 
-### 2. 🔍 판단의 근거: 왜 팔리는가? (혹은 왜 안 팔리는가?)
+### 3. 🔍 판단의 근거: 왜 팔리는가? (혹은 왜 안 팔리는가?)
 * 프레임 데이터에서 실제 보이는 화면을 인용하며 논리적으로 설명.
 * 데이터(수치, 타임스탬프, 소구점)와 마케팅 심리(인지적 부하, 설득 밀도 등)를 연결해야 해.
 
-### 3. 🛠️ 액션 플랜: 어떻게 하면 더 팔리겠는가?
-* 즉시 실행 가능한 To-Do 3가지.
+### 4. 🔑 마케팅 키워드 분석
+* **현재 사용 중인 키워드**: 영상의 텍스트 오버레이와 음성에서 추출한 마케팅 키워드 목록.
+* **누락된 핵심 키워드**: 이 제품 카테고리({product_category})에서 구매 전환에 효과적이지만 영상에 없는 키워드.
+* **추천 키워드**: SNS 해시태그/검색 최적화용 키워드 5~10개.
+* 각 키워드에 왜 효과적인지 간단한 이유를 붙여.
+
+### 5. 🛠️ 액션 플랜: 어떻게 하면 더 팔리겠는가?
+* 즉시 실행 가능한 To-Do 3~5가지.
 * 반드시 [타임스탬프]와 [해당 프레임에서 보이는 것]을 참조하여 구체적 행동 지시.
 """
 
 
-def _parse_verdict(markdown: str) -> tuple[str, str, str, str]:
-    """Parse the 3-section markdown into verdict, evidence, action_plan."""
-    verdict = ""
-    verdict_summary = ""
-    evidence = ""
-    action_plan = ""
+def _parse_verdict(markdown: str) -> dict:
+    """Parse the 5-section markdown into structured result."""
+    result = {
+        "verdict": "",
+        "verdict_summary": "",
+        "evidence": "",
+        "action_plan": "",
+        "hook_analysis": "",
+        "keyword_analysis": "",
+    }
     
     sections = markdown.split("### ")
     for section in sections:
-        if "최종 판결" in section or "The Verdict" in section:
+        if "3초 훅" in section or "hook" in section.lower():
+            lines = section.strip().split("\n", 1)
+            result["hook_analysis"] = lines[1].strip() if len(lines) > 1 else ""
+        elif "최종 판결" in section or "The Verdict" in section:
             lines = section.strip().split("\n", 1)
             body = lines[1].strip() if len(lines) > 1 else ""
-            # Extract verdict type
             for v in ["집행 권장", "조건부 집행", "집행 불가"]:
                 if v in body:
-                    verdict = v
+                    result["verdict"] = v
                     break
-            verdict_summary = body
+            result["verdict_summary"] = body
         elif "판단의 근거" in section:
             lines = section.strip().split("\n", 1)
-            evidence = lines[1].strip() if len(lines) > 1 else ""
+            result["evidence"] = lines[1].strip() if len(lines) > 1 else ""
+        elif "키워드" in section:
+            lines = section.strip().split("\n", 1)
+            result["keyword_analysis"] = lines[1].strip() if len(lines) > 1 else ""
         elif "액션 플랜" in section:
             lines = section.strip().split("\n", 1)
-            action_plan = lines[1].strip() if len(lines) > 1 else ""
+            result["action_plan"] = lines[1].strip() if len(lines) > 1 else ""
     
-    return verdict, verdict_summary, evidence, action_plan
+    return result
 
 
 def run_marketer_judge(
@@ -312,13 +337,15 @@ def run_marketer_judge(
         )
     
     # Parse result
-    verdict, verdict_summary, evidence_text, action_plan = _parse_verdict(markdown)
+    parsed = _parse_verdict(markdown)
     
     result = MarketingVerdict(
-        verdict=verdict or "조건부 집행",
-        verdict_summary=verdict_summary,
-        evidence=evidence_text,
-        action_plan=action_plan,
+        verdict=parsed["verdict"] or "조건부 집행",
+        verdict_summary=parsed["verdict_summary"],
+        evidence=parsed["evidence"],
+        action_plan=parsed["action_plan"],
+        hook_analysis=parsed["hook_analysis"],
+        keyword_analysis=parsed["keyword_analysis"],
         full_markdown=markdown,
         product_name=product_name,
         product_category=product_category,

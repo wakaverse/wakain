@@ -337,6 +337,8 @@ export interface MarketingVerdict {
   verdict_summary: string;
   evidence: string;
   action_plan: string;
+  hook_analysis: string;
+  keyword_analysis: string;
   full_markdown: string;
   product_name: string;
   product_category: string;

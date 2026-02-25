@@ -14,8 +14,8 @@ import AppealTimelineBar from '../components/Report/AppealTimelineBar';
 type TabId = 'structure' | 'diagnosis' | 'art';
 
 const tabs: { id: TabId; label: string; icon: string }[] = [
-  { id: 'structure', label: '설득 구조', icon: '🎯' },
-  { id: 'diagnosis', label: '진단서', icon: '💊' },
+  { id: 'structure', label: '영상 구조', icon: '🎯' },
+  { id: 'diagnosis', label: '개선 의견', icon: '💡' },
   { id: 'art', label: '아트 디렉션', icon: '🎨' },
 ];
 
@@ -110,10 +110,15 @@ export default function ReportPage() {
           </Link>
           <div>
             <h1 className="text-lg font-bold text-gray-900">
-              {meta.category ? `${meta.category}` : '영상'} 분석 리포트
+              {result.verdict?.product_name || meta.category || '영상'} 분석 리포트
             </h1>
             <div className="flex items-center gap-3 text-xs text-gray-500">
-              <span>{formatKo} × {intentKo}</span>
+              {result.verdict?.product_name && (
+                <span className="px-2 py-0.5 bg-gray-100 rounded-full font-medium text-gray-700">
+                  🏷️ {result.verdict.product_name}
+                  {result.verdict.product_category ? ` · ${result.verdict.product_category}` : ''}
+                </span>
+              )}
               <span>{narrationLabel}</span>
               <span>{duration}초</span>
             </div>

@@ -212,6 +212,30 @@ export default function DiagnosisTab({ verdict, prescriptions, diagnosis, overal
         </div>
       </div>
 
+      {/* 1.5. Hook Analysis */}
+      {verdict?.hook_analysis && (
+        <div className="rounded-2xl border border-orange-200 bg-orange-50 overflow-hidden">
+          <div className="px-5 py-3 bg-orange-100 border-b border-orange-200">
+            <h3 className="text-sm font-bold text-orange-900">🎣 3초 훅 진단</h3>
+          </div>
+          <div className="px-5 py-4 text-sm text-orange-900 leading-relaxed whitespace-pre-line">
+            {verdict.hook_analysis}
+          </div>
+        </div>
+      )}
+
+      {/* 1.6. Keyword Analysis */}
+      {verdict?.keyword_analysis && (
+        <div className="rounded-2xl border border-indigo-200 bg-indigo-50 overflow-hidden">
+          <div className="px-5 py-3 bg-indigo-100 border-b border-indigo-200">
+            <h3 className="text-sm font-bold text-indigo-900">🔑 마케팅 키워드 분석</h3>
+          </div>
+          <div className="px-5 py-4 text-sm text-indigo-900 leading-relaxed whitespace-pre-line">
+            {verdict.keyword_analysis}
+          </div>
+        </div>
+      )}
+
       {/* 2. Top 3 Actions */}
       {prescriptions && prescriptions.top_3_actions.length > 0 && (
         <div className="rounded-xl bg-gray-900 text-white p-4">
