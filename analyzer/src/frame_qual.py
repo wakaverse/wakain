@@ -20,8 +20,8 @@ from google.genai import types
 from .schemas import FrameQual, FrameQuant
 
 MODEL = "gemini-2.5-flash-lite"
-MAX_CONCURRENCY = 10  # simultaneous API calls
-REQUEST_DELAY = 0.3   # seconds between requests
+MAX_CONCURRENCY = 3   # simultaneous API calls (reduced to avoid 503)
+REQUEST_DELAY = 0.5   # seconds between requests
 
 SYSTEM_INSTRUCTION = """\
 You are a shortform marketing video analyst. You analyse individual frames
@@ -146,6 +146,19 @@ async def analyse_frames_qual(
         for (timestamp, jpeg_bytes), quant in zip(jpeg_frames, quants)
     ]
 
-    results = await asyncio.gather(*tasks)
+    results_raw = await asyncio.gather(*tasks, return_exceptions=True)
+
+    # Filter out failed frames (skip them instead of crashing pipeline)
+    results = []
+    failed = 0
+    for i, r in enumerate(results_raw):
+        if isinstance(r, Exception):
+            ts = jpeg_frames[i][0] if i < len(jpeg_frames) else 0
+            print(f"  ⚠ Frame {ts}s failed, skipping: {r}")
+            failed += 1
+        else:
+            results.append(r)
+    if failed:
+        print(f"  ⚠ {failed}/{len(results_raw)} frames failed, continuing with {len(results)} frames")
     # Sort by timestamp to maintain order
     return sorted(results, key=lambda q: q.timestamp)

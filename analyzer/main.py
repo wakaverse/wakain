@@ -650,7 +650,12 @@ def run_full_pipeline(video_path: str, output_dir: str, resolution: int = 720, p
                 print(f"  ❌ Phase 2/4 error: {e}")
 
     if phase24_errors:
-        raise RuntimeError(f"Phase 2/4 failures: {'; '.join(phase24_errors)}")
+        print(f"  ⚠️ Phase 2/4 had errors (continuing with available data): {'; '.join(phase24_errors)}")
+        # Don't crash — continue with whatever data we have
+        if quals is None:
+            quals = []
+        if video_analysis is None:
+            video_analysis = {}
 
     elapsed_phase24 = time.perf_counter() - t_phase24
     print(f"\n[Parallel] Phase 2+4 done in {elapsed_phase24:.1f}s (was sequential ~{elapsed_phase24*1.7:.0f}s before)")
