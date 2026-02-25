@@ -1,10 +1,8 @@
-"""Phase 2: Gemini 2.0 Flash qualitative frame analysis.
+"""Phase 2: Gemini Flash Lite qualitative frame analysis (batched).
 
-Sends each keyframe image to Gemini with:
-  - frame_quant data as context
-Returns structured FrameQual JSON.
+Sends frames in batches (4-5 per call) to reduce API call count.
+Returns structured FrameQual JSON per frame.
 
-Supports parallel processing with throttling (Semaphore + delay).
 Uses GEMINI_API_KEY_PRO (Tier 3) if available, falls back to GEMINI_API_KEY.
 """
 
@@ -20,14 +18,17 @@ from google.genai import types
 from .schemas import FrameQual, FrameQuant
 
 MODEL = "gemini-2.5-flash-lite"
-MAX_CONCURRENCY = 3   # simultaneous API calls (reduced to avoid 503)
-REQUEST_DELAY = 0.5   # seconds between requests
+BATCH_SIZE = 5          # frames per API call
+MAX_CONCURRENCY = 2     # simultaneous batch calls
+REQUEST_DELAY = 0.3     # seconds between batch requests
 
 SYSTEM_INSTRUCTION = """\
 You are a shortform marketing video analyst. You analyse individual frames
 to extract structured visual metadata for building a video recipe.
 
-Always respond with valid JSON matching the requested schema exactly.
+You will receive MULTIPLE frames in a single request. Analyse EACH frame independently
+and return a JSON array with one object per frame, in the SAME ORDER as the images.
+
 Be precise with shot_type classification:
   - closeup: main subject occupies >60% of frame
   - medium: 30-60%
@@ -55,24 +56,10 @@ For artwork analysis:
   Options: text, product, person, graphic, empty, mixed.
 - color_design: Identify primary background color (hex), accent/highlight color (hex),
   text-background contrast level, and color harmony type.
-
-For artwork analysis:
-- Identify typography details: font family (gothic/rounded/serif/handwritten/display), weight, color, outline, shadow, background box
-- Note highlight techniques: which words are emphasized and how (color change, size, underline, glow)
-- Identify graphic elements: icons, stickers, arrows, badges, gradient overlays
-- Describe layout zones: what occupies top/middle/bottom third of frame
-- Assess color design: primary/accent colors, text-background contrast, color harmony
-- If no text/graphics visible, set artwork to null
 """
 
 
-def _build_prompt(quant: FrameQuant) -> str:
-    """Build the text prompt (quant context removed for lite model)."""
-    return "Analyse the frame image above. Return a JSON object matching the FrameQual schema."
-
-
 def _make_client() -> genai.Client:
-    # Prefer Tier 3 key for higher rate limits
     api_key = os.environ.get("GEMINI_API_KEY_PRO", "") or os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         raise RuntimeError(
@@ -84,45 +71,71 @@ def _make_client() -> genai.Client:
     return genai.Client(api_key=api_key)
 
 
-async def analyse_frame_qual(
+async def _analyse_batch(
     client: genai.Client,
     semaphore: asyncio.Semaphore,
-    jpeg_bytes: bytes,
-    timestamp: float,
-    quant: FrameQuant,
-) -> FrameQual:
-    """Send a single frame to Gemini Flash and return FrameQual."""
-    prompt = _build_prompt(quant)
+    batch: list[tuple[float, bytes]],
+) -> list[tuple[float, dict]]:
+    """Send a batch of frames to Gemini and return list of (timestamp, parsed_dict)."""
 
-    image_part = types.Part.from_bytes(data=jpeg_bytes, mime_type="image/jpeg")
-    text_part = types.Part.from_text(text=prompt)
+    # Build contents: image parts interleaved with frame labels
+    parts = []
+    timestamps = []
+    for i, (ts, jpeg_bytes) in enumerate(batch):
+        timestamps.append(ts)
+        parts.append(types.Part.from_text(text=f"[Frame {i+1}: timestamp={ts:.2f}s]"))
+        parts.append(types.Part.from_bytes(data=jpeg_bytes, mime_type="image/jpeg"))
+
+    parts.append(types.Part.from_text(
+        text=f"Analyse all {len(batch)} frames above. "
+             f"Return a JSON array of {len(batch)} FrameQual objects in the same order."
+    ))
 
     max_retries = 5
     async with semaphore:
-        await asyncio.sleep(REQUEST_DELAY)  # throttle
+        await asyncio.sleep(REQUEST_DELAY)
         for attempt in range(max_retries):
             try:
                 response = await client.aio.models.generate_content(
                     model=MODEL,
-                    contents=[image_part, text_part],
+                    contents=parts,
                     config=types.GenerateContentConfig(
                         system_instruction=SYSTEM_INSTRUCTION,
                         response_mime_type="application/json",
-                        response_schema=FrameQual,
                         temperature=0.1,
                     ),
                 )
-                data = json.loads(response.text)
-                data["timestamp"] = timestamp
-                return FrameQual.model_validate(data)
+                text = response.text.strip()
+                data = json.loads(text)
+
+                # Handle both array and single object
+                if isinstance(data, dict):
+                    data = [data]
+
+                results = []
+                for j, ts in enumerate(timestamps):
+                    if j < len(data):
+                        item = data[j]
+                        item["timestamp"] = ts
+                        results.append((ts, item))
+                    else:
+                        print(f"  ⚠ Batch missing frame {ts}s (got {len(data)}/{len(batch)})")
+
+                return results
+
             except Exception as e:
                 wait = 2 ** attempt * 5  # 5, 10, 20, 40, 80s
                 err_name = type(e).__name__
                 if attempt < max_retries - 1:
-                    print(f"  ⚠ Frame {timestamp}s retry {attempt+1}/{max_retries} ({err_name}), waiting {wait}s...")
+                    ts_range = f"{timestamps[0]:.1f}s-{timestamps[-1]:.1f}s"
+                    print(f"  ⚠ Batch [{ts_range}] retry {attempt+1}/{max_retries} ({err_name}), waiting {wait}s...")
                     await asyncio.sleep(wait)
                 else:
-                    raise RuntimeError(f"Frame {timestamp}s failed after {max_retries} retries: {e}") from e
+                    raise RuntimeError(
+                        f"Batch [{timestamps[0]:.1f}s-{timestamps[-1]:.1f}s] failed after {max_retries} retries: {e}"
+                    ) from e
+
+    return []  # unreachable but satisfies type checker
 
 
 async def analyse_frames_qual(
@@ -130,42 +143,56 @@ async def analyse_frames_qual(
     quants: list[FrameQuant],
     concurrency: int = MAX_CONCURRENCY,
 ) -> list[FrameQual]:
-    """Analyse all frames in parallel with throttling.
+    """Analyse all frames in batched parallel calls.
 
     Parameters
     ----------
     jpeg_frames : list of (timestamp, jpeg_bytes)
-    quants : list of FrameQuant matching each frame
-    concurrency : max simultaneous API calls (default 10)
+    quants : list of FrameQuant matching each frame (unused in lite mode, kept for API compat)
+    concurrency : max simultaneous batch API calls
     """
     client = _make_client()
     semaphore = asyncio.Semaphore(concurrency)
 
-    tasks = [
-        analyse_frame_qual(client, semaphore, jpeg_bytes, timestamp, quant)
-        for (timestamp, jpeg_bytes), quant in zip(jpeg_frames, quants)
-    ]
+    # Split frames into batches
+    batches = []
+    for i in range(0, len(jpeg_frames), BATCH_SIZE):
+        batches.append(jpeg_frames[i:i + BATCH_SIZE])
 
+    total_frames = len(jpeg_frames)
+    total_batches = len(batches)
+    print(f"  Phase 2: {total_frames} frames → {total_batches} batches (×{BATCH_SIZE})")
+
+    tasks = [_analyse_batch(client, semaphore, batch) for batch in batches]
     results_raw = await asyncio.gather(*tasks, return_exceptions=True)
 
-    # Filter out failed frames (skip them instead of crashing pipeline)
-    results = []
-    failed = 0
+    # Collect and validate results
+    all_results: list[FrameQual] = []
+    failed_batches = 0
     for i, r in enumerate(results_raw):
         if isinstance(r, Exception):
-            ts = jpeg_frames[i][0] if i < len(jpeg_frames) else 0
-            print(f"  ⚠ Frame {ts}s failed, skipping: {r}")
-            failed += 1
+            batch = batches[i]
+            ts_range = f"{batch[0][0]:.1f}s-{batch[-1][0]:.1f}s"
+            print(f"  ⚠ Batch [{ts_range}] failed, skipping {len(batch)} frames: {r}")
+            failed_batches += 1
         else:
-            results.append(r)
-    if failed:
-        fail_ratio = failed / len(results_raw) if results_raw else 0
-        print(f"  ⚠ {failed}/{len(results_raw)} frames failed ({fail_ratio:.0%})")
-        if fail_ratio >= 0.3:
+            for ts, item_dict in r:
+                try:
+                    fq = FrameQual.model_validate(item_dict)
+                    all_results.append(fq)
+                except Exception as e:
+                    print(f"  ⚠ Frame {ts}s validation failed, skipping: {e}")
+
+    failed_frames = sum(len(batches[i]) for i, r in enumerate(results_raw) if isinstance(r, Exception))
+    if failed_frames:
+        fail_ratio = failed_frames / total_frames if total_frames else 0
+        print(f"  ⚠ {failed_frames}/{total_frames} frames failed ({fail_ratio:.0%})")
+        if fail_ratio >= 0.5:
             raise RuntimeError(
-                f"프레임 분석 {failed}/{len(results_raw)}개 실패 ({fail_ratio:.0%}). "
+                f"프레임 분석 {failed_frames}/{total_frames}개 실패 ({fail_ratio:.0%}). "
                 f"AI 서버가 일시적으로 과부하 상태입니다. 잠시 후 다시 시도해주세요."
             )
-        print(f"  → {len(results)}개 프레임으로 계속 진행합니다")
-    # Sort by timestamp to maintain order
-    return sorted(results, key=lambda q: q.timestamp)
+        print(f"  → {len(all_results)}개 프레임으로 계속 진행합니다")
+
+    # Sort by timestamp
+    return sorted(all_results, key=lambda q: q.timestamp)
