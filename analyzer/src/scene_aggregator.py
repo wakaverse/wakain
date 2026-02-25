@@ -95,6 +95,24 @@ def _compute_visual_summary(
     time_range: list[float] | None = None,
 ) -> dict:
     """Compute visual_summary fields from grouped frames (no LLM)."""
+    if not quals:
+        # No qual data for this scene — return safe defaults
+        return {
+            "dominant_shot": "medium",
+            "shot_sequence": [],
+            "composition": "center",
+            "cut_count": 0,
+            "avg_cut_interval": 0,
+            "motion_level": "static",
+            "dominant_colors": [],
+            "brightness_trend": "stable",
+            "avg_brightness": 0.5,
+            "avg_saturation": 0.5,
+            "avg_contrast": 0.5,
+            "face_presence_ratio": 0,
+            "text_presence_ratio": 0,
+        }
+
     shot_counts = Counter(q.shot_type for q in quals)
     dominant_shot = shot_counts.most_common(1)[0][0]
 
