@@ -59,6 +59,57 @@ For artwork analysis:
 """
 
 
+_DEFAULT_FRAME = {
+    "timestamp": 0,
+    "shot_type": "medium",
+    "subject_type": "lifestyle_scene",
+    "composition": {"layout": "center", "visual_weight": "center", "depth": "flat"},
+    "text_overlay": None,
+    "product_presentation": {"visibility": "hidden", "angle": "front", "context": "studio"},
+    "human_element": {"role": "none", "emotion": "neutral", "eye_contact": False, "gesture": "none"},
+    "color_mood": "bold_contrast",
+    "attention_element": "main subject",
+    "artwork": None,
+}
+
+_DEFAULT_ARTWORK = {
+    "typography": None,
+    "graphic_elements": ["none"],
+    "layout_zones": {"top": "empty", "middle": "empty", "bottom": "empty", "text_product_overlap": False},
+    "color_design": {"primary_color": "#000000", "text_bg_contrast": "medium", "color_harmony": "monochrome"},
+}
+
+
+def _deep_merge(defaults: dict, data: dict) -> dict:
+    """Merge data onto defaults recursively. data values take priority."""
+    result = dict(defaults)
+    for k, v in data.items():
+        if isinstance(v, dict) and isinstance(result.get(k), dict):
+            result[k] = _deep_merge(result[k], v)
+        else:
+            result[k] = v
+    return result
+
+
+def _fill_defaults(item: dict) -> dict:
+    """Ensure all required FrameQual fields exist with valid defaults."""
+    merged = _deep_merge(_DEFAULT_FRAME, item)
+    # Fix nested objects that Gemini might partially return
+    for key, defaults in [
+        ("composition", _DEFAULT_FRAME["composition"]),
+        ("product_presentation", _DEFAULT_FRAME["product_presentation"]),
+        ("human_element", _DEFAULT_FRAME["human_element"]),
+    ]:
+        if isinstance(merged.get(key), dict):
+            merged[key] = _deep_merge(defaults, merged[key])
+        elif merged.get(key) is None:
+            merged[key] = dict(defaults)
+    # Artwork sub-fields
+    if isinstance(merged.get("artwork"), dict):
+        merged["artwork"] = _deep_merge(_DEFAULT_ARTWORK, merged["artwork"])
+    return merged
+
+
 def _make_client() -> genai.Client:
     api_key = os.environ.get("GEMINI_API_KEY_PRO", "") or os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
@@ -117,23 +168,8 @@ async def _analyse_batch(
                     if j < len(data):
                         item = data[j]
                         item["timestamp"] = ts
-                        # Fill defaults for commonly missing fields
-                        item.setdefault("color_mood", "bold_contrast")
-                        item.setdefault("attention_element", "main subject")
-                        item.setdefault("shot_type", "medium")
-                        item.setdefault("subject_type", "lifestyle_scene")
-                        if item.get("composition") is None:
-                            item["composition"] = {"layout": "center", "visual_weight": "center", "depth": "flat"}
-                        if item.get("product_presentation") is None:
-                            item["product_presentation"] = {"visibility": "hidden", "angle": "front", "context": "studio"}
-                        if item.get("human_element") is None:
-                            item["human_element"] = {"role": "none", "emotion": "neutral", "eye_contact": False, "gesture": "none"}
-                        if item.get("artwork") is not None:
-                            aw = item["artwork"]
-                            if aw.get("layout_zones") is None:
-                                aw["layout_zones"] = {"top": "empty", "middle": "empty", "bottom": "empty", "text_product_overlap": False}
-                            if aw.get("color_design") is None:
-                                aw["color_design"] = {"primary_color": "#000000", "text_bg_contrast": "medium", "color_harmony": "monochrome"}
+                        # Merge with complete defaults so Pydantic never fails
+                        item = _fill_defaults(item)
                         results.append((ts, item))
                     else:
                         print(f"  ⚠ Batch missing frame {ts}s (got {len(data)}/{len(batch)})")

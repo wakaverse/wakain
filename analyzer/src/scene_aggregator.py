@@ -195,6 +195,18 @@ def _compute_content_summary(
     quants: list[FrameQuant],
 ) -> dict:
     """Compute content_summary fields from grouped frames."""
+    if not quals:
+        return {
+            "subject_type": "lifestyle_scene",
+            "product_visibility": "hidden",
+            "product_angle": "front",
+            "product_context": "studio",
+            "human_element": None,
+            "text_overlays": [],
+            "mood_counts": {},
+            "attention_elements": [],
+        }
+
     subject_counts = Counter(q.subject_type for q in quals)
     subject_type = subject_counts.most_common(1)[0][0]
 
