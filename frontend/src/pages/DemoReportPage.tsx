@@ -56,7 +56,7 @@ export default function DemoReportPage() {
           caption_map,
           verdict: null,
           video_url: null, // no video file for demo
-          appeal_structure: null,
+          appeal_structure: null, product: null,
         });
       })
       .catch((e) => setError(e.message))

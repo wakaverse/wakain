@@ -133,6 +133,7 @@ export async function getResult(id: string): Promise<AnalysisResult> {
     verdict: data.verdict_json || null,
     video_url: data.video_url || null,
     appeal_structure: data.appeal_structure_json || null,
+    product: data.product_json || null,
   };
 }
 

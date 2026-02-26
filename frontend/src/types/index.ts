@@ -344,6 +344,13 @@ export interface MarketingVerdict {
   product_category: string;
 }
 
+export interface ProductInfo {
+  product_name?: string;
+  brand?: string;
+  category?: string;
+  sub_category?: string;
+}
+
 export interface AnalysisResult {
   video_recipe: VideoRecipe;
   diagnosis: Diagnosis | null;
@@ -354,4 +361,5 @@ export interface AnalysisResult {
   verdict: MarketingVerdict | null;
   video_url: string | null;
   appeal_structure: AppealStructure | null;
+  product: ProductInfo | null;
 }

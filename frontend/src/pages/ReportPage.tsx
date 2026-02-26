@@ -19,16 +19,6 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
   { id: 'art', label: '아트 디렉션', icon: '🎨' },
 ];
 
-const formatLabels: Record<string, string> = {
-  talking_head: '진행자형', caption_text: '캡션/텍스트형', product_demo: '데모/언박싱형',
-  ugc_vlog: 'UGC/브이로그형', asmr_mood: 'ASMR/무드형', comparison: '비교형',
-  listicle: '리스트형', story_problem: '스토리/문제해결형', entertainment: '엔터형',
-};
-
-const intentLabels: Record<string, string> = {
-  commerce: '커머스/세일즈', information: '정보 전달', branding: '브랜딩/이미지',
-  entertainment: '엔터테인먼트',
-};
 
 export default function ReportPage() {
   const { id } = useParams<{ id: string }>();
@@ -98,6 +88,11 @@ export default function ReportPage() {
 
   const narrationLabel = narration === 'voice' ? '🎤 음성' : narration === 'caption' ? '📝 캡션' : '🔇 무음';
 
+  // Product info: prefer product_json (Phase 0.1), fallback to verdict
+  const productName = result.product?.product_name || result.verdict?.product_name || '';
+  const productBrand = result.product?.brand || '';
+  const productCategory = result.product?.category || result.verdict?.product_category || '';
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
@@ -108,13 +103,14 @@ export default function ReportPage() {
           </Link>
           <div>
             <h1 className="text-lg font-bold text-gray-900">
-              {result.verdict?.product_name || meta.category || '영상'} 분석 리포트
+              {productName || meta.category || '영상'} 분석 리포트
             </h1>
             <div className="flex items-center gap-3 text-xs text-gray-500">
-              {result.verdict?.product_name && (
+              {productName && (
                 <span className="px-2 py-0.5 bg-gray-100 rounded-full font-medium text-gray-700">
-                  🏷️ {result.verdict.product_name}
-                  {result.verdict.product_category ? ` · ${result.verdict.product_category}` : ''}
+                  🏷️ {productName}
+                  {productCategory ? ` | ${productCategory}` : ''}
+                  {productBrand ? ` | ${productBrand}` : ''}
                 </span>
               )}
               <span>{narrationLabel}</span>
