@@ -2,24 +2,24 @@ import { useEffect, useMemo, useState, useRef, useCallback, Fragment } from 'rea
 import { useParams, Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { getResult } from '../lib/api';
-import type { AnalysisResult, AppealScene, AppealGroup, Prescription, SceneCard as SceneCardType } from '../types';
+import type { AnalysisResult, AppealScene, AppealGroup, AppealPoint, Prescription, Stt, SceneCard as SceneCardType } from '../types';
 import VideoPlayer, { type VideoPlayerHandle } from '../components/Report/VideoPlayer';
 import AppealTimelineBar from '../components/Report/AppealTimelineBar';
 import DimensionChart from '../components/Report/DimensionChart';
 import FlowTimeline from '../components/Report/FlowTimeline';
 import GroupHeader from '../components/Report/GroupHeader';
-import SceneCard from '../components/Report/SceneCard';
-import SceneDetail from '../components/Report/SceneDetail';
+import CutCard from '../components/Report/CutCard';
+import CutDetail from '../components/Report/CutDetail';
 
 /* ── Helpers ──────────────────────────────────────────── */
 
 /** Find best-matching recipe scene role by time overlap */
-function getSceneRole(sceneTimeRange: [number, number], recipeScenes: SceneCardType[]): string {
+function getSceneRole(timeRange: [number, number], recipeScenes: SceneCardType[]): string {
   if (!recipeScenes?.length) return '';
   let bestRole = '';
   let bestOverlap = 0;
   for (const sc of recipeScenes) {
-    const [s1, e1] = sceneTimeRange;
+    const [s1, e1] = timeRange;
     const [s2, e2] = sc.time_range || [0, 0];
     const overlap = Math.max(0, Math.min(e1, e2) - Math.max(s1, s2));
     if (overlap > bestOverlap) {
@@ -30,38 +30,61 @@ function getSceneRole(sceneTimeRange: [number, number], recipeScenes: SceneCardT
   return bestRole;
 }
 
-/** Aggregate rhythm data from recipe scene cards overlapping the given time range */
-function findRhythmProfile(
-  sceneTimeRange: [number, number],
-  recipeScenes: any[],
-): { cut_count: number; cut_density: number; zoom_events: number; color_shifts: number; tempo_level: string } | null {
-  if (!recipeScenes?.length) return null;
-  const matching = recipeScenes.filter((sc: any) => {
-    const [s1, e1] = sceneTimeRange;
-    const [s2, e2] = sc.time_range || [0, 0];
-    return s1 < e2 && s2 < e1;
-  });
-  if (!matching.length) return null;
-  return {
-    cut_count: matching.reduce((sum: number, sc: any) => sum + (sc.rhythm_profile?.cut_count || 0), 0),
-    cut_density: matching.reduce((sum: number, sc: any) => sum + (sc.rhythm_profile?.cut_density || 0), 0) / matching.length,
-    zoom_events: matching.reduce((sum: number, sc: any) => sum + (sc.rhythm_profile?.zoom_events || 0), 0),
-    color_shifts: matching.reduce((sum: number, sc: any) => sum + (sc.rhythm_profile?.color_shifts || 0), 0),
-    tempo_level: matching[0]?.rhythm_profile?.tempo_level || 'medium',
-  };
+/** Extract transcript for a cut time range from STT segments */
+function getCutTranscript(cutTimeRange: [number, number], stt: Stt | null): string {
+  if (!stt?.segments) return '';
+  const [start, end] = cutTimeRange;
+  const words: string[] = [];
+  for (const seg of stt.segments) {
+    if (seg.end <= start || seg.start >= end) continue;
+    if (seg.words && seg.words.length > 0) {
+      for (const w of seg.words) {
+        if (w.end > start && w.start < end) words.push(w.word);
+      }
+    } else {
+      const segDur = seg.end - seg.start;
+      if (segDur <= 0) { words.push(seg.text); continue; }
+      const overlapStart = Math.max(start, seg.start);
+      const overlapEnd = Math.min(end, seg.end);
+      const overlapRatio = (overlapEnd - overlapStart) / segDur;
+      if (overlapRatio > 0.5) words.push(seg.text);
+    }
+  }
+  return words.join(' ').trim();
 }
 
-/** Parse prescriptions' time_range and match to a scene */
-function matchPrescriptions(scene: AppealScene, allRx: Prescription[]): Prescription[] {
-  const [sStart, sEnd] = scene.time_range;
+/** Get appeals from parent scene that overlap with the cut's time range */
+function getCutAppeals(cutTimeRange: [number, number], sceneAppeals: AppealPoint[]): AppealPoint[] {
+  const [start, end] = cutTimeRange;
+  return sceneAppeals.filter(a => {
+    const ts = a.visual_proof?.timestamp;
+    if (ts != null) return ts >= start && ts < end;
+    return true; // appeals without timestamp belong to the whole scene
+  });
+}
+
+/** Parse prescriptions' time_range and match to a cut */
+function matchCutPrescriptions(cutTimeRange: [number, number], allRx: Prescription[]): Prescription[] {
+  const [cStart, cEnd] = cutTimeRange;
   return allRx.filter(rx => {
     if (!rx.time_range) return false;
     const match = rx.time_range.match(/([\d.]+)\s*[-–s]\s*([\d.]+)/);
     if (!match) return false;
     const rxStart = parseFloat(match[1]);
     const rxEnd = parseFloat(match[2]);
-    return rxStart < sEnd && rxEnd > sStart;
+    return rxStart < cEnd && rxEnd > cStart;
   });
+}
+
+/** Flattened cut info used for rendering */
+interface FlatCut {
+  cutKey: string;
+  cutId: number;
+  sceneId: number;
+  timeRange: [number, number];
+  appeals: AppealPoint[];
+  script: string;
+  persuasionIntent?: string;
 }
 
 /* ── Verdict badge configs ────────────────────────────── */
@@ -80,9 +103,9 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentTime, setCurrentTime] = useState(0);
-  const [expandedScene, setExpandedScene] = useState<number | null>(null);
+  const [expandedCut, setExpandedCut] = useState<string | null>(null);
   const [showVerdict, setShowVerdict] = useState(false);
-  const [thumbnails, setThumbnails] = useState<Map<number, string>>(new Map());
+  const [thumbnails, setThumbnails] = useState<Map<string, string>>(new Map());
   const playerRef = useRef<VideoPlayerHandle>(null);
   const groupRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
@@ -107,9 +130,9 @@ export default function ReportPage() {
     setCurrentTime(time);
   }, []);
 
-  const handleSceneClick = useCallback((scene: AppealScene) => {
-    setExpandedScene(prev => prev === scene.scene_id ? null : scene.scene_id);
-    handleSeek(scene.time_range[0]);
+  const handleCutClick = useCallback((cutKey: string, startTime: number) => {
+    setExpandedCut(prev => prev === cutKey ? null : cutKey);
+    handleSeek(startTime);
   }, [handleSeek]);
 
   const handleGroupClick = useCallback((groupId: number) => {
@@ -119,19 +142,25 @@ export default function ReportPage() {
     }
   }, []);
 
-  /* ── Thumbnail capture ──────────────────────────────── */
+  /* ── Thumbnail capture (cut midpoints) ──────────────── */
 
-  const sceneMidpoints = useMemo(() => {
+  const cutMidpoints = useMemo(() => {
     if (!result?.appeal_structure?.scenes) return [];
-    return result.appeal_structure.scenes.map(s => ({
-      sceneId: s.scene_id,
-      time: (s.time_range[0] + s.time_range[1]) / 2,
-    }));
+    const points: { cutKey: string; time: number }[] = [];
+    for (const scene of result.appeal_structure.scenes) {
+      for (const cut of scene.cuts) {
+        points.push({
+          cutKey: `${scene.scene_id}-${cut.cut_id}`,
+          time: (cut.time_range[0] + cut.time_range[1]) / 2,
+        });
+      }
+    }
+    return points;
   }, [result]);
 
   useEffect(() => {
     const url = result?.video_url;
-    if (!url || sceneMidpoints.length === 0) return;
+    if (!url || cutMidpoints.length === 0) return;
 
     const video = document.createElement('video');
     video.crossOrigin = 'anonymous';
@@ -144,17 +173,17 @@ export default function ReportPage() {
     if (!ctx) return;
 
     let cancelled = false;
-    const map = new Map<number, string>();
+    const map = new Map<string, string>();
     let idx = 0;
 
     const captureNext = () => {
-      if (cancelled || idx >= sceneMidpoints.length) {
+      if (cancelled || idx >= cutMidpoints.length) {
         if (!cancelled) setThumbnails(new Map(map));
         video.removeAttribute('src');
         video.load();
         return;
       }
-      video.currentTime = sceneMidpoints[idx].time;
+      video.currentTime = cutMidpoints[idx].time;
     };
 
     video.addEventListener('seeked', () => {
@@ -163,7 +192,7 @@ export default function ReportPage() {
       canvas.height = video.videoHeight || 180;
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       try {
-        map.set(sceneMidpoints[idx].sceneId, canvas.toDataURL('image/jpeg', 0.6));
+        map.set(cutMidpoints[idx].cutKey, canvas.toDataURL('image/jpeg', 0.6));
       } catch { /* CORS fallback: skip */ }
       idx++;
       captureNext();
@@ -174,7 +203,7 @@ export default function ReportPage() {
     });
 
     return () => { cancelled = true; };
-  }, [result?.video_url, sceneMidpoints]);
+  }, [result?.video_url, cutMidpoints]);
 
   /* ── Loading / Error ─────────────────────────────────── */
 
@@ -392,16 +421,34 @@ export default function ReportPage() {
               </div>
             )}
 
-            {/* ── Group → Scene flow ───────────────────── */}
+            {/* ── Group → Cut flow ────────────────────── */}
             {appealStructure && sortedGroups.length > 0 ? (
               <div className="space-y-2">
                 {sortedGroups.map(group => {
                   const scenes = group.scene_ids
                     .map(sid => sceneMap.get(sid))
                     .filter(Boolean) as AppealScene[];
-                  const sorted = [...scenes].sort((a, b) => a.time_range[0] - b.time_range[0]);
                   const range = getGroupRange(group, sceneMap);
-                  const appealCount = scenes.reduce((sum, s) => sum + s.appeals.length, 0);
+
+                  // Flatten all cuts from scenes in this group
+                  const flatCuts: FlatCut[] = [];
+                  for (const scene of scenes) {
+                    for (const cut of scene.cuts) {
+                      const cutKey = `${scene.scene_id}-${cut.cut_id}`;
+                      flatCuts.push({
+                        cutKey,
+                        cutId: cut.cut_id,
+                        sceneId: scene.scene_id,
+                        timeRange: cut.time_range,
+                        appeals: getCutAppeals(cut.time_range, scene.appeals),
+                        script: getCutTranscript(cut.time_range, result.stt),
+                        persuasionIntent: scene.persuasion_intent,
+                      });
+                    }
+                  }
+                  flatCuts.sort((a, b) => a.timeRange[0] - b.timeRange[0]);
+
+                  const appealCount = flatCuts.reduce((sum, c) => sum + c.appeals.length, 0);
 
                   return (
                     <div
@@ -412,38 +459,44 @@ export default function ReportPage() {
                       <GroupHeader
                         group={group}
                         timeRange={range}
-                        sceneCount={scenes.length}
+                        cutCount={flatCuts.length}
                         appealCount={appealCount}
                       />
 
-                      {/* Scene cards grid */}
+                      {/* Cut cards grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                        {sorted.map(scene => {
-                          const isActive = currentTime >= scene.time_range[0] && currentTime < scene.time_range[1];
-                          const isExpanded = expandedScene === scene.scene_id;
-                          const role = getSceneRole(scene.time_range, recipeScenes);
-                          const groupColor = sceneGroupColorMap.get(scene.scene_id) || group.color;
+                        {flatCuts.map(fc => {
+                          const isActive = currentTime >= fc.timeRange[0] && currentTime < fc.timeRange[1];
+                          const isExpanded = expandedCut === fc.cutKey;
+                          const role = getSceneRole(fc.timeRange, recipeScenes);
+                          const groupColor = sceneGroupColorMap.get(fc.sceneId) || group.color;
 
                           return (
-                            <Fragment key={scene.scene_id}>
-                              <SceneCard
-                                scene={scene}
+                            <Fragment key={fc.cutKey}>
+                              <CutCard
+                                cutKey={fc.cutKey}
+                                cutId={fc.cutId}
+                                timeRange={fc.timeRange}
+                                appeals={fc.appeals}
+                                script={fc.script}
                                 groupColor={groupColor}
                                 role={role}
                                 isActive={isActive}
                                 isExpanded={isExpanded}
-                                thumbnailUrl={thumbnails.get(scene.scene_id)}
-                                onClick={() => handleSceneClick(scene)}
+                                thumbnailUrl={thumbnails.get(fc.cutKey)}
+                                onClick={() => handleCutClick(fc.cutKey, fc.timeRange[0])}
                               />
                               {isExpanded && (
                                 <div className="col-span-full">
-                                  <SceneDetail
-                                    scene={scene}
-                                    prescriptions={matchPrescriptions(scene, allRx)}
-                                    stt={result.stt}
-                                    rhythmProfile={findRhythmProfile(scene.time_range, recipeScenes)}
+                                  <CutDetail
+                                    cutId={fc.cutId}
+                                    timeRange={fc.timeRange}
+                                    script={fc.script}
+                                    appeals={fc.appeals}
+                                    prescriptions={matchCutPrescriptions(fc.timeRange, allRx)}
+                                    persuasionIntent={fc.persuasionIntent}
                                     onSeek={handleSeek}
-                                    onClose={() => setExpandedScene(null)}
+                                    onClose={() => setExpandedCut(null)}
                                   />
                                 </div>
                               )}

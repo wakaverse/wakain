@@ -3,11 +3,11 @@ import type { AppealGroup } from '../../types';
 interface Props {
   group: AppealGroup;
   timeRange: [number, number];
-  sceneCount: number;
+  cutCount: number;
   appealCount: number;
 }
 
-export default function GroupHeader({ group, timeRange, sceneCount, appealCount }: Props) {
+export default function GroupHeader({ group, timeRange, cutCount, appealCount }: Props) {
   return (
     <div className="flex items-center gap-3 pt-6 pb-3">
       <div
@@ -31,7 +31,7 @@ export default function GroupHeader({ group, timeRange, sceneCount, appealCount 
         )}
       </div>
       <div className="text-[11px] text-gray-400 shrink-0">
-        {sceneCount}씬 · {appealCount}소구
+        {cutCount}컷 · {appealCount}소구
       </div>
     </div>
   );

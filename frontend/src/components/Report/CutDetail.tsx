@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import type { AppealScene, AppealPoint, Prescription, Stt } from '../../types';
+import type { AppealPoint, Prescription } from '../../types';
 
 /* ── Helpers ──────────────────────────────────────────── */
 
@@ -23,30 +22,6 @@ const severityIcon: Record<string, string> = {
   warning: '⚠️',
   info: '💡',
 };
-
-function getCutTranscript(cutTimeRange: [number, number], stt: Stt | null): string {
-  if (!stt?.segments) return '';
-  const [start, end] = cutTimeRange;
-  const words: string[] = [];
-
-  for (const seg of stt.segments) {
-    if (seg.end <= start || seg.start >= end) continue;
-
-    if (seg.words && seg.words.length > 0) {
-      for (const w of seg.words) {
-        if (w.end > start && w.start < end) words.push(w.word);
-      }
-    } else {
-      const segDur = seg.end - seg.start;
-      if (segDur <= 0) { words.push(seg.text); continue; }
-      const overlapStart = Math.max(start, seg.start);
-      const overlapEnd = Math.min(end, seg.end);
-      const overlapRatio = (overlapEnd - overlapStart) / segDur;
-      if (overlapRatio > 0.5) words.push(seg.text);
-    }
-  }
-  return words.join(' ').trim();
-}
 
 /* ── Sub-sections ─────────────────────────────────────── */
 
@@ -98,7 +73,7 @@ function RxCard({ rx, onSeek }: { rx: Prescription; onSeek: (t: number) => void 
         <span className="text-sm">{icon}</span>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-gray-800">{rx.symptom}</p>
-          <p className="text-xs text-gray-600 mt-1">→ {rx.recommendation}</p>
+          <p className="text-xs text-gray-600 mt-1">&rarr; {rx.recommendation}</p>
           <div className="flex items-center gap-3 mt-1.5 text-[10px] text-gray-500">
             {rx.impact && <span>{rx.impact}</span>}
             {rx.time_range && (
@@ -119,23 +94,20 @@ function RxCard({ rx, onSeek }: { rx: Prescription; onSeek: (t: number) => void 
 /* ── Main Component ───────────────────────────────────── */
 
 interface Props {
-  scene: AppealScene;
+  cutId: number;
+  timeRange: [number, number];
+  script: string;
+  appeals: AppealPoint[];
   prescriptions: Prescription[];
-  stt: Stt | null;
-  rhythmProfile: {
-    cut_count: number;
-    cut_density: number;
-    zoom_events: number;
-    color_shifts: number;
-    tempo_level: string;
-  } | null;
+  persuasionIntent?: string;
   onSeek: (time: number) => void;
   onClose: () => void;
 }
 
-export default function SceneDetail({ scene, prescriptions, stt, rhythmProfile, onSeek, onClose }: Props) {
-  const [showCuts, setShowCuts] = useState(false);
-
+export default function CutDetail({
+  cutId, timeRange, script, appeals, prescriptions, persuasionIntent,
+  onSeek, onClose,
+}: Props) {
   return (
     <div
       className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-5 mt-2 animate-in"
@@ -144,9 +116,9 @@ export default function SceneDetail({ scene, prescriptions, stt, rhythmProfile, 
       {/* Header + close */}
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-bold text-gray-900">
-          씬 {scene.scene_id} 상세
+          컷 {cutId} 상세
           <span className="text-gray-400 font-normal ml-2 font-mono text-xs">
-            {scene.time_range[0].toFixed(1)}–{scene.time_range[1].toFixed(1)}s
+            {timeRange[0].toFixed(1)}&ndash;{timeRange[1].toFixed(1)}s
           </span>
         </h4>
         <button
@@ -158,38 +130,31 @@ export default function SceneDetail({ scene, prescriptions, stt, rhythmProfile, 
       </div>
 
       {/* Script */}
-      {(scene.stt_text || scene.caption_text) && (
+      {script && (
         <section>
           <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">스크립트</h5>
-          {scene.stt_text && (
-            <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-800 leading-relaxed">
-              🎤 {scene.stt_text}
-            </div>
-          )}
-          {scene.caption_text && scene.caption_text !== scene.stt_text && (
-            <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-800 leading-relaxed mt-2">
-              📝 {scene.caption_text}
-            </div>
-          )}
+          <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-800 leading-relaxed">
+            🎤 {script}
+          </div>
         </section>
       )}
 
       {/* Persuasion Intent */}
-      {scene.persuasion_intent && (
+      {persuasionIntent && (
         <section>
           <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">설득 의도</h5>
-          <p className="text-sm text-gray-700">{scene.persuasion_intent}</p>
+          <p className="text-sm text-gray-700">{persuasionIntent}</p>
         </section>
       )}
 
       {/* Appeals – grouped by source */}
-      {scene.appeals.length > 0 && (() => {
-        const visualAppeals = scene.appeals.filter(a => a.source === 'visual');
-        const voiceAppeals = scene.appeals.filter(a => a.source === 'script' || a.source === 'both');
+      {appeals.length > 0 && (() => {
+        const visualAppeals = appeals.filter(a => a.source === 'visual');
+        const voiceAppeals = appeals.filter(a => a.source === 'script' || a.source === 'both');
         return (
           <section>
             <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              소구 포인트 ({scene.appeals.length})
+              소구 포인트 ({appeals.length})
             </h5>
             {visualAppeals.length > 0 && (
               <div className="mb-3">
@@ -215,65 +180,7 @@ export default function SceneDetail({ scene, prescriptions, stt, rhythmProfile, 
         );
       })()}
 
-      {/* Rhythm / Production Stats */}
-      {rhythmProfile && (rhythmProfile.cut_count > 0 || rhythmProfile.cut_density > 0 || rhythmProfile.zoom_events > 0 || rhythmProfile.color_shifts > 0) && (
-        <section>
-          <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">연출 수치</h5>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <Stat label="컷" value={`${rhythmProfile.cut_count}개`} />
-            <Stat label="컷 밀도" value={`${rhythmProfile.cut_density.toFixed(1)}/s`} />
-            <Stat label="줌 이벤트" value={`${rhythmProfile.zoom_events}`} />
-            <Stat
-              label="템포"
-              value={rhythmProfile.tempo_level === 'high' ? '빠름' : rhythmProfile.tempo_level === 'low' ? '느림' : '보통'}
-              color={rhythmProfile.tempo_level === 'high' ? 'text-red-600' : rhythmProfile.tempo_level === 'low' ? 'text-blue-600' : 'text-amber-600'}
-            />
-          </div>
-        </section>
-      )}
-
-      {/* Cuts breakdown (collapsible) */}
-      {scene.cuts.length > 0 && (
-        <section>
-          <button
-            onClick={() => setShowCuts(!showCuts)}
-            className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1 hover:text-gray-700 transition-colors"
-          >
-            컷 상세 ({scene.cuts.length})
-            <span className="text-[10px] normal-case">{showCuts ? '▲' : '▼'}</span>
-          </button>
-          {showCuts && (
-            <div className="mt-2 space-y-1.5">
-              {scene.cuts.map(cut => {
-                const transcript = getCutTranscript(cut.time_range, stt);
-                return (
-                  <div
-                    key={cut.cut_id}
-                    className="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={() => onSeek(cut.time_range[0])}
-                  >
-                    <span className="w-6 h-6 bg-gray-900 text-white rounded flex items-center justify-center text-[10px] font-bold shrink-0">
-                      {cut.cut_id}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[11px] text-gray-400 font-mono">
-                        {cut.time_range[0].toFixed(1)}–{cut.time_range[1].toFixed(1)}s
-                      </span>
-                      {transcript && (
-                        <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">
-                          &ldquo;{transcript}&rdquo;
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* Prescriptions for this scene */}
+      {/* Prescriptions for this cut */}
       {prescriptions.length > 0 && (
         <section>
           <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
@@ -286,17 +193,6 @@ export default function SceneDetail({ scene, prescriptions, stt, rhythmProfile, 
           </div>
         </section>
       )}
-    </div>
-  );
-}
-
-/* ── Tiny stat box ────────────────────────────────────── */
-
-function Stat({ label, value, color }: { label: string; value: string; color?: string }) {
-  return (
-    <div className="bg-gray-50 rounded-lg px-3 py-2 text-center">
-      <div className={`text-sm font-bold ${color || 'text-gray-900'}`}>{value}</div>
-      <div className="text-[10px] text-gray-400 mt-0.5">{label}</div>
     </div>
   );
 }

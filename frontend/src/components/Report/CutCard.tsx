@@ -1,4 +1,4 @@
-import type { AppealScene } from '../../types';
+import type { AppealPoint } from '../../types';
 
 const APPEAL_TYPE_KO: Record<string, string> = {
   myth_bust: '오해반박', ingredient: '원재료', manufacturing: '제조공정',
@@ -16,7 +16,11 @@ const ROLE_KO: Record<string, string> = {
 };
 
 interface Props {
-  scene: AppealScene;
+  cutKey: string;
+  cutId: number;
+  timeRange: [number, number];
+  appeals: AppealPoint[];
+  script: string;
   groupColor: string;
   role: string;
   isActive: boolean;
@@ -25,9 +29,10 @@ interface Props {
   onClick: () => void;
 }
 
-export default function SceneCard({ scene, groupColor, role, isActive, isExpanded, thumbnailUrl, onClick }: Props) {
-  const mainText = scene.stt_text || scene.caption_text || scene.persuasion_intent || '';
-
+export default function CutCard({
+  cutId, timeRange, appeals, script, groupColor, role,
+  isActive, isExpanded, thumbnailUrl, onClick,
+}: Props) {
   return (
     <div
       className={`group/card rounded-2xl border overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-md ${
@@ -48,14 +53,14 @@ export default function SceneCard({ scene, groupColor, role, isActive, isExpande
         <div className="absolute top-0 inset-x-0 h-0.5 z-10" style={{ backgroundColor: groupColor }} />
 
         {thumbnailUrl ? (
-          <img src={thumbnailUrl} alt={`씬 ${scene.scene_id}`} className="absolute inset-0 w-full h-full object-cover" />
+          <img src={thumbnailUrl} alt={`컷 ${cutId}`} className="absolute inset-0 w-full h-full object-cover" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center select-none">
             <div
               className="text-5xl font-bold opacity-[0.06]"
               style={{ color: groupColor, fontFamily: 'var(--font-display), sans-serif' }}
             >
-              {scene.scene_id}
+              {cutId}
             </div>
           </div>
         )}
@@ -63,7 +68,7 @@ export default function SceneCard({ scene, groupColor, role, isActive, isExpande
         {/* Time badge */}
         <div className="absolute bottom-2 right-2 z-10">
           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/60 text-white backdrop-blur-sm">
-            {scene.time_range[0].toFixed(1)}–{scene.time_range[1].toFixed(1)}s
+            {timeRange[0].toFixed(1)}&ndash;{timeRange[1].toFixed(1)}s
           </span>
         </div>
 
@@ -90,9 +95,9 @@ export default function SceneCard({ scene, groupColor, role, isActive, isExpande
       {/* Info */}
       <div className="p-3 space-y-1.5">
         {/* Appeal tags */}
-        {scene.appeals.length > 0 && (
+        {appeals.length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {scene.appeals.slice(0, 3).map((appeal, i) => (
+            {appeals.slice(0, 3).map((appeal, i) => (
               <span
                 key={i}
                 className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600"
@@ -100,18 +105,18 @@ export default function SceneCard({ scene, groupColor, role, isActive, isExpande
                 {APPEAL_TYPE_KO[appeal.type] || appeal.type}
               </span>
             ))}
-            {scene.appeals.length > 3 && (
+            {appeals.length > 3 && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-50 text-gray-400">
-                +{scene.appeals.length - 3}
+                +{appeals.length - 3}
               </span>
             )}
           </div>
         )}
 
         {/* Key text */}
-        {mainText && (
+        {script && (
           <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-            {mainText}
+            {script}
           </p>
         )}
       </div>
