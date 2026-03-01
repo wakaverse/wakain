@@ -85,25 +85,21 @@ async def get_result(job_id: str, user: dict = Depends(get_current_user)):
     else:
         result["video_url"] = None
 
-    # Generate presigned URLs for thumbnails (stored inside appeal_structure_json)
-    appeal_data = result.get("appeal_structure_json")
-    if appeal_data and isinstance(appeal_data, dict):
-        thumb_map = appeal_data.get("thumbnails", {})
-        if thumb_map:
-            s3 = _s3()
-            thumb_urls = {}
-            for cut_key, r2_key in thumb_map.items():
-                try:
-                    thumb_urls[cut_key] = s3.generate_presigned_url(
-                        "get_object",
-                        Params={"Bucket": R2_BUCKET_NAME, "Key": r2_key},
-                        ExpiresIn=3600,
-                    )
-                except Exception:
-                    pass
-            result["thumbnails"] = thumb_urls
-        else:
-            result["thumbnails"] = {}
+    # Generate presigned URLs for thumbnails
+    thumb_map = result.get("thumbnails_json")
+    if thumb_map and isinstance(thumb_map, dict):
+        s3 = _s3()
+        thumb_urls = {}
+        for cut_key, r2_key in thumb_map.items():
+            try:
+                thumb_urls[cut_key] = s3.generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": R2_BUCKET_NAME, "Key": r2_key},
+                    ExpiresIn=3600,
+                )
+            except Exception:
+                pass
+        result["thumbnails"] = thumb_urls
     else:
         result["thumbnails"] = {}
 
