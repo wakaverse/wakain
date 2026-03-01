@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef, useCallback, Fragment } from 'react';
+import { useEffect, useState, useRef, useCallback, Fragment } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, ChevronDown, ChevronUp, Layers } from 'lucide-react';
 import { getResult } from '../lib/api';
@@ -106,7 +106,6 @@ export default function ReportPage() {
   const [expandedCut, setExpandedCut] = useState<string | null>(null);
   const [showVerdict, setShowVerdict] = useState(false);
   const [showGroups, setShowGroups] = useState(true);
-  const [thumbnails, setThumbnails] = useState<Map<string, string>>(new Map());
   const playerRef = useRef<VideoPlayerHandle>(null);
   const groupRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
@@ -145,66 +144,9 @@ export default function ReportPage() {
 
   /* ── Thumbnail capture (cut midpoints) ──────────────── */
 
-  const cutMidpoints = useMemo(() => {
-    if (!result?.appeal_structure?.scenes) return [];
-    const points: { cutKey: string; time: number }[] = [];
-    for (const scene of result.appeal_structure.scenes) {
-      for (const cut of scene.cuts) {
-        points.push({
-          cutKey: `${scene.scene_id}-${cut.cut_id}`,
-          time: (cut.time_range[0] + cut.time_range[1]) / 2,
-        });
-      }
-    }
-    return points;
-  }, [result]);
 
-  useEffect(() => {
-    const url = result?.video_url;
-    if (!url || cutMidpoints.length === 0) return;
 
-    const video = document.createElement('video');
-    video.crossOrigin = 'anonymous';
-    video.preload = 'auto';
-    video.muted = true;
-    video.src = url;
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let cancelled = false;
-    const map = new Map<string, string>();
-    let idx = 0;
-
-    const captureNext = () => {
-      if (cancelled || idx >= cutMidpoints.length) {
-        if (!cancelled) setThumbnails(new Map(map));
-        video.removeAttribute('src');
-        video.load();
-        return;
-      }
-      video.currentTime = cutMidpoints[idx].time;
-    };
-
-    video.addEventListener('seeked', () => {
-      if (cancelled) return;
-      canvas.width = video.videoWidth || 320;
-      canvas.height = video.videoHeight || 180;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      try {
-        map.set(cutMidpoints[idx].cutKey, canvas.toDataURL('image/jpeg', 0.6));
-      } catch { /* CORS fallback: skip */ }
-      idx++;
-      captureNext();
-    });
-
-    video.addEventListener('loadeddata', () => {
-      if (!cancelled) captureNext();
-    });
-
-    return () => { cancelled = true; };
-  }, [result?.video_url, cutMidpoints]);
 
   /* ── Loading / Error ─────────────────────────────────── */
 
@@ -502,7 +444,7 @@ export default function ReportPage() {
                                 role={role}
                                 isActive={isActive}
                                 isExpanded={isExpanded}
-                                thumbnailUrl={thumbnails.get(fc.cutKey)}
+                                thumbnailUrl={result.thumbnails?.[fc.cutKey]}
                                 onClick={() => handleCutClick(fc.cutKey, fc.timeRange[0])}
                               />
                               {isExpanded && (
@@ -564,7 +506,7 @@ export default function ReportPage() {
                           role={role}
                           isActive={isActive}
                           isExpanded={isExpanded}
-                          thumbnailUrl={thumbnails.get(fc.cutKey)}
+                          thumbnailUrl={result.thumbnails?.[fc.cutKey]}
                           onClick={() => handleCutClick(fc.cutKey, fc.timeRange[0])}
                         />
                         {isExpanded && (

@@ -46,6 +46,58 @@ def _update_job(job_id: str, **fields) -> None:
     _supabase().table("jobs").update(fields).eq("id", job_id).execute()
 
 
+
+def _extract_thumbnails(video_path: str, appeal_structure: dict, job_id: str) -> dict:
+    """Extract thumbnail frames for each cut using ffmpeg, upload to R2, return URL map."""
+    import tempfile
+    scenes = appeal_structure.get("scenes", [])
+    if not scenes:
+        return {}
+
+    s3 = _s3()
+    thumb_map = {}  # cutKey -> r2_key
+
+    for scene in scenes:
+        for cut in scene.get("cuts", []):
+            cut_id = cut.get("cut_id", 0)
+            tr = cut.get("time_range", [0, 0])
+            mid_t = (tr[0] + tr[1]) / 2
+            cut_key = f"{scene['scene_id']}-{cut_id}"
+
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                tmp_path = tmp.name
+
+            try:
+                cmd = [
+                    "ffmpeg", "-y",
+                    "-ss", str(mid_t),
+                    "-i", video_path,
+                    "-frames:v", "1",
+                    "-q:v", "5",
+                    "-vf", "scale=320:-1",
+                    tmp_path,
+                ]
+                subprocess.run(cmd, capture_output=True, timeout=10)
+
+                if Path(tmp_path).exists() and Path(tmp_path).stat().st_size > 0:
+                    r2_thumb_key = f"thumbnails/{job_id}/{cut_key}.jpg"
+                    s3.upload_file(
+                        tmp_path,
+                        R2_BUCKET_NAME,
+                        r2_thumb_key,
+                        ExtraArgs={"ContentType": "image/jpeg"},
+                    )
+                    thumb_map[cut_key] = r2_thumb_key
+            except Exception:
+                pass
+            finally:
+                try:
+                    Path(tmp_path).unlink(missing_ok=True)
+                except Exception:
+                    pass
+
+    return thumb_map
+
 def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, product_category: str | None = None) -> None:
     """Download video from R2, run pipeline, persist results, clean up."""
     output_dir = str(OUTPUT_DIR / job_id)
@@ -135,11 +187,24 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
         # Build a lightweight summary for fast loading
         summary = _build_summary(recipe_json)
 
+        # Extract thumbnails for each cut and embed in appeal_structure_json
+        if extra.get("appeal_structure_json"):
+            try:
+                thumb_map = _extract_thumbnails(
+                    str(video_path), extra["appeal_structure_json"], job_id
+                )
+                if thumb_map:
+                    extra["appeal_structure_json"]["thumbnails"] = thumb_map
+                    print(f"[pipeline:{job_id[:8]}] Extracted {len(thumb_map)} thumbnails", flush=True)
+            except Exception as exc:
+                print(f"[pipeline:{job_id[:8]}] Thumbnail extraction failed: {exc}", flush=True)
+
         # Save to results table
         _supabase().table("results").insert({
             "job_id": job_id,
             "recipe_json": recipe_json,
             "summary_json": summary,
+
             **extra,
         }).execute()
 

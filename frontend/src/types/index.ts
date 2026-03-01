@@ -361,5 +361,6 @@ export interface AnalysisResult {
   verdict: MarketingVerdict | null;
   video_url: string | null;
   appeal_structure: AppealStructure | null;
+  thumbnails?: Record<string, string>;
   product: ProductInfo | null;
 }
