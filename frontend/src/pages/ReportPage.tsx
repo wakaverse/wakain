@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useRef, useCallback, Fragment } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Loader2, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, ArrowLeft, ChevronDown, ChevronUp, Layers } from 'lucide-react';
 import { getResult } from '../lib/api';
 import type { AnalysisResult, AppealScene, AppealGroup, AppealPoint, Prescription, Stt, SceneCard as SceneCardType } from '../types';
 import VideoPlayer, { type VideoPlayerHandle } from '../components/Report/VideoPlayer';
@@ -105,6 +105,7 @@ export default function ReportPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [expandedCut, setExpandedCut] = useState<string | null>(null);
   const [showVerdict, setShowVerdict] = useState(false);
+  const [showGroups, setShowGroups] = useState(true);
   const [thumbnails, setThumbnails] = useState<Map<string, string>>(new Map());
   const playerRef = useRef<VideoPlayerHandle>(null);
   const groupRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -421,8 +422,26 @@ export default function ReportPage() {
               </div>
             )}
 
+            {/* ── Group toggle ──────────────────────── */}
+            {appealStructure && sortedGroups.length > 0 && (
+              <div className="flex items-center justify-end mb-1">
+                <button
+                  onClick={() => setShowGroups(g => !g)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    showGroups
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  {showGroups ? '그룹 ON' : '그룹 OFF'}
+                </button>
+              </div>
+            )}
+
             {/* ── Group → Cut flow ────────────────────── */}
             {appealStructure && sortedGroups.length > 0 ? (
+              showGroups ? (
               <div className="space-y-2">
                 {sortedGroups.map(group => {
                   const scenes = group.scene_ids
@@ -508,6 +527,66 @@ export default function ReportPage() {
                   );
                 })}
               </div>
+              ) : (
+              /* ── Flat mode (no groups) ── */
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                {(() => {
+                  const allCuts: FlatCut[] = [];
+                  for (const scene of appealStructure.scenes) {
+                    for (const cut of scene.cuts) {
+                      const cutKey = `${scene.scene_id}-${cut.cut_id}`;
+                      allCuts.push({
+                        cutKey,
+                        cutId: cut.cut_id,
+                        sceneId: scene.scene_id,
+                        timeRange: cut.time_range,
+                        appeals: getCutAppeals(cut.time_range, scene.appeals),
+                        script: getCutTranscript(cut.time_range, result.stt),
+                        persuasionIntent: scene.persuasion_intent,
+                      });
+                    }
+                  }
+                  allCuts.sort((a, b) => a.timeRange[0] - b.timeRange[0]);
+                  return allCuts.map(fc => {
+                    const isActive = currentTime >= fc.timeRange[0] && currentTime < fc.timeRange[1];
+                    const isExpanded = expandedCut === fc.cutKey;
+                    const role = getSceneRole(fc.timeRange, recipeScenes);
+                    const groupColor = sceneGroupColorMap.get(fc.sceneId) || '#6B7280';
+                    return (
+                      <Fragment key={fc.cutKey}>
+                        <CutCard
+                          cutKey={fc.cutKey}
+                          cutId={fc.cutId}
+                          timeRange={fc.timeRange}
+                          appeals={fc.appeals}
+                          script={fc.script}
+                          groupColor={groupColor}
+                          role={role}
+                          isActive={isActive}
+                          isExpanded={isExpanded}
+                          thumbnailUrl={thumbnails.get(fc.cutKey)}
+                          onClick={() => handleCutClick(fc.cutKey, fc.timeRange[0])}
+                        />
+                        {isExpanded && (
+                          <div className="col-span-full">
+                            <CutDetail
+                              cutId={fc.cutId}
+                              timeRange={fc.timeRange}
+                              script={fc.script}
+                              appeals={fc.appeals}
+                              prescriptions={matchCutPrescriptions(fc.timeRange, allRx)}
+                              persuasionIntent={fc.persuasionIntent}
+                              onSeek={handleSeek}
+                              onClose={() => setExpandedCut(null)}
+                            />
+                          </div>
+                        )}
+                      </Fragment>
+                    );
+                  });
+                })()}
+              </div>
+              )
             ) : (
               <div className="text-center text-sm text-gray-400 py-12 bg-white rounded-2xl border">
                 소구 구조 데이터가 없습니다

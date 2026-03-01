@@ -30,6 +30,7 @@ export default function AnalyzePage() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [progress, setProgress] = useState(0);
   const [compressInfo, setCompressInfo] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const onDrop = useCallback((accepted: File[], rejected: FileRejection[]) => {
     setError('');
@@ -40,7 +41,10 @@ export default function AnalyzePage() {
         : '.mp4, .mov, .webm 형식만 업로드 가능합니다.');
       return;
     }
-    if (accepted.length > 0) setFile(accepted[0]);
+    if (accepted.length > 0) {
+      setFile(accepted[0]);
+      setPreviewUrl(URL.createObjectURL(accepted[0]));
+    }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -172,12 +176,18 @@ export default function AnalyzePage() {
         }`}
       >
         <input {...getInputProps()} />
-        {file ? (
-          <div className="flex flex-col items-center gap-3">
-            <CheckCircle2 className="w-12 h-12 text-emerald-500" />
-            <div>
-              <p className="text-gray-900 font-medium">{file.name}</p>
-              <p className="text-sm text-gray-500 mt-1">{formatBytes(file.size)}</p>
+        {file && previewUrl ? (
+          <div className="flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
+            <video
+              src={previewUrl}
+              controls
+              className="w-full max-w-md rounded-xl shadow-sm"
+              style={{ maxHeight: '320px' }}
+            />
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <p className="text-gray-900 font-medium text-sm">{file.name}</p>
+              <span className="text-xs text-gray-400">({formatBytes(file.size)})</span>
             </div>
           </div>
         ) : (
@@ -246,7 +256,7 @@ export default function AnalyzePage() {
             </div>
           </div>
           <button
-            onClick={(e) => { e.stopPropagation(); setFile(null); setError(''); }}
+            onClick={(e) => { e.stopPropagation(); setFile(null); setError(''); if (previewUrl) { URL.revokeObjectURL(previewUrl); setPreviewUrl(null); } }}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X className="w-4 h-4" />
