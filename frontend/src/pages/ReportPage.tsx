@@ -39,15 +39,15 @@ function getCutTranscript(cutTimeRange: [number, number], stt: Stt | null): stri
     if (seg.end <= start || seg.start >= end) continue;
     if (seg.words && seg.words.length > 0) {
       for (const w of seg.words) {
-        if (w.end > start && w.start < end) words.push(w.word);
+        if (w.end <= start || w.start >= end) continue;
+        // Assign word to the cut that contains its midpoint
+        const wordMid = (w.start + w.end) / 2;
+        if (wordMid >= start && wordMid < end) words.push(w.word);
       }
     } else {
-      const segDur = seg.end - seg.start;
-      if (segDur <= 0) { words.push(seg.text); continue; }
-      const overlapStart = Math.max(start, seg.start);
-      const overlapEnd = Math.min(end, seg.end);
-      const overlapRatio = (overlapEnd - overlapStart) / segDur;
-      if (overlapRatio > 0.5) words.push(seg.text);
+      // No word-level timing: assign segment to cut containing its midpoint
+      const segMid = (seg.start + seg.end) / 2;
+      if (segMid >= start && segMid < end) words.push(seg.text);
     }
   }
   return words.join(' ').trim();
