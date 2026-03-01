@@ -21,10 +21,11 @@ interface Props {
   role: string;
   isActive: boolean;
   isExpanded: boolean;
+  thumbnailUrl?: string;
   onClick: () => void;
 }
 
-export default function SceneCard({ scene, groupColor, role, isActive, isExpanded, onClick }: Props) {
+export default function SceneCard({ scene, groupColor, role, isActive, isExpanded, thumbnailUrl, onClick }: Props) {
   const mainText = scene.stt_text || scene.caption_text || scene.persuasion_intent || '';
 
   return (
@@ -38,25 +39,32 @@ export default function SceneCard({ scene, groupColor, role, isActive, isExpande
       } bg-white`}
       onClick={onClick}
     >
-      {/* Thumbnail placeholder */}
+      {/* Thumbnail */}
       <div
         className="h-44 relative overflow-hidden"
         style={{ backgroundColor: `${groupColor}0a` }}
       >
         {/* Top color accent */}
-        <div className="absolute top-0 inset-x-0 h-0.5" style={{ backgroundColor: groupColor }} />
+        <div className="absolute top-0 inset-x-0 h-0.5 z-10" style={{ backgroundColor: groupColor }} />
 
-        {/* Center: scene number + time */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center select-none">
-          <div
-            className="text-5xl font-bold opacity-[0.06]"
-            style={{ color: groupColor, fontFamily: 'var(--font-display), sans-serif' }}
-          >
-            {scene.scene_id}
+        {thumbnailUrl ? (
+          <img src={thumbnailUrl} alt={`씬 ${scene.scene_id}`} className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center select-none">
+            <div
+              className="text-5xl font-bold opacity-[0.06]"
+              style={{ color: groupColor, fontFamily: 'var(--font-display), sans-serif' }}
+            >
+              {scene.scene_id}
+            </div>
           </div>
-          <div className="text-[11px] text-gray-400 font-mono mt-1">
+        )}
+
+        {/* Time badge */}
+        <div className="absolute bottom-2 right-2 z-10">
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/60 text-white backdrop-blur-sm">
             {scene.time_range[0].toFixed(1)}–{scene.time_range[1].toFixed(1)}s
-          </div>
+          </span>
         </div>
 
         {/* Role badge */}

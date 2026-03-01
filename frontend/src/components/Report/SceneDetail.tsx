@@ -182,22 +182,41 @@ export default function SceneDetail({ scene, prescriptions, stt, rhythmProfile, 
         </section>
       )}
 
-      {/* Appeals */}
-      {scene.appeals.length > 0 && (
-        <section>
-          <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-            소구 포인트 ({scene.appeals.length})
-          </h5>
-          <div className="divide-y divide-gray-100">
-            {scene.appeals.map((appeal, i) => (
-              <AppealRow key={i} appeal={appeal} />
-            ))}
-          </div>
-        </section>
-      )}
+      {/* Appeals – grouped by source */}
+      {scene.appeals.length > 0 && (() => {
+        const visualAppeals = scene.appeals.filter(a => a.source === 'visual');
+        const voiceAppeals = scene.appeals.filter(a => a.source === 'script' || a.source === 'both');
+        return (
+          <section>
+            <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              소구 포인트 ({scene.appeals.length})
+            </h5>
+            {visualAppeals.length > 0 && (
+              <div className="mb-3">
+                <h6 className="text-[11px] font-medium text-gray-400 mb-1">🎬 비주얼 소구</h6>
+                <div className="divide-y divide-gray-100">
+                  {visualAppeals.map((appeal, i) => (
+                    <AppealRow key={`v-${i}`} appeal={appeal} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {voiceAppeals.length > 0 && (
+              <div>
+                <h6 className="text-[11px] font-medium text-gray-400 mb-1">🎤 보이스 소구</h6>
+                <div className="divide-y divide-gray-100">
+                  {voiceAppeals.map((appeal, i) => (
+                    <AppealRow key={`s-${i}`} appeal={appeal} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        );
+      })()}
 
       {/* Rhythm / Production Stats */}
-      {rhythmProfile && (
+      {rhythmProfile && (rhythmProfile.cut_count > 0 || rhythmProfile.cut_density > 0 || rhythmProfile.zoom_events > 0 || rhythmProfile.color_shifts > 0) && (
         <section>
           <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">연출 수치</h5>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">

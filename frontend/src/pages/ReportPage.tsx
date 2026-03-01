@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, Fragment } from 'react';
+import { useEffect, useMemo, useState, useRef, useCallback, Fragment } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { getResult } from '../lib/api';
@@ -82,6 +82,7 @@ export default function ReportPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [expandedScene, setExpandedScene] = useState<number | null>(null);
   const [showVerdict, setShowVerdict] = useState(false);
+  const [thumbnails, setThumbnails] = useState<Map<number, string>>(new Map());
   const playerRef = useRef<VideoPlayerHandle>(null);
   const groupRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
@@ -118,6 +119,63 @@ export default function ReportPage() {
     }
   }, []);
 
+  /* ── Thumbnail capture ──────────────────────────────── */
+
+  const sceneMidpoints = useMemo(() => {
+    if (!result?.appeal_structure?.scenes) return [];
+    return result.appeal_structure.scenes.map(s => ({
+      sceneId: s.scene_id,
+      time: (s.time_range[0] + s.time_range[1]) / 2,
+    }));
+  }, [result]);
+
+  useEffect(() => {
+    const url = result?.video_url;
+    if (!url || sceneMidpoints.length === 0) return;
+
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    video.preload = 'auto';
+    video.muted = true;
+    video.src = url;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let cancelled = false;
+    const map = new Map<number, string>();
+    let idx = 0;
+
+    const captureNext = () => {
+      if (cancelled || idx >= sceneMidpoints.length) {
+        if (!cancelled) setThumbnails(new Map(map));
+        video.removeAttribute('src');
+        video.load();
+        return;
+      }
+      video.currentTime = sceneMidpoints[idx].time;
+    };
+
+    video.addEventListener('seeked', () => {
+      if (cancelled) return;
+      canvas.width = video.videoWidth || 320;
+      canvas.height = video.videoHeight || 180;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      try {
+        map.set(sceneMidpoints[idx].sceneId, canvas.toDataURL('image/jpeg', 0.6));
+      } catch { /* CORS fallback: skip */ }
+      idx++;
+      captureNext();
+    });
+
+    video.addEventListener('loadeddata', () => {
+      if (!cancelled) captureNext();
+    });
+
+    return () => { cancelled = true; };
+  }, [result?.video_url, sceneMidpoints]);
+
   /* ── Loading / Error ─────────────────────────────────── */
 
   if (loading) {
@@ -150,11 +208,13 @@ export default function ReportPage() {
   const diagnosis = result.diagnosis || ({} as any);
   const dimensions = diagnosis.dimensions || [];
   const engagementScore = diagnosis.overall_score || diagnosis.engagement_score || 0;
-  const classification = diagnosis.classification || {};
 
-  const style = result.style || classification;
-  const narration = (style as any).narration_type || classification.narration_type || '?';
-  const narrationLabel = narration === 'voice' ? '음성' : narration === 'caption' ? '캡션' : '무음';
+  const narrationLabel =
+    result.stt && result.stt.segments && result.stt.segments.length > 0
+      ? '음성'
+      : result.caption_map && result.caption_map.events && result.caption_map.events.length > 0
+        ? '캡션'
+        : '무음';
 
   const artDirection = (recipeData as any).art_direction || {};
 
@@ -372,6 +432,7 @@ export default function ReportPage() {
                                 role={role}
                                 isActive={isActive}
                                 isExpanded={isExpanded}
+                                thumbnailUrl={thumbnails.get(scene.scene_id)}
                                 onClick={() => handleSceneClick(scene)}
                               />
                               {isExpanded && (
