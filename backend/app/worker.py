@@ -187,14 +187,15 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
         # Build a lightweight summary for fast loading
         summary = _build_summary(recipe_json)
 
-        # Extract thumbnails for each cut and embed in appeal_structure_json
+        # Extract thumbnails for each cut
+        thumbnails_json = None
         if extra.get("appeal_structure_json"):
             try:
                 thumb_map = _extract_thumbnails(
                     str(video_path), extra["appeal_structure_json"], job_id
                 )
                 if thumb_map:
-                    extra["appeal_structure_json"]["thumbnails"] = thumb_map
+                    thumbnails_json = thumb_map
                     print(f"[pipeline:{job_id[:8]}] Extracted {len(thumb_map)} thumbnails", flush=True)
             except Exception as exc:
                 print(f"[pipeline:{job_id[:8]}] Thumbnail extraction failed: {exc}", flush=True)
@@ -204,7 +205,7 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
             "job_id": job_id,
             "recipe_json": recipe_json,
             "summary_json": summary,
-
+            "thumbnails_json": thumbnails_json,
             **extra,
         }).execute()
 
