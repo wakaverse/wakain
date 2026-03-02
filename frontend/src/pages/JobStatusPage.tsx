@@ -27,7 +27,7 @@ export default function JobStatusPage() {
         const data = await getJob(id!);
         setJob(data);
         if (data.status === 'completed') {
-          setTimeout(() => navigate(`/results/${id}`), 800);
+          setTimeout(() => navigate(`/app/results/${id}`), 800);
           return;
         }
         if (data.status !== 'failed') {

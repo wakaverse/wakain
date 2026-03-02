@@ -14,7 +14,7 @@
   },
   "keywords": {
     "spike": "Spike",
-    "hack": "Hack",
+    "hack": "Analyze",
     "recipe": "Recipe",
     "radar": "Radar"
   },
@@ -28,7 +28,7 @@
         "description": "Automatically detect commerce videos with surging performance by category"
       },
       "hack": {
-        "title": "Hack",
+        "title": "Analyze",
         "subtitle": "Analyze Structure",
         "description": "Break down video structure cut by cut and analyze persuasion patterns"
       },
@@ -53,7 +53,7 @@
       "description": "Monitor viral videos in real-time by category and never miss a new trend"
     },
     "hack": {
-      "title": "Hack",
+      "title": "Analyze",
       "description": "Analyze viral video structure cut by cut, dissecting persuasion patterns and recipes"
     },
     "script": {
@@ -283,5 +283,56 @@
       "title": "Demo Report — WakaLab",
       "description": "Experience WakaLab's video analysis demo."
     }
+  },
+  "menu": {
+    "radar": "Radar",
+    "hack": "Analyze",
+    "script": "Script",
+    "expand": "Expand",
+    "compare": "Compare",
+    "insight": "Insight",
+    "logout": "Log out",
+    "library": "Library"
+  },
+  "radar": {
+    "title": "Radar",
+    "subtitle": "Discover spiking reels",
+    "addChannel": "Add Channel",
+    "channelManage": "Manage Channels",
+    "empty": "No reels collected yet",
+    "emptyHint": "Add channels and start collecting",
+    "filters": {
+      "allChannels": "All Channels",
+      "period": "Period",
+      "spike": "Spike",
+      "views": "Views",
+      "engagement": "Engagement",
+      "keyword": "Search keywords",
+      "sort": "Sort"
+    },
+    "card": {
+      "hack": "Analyze",
+      "views": "Views",
+      "likes": "Likes",
+      "comments": "Comments"
+    },
+    "sort": {
+      "spike": "By Spike",
+      "engagement": "By Engagement",
+      "views": "By Views",
+      "recent": "Latest"
+    }
+  },
+  "library": {
+    "title": "Library",
+    "subtitle": "Manage your favorite videos",
+    "empty": "No saved videos yet",
+    "emptyHint": "Save videos from Radar or start analyzing"
+  },
+  "toast": {
+    "analysis_started": "Analysis started",
+    "analysis_completed": "Analysis completed",
+    "added_to_favorites": "Added to favorites",
+    "removed_from_favorites": "Removed from favorites"
   }
 }

@@ -14,7 +14,7 @@
   },
   "keywords": {
     "spike": "バズ",
-    "hack": "ハッキング",
+    "hack": "分析",
     "recipe": "レシピ",
     "radar": "レーダー"
   },
@@ -53,7 +53,7 @@
       "description": "カテゴリ別のバズ動画をリアルタイムでモニタリングし、新しいトレンドを見逃しません"
     },
     "hack": {
-      "title": "ハッキング",
+      "title": "分析",
       "description": "バズ動画の構造をカット単位で分析し、説得パターンとレシピを解剖します"
     },
     "script": {
@@ -283,5 +283,56 @@
       "title": "デモレポート — WakaLab",
       "description": "WakaLabの動画分析デモを体験してください。"
     }
+  },
+  "menu": {
+    "radar": "レーダー",
+    "hack": "分析",
+    "script": "スクリプト",
+    "expand": "素材拡張",
+    "compare": "比較",
+    "insight": "インサイト",
+    "logout": "ログアウト",
+    "library": "ライブラリ"
+  },
+  "radar": {
+    "title": "レーダー",
+    "subtitle": "バズったリールを見つけよう",
+    "addChannel": "チャンネル追加",
+    "channelManage": "チャンネル管理",
+    "empty": "収集されたリールがありません",
+    "emptyHint": "チャンネルを追加して収集を開始しましょう",
+    "filters": {
+      "allChannels": "全チャンネル",
+      "period": "期間",
+      "spike": "Spike",
+      "views": "再生数",
+      "engagement": "エンゲージメント",
+      "keyword": "キーワード検索",
+      "sort": "並び替え"
+    },
+    "card": {
+      "hack": "分析",
+      "views": "再生数",
+      "likes": "いいね",
+      "comments": "コメント"
+    },
+    "sort": {
+      "spike": "Spike順",
+      "engagement": "エンゲージメント順",
+      "views": "再生順",
+      "recent": "新着順"
+    }
+  },
+  "library": {
+    "title": "ライブラリ",
+    "subtitle": "お気に入りの動画を管理",
+    "empty": "まだ保存された動画はありません",
+    "emptyHint": "レーダーから動画を保存またはハッキングしてみましょう"
+  },
+  "toast": {
+    "analysis_started": "分析を開始しました",
+    "analysis_completed": "分析が完了しました",
+    "added_to_favorites": "お気に入りに追加しました",
+    "removed_from_favorites": "お気に入りから削除しました"
   }
 }

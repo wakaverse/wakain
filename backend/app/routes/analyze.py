@@ -63,6 +63,11 @@ class AnalyzeUrlRequest(BaseModel):
     video_url: str
     product_name: str | None = None
     product_category: str | None = None
+    title: str | None = None
+    thumbnail_url: str | None = None
+    channel_name: str | None = None
+    source_url: str | None = None
+    posted_at: str | None = None
 
 
 # --- Endpoints ---
@@ -197,7 +202,7 @@ async def analyze_video_url(
     # Create job
     job_id = str(uuid.uuid4())
     supabase = get_supabase()
-    supabase.table("jobs").insert({
+    job_data = {
         "id": job_id,
         "user_id": user["id"],
         "status": "pending",
@@ -206,7 +211,18 @@ async def analyze_video_url(
         "video_url": r2_key,
         "product_name": body.product_name,
         "product_category": body.product_category,
-    }).execute()
+    }
+    if body.title:
+        job_data["title"] = body.title
+    if body.thumbnail_url:
+        job_data["thumbnail_url"] = body.thumbnail_url
+    if body.channel_name:
+        job_data["channel_name"] = body.channel_name
+    if body.source_url:
+        job_data["source_url"] = body.source_url
+    if body.posted_at:
+        job_data["posted_at"] = body.posted_at
+    supabase.table("jobs").insert(job_data).execute()
 
     background_tasks.add_task(run_analysis, job_id, r2_key, body.product_name, body.product_category)
 

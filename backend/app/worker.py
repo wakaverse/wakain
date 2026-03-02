@@ -115,6 +115,32 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
         s3 = _s3()
         s3.download_file(R2_BUCKET_NAME, r2_key, str(video_path))
 
+        # Downscale to 480p (short side) to save processing time & storage
+        downscaled_path = UPLOAD_DIR / f"{job_id}_480p{suffix}"
+        try:
+            ds_proc = subprocess.run(
+                [
+                    "ffmpeg", "-y", "-i", str(video_path),
+                    "-vf", "scale='if(gt(iw,ih),-2,480)':'if(gt(iw,ih),480,-2)'",
+                    "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+                    "-c:a", "aac", "-b:a", "128k",
+                    str(downscaled_path),
+                ],
+                capture_output=True, text=True, timeout=120,
+            )
+            if ds_proc.returncode == 0 and downscaled_path.exists():
+                print(f"[worker:{job_id[:8]}] Downscaled to 480p: {video_path.stat().st_size // 1024}KB -> {downscaled_path.stat().st_size // 1024}KB")
+                video_path.unlink()
+                downscaled_path.rename(video_path)
+            else:
+                print(f"[worker:{job_id[:8]}] Downscale failed, using original: {ds_proc.stderr[:200]}")
+                if downscaled_path.exists():
+                    downscaled_path.unlink()
+        except Exception as e:
+            print(f"[worker:{job_id[:8]}] Downscale error, using original: {e}")
+            if downscaled_path.exists():
+                downscaled_path.unlink()
+
         # Use the current Python interpreter (works in both local and container)
         python_bin = sys.executable
 
@@ -200,12 +226,23 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
             except Exception as exc:
                 print(f"[pipeline:{job_id[:8]}] Thumbnail extraction failed: {exc}", flush=True)
 
+        # Phase 4d: Persuasion Lens analysis
+        persuasion_lens_json = None
+        try:
+            from src.persuasion_lens import analyze_persuasion_lens
+            stt_text = extra.get('stt_json', {}).get('full_transcript', '') if extra.get('stt_json') else ''
+            persuasion_lens_json = analyze_persuasion_lens(recipe_json, stt_text or None)
+            print(f'[pipeline:{job_id[:8]}] Persuasion lens analysis complete', flush=True)
+        except Exception as exc:
+            print(f'[pipeline:{job_id[:8]}] Persuasion lens failed (non-fatal): {exc}', flush=True)
+
         # Save to results table
         _supabase().table("results").insert({
             "job_id": job_id,
             "recipe_json": recipe_json,
             "summary_json": summary,
             "thumbnails_json": thumbnails_json,
+            "persuasion_lens_json": persuasion_lens_json,
             **extra,
         }).execute()
 

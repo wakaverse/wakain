@@ -96,6 +96,7 @@ export async function createJobFromUrl(
   videoUrl: string,
   productName?: string,
   productCategory?: string,
+  meta?: { title?: string; thumbnail_url?: string; channel_name?: string; source_url?: string; posted_at?: string },
 ): Promise<{ id: string }> {
   const headers = await authHeaders();
   const res = await fetch(`${API_URL}/api/analyze-url`, {
@@ -105,6 +106,7 @@ export async function createJobFromUrl(
       video_url: videoUrl,
       product_name: productName || null,
       product_category: productCategory || null,
+      ...(meta || {}),
     }),
   });
   if (!res.ok) {
@@ -135,6 +137,7 @@ export async function getResult(id: string): Promise<AnalysisResult> {
     appeal_structure: data.appeal_structure_json || null,
     product: data.product_json || null,
     thumbnails: data.thumbnails || {},
+    persuasion_lens: data.persuasion_lens_json || null,
   };
 }
 
@@ -148,4 +151,134 @@ export async function listJobs(): Promise<Job[]> {
   return res.json();
 }
 
+export async function getJobStatus(jobId: string): Promise<{ status: string; id: string }> {
+  const res = await fetch(`${API_URL}/api/jobs/${jobId}`, {
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to get job status');
+  return res.json();
+}
+
 export { API_URL };
+
+// ─── Radar API ───
+
+import type { RadarChannel, RadarReel, RadarFilters } from '../types';
+
+export async function getRadarChannels(): Promise<RadarChannel[]> {
+  const res = await fetch(`${API_URL}/api/radar/channels`, {
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('채널 목록을 불러올 수 없습니다');
+  return res.json();
+}
+
+export async function addRadarChannel(
+  ig_username: string,
+  category: string,
+  platform: string = 'instagram',
+): Promise<RadarChannel> {
+  const res = await fetch(`${API_URL}/api/radar/channels`, {
+    method: 'POST',
+    headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ig_username, category, platform }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: '채널 등록에 실패했습니다' }));
+    throw new Error(err.detail || '채널 등록에 실패했습니다');
+  }
+  return res.json();
+}
+
+export async function deleteRadarChannel(id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/radar/channels/${id}`, {
+    method: 'DELETE',
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('채널 삭제에 실패했습니다');
+}
+
+export async function getRadarFeed(
+  filters: RadarFilters,
+): Promise<{ reels: RadarReel[]; total: number }> {
+  const params = new URLSearchParams();
+  if (filters.channel_id) params.set('channel_id', filters.channel_id);
+  if (filters.platform) params.set('platform', filters.platform);
+  if (filters.period) params.set('period', filters.period);
+  if (filters.min_spike) params.set('min_spike', String(filters.min_spike));
+  if (filters.min_views) params.set('min_views', String(filters.min_views));
+  if (filters.min_engagement) params.set('min_engagement', String(filters.min_engagement));
+  if (filters.keyword) params.set('keyword', filters.keyword);
+  if (filters.sort) params.set('sort', filters.sort);
+  if (filters.page) params.set('page', String(filters.page));
+  if (filters.limit) params.set('limit', String(filters.limit));
+
+  const res = await fetch(`${API_URL}/api/radar/feed?${params}`, {
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('피드를 불러올 수 없습니다');
+  return res.json();
+}
+
+export async function collectChannel(channelId: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/radar/collect/${channelId}`, {
+    method: 'POST',
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('수집에 실패했습니다');
+}
+
+// ─── Library API ───
+
+import type { LibraryItem, LibraryFilters } from '../types';
+
+export async function getLibraryItems(
+  filters: LibraryFilters,
+): Promise<{ items: LibraryItem[]; total: number }> {
+  const params = new URLSearchParams();
+  if (filters.source) params.set('source', filters.source);
+  if (filters.platform) params.set('platform', filters.platform);
+  if (filters.tag) params.set('tag', filters.tag);
+  if (filters.keyword) params.set('keyword', filters.keyword);
+  if (filters.starred) params.set('starred', 'true');
+  if (filters.sort) params.set('sort', filters.sort);
+  if (filters.page) params.set('page', String(filters.page));
+  if (filters.limit) params.set('limit', String(filters.limit));
+
+  const res = await fetch(`${API_URL}/api/library/items?${params}`, {
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('라이브러리를 불러올 수 없습니다');
+  return res.json();
+}
+
+export async function addLibraryItem(item: Partial<LibraryItem>): Promise<LibraryItem> {
+  const res = await fetch(`${API_URL}/api/library/items`, {
+    method: 'POST',
+    headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+    body: JSON.stringify(item),
+  });
+  if (!res.ok) throw new Error('라이브러리에 추가할 수 없습니다');
+  return res.json();
+}
+
+export async function updateLibraryItem(
+  id: string,
+  updates: Partial<LibraryItem>,
+): Promise<LibraryItem> {
+  const res = await fetch(`${API_URL}/api/library/items/${id}`, {
+    method: 'PATCH',
+    headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error('업데이트에 실패했습니다');
+  return res.json();
+}
+
+export async function deleteLibraryItem(id: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/library/items/${id}`, {
+    method: 'DELETE',
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('삭제에 실패했습니다');
+}

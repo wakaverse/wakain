@@ -12,6 +12,14 @@ export interface Job {
   started_at?: string;
   completed_at?: string;
   error_message?: string;
+  product_name?: string;
+  product_category?: string;
+  source_url?: string;
+  original_filename?: string;
+  thumbnail_url?: string;
+  title?: string;
+  channel_name?: string;
+  posted_at?: string;
 }
 
 export interface AppealPoint {
@@ -363,4 +371,119 @@ export interface AnalysisResult {
   appeal_structure: AppealStructure | null;
   thumbnails?: Record<string, string>;
   product: ProductInfo | null;
+  persuasion_lens?: PersuasionLens | null;
+}
+
+// ─── Persuasion Lens (Phase 4d) ───
+
+export interface PersuasionStep {
+  step: number;
+  name_ko: string;
+  name_en: string;
+  present: boolean;
+  sub_type: string | null;
+  sub_type_ko: string | null;
+  time_range: [number, number] | null;
+  evidence: string;
+  extensions: string[];
+  quality_checks?: Record<string, boolean>;
+}
+
+export interface FrameworkMapping {
+  phase: string;
+  phase_ko: string;
+  time_range: [number, number];
+  description: string;
+}
+
+export interface FrameworkMatch {
+  primary_framework: string;
+  primary_framework_ko: string;
+  confidence: number;
+  mapping: FrameworkMapping[];
+  secondary_framework: string | null;
+  secondary_confidence: number;
+}
+
+export interface PersuasionLens {
+  lens_7step: PersuasionStep[];
+  lens_framework: FrameworkMatch;
+}
+
+// ─── Radar Types ───
+
+export interface RadarChannel {
+  id: string;
+  ig_username: string;
+  display_name: string;
+  profile_pic_url: string;
+  follower_count: number;
+  category: string;
+  avg_views_30d: number;
+}
+
+export interface RadarReel {
+  id: string;
+  channel: RadarChannel;
+  ig_media_id: string;
+  shortcode: string;
+  thumbnail_url: string;
+  video_url: string;
+  caption: string;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  spike_multiplier: number;
+  engagement_rate: number;
+  comment_ratio: number;
+  platform: 'instagram' | 'youtube' | 'tiktok';
+  posted_at: string;
+  is_analyzed: boolean;
+  job_id?: string;
+}
+
+export interface RadarFilters {
+  channel_id?: string;
+  platform?: string;
+  period?: '24h' | '7d' | '30d' | '90d';
+  min_spike?: number;
+  min_views?: number;
+  min_engagement?: number;
+  keyword?: string;
+  sort?: 'spike' | 'engagement' | 'views' | 'recent';
+  page?: number;
+  limit?: number;
+}
+
+// ─── Library Types ───
+
+export interface LibraryItem {
+  id: string;
+  platform: string;
+  source: string;
+  original_url: string;
+  video_url: string;
+  thumbnail_url: string;
+  title: string;
+  channel_name: string;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  spike_multiplier: number;
+  job_id?: string;
+  tags: string[];
+  memo: string;
+  is_starred: boolean;
+  created_at: string;
+}
+
+export interface LibraryFilters {
+  source?: string;
+  platform?: string;
+  tag?: string;
+  keyword?: string;
+  starred?: boolean;
+  sort?: 'recent' | 'starred' | 'views' | 'spike';
+  page?: number;
+  limit?: number;
 }

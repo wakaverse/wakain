@@ -10,7 +10,7 @@ export default function HeroSection() {
 
   const keywords = [
     { en: 'Spike', local: t('keywords.spike') },
-    { en: 'Hack', local: t('keywords.hack') },
+    { en: 'Analyze', local: t('keywords.hack') },
     { en: 'Recipe', local: t('keywords.recipe') },
     { en: 'Radar', local: t('keywords.radar') },
   ];

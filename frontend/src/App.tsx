@@ -1,8 +1,10 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
 import LangSync from './components/LangSync';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import AppShell from './components/App/AppShell';
 import LandingPage from './pages/LandingPage';
 import AnalyzePage from './pages/AnalyzePage';
 import JobStatusPage from './pages/JobStatusPage';
@@ -11,61 +13,33 @@ import DashboardPage from './pages/DashboardPage';
 import DemoReportPage from './pages/DemoReportPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
-import ProtectedRoute from './components/ProtectedRoute';
+import ComingSoonPage from './pages/ComingSoonPage';
+import RadarPage from './pages/RadarPage';
+import LibraryPage from './pages/LibraryPage';
+import ToastContainer from './components/Toast';
 
-function AppRoutes() {
+function LandingRoutes() {
   return (
     <>
-      <Route
-        index
-        element={
-          <Layout>
-            <LandingPage />
-          </Layout>
-        }
-      />
-      <Route
-        path="analyze"
-        element={
-          <Layout>
-            <ProtectedRoute><AnalyzePage /></ProtectedRoute>
-          </Layout>
-        }
-      />
-      <Route
-        path="jobs/:id"
-        element={
-          <Layout>
-            <JobStatusPage />
-          </Layout>
-        }
-      />
-      <Route
-        path="results/:id"
-        element={
-          <Layout>
-            <ReportPage />
-          </Layout>
-        }
-      />
-      <Route
-        path="contact"
-        element={
-          <Layout>
-            <ContactPage />
-          </Layout>
-        }
-      />
-      <Route path="demo" element={<DemoReportPage />} />
+      <Route index element={<Layout><LandingPage /></Layout>} />
+      <Route path="contact" element={<Layout><ContactPage /></Layout>} />
       <Route path="login" element={<LoginPage />} />
-      <Route
-        path="dashboard"
-        element={
-          <Layout>
-            <ProtectedRoute><DashboardPage /></ProtectedRoute>
-          </Layout>
-        }
-      />
+      <Route path="demo" element={<DemoReportPage />} />
+      <Route path="app" element={<ProtectedRoute><AppShell><Navigate to="/app/radar" replace /></AppShell></ProtectedRoute>} />
+      <Route path="app/radar" element={<ProtectedRoute><AppShell><RadarPage /></AppShell></ProtectedRoute>} />
+      <Route path="app/hack" element={<ProtectedRoute><AppShell><AnalyzePage /></AppShell></ProtectedRoute>} />
+      <Route path="app/script" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="script" /></AppShell></ProtectedRoute>} />
+      <Route path="app/expand" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="expand" /></AppShell></ProtectedRoute>} />
+      <Route path="app/library" element={<ProtectedRoute><AppShell><LibraryPage /></AppShell></ProtectedRoute>} />
+      <Route path="app/compare" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="compare" /></AppShell></ProtectedRoute>} />
+      <Route path="app/insight" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="insight" /></AppShell></ProtectedRoute>} />
+      <Route path="app/jobs/:id" element={<ProtectedRoute><AppShell><JobStatusPage /></AppShell></ProtectedRoute>} />
+      <Route path="app/results/:id" element={<ProtectedRoute><AppShell><ReportPage /></AppShell></ProtectedRoute>} />
+      <Route path="dashboard" element={<ProtectedRoute><AppShell><DashboardPage /></AppShell></ProtectedRoute>} />
+      {/* Legacy redirects */}
+      <Route path="analyze" element={<Navigate to="/app/hack" replace />} />
+      <Route path="jobs/:id" element={<Navigate to="/app/jobs/:id" replace />} />
+      <Route path="results/:id" element={<Navigate to="/app/results/:id" replace />} />
     </>
   );
 }
@@ -75,14 +49,13 @@ export default function App() {
     <HelmetProvider>
       <BrowserRouter>
         <AuthProvider>
+          <ToastContainer />
           <Routes>
-            {/* Default (ko) — no lang prefix */}
             <Route element={<LangSync />}>
-              {AppRoutes()}
+              {LandingRoutes()}
             </Route>
-            {/* /en/*, /ja/* */}
             <Route path=":lang" element={<LangSync />}>
-              {AppRoutes()}
+              {LandingRoutes()}
             </Route>
           </Routes>
         </AuthProvider>

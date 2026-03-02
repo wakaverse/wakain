@@ -10,6 +10,9 @@ SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_API_KEY_PRO = os.getenv("GEMINI_API_KEY_PRO")
 
+# --- RapidAPI (Instagram Looter) ---
+RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "")
+
 MAX_FILE_SIZE = 200 * 1024 * 1024  # 200MB
 ALLOWED_EXTENSIONS = {".mp4", ".mov", ".webm"}
 

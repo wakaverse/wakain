@@ -94,7 +94,7 @@ export default function Layout({ children }: LayoutProps) {
             {user ? (
               <>
                 <Link
-                  to={`${prefix}/analyze`}
+                  to="/app/hack"
                   className="ml-2 px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-full transition-colors"
                 >
                   {t('nav.start')}
