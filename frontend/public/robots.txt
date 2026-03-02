@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /jobs/
+Disallow: /results/
+Disallow: /dashboard
+
+Sitemap: https://wakalab.com/sitemap.xml

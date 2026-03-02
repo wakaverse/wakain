@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { AppealGroup } from '../../types';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function GroupHeader({ group, timeRange, cutCount, appealCount }: Props) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-3 pt-6 pb-3">
       <div
@@ -31,7 +33,7 @@ export default function GroupHeader({ group, timeRange, cutCount, appealCount }:
         )}
       </div>
       <div className="text-[11px] text-gray-400 shrink-0">
-        {cutCount}컷 · {appealCount}소구
+        {t('cut.cuts_count', { count: cutCount })} · {t('cut.appeals_count', { count: appealCount })}
       </div>
     </div>
   );

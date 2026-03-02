@@ -1,0 +1,287 @@
+{
+  "nav": {
+    "contact": "Contact",
+    "start": "Get Started"
+  },
+  "hero": {
+    "badge": "Commerce Video Intelligence",
+    "title_line1": "Hack viral",
+    "title_line2": "commerce videos",
+    "description": "Analyze the structure of top-performing videos cut by cut,",
+    "description2": "and create optimized content for your product",
+    "cta_start": "Get Started",
+    "cta_demo": "View Demo"
+  },
+  "keywords": {
+    "spike": "Spike",
+    "hack": "Hack",
+    "recipe": "Recipe",
+    "radar": "Radar"
+  },
+  "workflow": {
+    "label": "Workflow",
+    "title": "How it works",
+    "steps": {
+      "spike": {
+        "title": "Spike",
+        "subtitle": "Discover Trends",
+        "description": "Automatically detect commerce videos with surging performance by category"
+      },
+      "hack": {
+        "title": "Hack",
+        "subtitle": "Analyze Structure",
+        "description": "Break down video structure cut by cut and analyze persuasion patterns"
+      },
+      "script": {
+        "title": "Script",
+        "subtitle": "Generate Scripts",
+        "description": "Generate scripts optimized for your product based on proven recipes"
+      },
+      "expand": {
+        "title": "Expand",
+        "subtitle": "Scale Content",
+        "description": "Create diverse content variations from a single proven recipe"
+      }
+    }
+  },
+  "features": {
+    "label": "Features",
+    "title": "Key Features",
+    "description": "From discovering viral videos to creating content — all in one workflow",
+    "radar": {
+      "title": "Radar",
+      "description": "Monitor viral videos in real-time by category and never miss a new trend"
+    },
+    "hack": {
+      "title": "Hack",
+      "description": "Analyze viral video structure cut by cut, dissecting persuasion patterns and recipes"
+    },
+    "script": {
+      "title": "Script",
+      "description": "Automatically generate commerce scripts optimized for your product based on analyzed recipes"
+    },
+    "expand": {
+      "title": "Expand",
+      "description": "Create diverse variations by changing tone, length, and format from one proven pattern"
+    },
+    "compare": {
+      "title": "Compare",
+      "description": "Compare the structure and performance of two videos side by side to identify success factors"
+    },
+    "insight": {
+      "title": "Insight",
+      "description": "Derive category trends and success patterns from accumulated analysis data"
+    },
+    "comingSoon": "Coming Soon"
+  },
+  "cta": {
+    "title_line1": "Start now —",
+    "title_line2": "Hack viral videos",
+    "description": "All you need is a video URL.",
+    "description2": "From cut analysis to script generation, it takes just 3 minutes.",
+    "button": "Start for Free"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "description": "Have questions about WakaLab? Feel free to reach out.",
+    "email": "Email",
+    "hours": "Mon-Fri 10:00 - 18:00 (KST)",
+    "company": "CRABs Inc. | CEO Taeyoung Kim | Reg. No. 224-88-02602"
+  },
+  "analyze": {
+    "title": "Start Video Analysis",
+    "description": "Upload a short-form video and AI will analyze it automatically",
+    "tab_file": "Upload File",
+    "tab_url": "Enter URL",
+    "url_title": "Enter a video URL",
+    "url_placeholder": "https://example.com/video.mp4",
+    "url_hint": "Supports direct links (.mp4, .mov, .webm) · Max 200MB",
+    "drop_title": "Drag & drop or click to select a video",
+    "drop_here": "Drop it here",
+    "drop_hint": ".mp4, .mov, .webm · Max 200MB",
+    "product_name": "Product Name",
+    "product_name_placeholder": "e.g. Health Juice, Wireless Vacuum",
+    "product_category": "Category",
+    "product_category_placeholder": "e.g. Health Supplements, Electronics, Cosmetics",
+    "product_hint": "Providing product info enables more accurate marketing analysis. AI auto-detects if left blank.",
+    "optional": "Optional",
+    "submit": "Start Analysis",
+    "plan_info": "Free plan: 3 analyses/month · Takes about 3-4 minutes",
+    "phase_compressing": "Optimizing video...",
+    "phase_uploading": "Uploading...",
+    "phase_downloading": "Server downloading video...",
+    "phase_starting": "Starting analysis...",
+    "compress_hint": "Converting to 480p in browser — faster upload and analysis",
+    "compress_done": "Video optimized",
+    "compress_saving": "{{percent}}% saved",
+    "error_size": "File size must be under 200MB.",
+    "error_format": "Only .mp4, .mov, .webm formats are supported.",
+    "error_network": "Server connection failed. Please try again later.",
+    "error_auth": "Login is required.",
+    "error_generic": "An error occurred."
+  },
+  "dashboard": {
+    "title": "Analysis Dashboard",
+    "description": "Check your previous analysis results",
+    "new_analysis": "New Analysis",
+    "empty": "No analyzed videos yet",
+    "first_analysis": "Analyze your first video",
+    "seconds": "s"
+  },
+  "status": {
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "jobStatus": {
+    "pending_title": "Waiting",
+    "pending_desc": "Registered in the analysis queue. Please wait.",
+    "processing_title": "Analyzing",
+    "processing_desc": "AI is analyzing the video. Takes about 3-4 minutes.",
+    "completed_title": "Analysis Complete!",
+    "completed_desc": "Redirecting to the report page...",
+    "failed_title": "Analysis Failed",
+    "failed_desc": "An unknown error occurred.",
+    "retry": "Try Again",
+    "video_label": "Video"
+  },
+  "report": {
+    "loading": "Loading analysis results...",
+    "not_found": "Results not found",
+    "go_back": "Go back",
+    "narration_voice": "Voice",
+    "narration_caption": "Caption",
+    "narration_silent": "Silent",
+    "overall": "Overall",
+    "video": "Video",
+    "analysis": "Analysis",
+    "seconds": "s",
+    "hook_analysis": "3-Second Hook Analysis",
+    "keyword_analysis": "Keyword Analysis",
+    "action_plan": "Action Plan",
+    "top3": "Top 3 Quick Wins",
+    "group_on": "Groups ON",
+    "group_off": "Groups OFF",
+    "no_appeal_data": "No appeal structure data available",
+    "art_direction": "Art Direction",
+    "tone_manner": "Tone & Manner",
+    "graphic": "Graphic",
+    "background": "Background",
+    "emphasis": "Emphasis",
+    "reference": "Reference",
+    "heading_font": "Heading Font",
+    "body_font": "Body Font",
+    "brand_colors": "Brand Colors",
+    "diagnosis_summary": "3-Axis Diagnosis Summary",
+    "good": "Good",
+    "extra_rx": "Additional Prescriptions",
+    "playing": "Playing"
+  },
+  "demo": {
+    "loading": "Loading demo data...",
+    "not_found": "Data not found",
+    "go_back": "Go back",
+    "report_title": "Analysis Report",
+    "tab_structure": "Persuasion Structure",
+    "tab_diagnosis": "Diagnosis",
+    "tab_art": "Art Direction",
+    "overall": "Overall",
+    "video": "Video"
+  },
+  "cut": {
+    "detail_title": "Cut {{id}} Detail",
+    "script": "Script",
+    "persuasion_intent": "Persuasion Intent",
+    "appeal_points": "Appeal Points ({{count}})",
+    "visual_appeal": "Visual Appeal",
+    "voice_appeal": "Voice Appeal",
+    "prescriptions": "Prescriptions ({{count}})",
+    "cuts_count": "{{count}} cuts",
+    "appeals_count": "{{count}} appeals"
+  },
+  "appealType": {
+    "myth_bust": "Myth Bust",
+    "ingredient": "Ingredient",
+    "manufacturing": "Manufacturing",
+    "track_record": "Track Record",
+    "price": "Price Benefit",
+    "comparison": "Comparison",
+    "guarantee": "Guarantee",
+    "origin": "Origin",
+    "feature_demo": "Feature Demo",
+    "spec_data": "Spec Data",
+    "design_aesthetic": "Design",
+    "authenticity": "Authenticity",
+    "social_proof": "Social Proof",
+    "urgency": "Urgency",
+    "lifestyle": "Lifestyle",
+    "nostalgia": "Nostalgia",
+    "authority": "Authority",
+    "emotional": "Emotional"
+  },
+  "role": {
+    "hook": "Hook",
+    "problem": "Problem",
+    "solution": "Solution",
+    "demo": "Demo",
+    "proof": "Proof",
+    "brand_intro": "Brand",
+    "recap": "Recap",
+    "cta": "CTA",
+    "transition": "Transition",
+    "body": "Body"
+  },
+  "strength": {
+    "strong": "Strong",
+    "moderate": "Medium",
+    "weak": "Weak"
+  },
+  "format": {
+    "talking_head": "Talking Head",
+    "caption_text": "Caption/Text",
+    "product_demo": "Demo/Unboxing",
+    "ugc_vlog": "UGC/Vlog",
+    "asmr_mood": "ASMR/Mood",
+    "comparison": "Comparison",
+    "listicle": "Listicle",
+    "story_problem": "Story/Problem-Solving",
+    "entertainment": "Entertainment"
+  },
+  "intent": {
+    "commerce": "Commerce/Sales",
+    "information": "Information",
+    "branding": "Branding/Image",
+    "entertainment": "Entertainment"
+  },
+  "verdict": {
+    "집행 권장": "Recommended",
+    "조건부 집행": "Conditional",
+    "집행 불가": "Not Recommended"
+  },
+  "footer": {
+    "copyright": "© 2026 CRABs — Creator's AI Bridge"
+  },
+  "seo": {
+    "landing": {
+      "title": "WakaLab — Commerce Short-form Video Hacking Platform",
+      "description": "AI platform that analyzes viral commerce videos cut by cut and generates optimized content for your product. Recipe-based script generation included."
+    },
+    "analyze": {
+      "title": "Start Video Analysis — WakaLab",
+      "description": "All you need is a short-form video URL. AI handles everything from cut analysis to script generation."
+    },
+    "contact": {
+      "title": "Contact Us — WakaLab",
+      "description": "Have questions about WakaLab? Feel free to reach out. Operated by CRABs Inc."
+    },
+    "dashboard": {
+      "title": "Analysis Dashboard — WakaLab",
+      "description": "Check your previous video analysis results and start new analyses."
+    },
+    "demo": {
+      "title": "Demo Report — WakaLab",
+      "description": "Experience WakaLab's video analysis demo."
+    }
+  }
+}

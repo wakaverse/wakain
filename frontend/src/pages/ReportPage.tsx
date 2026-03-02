@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback, Fragment } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Loader2, ArrowLeft, ChevronDown, ChevronUp, Layers } from 'lucide-react';
 import { getResult } from '../lib/api';
 import type { AnalysisResult, AppealScene, AppealGroup, AppealPoint, Prescription, Stt, SceneCard as SceneCardType } from '../types';
@@ -108,6 +109,7 @@ export default function ReportPage() {
   const [showGroups, setShowGroups] = useState(true);
   const playerRef = useRef<VideoPlayerHandle>(null);
   const groupRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const { t } = useTranslation();
 
   /* ── Data fetch ──────────────────────────────────────── */
 
@@ -154,7 +156,7 @@ export default function ReportPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fafafa]">
         <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-3 text-sm text-gray-500">분석 결과 로딩 중...</span>
+        <span className="ml-3 text-sm text-gray-500">{t('report.loading')}</span>
       </div>
     );
   }
@@ -162,9 +164,9 @@ export default function ReportPage() {
   if (error || !result) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#fafafa]">
-        <p className="text-red-600 text-sm mb-4">{error || '결과를 찾을 수 없습니다'}</p>
+        <p className="text-red-600 text-sm mb-4">{error || t('report.not_found')}</p>
         <Link to="/" className="text-gray-600 hover:text-gray-900 text-sm flex items-center gap-1">
-          <ArrowLeft className="w-4 h-4" /> 돌아가기
+          <ArrowLeft className="w-4 h-4" /> {t('report.go_back')}
         </Link>
       </div>
     );
@@ -183,10 +185,10 @@ export default function ReportPage() {
 
   const narrationLabel =
     result.stt && result.stt.segments && result.stt.segments.length > 0
-      ? '음성'
+      ? t('report.narration_voice')
       : result.caption_map && result.caption_map.events && result.caption_map.events.length > 0
-        ? '캡션'
-        : '무음';
+        ? t('report.narration_caption')
+        : t('report.narration_silent');
 
   const artDirection = (recipeData as any).art_direction || {};
 
@@ -231,13 +233,13 @@ export default function ReportPage() {
           </Link>
           <div className="flex-1 min-w-0">
             <h1 className="text-base font-bold text-gray-900 truncate" style={{ fontFamily: 'var(--font-display), sans-serif' }}>
-              {productName || meta.category || '영상'} 분석
+              {productName || meta.category || t('report.video')} {t('report.analysis')}
             </h1>
             <div className="flex items-center gap-2 text-[11px] text-gray-400 mt-0.5">
               {productCategory && <span>{productCategory}</span>}
               {productBrand && <span>· {productBrand}</span>}
               <span>· {narrationLabel}</span>
-              <span>· {duration}초</span>
+              <span>· {duration}{t('report.seconds')}</span>
             </div>
           </div>
 
@@ -253,7 +255,7 @@ export default function ReportPage() {
               >
                 {Math.round(engagementScore)}
               </div>
-              <div className="text-[9px] text-gray-400">종합</div>
+              <div className="text-[9px] text-gray-400">{t('report.overall')}</div>
             </div>
           )}
         </div>
@@ -304,7 +306,7 @@ export default function ReportPage() {
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span className={`inline-flex items-center gap-1 text-sm font-bold ${vc.text}`}>
-                      {vc.icon} {verdict.verdict}
+                      {vc.icon} {t(`verdict.${verdict.verdict}`, { defaultValue: verdict.verdict })}
                     </span>
                     {!showVerdict && verdict.verdict_summary && (
                       <span className="text-xs text-gray-500 truncate">
@@ -326,19 +328,19 @@ export default function ReportPage() {
                     )}
                     {verdict.hook_analysis && (
                       <div className="bg-white/60 rounded-lg p-3">
-                        <h5 className="text-[11px] font-semibold text-gray-500 mb-1">3초 훅 분석</h5>
+                        <h5 className="text-[11px] font-semibold text-gray-500 mb-1">{t('report.hook_analysis')}</h5>
                         <p className="text-xs text-gray-700 whitespace-pre-line">{verdict.hook_analysis}</p>
                       </div>
                     )}
                     {verdict.keyword_analysis && (
                       <div className="bg-white/60 rounded-lg p-3">
-                        <h5 className="text-[11px] font-semibold text-gray-500 mb-1">키워드 분석</h5>
+                        <h5 className="text-[11px] font-semibold text-gray-500 mb-1">{t('report.keyword_analysis')}</h5>
                         <p className="text-xs text-gray-700 whitespace-pre-line">{verdict.keyword_analysis}</p>
                       </div>
                     )}
                     {verdict.action_plan && (
                       <div className="bg-white/60 rounded-lg p-3">
-                        <h5 className="text-[11px] font-semibold text-gray-500 mb-1">액션 플랜</h5>
+                        <h5 className="text-[11px] font-semibold text-gray-500 mb-1">{t('report.action_plan')}</h5>
                         <p className="text-xs text-gray-700 whitespace-pre-line">{verdict.action_plan}</p>
                       </div>
                     )}
@@ -350,7 +352,7 @@ export default function ReportPage() {
             {/* Top 3 actions */}
             {result.prescriptions && result.prescriptions.top_3_actions.length > 0 && (
               <div className="rounded-xl bg-gray-900 text-white p-4">
-                <h3 className="text-xs font-bold mb-2 text-gray-400 uppercase tracking-wider">즉시 개선 Top 3</h3>
+                <h3 className="text-xs font-bold mb-2 text-gray-400 uppercase tracking-wider">{t('report.top3')}</h3>
                 <div className="space-y-1.5">
                   {result.prescriptions.top_3_actions.map((action, i) => (
                     <div key={i} className="flex items-start gap-2 text-sm">
@@ -376,7 +378,7 @@ export default function ReportPage() {
                   }`}
                 >
                   <Layers className="w-3.5 h-3.5" />
-                  {showGroups ? '그룹 ON' : '그룹 OFF'}
+                  {showGroups ? t('report.group_on') : t('report.group_off')}
                 </button>
               </div>
             )}
@@ -531,7 +533,7 @@ export default function ReportPage() {
               )
             ) : (
               <div className="text-center text-sm text-gray-400 py-12 bg-white rounded-2xl border">
-                소구 구조 데이터가 없습니다
+                {t('report.no_appeal_data')}
               </div>
             )}
 
@@ -586,34 +588,35 @@ function hasArtDirection(art: any): boolean {
 
 function ArtDirectionCollapsible({ art }: { art: any }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
       >
-        <span>🎨 아트 디렉션</span>
+        <span>{'🎨 '}{t('report.art_direction')}</span>
         {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
       </button>
       {open && (
         <div className="px-5 pb-4 space-y-3 border-t border-gray-100">
           {art.tone_and_manner && (
             <div className="pt-3">
-              <h5 className="text-[11px] font-semibold text-gray-500 mb-1">톤 & 매너</h5>
+              <h5 className="text-[11px] font-semibold text-gray-500 mb-1">{t('report.tone_manner')}</h5>
               <p className="text-sm text-gray-700">{art.tone_and_manner}</p>
             </div>
           )}
           <div className="grid grid-cols-2 gap-3 text-sm">
-            {art.graphic_style && <ArtField label="그래픽" value={art.graphic_style} />}
-            {art.background_style && <ArtField label="배경" value={art.background_style} />}
-            {art.highlight_method && <ArtField label="강조" value={art.highlight_method} />}
-            {art.style_reference && <ArtField label="레퍼런스" value={art.style_reference} />}
-            {art.heading_font && <ArtField label="헤딩 폰트" value={art.heading_font} />}
-            {art.body_font && <ArtField label="본문 폰트" value={art.body_font} />}
+            {art.graphic_style && <ArtField label={t('report.graphic')} value={art.graphic_style} />}
+            {art.background_style && <ArtField label={t('report.background')} value={art.background_style} />}
+            {art.highlight_method && <ArtField label={t('report.emphasis')} value={art.highlight_method} />}
+            {art.style_reference && <ArtField label={t('report.reference')} value={art.style_reference} />}
+            {art.heading_font && <ArtField label={t('report.heading_font')} value={art.heading_font} />}
+            {art.body_font && <ArtField label={t('report.body_font')} value={art.body_font} />}
           </div>
           {art.brand_colors && art.brand_colors.length > 0 && (
             <div>
-              <h5 className="text-[11px] font-semibold text-gray-500 mb-1.5">브랜드 컬러</h5>
+              <h5 className="text-[11px] font-semibold text-gray-500 mb-1.5">{t('report.brand_colors')}</h5>
               <div className="flex gap-2 flex-wrap">
                 {art.brand_colors.map((c: string, i: number) => (
                   <div key={i} className="flex items-center gap-1.5">
@@ -641,13 +644,14 @@ function ArtField({ label, value }: { label: string; value: string }) {
 
 function DiagnosisSummary({ axes }: { axes: Array<{ id: string; name: string; score: number; diagnoses: Array<{ severity: string }> }> }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
       >
-        <span>📊 3축 진단 요약</span>
+        <span>{'📊 '}{t('report.diagnosis_summary')}</span>
         {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
       </button>
       {!open && (
@@ -677,7 +681,7 @@ function DiagnosisSummary({ axes }: { axes: Array<{ id: string; name: string; sc
                   <div className="flex items-center gap-2 mt-0.5 text-[10px] text-gray-500">
                     {dangerCount > 0 && <span className="text-red-600">🔴 {dangerCount}</span>}
                     {warningCount > 0 && <span className="text-amber-600">⚠️ {warningCount}</span>}
-                    {dangerCount === 0 && warningCount === 0 && <span className="text-green-600">✅ 양호</span>}
+                    {dangerCount === 0 && warningCount === 0 && <span className="text-green-600">✅ {t('report.good')}</span>}
                   </div>
                 </div>
                 <span className={`text-2xl font-bold ${color}`} style={{ fontFamily: 'var(--font-display), sans-serif' }}>{axis.score}</span>
@@ -701,6 +705,7 @@ function UnmatchedPrescriptions({
   onSeek: (time: number) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   // Find prescriptions without a time_range (global) or that don't overlap any scene
   const unmatched = allRx.filter(rx => {
@@ -725,7 +730,7 @@ function UnmatchedPrescriptions({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-5 py-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
       >
-        <span>📋 추가 처방전 ({unmatched.length})</span>
+        <span>{'📋 '}{t('report.extra_rx')} ({unmatched.length})</span>
         {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
       </button>
       {open && (

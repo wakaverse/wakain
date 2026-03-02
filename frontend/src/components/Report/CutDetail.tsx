@@ -1,15 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import type { AppealPoint, Prescription } from '../../types';
 
 /* ── Helpers ──────────────────────────────────────────── */
-
-const APPEAL_TYPE_KO: Record<string, string> = {
-  myth_bust: '오해반박', ingredient: '원재료/성분', manufacturing: '제조공정',
-  track_record: '실적/수상', price: '가격/혜택', comparison: '비교우위',
-  guarantee: '보장/환불', origin: '원산지', feature_demo: '기능시연',
-  spec_data: '스펙수치', design_aesthetic: '디자인감성', authenticity: '진정성/리얼',
-  social_proof: '사회적증거', urgency: '긴급/한정', lifestyle: '라이프스타일',
-  nostalgia: '향수/추억', authority: '권위/전문가', emotional: '감정호소',
-};
 
 const strengthConfig: Record<string, { label: string; bg: string; text: string }> = {
   strong: { label: '강', bg: 'bg-green-100', text: 'text-green-700' },
@@ -26,6 +18,7 @@ const severityIcon: Record<string, string> = {
 /* ── Sub-sections ─────────────────────────────────────── */
 
 function AppealRow({ appeal }: { appeal: AppealPoint }) {
+  const { t } = useTranslation();
   const str = strengthConfig[appeal.strength];
   const sourceIcon = appeal.source === 'script' ? '🎤' : appeal.source === 'visual' ? '🎬' : '🔗';
 
@@ -35,11 +28,11 @@ function AppealRow({ appeal }: { appeal: AppealPoint }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-xs font-medium text-gray-900">
-            {APPEAL_TYPE_KO[appeal.type] || appeal.type}
+            {t(`appealType.${appeal.type}`, { defaultValue: appeal.type })}
           </span>
           {str && (
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${str.bg} ${str.text}`}>
-              {str.label}
+              {t(`strength.${appeal.strength}`, { defaultValue: str?.label })}
             </span>
           )}
           {appeal.visual_proof?.technique && appeal.visual_proof.technique !== 'none' && (
@@ -108,6 +101,7 @@ export default function CutDetail({
   cutId, timeRange, script, appeals, prescriptions, persuasionIntent,
   onSeek, onClose,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <div
       className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-5 mt-2 animate-in"
@@ -116,7 +110,7 @@ export default function CutDetail({
       {/* Header + close */}
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-bold text-gray-900">
-          컷 {cutId} 상세
+          {t('cut.detail_title', { id: cutId })}
           <span className="text-gray-400 font-normal ml-2 font-mono text-xs">
             {timeRange[0].toFixed(1)}&ndash;{timeRange[1].toFixed(1)}s
           </span>
@@ -132,7 +126,7 @@ export default function CutDetail({
       {/* Script */}
       {script && (
         <section>
-          <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">스크립트</h5>
+          <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{t('cut.script')}</h5>
           <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-800 leading-relaxed">
             🎤 {script}
           </div>
@@ -142,7 +136,7 @@ export default function CutDetail({
       {/* Persuasion Intent */}
       {persuasionIntent && (
         <section>
-          <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">설득 의도</h5>
+          <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{t('cut.persuasion_intent')}</h5>
           <p className="text-sm text-gray-700">{persuasionIntent}</p>
         </section>
       )}
@@ -154,11 +148,11 @@ export default function CutDetail({
         return (
           <section>
             <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              소구 포인트 ({appeals.length})
+              {t('cut.appeal_points', { count: appeals.length })}
             </h5>
             {visualAppeals.length > 0 && (
               <div className="mb-3">
-                <h6 className="text-[11px] font-medium text-gray-400 mb-1">🎬 비주얼 소구</h6>
+                <h6 className="text-[11px] font-medium text-gray-400 mb-1">{'🎬 '}{t('cut.visual_appeal')}</h6>
                 <div className="divide-y divide-gray-100">
                   {visualAppeals.map((appeal, i) => (
                     <AppealRow key={`v-${i}`} appeal={appeal} />
@@ -168,7 +162,7 @@ export default function CutDetail({
             )}
             {voiceAppeals.length > 0 && (
               <div>
-                <h6 className="text-[11px] font-medium text-gray-400 mb-1">🎤 보이스 소구</h6>
+                <h6 className="text-[11px] font-medium text-gray-400 mb-1">{'🎤 '}{t('cut.voice_appeal')}</h6>
                 <div className="divide-y divide-gray-100">
                   {voiceAppeals.map((appeal, i) => (
                     <AppealRow key={`s-${i}`} appeal={appeal} />
@@ -184,7 +178,7 @@ export default function CutDetail({
       {prescriptions.length > 0 && (
         <section>
           <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-            처방전 ({prescriptions.length})
+            {t('cut.prescriptions', { count: prescriptions.length })}
           </h5>
           <div className="space-y-2">
             {prescriptions.map((rx, i) => (

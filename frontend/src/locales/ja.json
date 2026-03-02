@@ -1,0 +1,287 @@
+{
+  "nav": {
+    "contact": "お問い合わせ",
+    "start": "始める"
+  },
+  "hero": {
+    "badge": "Commerce Video Intelligence",
+    "title_line1": "バズったコマース動画を",
+    "title_line2": "ハッキングしよう",
+    "description": "成果が出た動画の構造をカット単位で分析し、",
+    "description2": "あなたの商品に合った素材を作るプラットフォーム",
+    "cta_start": "今すぐ始める",
+    "cta_demo": "デモを見る"
+  },
+  "keywords": {
+    "spike": "バズ",
+    "hack": "ハッキング",
+    "recipe": "レシピ",
+    "radar": "レーダー"
+  },
+  "workflow": {
+    "label": "Workflow",
+    "title": "仕組み",
+    "steps": {
+      "spike": {
+        "title": "Spike",
+        "subtitle": "バズ発見",
+        "description": "カテゴリ別に急上昇したコマース動画を自動で検出します"
+      },
+      "hack": {
+        "title": "Hack",
+        "subtitle": "構造ハッキング",
+        "description": "動画の構造をカット単位で分解し、説得パターンを分析します"
+      },
+      "script": {
+        "title": "Script",
+        "subtitle": "台本生成",
+        "description": "検証済みレシピをもとに、あなたの商品に最適な台本を生成します"
+      },
+      "expand": {
+        "title": "Expand",
+        "subtitle": "素材拡張",
+        "description": "一つのレシピから多様な素材バリエーションを作り出します"
+      }
+    }
+  },
+  "features": {
+    "label": "Features",
+    "title": "主な機能",
+    "description": "バズ動画の発見から素材制作まで、一つのワークフローで繋がります",
+    "radar": {
+      "title": "レーダー",
+      "description": "カテゴリ別のバズ動画をリアルタイムでモニタリングし、新しいトレンドを見逃しません"
+    },
+    "hack": {
+      "title": "ハッキング",
+      "description": "バズ動画の構造をカット単位で分析し、説得パターンとレシピを解剖します"
+    },
+    "script": {
+      "title": "台本",
+      "description": "分析されたレシピをもとに、あなたの商品に最適化されたコマース台本を自動生成します"
+    },
+    "expand": {
+      "title": "素材拡張",
+      "description": "一つの検証済みパターンからトーン、長さ、フォーマットを変えて多様な素材を作ります"
+    },
+    "compare": {
+      "title": "比較",
+      "description": "二つの動画の構造とパフォーマンスを並べて比較し、成功要因を正確に把握します"
+    },
+    "insight": {
+      "title": "インサイト",
+      "description": "蓄積された分析データからカテゴリ別トレンドと成功パターンを導き出します"
+    },
+    "comingSoon": "Coming Soon"
+  },
+  "cta": {
+    "title_line1": "今すぐ",
+    "title_line2": "バズ動画をハッキングしよう",
+    "description": "動画URLひとつで十分です。",
+    "description2": "カット分析から台本生成まで、3分で完了します。",
+    "button": "無料で始める"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "description": "WakaLabについてご質問がございましたら、お気軽にご連絡ください。",
+    "email": "メール",
+    "hours": "平日 10:00 - 18:00 (KST)",
+    "company": "CRABs Inc. | 代表 キム・テヨン | 事業者登録番号 224-88-02602"
+  },
+  "analyze": {
+    "title": "動画分析を開始",
+    "description": "ショート動画をアップロードすると、AIが自動で分析します",
+    "tab_file": "ファイルアップロード",
+    "tab_url": "URL入力",
+    "url_title": "動画URLを入力してください",
+    "url_placeholder": "https://example.com/video.mp4",
+    "url_hint": "直接リンク（.mp4, .mov, .webm）に対応 · 最大200MB",
+    "drop_title": "ドラッグ＆ドロップまたはクリックして動画を選択",
+    "drop_here": "ここにドロップ",
+    "drop_hint": ".mp4, .mov, .webm · 最大200MB",
+    "product_name": "商品名",
+    "product_name_placeholder": "例：健康ジュース、ワイヤレス掃除機",
+    "product_category": "カテゴリ",
+    "product_category_placeholder": "例：健康食品、家電、化粧品",
+    "product_hint": "商品情報を入力すると、より正確なマーケティング分析が可能になります。未入力の場合AIが自動検出します。",
+    "optional": "任意",
+    "submit": "分析開始",
+    "plan_info": "無料プラン：月3件 · 分析所要時間 約3〜4分",
+    "phase_compressing": "動画最適化中...",
+    "phase_uploading": "アップロード中...",
+    "phase_downloading": "サーバーで動画ダウンロード中...",
+    "phase_starting": "分析リクエスト中...",
+    "compress_hint": "ブラウザで480pに変換中 — アップロードと分析が速くなります",
+    "compress_done": "動画最適化完了",
+    "compress_saving": "{{percent}}%削減",
+    "error_size": "ファイルサイズは200MB以下でアップロードしてください。",
+    "error_format": ".mp4, .mov, .webm形式のみ対応しています。",
+    "error_network": "サーバー接続に失敗しました。しばらくしてから再度お試しください。",
+    "error_auth": "ログインが必要です。",
+    "error_generic": "エラーが発生しました。"
+  },
+  "dashboard": {
+    "title": "分析ダッシュボード",
+    "description": "以前の分析結果を確認",
+    "new_analysis": "新規分析",
+    "empty": "まだ分析した動画はありません",
+    "first_analysis": "最初の動画を分析する",
+    "seconds": "秒"
+  },
+  "status": {
+    "pending": "待機中",
+    "processing": "分析中",
+    "completed": "完了",
+    "failed": "失敗"
+  },
+  "jobStatus": {
+    "pending_title": "待機中",
+    "pending_desc": "分析キューに登録されました。しばらくお待ちください。",
+    "processing_title": "分析中",
+    "processing_desc": "AIが動画を分析しています。約3〜4分かかります。",
+    "completed_title": "分析完了！",
+    "completed_desc": "レポートページに移動します...",
+    "failed_title": "分析失敗",
+    "failed_desc": "不明なエラーが発生しました。",
+    "retry": "再試行",
+    "video_label": "動画"
+  },
+  "report": {
+    "loading": "分析結果を読み込み中...",
+    "not_found": "結果が見つかりません",
+    "go_back": "戻る",
+    "narration_voice": "音声",
+    "narration_caption": "キャプション",
+    "narration_silent": "無音",
+    "overall": "総合",
+    "video": "動画",
+    "analysis": "分析",
+    "seconds": "秒",
+    "hook_analysis": "3秒フック分析",
+    "keyword_analysis": "キーワード分析",
+    "action_plan": "アクションプラン",
+    "top3": "即時改善 Top 3",
+    "group_on": "グループ ON",
+    "group_off": "グループ OFF",
+    "no_appeal_data": "訴求構造データがありません",
+    "art_direction": "アートディレクション",
+    "tone_manner": "トーン＆マナー",
+    "graphic": "グラフィック",
+    "background": "背景",
+    "emphasis": "強調",
+    "reference": "リファレンス",
+    "heading_font": "見出しフォント",
+    "body_font": "本文フォント",
+    "brand_colors": "ブランドカラー",
+    "diagnosis_summary": "3軸診断サマリー",
+    "good": "良好",
+    "extra_rx": "追加処方箋",
+    "playing": "再生中"
+  },
+  "demo": {
+    "loading": "デモデータ読み込み中...",
+    "not_found": "データが見つかりません",
+    "go_back": "戻る",
+    "report_title": "分析レポート",
+    "tab_structure": "説得構造",
+    "tab_diagnosis": "診断書",
+    "tab_art": "アートディレクション",
+    "overall": "総合",
+    "video": "動画"
+  },
+  "cut": {
+    "detail_title": "カット {{id}} 詳細",
+    "script": "スクリプト",
+    "persuasion_intent": "説得意図",
+    "appeal_points": "訴求ポイント ({{count}})",
+    "visual_appeal": "ビジュアル訴求",
+    "voice_appeal": "ボイス訴求",
+    "prescriptions": "処方箋 ({{count}})",
+    "cuts_count": "{{count}}カット",
+    "appeals_count": "{{count}}訴求"
+  },
+  "appealType": {
+    "myth_bust": "誤解反論",
+    "ingredient": "原材料",
+    "manufacturing": "製造工程",
+    "track_record": "実績",
+    "price": "価格特典",
+    "comparison": "比較優位",
+    "guarantee": "保証",
+    "origin": "原産地",
+    "feature_demo": "機能実演",
+    "spec_data": "スペック数値",
+    "design_aesthetic": "デザイン",
+    "authenticity": "リアル",
+    "social_proof": "社会的証拠",
+    "urgency": "緊急限定",
+    "lifestyle": "ライフスタイル",
+    "nostalgia": "郷愁",
+    "authority": "権威",
+    "emotional": "感情訴求"
+  },
+  "role": {
+    "hook": "フック",
+    "problem": "問題提起",
+    "solution": "解決策",
+    "demo": "実演",
+    "proof": "証拠",
+    "brand_intro": "ブランド",
+    "recap": "まとめ",
+    "cta": "CTA",
+    "transition": "転換",
+    "body": "本文"
+  },
+  "strength": {
+    "strong": "強",
+    "moderate": "中",
+    "weak": "弱"
+  },
+  "format": {
+    "talking_head": "進行者型",
+    "caption_text": "キャプション/テキスト型",
+    "product_demo": "デモ/開封型",
+    "ugc_vlog": "UGC/ブイログ型",
+    "asmr_mood": "ASMR/ムード型",
+    "comparison": "比較型",
+    "listicle": "リスト型",
+    "story_problem": "ストーリー/問題解決型",
+    "entertainment": "エンタメ型"
+  },
+  "intent": {
+    "commerce": "コマース/セールス",
+    "information": "情報伝達",
+    "branding": "ブランディング/イメージ",
+    "entertainment": "エンターテインメント"
+  },
+  "verdict": {
+    "집행 권장": "実行推奨",
+    "조건부 집행": "条件付き実行",
+    "집행 불가": "実行不可"
+  },
+  "footer": {
+    "copyright": "© 2026 CRABs — Creator's AI Bridge"
+  },
+  "seo": {
+    "landing": {
+      "title": "WakaLab — コマースショート動画ハッキングプラットフォーム",
+      "description": "バズったコマース動画をカット単位で分析し、あなたの商品に最適なコンテンツを生成するAIプラットフォーム。レシピベースの台本生成付き。"
+    },
+    "analyze": {
+      "title": "動画分析を開始 — WakaLab",
+      "description": "ショート動画URLひとつで十分。AIがカット分析から台本生成まですべて自動処理します。"
+    },
+    "contact": {
+      "title": "お問い合わせ — WakaLab",
+      "description": "WakaLabについてご質問がございましたら、お気軽にご連絡ください。CRABs Inc.が運営しています。"
+    },
+    "dashboard": {
+      "title": "分析ダッシュボード — WakaLab",
+      "description": "以前の動画分析結果を確認し、新しい分析を開始しましょう。"
+    },
+    "demo": {
+      "title": "デモレポート — WakaLab",
+      "description": "WakaLabの動画分析デモを体験してください。"
+    }
+  }
+}

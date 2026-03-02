@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import type { AnalysisResult } from '../types';
 import VideoPlayer, { type VideoPlayerHandle } from '../components/Report/VideoPlayer';
@@ -12,30 +13,20 @@ import AppealTimelineBar from '../components/Report/AppealTimelineBar';
 
 type TabId = 'structure' | 'scores' | 'art';
 
-const tabs: { id: TabId; label: string; icon: string }[] = [
-  { id: 'structure', label: '설득 구조', icon: '🎯' },
-  { id: 'scores', label: '진단서', icon: '💊' },
-  { id: 'art', label: '아트 디렉션', icon: '🎨' },
-];
-
-const formatLabels: Record<string, string> = {
-  talking_head: '진행자형', caption_text: '캡션/텍스트형', product_demo: '데모/언박싱형',
-  ugc_vlog: 'UGC/브이로그형', asmr_mood: 'ASMR/무드형', comparison: '비교형',
-  listicle: '리스트형', story_problem: '스토리/문제해결형', entertainment: '엔터형',
-};
-
-const intentLabels: Record<string, string> = {
-  commerce: '커머스/세일즈', information: '정보 전달', branding: '브랜딩/이미지',
-  entertainment: '엔터테인먼트',
-};
-
 export default function DemoReportPage() {
+  const { t } = useTranslation();
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<TabId>('structure');
   const [currentTime, setCurrentTime] = useState(0);
   const playerRef = useRef<VideoPlayerHandle>(null);
+
+  const tabs: { id: TabId; label: string; icon: string }[] = [
+    { id: 'structure', label: t('demo.tab_structure'), icon: '🎯' },
+    { id: 'scores', label: t('demo.tab_diagnosis'), icon: '💊' },
+    { id: 'art', label: t('demo.tab_art'), icon: '🎨' },
+  ];
 
   useEffect(() => {
     Promise.all([
@@ -75,7 +66,7 @@ export default function DemoReportPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        <span className="ml-3 text-gray-600">데모 데이터 로딩 중...</span>
+        <span className="ml-3 text-gray-600">{t('demo.loading')}</span>
       </div>
     );
   }
@@ -83,9 +74,9 @@ export default function DemoReportPage() {
   if (error || !result) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <p className="text-red-600 mb-4">{error || '데이터를 찾을 수 없습니다'}</p>
+        <p className="text-red-600 mb-4">{error || t('demo.not_found')}</p>
         <Link to="/" className="text-blue-600 hover:underline flex items-center gap-1">
-          <ArrowLeft className="w-4 h-4" /> 돌아가기
+          <ArrowLeft className="w-4 h-4" /> {t('demo.go_back')}
         </Link>
       </div>
     );
@@ -109,12 +100,12 @@ export default function DemoReportPage() {
   const prescriptions = prescriptionsData.prescriptions || [];
 
   const style = result.style || classification;
-  const formatKo = (style as any).primary_format_ko || formatLabels[(style as any).primary_format || classification.format] || '?';
-  const intentKo = (style as any).primary_intent_ko || intentLabels[(style as any).primary_intent || classification.intent] || '?';
+  const formatKo = t(`format.${(style as any).primary_format || classification.format}`, { defaultValue: (style as any).primary_format_ko || '?' });
+  const intentKo = t(`intent.${(style as any).primary_intent || classification.intent}`, { defaultValue: (style as any).primary_intent_ko || '?' });
   const narration = (style as any).narration_type || classification.narration_type || '?';
 
   const artDirection = (recipeData as any).art_direction || {};
-  const narrationLabel = narration === 'voice' ? '🎤 음성' : narration === 'caption' ? '📝 캡션' : '🔇 무음';
+  const narrationLabel = narration === 'voice' ? '🎤 ' + t('report.narration_voice') : narration === 'caption' ? '📝 ' + t('report.narration_caption') : '🔇 ' + t('report.narration_silent');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -125,19 +116,19 @@ export default function DemoReportPage() {
           </Link>
           <div>
             <h1 className="text-lg font-bold text-gray-900">
-              {meta.category ? `${meta.category}` : '영상'} 분석 리포트
+              {meta.category || t('demo.video')} {t('demo.report_title')}
               <span className="ml-2 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">DEMO</span>
             </h1>
             <div className="flex items-center gap-3 text-xs text-gray-500">
               <span>{formatKo} × {intentKo}</span>
               <span>{narrationLabel}</span>
-              <span>{duration}초</span>
+              <span>{duration}{t('report.seconds')}</span>
             </div>
           </div>
           {engagementScore > 0 && (
             <div className="ml-auto text-center">
               <div className="text-2xl font-bold text-blue-600">{Math.round(engagementScore)}</div>
-              <div className="text-[10px] text-gray-400">종합</div>
+              <div className="text-[10px] text-gray-400">{t('demo.overall')}</div>
             </div>
           )}
         </div>

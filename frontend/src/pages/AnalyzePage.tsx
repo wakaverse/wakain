@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
 import { useDropzone, type FileRejection } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Upload, FileVideo, X, AlertCircle, CheckCircle2, Zap, Link2 } from 'lucide-react';
 import { createJob, createJobFromUrl } from '../lib/api';
 import { compressTo480p } from '../lib/videoCompress';
+import SEOHead from '../components/SEOHead';
 
 const MAX_SIZE = 200 * 1024 * 1024;
 const ACCEPTED_TYPES = { 'video/mp4': ['.mp4'], 'video/quicktime': ['.mov'], 'video/webm': ['.webm'] };
@@ -20,6 +22,7 @@ type Phase = 'idle' | 'compressing' | 'uploading' | 'starting' | 'downloading';
 type InputMode = 'file' | 'url';
 
 export default function AnalyzePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [inputMode, setInputMode] = useState<InputMode>('file');
   const [file, setFile] = useState<File | null>(null);
@@ -37,15 +40,15 @@ export default function AnalyzePage() {
     if (rejected.length > 0) {
       const err = rejected[0].errors[0];
       setError(err.message.includes('size')
-        ? '파일 크기는 200MB 이하만 업로드 가능합니다.'
-        : '.mp4, .mov, .webm 형식만 업로드 가능합니다.');
+        ? t('analyze.error_size')
+        : t('analyze.error_format'));
       return;
     }
     if (accepted.length > 0) {
       setFile(accepted[0]);
       setPreviewUrl(URL.createObjectURL(accepted[0]));
     }
-  }, []);
+  }, [t]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop, accept: ACCEPTED_TYPES, maxSize: MAX_SIZE, multiple: false,
@@ -79,7 +82,7 @@ export default function AnalyzePage() {
 
         if (compressed !== file) {
           setCompressInfo(
-            `${formatBytes(file!.size)} → ${formatBytes(compressed.size)} (${Math.round((1 - compressed.size / file!.size) * 100)}% 절감)`
+            `${formatBytes(file!.size)} → ${formatBytes(compressed.size)} (${t('analyze.compress_saving', { percent: Math.round((1 - compressed.size / file!.size) * 100) })})`
           );
         }
 
@@ -95,11 +98,11 @@ export default function AnalyzePage() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : '';
       if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
-        setError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        setError(t('analyze.error_network'));
       } else if (msg.includes('401') || msg.includes('Unauthorized')) {
-        setError('로그인이 필요합니다.');
+        setError(t('analyze.error_auth'));
       } else {
-        setError(msg || '오류가 발생했습니다.');
+        setError(msg || t('analyze.error_generic'));
       }
       setPhase('idle');
       setProgress(0);
@@ -108,22 +111,23 @@ export default function AnalyzePage() {
 
   const busy = phase !== 'idle';
   const statusText = phase === 'compressing'
-    ? '영상 최적화 중...'
+    ? t('analyze.phase_compressing')
     : phase === 'uploading'
-    ? '업로드 중...'
+    ? t('analyze.phase_uploading')
     : phase === 'downloading'
-    ? '서버에서 영상 다운로드 중...'
+    ? t('analyze.phase_downloading')
     : phase === 'starting'
-    ? '분석 요청 중...'
+    ? t('analyze.phase_starting')
     : '';
 
   const canSubmit = inputMode === 'file' ? !!file : !!videoUrl.trim();
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
+      <SEOHead page="analyze" />
       <div className="mb-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">영상 분석 시작</h1>
-        <p className="text-gray-500 text-sm">숏폼 영상을 업로드하면 AI가 자동으로 분석합니다</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">{t('analyze.title')}</h1>
+        <p className="text-gray-500 text-sm">{t('analyze.description')}</p>
       </div>
 
       {/* Input mode tabs */}
@@ -135,7 +139,7 @@ export default function AnalyzePage() {
           }`}
         >
           <FileVideo className="w-4 h-4" />
-          파일 업로드
+          {t('analyze.tab_file')}
         </button>
         <button
           onClick={() => { setInputMode('url'); setError(''); }}
@@ -144,7 +148,7 @@ export default function AnalyzePage() {
           }`}
         >
           <Link2 className="w-4 h-4" />
-          URL 입력
+          {t('analyze.tab_url')}
         </button>
       </div>
 
@@ -152,7 +156,7 @@ export default function AnalyzePage() {
       {inputMode === 'url' && !busy && (
         <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center">
           <Link2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-700 font-medium mb-4">동영상 URL을 입력하세요</p>
+          <p className="text-gray-700 font-medium mb-4">{t('analyze.url_title')}</p>
           <input
             type="url"
             value={videoUrl}
@@ -161,7 +165,7 @@ export default function AnalyzePage() {
             className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gray-400 transition-colors"
           />
           <p className="text-xs text-gray-400 mt-3">
-            직접 링크(.mp4, .mov, .webm)를 지원합니다 · 최대 200MB
+            {t('analyze.url_hint')}
           </p>
         </div>
       )}
@@ -195,14 +199,14 @@ export default function AnalyzePage() {
             {isDragActive ? (
               <>
                 <Upload className="w-12 h-12 text-gray-500" />
-                <p className="text-gray-700 font-medium">여기에 놓으세요</p>
+                <p className="text-gray-700 font-medium">{t('analyze.drop_here')}</p>
               </>
             ) : (
               <>
                 <FileVideo className="w-12 h-12 text-gray-300" />
                 <div>
-                  <p className="text-gray-700 font-medium">영상을 드래그하거나 클릭하여 선택</p>
-                  <p className="text-sm text-gray-400 mt-1">.mp4, .mov, .webm · 최대 200MB</p>
+                  <p className="text-gray-700 font-medium">{t('analyze.drop_title')}</p>
+                  <p className="text-sm text-gray-400 mt-1">{t('analyze.drop_hint')}</p>
                 </div>
               </>
             )}
@@ -214,26 +218,26 @@ export default function AnalyzePage() {
       {canSubmit && !busy && (
         <div className="mt-6 space-y-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">제품명 <span className="text-gray-400 font-normal">(선택)</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('analyze.product_name')} <span className="text-gray-400 font-normal">{t('analyze.optional')}</span></label>
             <input
               type="text"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
-              placeholder="예: 건강 착즙주스, 무선 청소기"
+              placeholder={t('analyze.product_name_placeholder')}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 transition-colors"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">카테고리 <span className="text-gray-400 font-normal">(선택)</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('analyze.product_category')} <span className="text-gray-400 font-normal">{t('analyze.optional')}</span></label>
             <input
               type="text"
               value={productCategory}
               onChange={(e) => setProductCategory(e.target.value)}
-              placeholder="예: 건강기능식품, 가전제품, 화장품"
+              placeholder={t('analyze.product_category_placeholder')}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400 transition-colors"
             />
           </div>
-          <p className="text-xs text-gray-400">제품 정보를 입력하면 더 정확한 마케팅 관점 분석이 가능합니다. 미입력 시 AI가 자동 감지합니다.</p>
+          <p className="text-xs text-gray-400">{t('analyze.product_hint')}</p>
         </div>
       )}
 
@@ -268,7 +272,7 @@ export default function AnalyzePage() {
       {compressInfo && !busy && (
         <div className="mt-3 flex items-center gap-2 text-emerald-600 text-xs bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
           <Zap className="w-3.5 h-3.5" />
-          영상 최적화 완료: {compressInfo}
+          {t('analyze.compress_done')}: {compressInfo}
         </div>
       )}
 
@@ -291,7 +295,7 @@ export default function AnalyzePage() {
             />
           </div>
           {phase === 'compressing' && (
-            <p className="text-xs text-gray-400 mt-1">브라우저에서 480p로 변환 중 — 업로드 속도와 분석 속도가 빨라집니다</p>
+            <p className="text-xs text-gray-400 mt-1">{t('analyze.compress_hint')}</p>
           )}
         </div>
       )}
@@ -302,11 +306,11 @@ export default function AnalyzePage() {
         disabled={!canSubmit || busy}
         className="mt-6 w-full py-3 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-full text-sm transition-colors"
       >
-        {busy ? statusText : '분석 시작'}
+        {busy ? statusText : t('analyze.submit')}
       </button>
 
       <p className="mt-4 text-center text-xs text-gray-400">
-        무료 플랜 기준 월 3건 · 분석 소요 시간 약 3~4분
+        {t('analyze.plan_info')}
       </p>
     </div>
   );
