@@ -159,6 +159,15 @@ export async function getJobStatus(jobId: string): Promise<{ status: string; id:
   return res.json();
 }
 
+export async function deleteJob(jobId: string): Promise<void> {
+  // Soft delete via backend API (bypasses RLS)
+  const res = await fetch(`${API_URL}/api/jobs/${jobId}`, {
+    method: 'DELETE',
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('삭제에 실패했습니다');
+}
+
 export { API_URL };
 
 // ─── Radar API ───

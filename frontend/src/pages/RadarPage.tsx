@@ -37,7 +37,6 @@ function timeAgo(dateStr: string): string {
 
 const TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
-const CATEGORIES = ['beauty', 'food', 'lifestyle', 'fashion', 'health', 'electronics'];
 
 // ─── Popover wrapper ───
 
@@ -151,6 +150,8 @@ function filtersToApi(f: ExtendedFilters): RadarFilters {
   if (f.channel_ids && f.channel_ids.length === 1) {
     api.channel_id = f.channel_ids[0];
   }
+  // Multiple channels: send first one (backend filters by user's channels anyway)
+  // TODO: backend support for multiple channel_ids
 
   if (f.min_spike && f.min_spike > 1) api.min_spike = f.min_spike;
   if (f.min_views && f.min_views > 0) api.min_views = f.min_views;
@@ -177,6 +178,7 @@ function FilterBar({
   const close = () => setOpenPopover(null);
 
   const hasActiveChannel = (filters.channel_ids?.length ?? 0) > 0;
+  // When no channels selected in filter, show all channels (default behavior)
   const hasActiveDate = (filters.posted_value ?? 0) > 0;
   const hasActivePlatform = filters.platforms
     ? Object.values(filters.platforms).some(Boolean) && !Object.values(filters.platforms).every(Boolean)
@@ -186,7 +188,7 @@ function FilterBar({
   const hasActiveEngagement = (filters.min_engagement_pct ?? 0) > 0;
   const hasActiveKeyword = !!filters.keyword;
 
-  const channelLabel = hasActiveChannel ? `${filters.channel_ids!.length}개 채널` : 'Search';
+  const channelLabel = hasActiveChannel ? `${filters.channel_ids!.length}개 채널` : '전체 채널';
   const spikeLabel = hasActiveSpike ? `> ${filters.min_spike}x outlier` : '> 1x outlier';
   const viewsLabel = hasActiveViews ? `Views ${formatNumber(filters.min_views!)}+` : 'Views';
   const engLabel = hasActiveEngagement ? `Engagement ${filters.min_engagement_pct}%+` : 'Engagement rate';
@@ -573,7 +575,6 @@ function ChannelModal({
   onCollect: (id: string) => Promise<void>;
 }) {
   const [username, setUsername] = useState('');
-  const [category, setCategory] = useState('beauty');
   const [platform, setPlatform] = useState('instagram');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -585,7 +586,24 @@ function ChannelModal({
     setLoading(true);
     setError('');
     try {
-      await onAdd(username.trim().replace(/^@/, ''), category, platform);
+      let input = username.trim();
+      let detectedPlatform = platform;
+      // Auto-detect platform from URL
+      if (input.includes('instagram.com')) {
+        detectedPlatform = 'instagram';
+        const match = input.match(/instagram\.com\/([^/?]+)/);
+        if (match) input = match[1];
+      } else if (input.includes('youtube.com') || input.includes('youtu.be')) {
+        detectedPlatform = 'youtube';
+        const match = input.match(/@([^/?]+)/);
+        if (match) input = match[1];
+      } else if (input.includes('tiktok.com')) {
+        detectedPlatform = 'tiktok';
+        const match = input.match(/@([^/?]+)/);
+        if (match) input = match[1];
+      }
+      input = input.replace(/^@/, '');
+      await onAdd(input, 'general', detectedPlatform);
       setUsername('');
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : '등록 실패';
@@ -596,8 +614,8 @@ function ChannelModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md sm:mx-4 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-gray-900">채널 관리</h2>
@@ -621,10 +639,7 @@ function ChannelModal({
 
           {/* Add channel */}
           <div className="flex gap-2 mb-4">
-            <input type="text" placeholder={platform === 'youtube' ? '유튜브 채널명' : platform === 'tiktok' ? '틱톡 계정명' : '인스타 계정명'} value={username} onChange={(e) => setUsername(e.target.value)} className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-300" onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="text-sm border border-gray-200 rounded-lg px-2 py-2">
-              {CATEGORIES.map((c) => (<option key={c} value={c}>{c}</option>))}
-            </select>
+            <input type="text" placeholder="계정명 또는 URL (예: @oliveyoung_official)" value={username} onChange={(e) => setUsername(e.target.value)} className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-300" onKeyDown={(e) => e.key === 'Enter' && handleAdd()} />
             <button onClick={handleAdd} disabled={loading || !username.trim()} className="text-sm font-medium px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-40 transition-colors whitespace-nowrap">
               {loading ? '...' : '추가'}
             </button>
@@ -658,7 +673,7 @@ function ChannelModal({
                       )}
                       <p className="text-sm font-medium text-gray-900 truncate">{ch.display_name || ch.ig_username}</p>
                     </div>
-                    <p className="text-xs text-gray-400">@{ch.ig_username} · {ch.category}{ch.follower_count ? ` · ${formatNumber(ch.follower_count)}` : ''}</p>
+                    <p className="text-xs text-gray-400">@{ch.ig_username}{ch.follower_count ? ` · ${formatNumber(ch.follower_count)}` : ''}</p>
                   </div>
                   <button onClick={() => onCollect(ch.id)} className="text-xs text-blue-500 hover:text-blue-700 mr-1" title="수집">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 8a6 6 0 0112 0" /><path d="M14 8a6 6 0 01-12 0" /><path d="M8 4v4l2 2" /></svg>
@@ -719,8 +734,22 @@ export default function RadarPage() {
   useEffect(() => { fetchFeed(); }, [fetchFeed]);
 
   const handleAddChannel = async (username: string, category: string, platform: string) => {
-    await addRadarChannel(username, category, platform);
+    const newChannel = await addRadarChannel(username, category, platform);
     await fetchChannels();
+    // Auto-collect reels for new channel
+    if (newChannel?.id) {
+      showToast('채널을 추가했습니다. 릴스 수집 중...', 'info');
+      try {
+        await collectChannel(newChannel.id);
+        await fetchFeed();
+        showToast('✅ 릴스 수집 완료', 'success');
+      } catch (e) {
+        console.error('Auto-collect failed:', e);
+        showToast('채널은 추가했지만 릴스 수집에 실패했습니다', 'error', '채널 관리에서 수동 수집해주세요');
+      }
+    } else {
+      await fetchFeed();
+    }
   };
 
   const handleDeleteChannel = async (id: string) => {
@@ -779,6 +808,21 @@ export default function RadarPage() {
           clearInterval(interval);
           pollingRef.current.delete(reelId);
           showToast('✅ 분석이 완료되었습니다', 'success', '분석 탭에서 결과를 확인하세요');
+          // Auto-save to library
+          const reel = reels.find(r => r.id === reelId);
+          if (reel) {
+            addLibraryItem({
+              platform: reel.platform || 'instagram',
+              source: 'analysis',
+              original_url: reel.video_url || '',
+              video_url: reel.video_url || '',
+              title: reel.caption?.slice(0, 80) || 'Untitled',
+              thumbnail_url: reel.thumbnail_url || '',
+              channel_name: reel.channel?.ig_username || '',
+              job_id: jobId,
+              tags: [],
+            }).catch(() => {});
+          }
         } else if (job.status === 'failed') {
           setAnalyzingJobs((prev) => {
             const next = new Map(prev);

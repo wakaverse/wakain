@@ -31,7 +31,7 @@ export default function ToastContainer() {
         return (
           <div
             key={toast.id}
-            className={`flex items-start gap-3 px-5 py-4 rounded-2xl shadow-xl ${bgMap[toast.type]}`}
+            className={`flex items-start gap-3 px-5 py-4 rounded-xl shadow-xl ${bgMap[toast.type]}`}
             style={{ animation: 'toastIn 0.4s cubic-bezier(0.16,1,0.3,1)' }}
           >
             <Icon className={`w-6 h-6 shrink-0 mt-0.5 ${iconColor[toast.type]}`} />

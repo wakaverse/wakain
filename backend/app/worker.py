@@ -47,10 +47,47 @@ def _update_job(job_id: str, **fields) -> None:
 
 
 
-def _extract_thumbnails(video_path: str, appeal_structure: dict, job_id: str) -> dict:
+
+def _clamp_appeal_structure(appeal_structure: dict, video_path: str) -> dict:
+    """Clamp appeal_structure scene time_ranges to actual video duration via ffprobe."""
+    try:
+        result = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", video_path],
+            capture_output=True, text=True, timeout=10
+        )
+        actual_duration = float(result.stdout.strip())
+    except Exception:
+        return appeal_structure
+
+    scenes = appeal_structure.get("scenes", [])
+    for scene in scenes:
+        tr = scene.get("time_range")
+        if tr and len(tr) == 2:
+            scene["time_range"] = [min(tr[0], actual_duration), min(tr[1], actual_duration)]
+        for cut in scene.get("cuts", []):
+            ctr = cut.get("time_range")
+            if ctr and len(ctr) == 2:
+                cut["time_range"] = [min(ctr[0], actual_duration), min(ctr[1], actual_duration)]
+    return appeal_structure
+
+
+def _extract_thumbnails(video_path: str, appeal_structure: dict, job_id: str, recipe: dict | None = None) -> dict:
     """Extract thumbnail frames for each cut using ffmpeg, upload to R2, return URL map."""
     import tempfile
     scenes = appeal_structure.get("scenes", [])
+    
+    # Fallback: if no appeal_structure scenes, use recipe scenes
+    if not scenes and recipe:
+        recipe_scenes = recipe.get("video_recipe", {}).get("scenes", [])
+        if recipe_scenes:
+            scenes = []
+            for rs in recipe_scenes:
+                scenes.append({
+                    "scene_id": rs.get("scene_id", 0),
+                    "cuts": [{"cut_id": rs.get("scene_id", 0), "time_range": rs.get("time_range", [0, 0])}],
+                })
+    
     if not scenes:
         return {}
 
@@ -215,10 +252,15 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
 
         # Extract thumbnails for each cut
         thumbnails_json = None
-        if extra.get("appeal_structure_json"):
+        appeal_json = extra.get("appeal_structure_json") or {}
+        if appeal_json and appeal_json.get("scenes"):
+            appeal_json = _clamp_appeal_structure(appeal_json, str(video_path))
+            extra["appeal_structure_json"] = appeal_json
+        recipe_json = extra.get("recipe_json")
+        if appeal_json or recipe_json:
             try:
                 thumb_map = _extract_thumbnails(
-                    str(video_path), extra["appeal_structure_json"], job_id
+                    str(video_path), appeal_json, job_id, recipe=recipe_json
                 )
                 if thumb_map:
                     thumbnails_json = thumb_map

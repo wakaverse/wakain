@@ -89,7 +89,7 @@
     "company": "CRABs Inc. | CEO Taeyoung Kim | Reg. No. 224-88-02602"
   },
   "analyze": {
-    "title": "Start Video Analysis",
+    "title": "Projects",
     "description": "Upload a short-form video and AI will analyze it automatically",
     "tab_file": "Upload File",
     "tab_url": "Enter URL",

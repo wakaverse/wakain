@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Star, Trash2, Search, SlidersHorizontal } from 'lucide-react';
+import { Star, Trash2, Search, SlidersHorizontal, X, Loader2 } from 'lucide-react';
 import {
   getLibraryItems,
   updateLibraryItem,
   deleteLibraryItem,
+  getResult,
 } from '../lib/api';
 import type { LibraryItem, LibraryFilters } from '../types';
 
-function formatNumber(n: number): string {
+function formatNumber(n: number | null | undefined): string {
+  if (n == null) return '-';
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
@@ -75,14 +77,16 @@ function LibraryCard({
   onHack,
   onToggleStar,
   onDelete,
+  onClick,
 }: {
   item: LibraryItem;
   onHack: () => void;
   onToggleStar: () => void;
   onDelete: () => void;
+  onClick?: () => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col cursor-pointer" onClick={onClick}>
       <div className="relative aspect-[9/16] bg-gray-100">
         {item.thumbnail_url ? (
           <img src={item.thumbnail_url} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -113,11 +117,13 @@ function LibraryCard({
         {item.title && (
           <p className="text-[11px] text-gray-700 font-medium line-clamp-2 leading-tight">{item.title}</p>
         )}
-        <div className="flex items-center gap-2 text-[11px] text-gray-500">
-          <span>👁 {formatNumber(item.view_count)}</span>
-          <span>❤️ {formatNumber(item.like_count)}</span>
-          <span>💬 {formatNumber(item.comment_count)}</span>
-        </div>
+        {(item.view_count != null || item.like_count != null || item.comment_count != null) && (
+          <div className="flex items-center gap-2 text-[11px] text-gray-500">
+            {item.view_count != null && <span>👁 {formatNumber(item.view_count)}</span>}
+            {item.like_count != null && <span>❤️ {formatNumber(item.like_count)}</span>}
+            {item.comment_count != null && <span>💬 {formatNumber(item.comment_count)}</span>}
+          </div>
+        )}
         {item.channel_name && (
           <span className="text-[11px] text-gray-400 truncate">@{item.channel_name}</span>
         )}
@@ -132,8 +138,8 @@ function LibraryCard({
           <p className="text-[10px] text-gray-400 line-clamp-1 italic">📝 {item.memo}</p>
         )}
         <div className="flex gap-1.5 mt-auto pt-1">
-          <button onClick={onHack} className="flex-1 text-xs font-medium py-1.5 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors">
-            분석하기
+          <button onClick={item.job_id ? onClick : onHack} className={`flex-1 text-xs font-medium py-1.5 rounded-lg transition-colors ${item.job_id ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-gray-900 text-white hover:bg-gray-800'}`}>
+            {item.job_id ? '결과 보기' : '분석하기'}
           </button>
           <button onClick={onDelete} className="p-1.5 rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors">
             <Trash2 className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -152,6 +158,10 @@ export default function LibraryPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [sourceTab, setSourceTab] = useState<string>('all');
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [reportData, setReportData] = useState<any>(null);
+  const [reportLoading, setReportLoading] = useState(false);
   const [filters, setFilters] = useState<LibraryFilters>({
     sort: 'recent',
     page: 1,
@@ -172,6 +182,19 @@ export default function LibraryPage() {
   }, [filters]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
+
+  // Fetch report when modal opens
+  useEffect(() => {
+    if (!selectedJobId) { setReportData(null); return; }
+    setReportLoading(true);
+    getResult(selectedJobId).then((data) => setReportData(data)).catch(() => setReportData(null)).finally(() => setReportLoading(false));
+  }, [selectedJobId]);
+
+  // Sync sourceTab to filters
+  const handleSourceTab = (key: string) => {
+    setSourceTab(key);
+    setFilters((prev) => ({ ...prev, source: key === 'all' ? undefined : key, page: 1 }));
+  };
 
   const handleToggleStar = async (item: LibraryItem) => {
     try {
@@ -237,6 +260,13 @@ export default function LibraryPage() {
         )}
       </div>
 
+
+      {/* Source tabs */}
+      <div className="flex gap-1 mb-4">
+        {[{ key: 'all', label: '전체' }, { key: 'hack', label: '분석' }, { key: 'manual', label: '직접추가' }, { key: 'radar', label: '레이더' }].map((tab) => (
+          <button key={tab.key} onClick={() => handleSourceTab(tab.key)} className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${sourceTab === tab.key ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>{tab.label}</button>
+        ))}
+      </div>
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin" />
@@ -256,7 +286,7 @@ export default function LibraryPage() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {items.map((item) => (
-              <LibraryCard key={item.id} item={item} onHack={() => handleHack(item)} onToggleStar={() => handleToggleStar(item)} onDelete={() => handleDelete(item.id)} />
+              <LibraryCard key={item.id} item={item} onHack={() => handleHack(item)} onToggleStar={() => handleToggleStar(item)} onDelete={() => handleDelete(item.id)} onClick={() => { if (item.job_id) { setSelectedJobId(item.job_id); } else if (item.original_url || item.video_url) { window.open(item.original_url || item.video_url, '_blank'); } }} />
             ))}
           </div>
           {totalPages > 1 && (
@@ -268,6 +298,63 @@ export default function LibraryPage() {
           )}
         </>
       )}
+
+      {/* Analysis Result Modal */}
+      {selectedJobId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setSelectedJobId(null)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] overflow-y-auto p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold">분석 결과</h2>
+              <button onClick={() => setSelectedJobId(null)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            </div>
+            {reportLoading ? (
+              <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
+            ) : reportData ? (
+              <div>
+                {reportData.product && (
+                  <div className="mb-4 p-3 bg-gray-50 rounded-xl">
+                    <p className="text-sm font-medium">{reportData.product.product_name || 'Unknown'}</p>
+                    <p className="text-xs text-gray-500">{reportData.product.brand} · {reportData.product.category}</p>
+                  </div>
+                )}
+                {reportData.persuasion_lens?.formula_lens && (
+                  <div className="mb-4">
+                    <h3 className="text-sm font-semibold mb-2">설득 구조</h3>
+                    <div className="space-y-1">
+                      {reportData.persuasion_lens.formula_lens.steps.filter((s: any) => s.present).map((step: any, i: number) => (
+                        <div key={i} className="flex items-center gap-2 text-xs">
+                          <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-bold">{step.step}</span>
+                          <span className="text-gray-700">{step.name_ko}</span>
+                          {step.sub_type_ko && <span className="text-gray-400">({step.sub_type_ko})</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {reportData.thumbnails && Object.keys(reportData.thumbnails).length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="text-sm font-semibold mb-2">컷 미리보기</h3>
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {Object.entries(reportData.thumbnails).slice(0, 8).map(([key, url]) => (
+                        <img key={key} src={url as string} alt={key} className="w-20 h-28 rounded-lg object-cover shrink-0" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={() => { setSelectedJobId(null); window.location.href = `/app/results/${selectedJobId}`; }}
+                  className="w-full mt-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors"
+                >
+                  상세 리포트 보기 →
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-10">결과를 불러올 수 없습니다</p>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

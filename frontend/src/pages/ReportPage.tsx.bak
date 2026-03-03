@@ -58,6 +58,12 @@ interface EditInfo {
   transitionStyle: string;
 }
 
+interface RecipeStep {
+  role: string;
+  timeRange: [number, number];
+  duration: number;
+  technique?: string;
+}
 
 interface CutData {
   id: number;
@@ -72,156 +78,52 @@ interface CutData {
 
 function extractHook(result: AnalysisResult): HookInfo | null {
   const recipe = result.video_recipe?.video_recipe;
-  if (recipe?.scenes?.length) {
-    const hookScene = recipe.scenes.find((s: any) =>
-      s.role?.toLowerCase().includes('hook') || s.role?.includes('훅')
-    );
-    return {
-      type: hookScene?.role || recipe.persuasion_analysis?.appeal_points?.[0]?.type || '알 수 없음',
-      description: hookScene?.description || '',
-      hookLine: recipe.audio?.voice?.hook_line || '',
-      timeRange: hookScene?.time_range || [0, recipe.structure?.hook_time || 3],
-    };
-  }
-  // Fallback: first appeal_structure scene as hook
-  const firstScene = result.appeal_structure?.scenes?.[0];
-  if (!firstScene) return null;
-  const stt = result.stt;
-  const hookText = stt?.segments?.find((seg: any) => seg.start < (firstScene.time_range?.[1] || 3))?.text || '';
+  if (!recipe) return null;
+  const hookScene = recipe.scenes?.find(s =>
+    s.role?.toLowerCase().includes('hook') || s.role?.includes('훅')
+  );
   return {
-    type: '훅',
-    description: firstScene.persuasion_intent || '',
-    hookLine: hookText,
-    timeRange: firstScene.time_range || [0, 3],
+    type: hookScene?.role || recipe.persuasion_analysis?.appeal_points?.[0]?.type || '알 수 없음',
+    description: hookScene?.description || '',
+    hookLine: recipe.audio?.voice?.hook_line || '',
+    timeRange: hookScene?.time_range || [0, recipe.structure?.hook_time || 3],
   };
 }
 
 function extractAppeals(result: AnalysisResult): AppealInfo[] {
   const appeals = result.video_recipe?.video_recipe?.persuasion_analysis?.appeal_points;
-  if (appeals?.length) {
-    return appeals.map((a: any) => ({
-      type: a.type, claim: a.claim, strength: a.strength, source: a.source,
-    }));
-  }
-  // Fallback: flatten appeal_structure scenes' appeals
-  const scenes = result.appeal_structure?.scenes || [];
-  const all: AppealInfo[] = [];
-  for (const s of scenes) {
-    for (const a of (s.appeals || [])) {
-      all.push({
-        type: a.type || '',
-        claim: a.claim || a.visual_proof?.description || '',
-        strength: a.strength || 0,
-        source: a.source || 'visual',
-      });
-    }
-  }
-  return all;
+  if (!appeals?.length) return [];
+  return appeals.map(a => ({
+    type: a.type, claim: a.claim, strength: a.strength, source: a.source,
+  }));
 }
 
 function extractEdit(result: AnalysisResult): EditInfo | null {
   const recipe = result.video_recipe?.video_recipe;
-  const appealScenes = result.appeal_structure?.scenes || [];
-  const hasRecipe = !!(recipe?.scenes?.length);
-  
-  if (!hasRecipe && !appealScenes.length) return null;
-  
-  const totalCuts = hasRecipe
-    ? (recipe.scenes.length || recipe.visual_style?.total_cuts || 0)
-    : appealScenes.reduce((sum: number, s: any) => sum + (s.cuts?.length || 1), 0);
-  const duration = recipe?.meta?.duration
-    || (appealScenes.length > 0 ? Math.max(...appealScenes.map((s: any) => s.time_range?.[1] || 0)) : 0)
-    || 0;
-  const avgCut = totalCuts > 0 ? duration / totalCuts : (recipe?.visual_style?.avg_cut_interval || 0);
+  if (!recipe) return null;
+  const actualCuts = recipe.scenes?.length || recipe.visual_style?.total_cuts || 0;
+  const duration = recipe.meta?.duration || 0;
+  const avgCut = actualCuts > 0 ? duration / actualCuts : (recipe.visual_style?.avg_cut_interval || 0);
   return {
     avgCutSec: avgCut,
-    totalCuts,
+    totalCuts: actualCuts,
     duration,
-    transitionStyle: recipe?.visual_style?.transition_style || '',
+    transitionStyle: recipe.visual_style?.transition_style || '',
   };
 }
 
-
-
-interface StructuredSummary {
-  duration: number;
-  style: string;
-  flow: string[];
-  topAppeals: string[];
-  productKeywords: string[];
+function extractRecipe(result: AnalysisResult): RecipeStep[] {
+  const scenes = result.video_recipe?.video_recipe?.scenes;
+  if (!scenes?.length) return [];
+  return scenes.map(s => ({
+    role: s.role, timeRange: s.time_range, duration: s.duration,
+  }));
 }
 
-function extractStructuredSummary(result: AnalysisResult): StructuredSummary | null {
-  const recipe = result.video_recipe?.video_recipe;
-  const appealScenes = result.appeal_structure?.scenes || [];
-  const recipeScenes = recipe?.scenes || [];
-  const scenes = recipeScenes.length ? recipeScenes : appealScenes;
-  
-  if (!scenes.length) return null;
-  
-  // Duration
-  const duration = recipe?.meta?.duration
-    || (scenes.length > 0 ? Math.max(...scenes.map((s: any) => s.time_range?.[1] || 0)) : 0);
-  
-  // Style
-  const style = (recipe?.persuasion_analysis as any)?.video_style?.sub_style
-    || (recipe?.persuasion_analysis as any)?.video_style?.type
-    || '';
-  
-  // Flow: scene roles
-  const flow = recipeScenes.length
-    ? recipeScenes.map((s: any) => s.role).filter(Boolean)
-    : appealScenes.map((_: any, i: number) => {
-        if (i === 0) return 'hook';
-        if (i === scenes.length - 1) return 'cta';
-        return '';
-      }).filter(Boolean);
-  
-  // Top appeals by frequency
-  const appealCounts = new Map<string, number>();
-  for (const s of appealScenes) {
-    for (const a of (s.appeals || [])) {
-      if (a.type) appealCounts.set(a.type, (appealCounts.get(a.type) || 0) + 1);
-    }
-  }
-  // Fallback to recipe appeal_points
-  if (appealCounts.size === 0) {
-    const pts = recipe?.persuasion_analysis?.appeal_points || [];
-    for (const a of pts) {
-      if (a.type) appealCounts.set(a.type, (appealCounts.get(a.type) || 0) + 1);
-    }
-  }
-  const topAppeals = Array.from(appealCounts.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3)
-    .map(([type]) => type);
-  
-  // Product keywords from appeals claims
-  const productKeywords: string[] = [];
-  const allClaims: string[] = [];
-  for (const s of appealScenes) {
-    for (const a of (s.appeals || [])) {
-      if (a.claim) allClaims.push(a.claim);
-    }
-  }
-  if (!allClaims.length) {
-    const pts = recipe?.persuasion_analysis?.appeal_points || [];
-    for (const a of pts) { if (a.claim) allClaims.push(a.claim); }
-  }
-  // Extract short keywords from claims (take first 3 unique short phrases)
-  const seen = new Set<string>();
-  for (const claim of allClaims) {
-    const short = claim.replace(/_/g, ' ').split(/\s+/).slice(0, 3).join(' ');
-    if (short.length > 2 && short.length < 20 && !seen.has(short)) {
-      seen.add(short);
-      productKeywords.push(short);
-      if (productKeywords.length >= 3) break;
-    }
-  }
-  
-  return { duration: Math.round(duration), style, flow, topAppeals, productKeywords };
-}
 
+function extractSummary(result: AnalysisResult): string {
+  return result.video_recipe?.video_recipe?.persuasion_analysis?.persuasion_summary || '';
+}
 
 function buildCuts(result: AnalysisResult): CutData[] {
   const appealStructure = result.appeal_structure;
@@ -234,7 +136,7 @@ function buildCuts(result: AnalysisResult): CutData[] {
       id: i + 1, sceneId: s.scene_id, timeRange: s.time_range, role: s.role,
       transcript: getCutTranscript(s.time_range, stt),
       appeals: s.appeal_points || [],
-      thumbnailUrl: thumbnails[`${s.scene_id}-${s.scene_id}`] || thumbnails[`scene_${s.scene_id}`] || thumbnails[String(s.scene_id)],
+      thumbnailUrl: thumbnails[`scene_${s.scene_id}`],
     }));
   }
 
@@ -256,7 +158,7 @@ function buildCuts(result: AnalysisResult): CutData[] {
             if (ts == null) return true;
             return ts >= cut.time_range[0] && ts < cut.time_range[1];
           }) || [],
-          thumbnailUrl: thumbnails[`${scene.scene_id}-${cut.cut_id}`] || thumbnails[`scene_${scene.scene_id}_cut_${cut.cut_id}`] || thumbnails[`scene_${scene.scene_id}`] || thumbnails[String(scene.scene_id)],
+          thumbnailUrl: thumbnails[`scene_${scene.scene_id}_cut_${cut.cut_id}`] || thumbnails[`scene_${scene.scene_id}`],
           persuasionIntent: scene.persuasion_intent,
         });
       }
@@ -270,63 +172,6 @@ function buildCuts(result: AnalysisResult): CutData[] {
     }
   }
   return cuts;
-}
-
-/* ── Label Maps ───────────────────────────── */
-
-const APPEAL_LABELS: Record<string, string> = {
-  emotional: '감성 소구',
-  feature_demo: '기능 시연',
-  design_aesthetic: '디자인/미학',
-  social_proof: '사회적 증거',
-  lifestyle: '라이프스타일',
-  authority: '권위/전문성',
-  urgency: '긴급성/희소성',
-  price_value: '가격/가치',
-  problem_solution: '문제 해결',
-  curiosity: '호기심 유발',
-  humor: '유머',
-  trust: '신뢰 구축',
-  ingredient: '성분/원료',
-  manufacturing: '제조 과정',
-  comparison: '비교',
-  transformation: '변화/전후',
-  community: '커뮤니티',
-  convenience: '편의성',
-  sensory: '감각 자극',
-  narrative: '스토리텔링',
-};
-
-const ROLE_LABELS: Record<string, string> = {
-  hook: '훅',
-  hoo: '훅',
-  demo: '시연',
-  dem: '시연',
-  problem: '문제',
-  pro: '문제',
-  solution: '해결',
-  sol: '해결',
-  proof: '증거',
-  cta: 'CTA',
-  benefit: '혜택',
-  transition: '전환',
-  emotional: '감성',
-  authority: '권위',
-  brand_intro: '브랜드',
-  brand: '브랜드',
-  intro: '인트로',
-  outro: '아웃트로',
-  testimonial: '후기',
-  feature: '기능',
-  comparison: '비교',
-};
-
-function appealLabel(key: string): string {
-  return APPEAL_LABELS[key] || key;
-}
-
-function roleLabel(key: string): string {
-  return ROLE_LABELS[key.toLowerCase()] || key;
 }
 
 /* ── UI Components ────────────────────────── */
@@ -619,7 +464,8 @@ function SummaryTab({ result, seekTo, navigate }: {
   const hook = extractHook(result);
   const appeals = extractAppeals(result);
   const edit = extractEdit(result);
-  const structuredSummary = extractStructuredSummary(result);
+  const recipe = extractRecipe(result);
+  const summary = extractSummary(result);
 
   // Appeal groups by type
   const appealGroups = (() => {
@@ -647,19 +493,45 @@ function SummaryTab({ result, seekTo, navigate }: {
   })();
   const maxGroupCount = Math.max(...appealGroups.map(g => g.count), 1);
 
-
+  const totalDuration = recipe.reduce((sum, s) => sum + s.duration, 0);
+  const sceneColors = ['#1a1a1a', '#444', '#666', '#888', '#aaa', '#ccc'];
 
   return (
     <div className="space-y-4">
-      {/* 1. 한줄 요약 */}
-      {structuredSummary && (
+      {/* 1. 한줄 요약 + 타임라인 바 */}
+      {(summary || recipe.length > 0) && (
         <Card icon={Sparkles} title="한줄 요약">
-          <p className="text-sm text-gray-700 leading-relaxed">
-            {structuredSummary.duration}초 · {structuredSummary.style ? structuredSummary.style.replace(/_/g, ' ') : '숏폼'}
-            {structuredSummary.topAppeals.length > 0 && (
-              <> · {structuredSummary.topAppeals.map(t => appealLabel(t)).join(' · ')}</>
-            )}
-          </p>
+          {summary && (
+            <p className="text-sm text-gray-700 leading-relaxed mb-4">{summary}</p>
+          )}
+          {recipe.length > 0 && totalDuration > 0 && (
+            <div>
+              <div className="flex rounded-lg overflow-hidden h-8">
+                {recipe.map((step, i) => {
+                  const pct = (step.duration / totalDuration) * 100;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => seekTo(step.timeRange[0])}
+                      className="flex items-center justify-center text-[10px] font-medium transition-opacity hover:opacity-80 truncate px-1"
+                      style={{
+                        width: `${Math.max(pct, 4)}%`,
+                        backgroundColor: sceneColors[i % sceneColors.length],
+                        color: i < 3 ? '#fff' : '#333',
+                      }}
+                      title={`${step.role} (${step.duration.toFixed(1)}s)`}
+                    >
+                      {pct > 8 ? step.role : ''}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5">
+                <span>0s</span>
+                <span>{Math.round(totalDuration)}s</span>
+              </div>
+            </div>
+          )}
         </Card>
       )}
 
@@ -735,7 +607,7 @@ function SummaryTab({ result, seekTo, navigate }: {
             {appealGroups.map((group) => (
               <div key={group.type}>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-gray-900">{appealLabel(group.type)}</span>
+                  <span className="text-sm font-medium text-gray-900">{group.type}</span>
                   <span className="text-xs text-gray-400">{group.count}회</span>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-1.5">
@@ -814,7 +686,7 @@ function CutViewTab({ result, seekTo }: {
                   style={{ minWidth: '24px', width: `${Math.max(pct, 3)}%` }}
                   title={`${fmtTime(cut.timeRange[0])}–${fmtTime(cut.timeRange[1])}${cut.role ? ` (${cut.role})` : ''}`}
                 >
-                  {cut.role ? roleLabel(cut.role.slice(0, 3)) : i + 1}
+                  {cut.role ? cut.role.slice(0, 3) : i + 1}
                 </button>
               );
             })}
@@ -850,7 +722,7 @@ function CutViewTab({ result, seekTo }: {
                 </span>
                 {cut.role && (
                   <span className="text-[10px] font-medium px-2 py-0.5 bg-gray-900 text-white rounded-full">
-                    {roleLabel(cut.role)}
+                    {cut.role}
                   </span>
                 )}
               </div>
@@ -863,7 +735,7 @@ function CutViewTab({ result, seekTo }: {
                 <div className="flex flex-wrap gap-1">
                   {cut.appeals.slice(0, 3).map((a, j) => (
                     <span key={j} className="text-[10px] px-2 py-0.5 bg-gray-50 text-gray-500 rounded-full">
-                      {appealLabel(a.type)}
+                      {a.type}
                     </span>
                   ))}
                 </div>
@@ -1006,13 +878,13 @@ function DetailTab({ result }: { result: AnalysisResult }) {
 
       {/* 성과 지표 */}
       {recipe?.performance_metrics && (
-        <Card title="영상 구조 요약">
+        <Card title="성과 지표">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[
-              { label: '첫 소구 등장', value: `${recipe.performance_metrics.time_to_first_appeal?.toFixed(1)}초` },
-              { label: 'CTA 등장', value: `${recipe.performance_metrics.time_to_cta?.toFixed(1)}초` },
+              { label: '첫 소구까지', value: `${recipe.performance_metrics.time_to_first_appeal?.toFixed(1)}초` },
+              { label: 'CTA까지', value: `${recipe.performance_metrics.time_to_cta?.toFixed(1)}초` },
               { label: '소구 수', value: `${recipe.performance_metrics.appeal_count}개` },
-              { label: '소구 유형 수', value: `${Math.round(recipe.performance_metrics.appeal_diversity || 0)}가지` },
+              { label: '소구 다양성', value: recipe.performance_metrics.appeal_diversity?.toFixed(2) },
               { label: '정보 밀도', value: recipe.performance_metrics.info_density?.toFixed(2) },
               { label: '제품 비중', value: `${(recipe.performance_metrics.product_focus_ratio * 100).toFixed(0)}%` },
             ].map(({ label, value }) => (

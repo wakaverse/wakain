@@ -1,4 +1,5 @@
 import boto3
+from datetime import datetime, timezone
 from botocore.config import Config as BotoConfig
 from fastapi import APIRouter, Depends, HTTPException
 from supabase import create_client
@@ -39,6 +40,7 @@ async def list_jobs(user: dict = Depends(get_current_user)):
         supabase.table("jobs")
         .select("*")
         .eq("user_id", user["id"])
+        .is_("deleted_at", "null")
         .order("created_at", desc=True)
         .limit(50)
         .execute()
@@ -104,3 +106,19 @@ async def get_result(job_id: str, user: dict = Depends(get_current_user)):
         result["thumbnails"] = {}
 
     return result
+
+
+@router.delete("/jobs/{job_id}")
+async def delete_job(job_id: str, user: dict = Depends(get_current_user)):
+    """Soft delete a job (set deleted_at timestamp)."""
+    supabase = get_supabase()
+    # Verify ownership
+    job = supabase.table("jobs").select("user_id").eq("id", job_id).single().execute()
+    if not job.data or job.data.get("user_id") != user["id"]:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    supabase.table("jobs").update({
+        "deleted_at": datetime.now(timezone.utc).isoformat()
+    }).eq("id", job_id).execute()
+    
+    return {"ok": True}

@@ -9,11 +9,6 @@ import { showToast } from '../hooks/useToast';
 import type { Job } from '../types';
 import SEOHead from '../components/SEOHead';
 
-
-function truncateTitle(s: string, max = 40): string {
-  return s.length > max ? s.slice(0, max) + '...' : s;
-}
-
 const MAX_SIZE = 200 * 1024 * 1024;
 const ACCEPTED_TYPES = { 'video/mp4': ['.mp4'], 'video/quicktime': ['.mov'], 'video/webm': ['.webm'] };
 const TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
@@ -151,6 +146,7 @@ export default function AnalyzePage() {
       if (pollingRef.current.has(job.id)) return;
 
       if (isTimedOut(job)) {
+        // Already timed out — skip polling, no toast on page load
         return;
       }
 
@@ -259,7 +255,6 @@ export default function AnalyzePage() {
     return true;
   });
 
-
   return (
     <div className="max-w-4xl mx-auto overflow-hidden">
       <SEOHead page="analyze" />
@@ -270,19 +265,17 @@ export default function AnalyzePage() {
         <h1 className="text-xl font-bold text-gray-900">{t('analyze.title')}</h1>
         <p className="text-xs text-gray-400 mt-0.5">영상을 분석하고 프로젝트를 관리하세요</p>
         </div>
-        {/* "+ 새 분석" button: mobile only */}
         <button
           onClick={() => setShowInput(!showInput)}
-          className={`sm:hidden flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-md transition-colors ${showInput ? 'bg-gray-200 text-gray-600' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
+          className={`flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl transition-colors ${showInput ? 'bg-gray-200 text-gray-600' : 'bg-gray-900 text-white hover:bg-gray-800'}`}
         >
           {showInput ? '닫기' : '+ 새 분석'}
         </button>
       </div>
 
 
-      {/* Input area: mobile uses showInput toggle, desktop always visible */}
-      <div className={`${showInput ? 'block' : 'hidden sm:block'}`}>
-      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+      {showInput && (
+      <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-6">
         {busy ? (
           <div>
             <div className="flex justify-between text-sm text-gray-500 mb-2">
@@ -299,7 +292,7 @@ export default function AnalyzePage() {
             {/* Dropzone — compact on mobile */}
             <div
               {...getRootProps()}
-              className={`border-2 border-dashed rounded-lg py-4 px-4 sm:py-6 text-center cursor-pointer transition-all mb-4 ${
+              className={`border-2 border-dashed rounded-xl py-4 px-4 sm:py-6 text-center cursor-pointer transition-all mb-4 ${
                 isDragActive ? 'border-gray-400 bg-gray-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
               }`}
             >
@@ -316,9 +309,6 @@ export default function AnalyzePage() {
               <div className="flex-1 h-px bg-gray-200" />
             </div>
 
-            {/* URL Platform Tabs */}
-            
-
             {/* URL Input */}
             <div className="flex gap-2">
               <div className="flex-1 relative">
@@ -328,28 +318,29 @@ export default function AnalyzePage() {
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
-                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-400"
+                  placeholder="영상 URL 입력"
+                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-gray-400"
                 />
               </div>
               <button
                 onClick={() => handleUrlSubmit()}
                 disabled={!videoUrl.trim()}
-                className="px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors shrink-0"
+                className="px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors shrink-0"
               >
                 분석
               </button>
             </div>
+            <p className="text-[11px] text-gray-400 mt-2 ml-1">Instagram, YouTube, TikTok URL 지원</p>
           </>
         )}
 
         {error && (
-          <div className="mt-3 flex items-center gap-2 text-red-600 text-sm bg-red-50 border border-red-100 rounded px-3 py-2">
+          <div className="mt-3 flex items-center gap-2 text-red-600 text-sm bg-red-50 border border-red-100 rounded-lg px-3 py-2">
             <AlertCircle className="w-4 h-4 shrink-0" />{error}
           </div>
         )}
       </div>
-      </div>
-
+      )}
       {/* Filter tabs + select mode */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex gap-1">
@@ -362,7 +353,7 @@ export default function AnalyzePage() {
             <button
               key={f.key}
               onClick={() => setJobFilter(f.key)}
-              className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors ${
+              className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
                 jobFilter === f.key ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
               }`}
             >
@@ -372,7 +363,7 @@ export default function AnalyzePage() {
         </div>
         <button
           onClick={() => { setSelectMode(!selectMode); setSelectedIds(new Set()); }}
-          className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors ${
+          className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
             selectMode ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-500 hover:text-gray-600 hover:bg-gray-200'
           }`}
         >
@@ -382,7 +373,7 @@ export default function AnalyzePage() {
 
       {/* Bulk action bar */}
       {selectMode && (
-        <div className="flex items-center justify-between mb-3 px-4 py-2.5 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="flex items-center justify-between mb-3 px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-200">
           <button onClick={toggleSelectAll} className="flex items-center gap-2 text-xs text-gray-600">
             {selectedIds.size === filteredJobs.length && filteredJobs.length > 0
               ? <CheckSquare className="w-4 h-4 text-gray-900" />
@@ -416,159 +407,81 @@ export default function AnalyzePage() {
           </p>
         </div>
       ) : (
-        <>
-          {/* Desktop table */}
-          <div className="hidden sm:block">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-xs text-gray-400 border-b border-gray-100">
-                  {selectMode && <th className="py-2 w-8"></th>}
-                  <th className="py-2 w-16"></th>
-                  <th className="py-2 px-3">제목</th>
-                  <th className="py-2 px-3 w-32">채널</th>
-                  <th className="py-2 px-3 w-20">상태</th>
-                  <th className="py-2 px-3 w-28">분석일</th>
-                  <th className="py-2 w-10"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredJobs.map((job) => {
-                  const status = getEffectiveStatus(job);
-                  return (
-                    <tr
-                      key={job.id}
-                      onClick={() => {
-                        if (selectMode) { toggleSelect(job.id); return; }
-                        if (status === 'completed') navigate(`/app/results/${job.id}`);
-                        else if (status === 'processing' || status === 'pending') navigate(`/app/jobs/${job.id}`);
-                      }}
-                      className={`border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors ${
-                        selectedIds.has(job.id) ? 'bg-red-50/50' : ''
-                      }`}
-                    >
-                      {selectMode && (
-                        <td className="py-3">
-                          {selectedIds.has(job.id)
-                            ? <CheckSquare className="w-4 h-4 text-red-500" />
-                            : <Square className="w-4 h-4 text-gray-300" />}
-                        </td>
-                      )}
-                      <td className="py-3">
-                        <div className="w-12 h-16 rounded overflow-hidden bg-gray-100 flex items-center justify-center">
-                          {job.thumbnail_url
-                            ? <img src={job.thumbnail_url} alt="" className="w-full h-full object-cover" />
-                            : <FileVideo className="w-5 h-5 text-gray-300" />}
-                        </div>
-                      </td>
-                      <td className="py-3 px-3">
-                        <p className="text-sm font-medium text-gray-900 truncate max-w-[300px]">
-                          {truncateTitle(job.title || job.product_name || job.video_name || 'Untitled')}
-                        </p>
-                      </td>
-                      <td className="py-3 px-3">
-                        {job.channel_name ? (
-                          <span className="text-xs text-gray-500">@{job.channel_name}</span>
-                        ) : (
-                          <span className="text-xs text-gray-300">직접 업로드</span>
-                        )}
-                      </td>
-                      <td className="py-3 px-3">
-                        {status === 'completed' && <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 font-medium">완료</span>}
-                        {(status === 'processing' || status === 'pending') && <span className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-medium flex items-center gap-1 whitespace-nowrap w-fit"><Loader2 className="w-3 h-3 animate-spin" />분석중</span>}
-                        {status === 'failed' && <span className="text-[10px] px-2 py-0.5 rounded bg-red-50 text-red-600 font-medium">실패</span>}
-                      </td>
-                      <td className="py-3 px-3 text-xs text-gray-400">{timeAgo(job.created_at)}</td>
-                      <td className="py-3">
-                        {!selectMode && (
-                          <button onClick={(e) => { e.stopPropagation(); handleDelete(job.id); }} className="text-gray-300 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-red-50">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile list */}
-          <div className="sm:hidden space-y-2">
-            {filteredJobs.map((job) => {
-              const status = getEffectiveStatus(job);
-              return (
-                <div
-                  key={job.id}
-                  onClick={() => {
-                    if (selectMode) { toggleSelect(job.id); return; }
-                    if (status === 'completed') navigate(`/app/results/${job.id}`);
-                    else if (status === 'processing' || status === 'pending') navigate(`/app/jobs/${job.id}`);
-                  }}
-                  className={`w-full flex items-center gap-3 p-3 bg-white rounded-lg border cursor-pointer transition-all text-left group overflow-hidden ${
-                    selectedIds.has(job.id) ? 'border-red-300 bg-red-50/30' : 'border-gray-100 hover:border-gray-300 hover:shadow-sm'
-                  }`}
-                >
-                  {/* Checkbox */}
-                  {selectMode && (
-                    <div className="shrink-0">
-                      {selectedIds.has(job.id)
-                        ? <CheckSquare className="w-5 h-5 text-red-500" />
-                        : <Square className="w-5 h-5 text-gray-300" />}
-                    </div>
-                  )}
-                  {/* Thumbnail */}
-                  <div className="w-14 h-18 rounded-lg overflow-hidden bg-gray-100 shrink-0 flex items-center justify-center">
-                    {job.thumbnail_url ? (
-                      <img src={job.thumbnail_url} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <FileVideo className="w-7 h-7 text-gray-300" />
-                    )}
+        <div className="space-y-2">
+          {filteredJobs.map((job) => {
+            const status = getEffectiveStatus(job);
+            return (
+              <div
+                key={job.id}
+                onClick={() => {
+                  if (selectMode) { toggleSelect(job.id); return; }
+                  if (status === 'completed') navigate(`/app/results/${job.id}`);
+                  else if (status === 'processing' || status === 'pending') navigate(`/app/jobs/${job.id}`);
+                }}
+                className={`w-full flex items-center gap-3 p-3 sm:gap-4 sm:p-4 bg-white rounded-xl border cursor-pointer transition-all text-left group overflow-hidden ${
+                  selectedIds.has(job.id) ? 'border-red-300 bg-red-50/30' : 'border-gray-100 hover:border-gray-300 hover:shadow-sm'
+                }`}
+              >
+                {/* Checkbox */}
+                {selectMode && (
+                  <div className="shrink-0">
+                    {selectedIds.has(job.id)
+                      ? <CheckSquare className="w-5 h-5 text-red-500" />
+                      : <Square className="w-5 h-5 text-gray-300" />}
                   </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    {/* Channel badge */}
-                    {job.channel_name && (
-                      <span className="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-100 text-gray-500 font-medium mb-1">
-                        @{job.channel_name}
-                      </span>
-                    )}
-                    {/* Title */}
-                    <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug break-all">
-                      {truncateTitle(job.title || job.product_name || job.video_name || 'Untitled')}
-                    </p>
-                    {/* Status + Dates */}
-                    <div className="flex items-center gap-2 mt-2 flex-wrap">
-                      {status === 'completed' && (
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 font-medium">✅ 완료</span>
-                      )}
-                      {(status === 'processing' || status === 'pending') && (
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-medium flex items-center gap-1 whitespace-nowrap">
-                          <Loader2 className="w-3 h-3 animate-spin" />분석중
-                        </span>
-                      )}
-                      {status === 'failed' && (
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-red-50 text-red-600 font-medium">❌ 실패</span>
-                      )}
-                      <span className="text-[10px] text-gray-400">분석: {timeAgo(job.created_at)}</span>
-                      {job.posted_at && (
-                        <span className="text-[10px] text-gray-400">· 게시: {timeAgo(job.posted_at)}</span>
-                      )}
-                      {!job.channel_name && (
-                        <span className="text-[10px] text-gray-300">· 직접 업로드</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {status === 'completed' && <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-gray-500 transition-colors" />}
-                  {!selectMode && (
-                    <button onClick={(e) => { e.stopPropagation(); handleDelete(job.id); }} className="shrink-0 text-gray-400 hover:text-red-500 active:text-red-600 transition-all p-2 -mr-2 rounded-lg hover:bg-red-50" title="삭제"><Trash2 className="w-5 h-5" /></button>
+                )}
+                {/* Thumbnail */}
+                <div className="w-14 h-18 sm:w-20 sm:h-24 rounded-xl overflow-hidden bg-gray-100 shrink-0 flex items-center justify-center">
+                  {job.thumbnail_url ? (
+                    <img src={job.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <FileVideo className="w-7 h-7 text-gray-300" />
                   )}
                 </div>
-              );
-            })}
-          </div>
-        </>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  {/* Channel badge */}
+                  {job.channel_name && (
+                    <span className="inline-block text-[10px] px-2 py-0.5 rounded bg-gray-100 text-gray-500 font-medium mb-1">
+                      @{job.channel_name}
+                    </span>
+                  )}
+                  {/* Title */}
+                  <p className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug break-all">
+                    {job.title || job.product_name || job.video_name || 'Untitled'}
+                  </p>
+                  {/* Status + Dates */}
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    {status === 'completed' && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 font-medium">✅ 완료</span>
+                    )}
+                    {(status === 'processing' || status === 'pending') && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium flex items-center gap-1">
+                        <Loader2 className="w-3 h-3 animate-spin" />분석중
+                      </span>
+                    )}
+                    {status === 'failed' && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-medium">❌ 실패</span>
+                    )}
+                    <span className="text-[10px] text-gray-400">분석: {timeAgo(job.created_at)}</span>
+                    {job.posted_at && (
+                      <span className="text-[10px] text-gray-400">· 게시: {timeAgo(job.posted_at)}</span>
+                    )}
+                    {!job.channel_name && (
+                      <span className="text-[10px] text-gray-300">· 직접 업로드</span>
+                    )}
+                  </div>
+                </div>
+
+                {status === 'completed' && <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-gray-500 transition-colors" />}
+                {!selectMode && (
+                  <button onClick={(e) => { e.stopPropagation(); handleDelete(job.id); }} className="shrink-0 text-gray-400 hover:text-red-500 active:text-red-600 transition-all p-2 -mr-2 rounded-lg hover:bg-red-50" title="삭제"><Trash2 className="w-5 h-5" /></button>
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );

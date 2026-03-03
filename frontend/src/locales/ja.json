@@ -89,7 +89,7 @@
     "company": "CRABs Inc. | 代表 キム・テヨン | 事業者登録番号 224-88-02602"
   },
   "analyze": {
-    "title": "動画分析を開始",
+    "title": "プロジェクト",
     "description": "ショート動画をアップロードすると、AIが自動で分析します",
     "tab_file": "ファイルアップロード",
     "tab_url": "URL入力",

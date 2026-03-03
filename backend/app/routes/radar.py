@@ -79,11 +79,22 @@ async def add_channel(body: ChannelCreate, user: dict = Depends(get_current_user
         "follower_count": info.get("follower_count", info.get("subscriber_count")),
         "category": body.category,
         "platform": body.platform,
+        "is_active": True,
     }
 
-    resp = sb.table("radar_channels").insert(row).execute()
+    try:
+        resp = sb.table("radar_channels").insert(row).execute()
+    except Exception as e:
+        if "duplicate" in str(e).lower() or "23505" in str(e):
+            # Already exists but maybe inactive — reactivate
+            existing = sb.table("radar_channels").select("*").eq("user_id", user["id"]).eq("ig_username", username).single().execute()
+            if existing.data:
+                sb.table("radar_channels").update({"is_active": True}).eq("id", existing.data["id"]).execute()
+                return existing.data
+            raise HTTPException(status_code=400, detail="이미 등록된 채널입니다.")
+        raise HTTPException(status_code=400, detail=f"채널 등록에 실패했습니다: {str(e)[:100]}")
     if not resp.data:
-        raise HTTPException(status_code=400, detail="채널 등록에 실패했습니다. 이미 등록된 채널일 수 있습니다.")
+        raise HTTPException(status_code=400, detail="채널 등록에 실패했습니다.")
     return resp.data[0]
 
 
