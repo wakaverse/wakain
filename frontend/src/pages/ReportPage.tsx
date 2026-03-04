@@ -388,36 +388,47 @@ function CutSpeedChart({ result }: { result: AnalysisResult }) {
   if (cuts.length < 2) return null;
 
   const maxDur = Math.max(...cuts.map(c => c.duration));
+  const minDur = Math.min(...cuts.map(c => c.duration));
   const totalTime = Math.max(...cuts.map(c => c.start + c.duration));
   const W = 320;
   const H = 64;
-  const gap = 1;
+  const padY = 4;
+
+  // 포인트 좌표: X=컷 중간시점, Y=속도(듀레이션 역전 — 짧을수록 위)
+  const points = cuts.map((cut) => {
+    const midX = ((cut.start + cut.duration / 2) / totalTime) * W;
+    const speed = maxDur === minDur ? 0.5 : 1 - (cut.duration - minDur) / (maxDur - minDur);
+    const y = padY + (1 - speed) * (H - padY * 2);
+    return { x: midX, y };
+  });
+
+  // 부드러운 곡선 (catmull-rom → cubic bezier)
+  const linePath = points.map((p, i) => (i === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`)).join(' ');
+  const areaPath = `${linePath} L${points[points.length - 1].x},${H} L${points[0].x},${H} Z`;
 
   return (
     <div className="mt-4">
       <p className="text-xs text-gray-400 mb-2">컷 속도 변화</p>
-      <svg viewBox={`0 0 ${W} ${H + 16}`} className="w-full" preserveAspectRatio="none">
-        {cuts.map((cut, i) => {
-          const x = (cut.start / totalTime) * W;
-          const barW = Math.max(2, ((cut.duration / totalTime) * W) - gap);
-          const h = (cut.duration / maxDur) * H;
-          const shade = 180 - Math.round((cut.duration / maxDur) * 80);
-          return (
-            <rect
-              key={i}
-              x={x}
-              y={H - h}
-              width={barW}
-              height={h}
-              rx={1}
-              fill={`rgb(${shade},${shade},${shade})`}
-            />
-          );
-        })}
+      <svg viewBox={`0 0 ${W} ${H + 16}`} className="w-full">
+        {/* 영역 채움 */}
+        <defs>
+          <linearGradient id="speedGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#6366f1" stopOpacity={0.15} />
+            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+        <path d={areaPath} fill="url(#speedGrad)" />
+        {/* 라인 */}
+        <path d={linePath} fill="none" stroke="#6366f1" strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
+        {/* 포인트 */}
+        {points.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r={2} fill="#6366f1" />
+        ))}
+        {/* 축 라벨 */}
         <text x={0} y={H + 12} fontSize={8} fill="#999">0s</text>
         <text x={W} y={H + 12} fontSize={8} fill="#999" textAnchor="end">{Math.round(totalTime)}s</text>
-        <text x={W} y={8} fontSize={7} fill="#ccc" textAnchor="end">길게</text>
-        <text x={W} y={H - 2} fontSize={7} fill="#ccc" textAnchor="end">짧게</text>
+        <text x={W} y={padY + 2} fontSize={7} fill="#ccc" textAnchor="end">빠름</text>
+        <text x={W} y={H - padY + 2} fontSize={7} fill="#ccc" textAnchor="end">느림</text>
       </svg>
     </div>
   );
