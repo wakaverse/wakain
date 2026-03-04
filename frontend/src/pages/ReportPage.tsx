@@ -376,14 +376,14 @@ const SECTION_COLORS: Record<string, string> = {
   '정적': '#d1d5db',
 };
 
-function VisualEnergyChart({ temporal }: { temporal: TemporalData }) {
+function VisualEnergyChart({ temporal, duration }: { temporal: TemporalData; duration?: number }) {
   const pts = temporal.attention_curve.points;
   if (pts.length < 2) return null;
 
   const W = 320;
   const H = 72;
   const padY = 6;
-  const maxTs = pts[pts.length - 1].timestamp;
+  const maxTs = duration || pts[pts.length - 1].timestamp;
 
   const coords = pts.map((p) => ({
     x: (p.timestamp / maxTs) * W,
@@ -413,7 +413,7 @@ function VisualEnergyChart({ temporal }: { temporal: TemporalData }) {
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs text-gray-400">👁 시각 에너지</p>
+        <p className="text-xs text-gray-400">👁 시각 에너지 <span className="text-gray-300">· 화면 변화량</span></p>
         <p className="text-xs text-gray-400">
           평균 <span className="font-medium text-gray-600">{temporal.attention_curve.attention_avg}</span>
           {' · '}
@@ -462,14 +462,14 @@ function VisualEnergyChart({ temporal }: { temporal: TemporalData }) {
 
 /* ── SVG: Edit Rhythm Chart (Cut Density) ── */
 
-function EditRhythmChart({ temporal }: { temporal: TemporalData }) {
+function EditRhythmChart({ temporal, duration }: { temporal: TemporalData; duration?: number }) {
   const cr = temporal.cut_rhythm;
   if (cr.intervals.length < 2) return null;
 
   const W = 320;
   const H = 56;
   const padY = 4;
-  const maxTs = cr.cut_timestamps[cr.cut_timestamps.length - 1];
+  const maxTs = duration || cr.cut_timestamps[cr.cut_timestamps.length - 1];
 
   // 슬라이딩 윈도우 (3초) 컷 밀도
   const WINDOW = 3;
@@ -505,7 +505,7 @@ function EditRhythmChart({ temporal }: { temporal: TemporalData }) {
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs text-gray-400">✂️ 편집 리듬</p>
+        <p className="text-xs text-gray-400">✂️ 편집 리듬 <span className="text-gray-300">· 컷 빈도</span></p>
         <p className="text-xs text-gray-400">
           패턴 <span className="font-medium text-gray-600">{patternKo[cr.pattern] || cr.pattern}</span>
           {' · '}
@@ -890,8 +890,8 @@ function SummaryTab({ result, seekTo, navigate }: {
           </div>
           {result.temporal ? (
             <>
-              <VisualEnergyChart temporal={result.temporal} />
-              <EditRhythmChart temporal={result.temporal} />
+              <VisualEnergyChart temporal={result.temporal} duration={edit?.duration} />
+              <EditRhythmChart temporal={result.temporal} duration={edit?.duration} />
             </>
           ) : (
             <CutSpeedChartFallback result={result} />
