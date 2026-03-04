@@ -248,7 +248,11 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
         extra = _load_extra_analysis(analysis_dir, video_name)
 
         # Build a lightweight summary for fast loading
-        summary = _build_summary(recipe_json)
+        try:
+            summary = _build_summary(recipe_json)
+        except Exception as exc:
+            print(f"[pipeline:{job_id[:8]}] ⚠️ Summary build failed: {exc}", flush=True)
+            summary = {}
 
         # Extract thumbnails for each cut
         thumbnails_json = None
@@ -279,14 +283,24 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
             print(f'[pipeline:{job_id[:8]}] Persuasion lens failed (non-fatal): {exc}', flush=True)
 
         # Save to results table
-        _supabase().table("results").insert({
-            "job_id": job_id,
-            "recipe_json": recipe_json,
-            "summary_json": summary,
-            "thumbnails_json": thumbnails_json,
-            "persuasion_lens_json": persuasion_lens_json,
-            **extra,
-        }).execute()
+        try:
+            insert_data = {
+                "job_id": job_id,
+                "recipe_json": recipe_json,
+                "summary_json": summary,
+                "thumbnails_json": thumbnails_json,
+                "persuasion_lens_json": persuasion_lens_json,
+            }
+            # Merge extra fields, skipping None values that might cause issues
+            for k, v in extra.items():
+                if v is not None:
+                    insert_data[k] = v
+            _supabase().table("results").insert(insert_data).execute()
+        except Exception as exc:
+            print(f"[pipeline:{job_id[:8]}] ⚠️ Results insert failed: {exc}", flush=True)
+            import traceback
+            traceback.print_exc()
+            raise
 
         # Mark job completed
         _update_job(job_id, status="completed", completed_at=_now())
