@@ -391,7 +391,7 @@ function CutSpeedChart({ result }: { result: AnalysisResult }) {
   const totalTime = Math.max(...cuts.map(c => c.start + c.duration));
   const W = 320;
   const H = 64;
-  const barW = Math.max(2, (W / cuts.length) - 1);
+  const gap = 1;
 
   return (
     <div className="mt-4">
@@ -399,6 +399,7 @@ function CutSpeedChart({ result }: { result: AnalysisResult }) {
       <svg viewBox={`0 0 ${W} ${H + 16}`} className="w-full" preserveAspectRatio="none">
         {cuts.map((cut, i) => {
           const x = (cut.start / totalTime) * W;
+          const barW = Math.max(2, ((cut.duration / totalTime) * W) - gap);
           const h = (cut.duration / maxDur) * H;
           const shade = 180 - Math.round((cut.duration / maxDur) * 80);
           return (
@@ -406,7 +407,7 @@ function CutSpeedChart({ result }: { result: AnalysisResult }) {
               key={i}
               x={x}
               y={H - h}
-              width={Math.max(barW, 2)}
+              width={barW}
               height={h}
               rx={1}
               fill={`rgb(${shade},${shade},${shade})`}
