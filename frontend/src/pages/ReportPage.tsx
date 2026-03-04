@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Loader2, Zap, Target, Film,
   FileText, Layers, ArrowLeftRight,
-  Sparkles, BarChart2, Lightbulb,
+  Sparkles,
 } from 'lucide-react';
 import { getResult, addLibraryItem } from '../lib/api';
 import type { AnalysisResult, AppealPoint, Stt, PersuasionStep, FrameworkMatch, TemporalData } from '../types';
@@ -142,168 +142,6 @@ function extractEdit(result: AnalysisResult): EditInfo | null {
 }
 
 
-/* ── Score Card Helpers ───────────────────── */
-
-interface ScoreMetric {
-  emoji: string;
-  label: string;
-  value: string;
-  status: '✅' | '⚠️' | '❌';
-  score: number;
-  evidence: string;
-}
-
-function ratingScore(r: string): number { return r === 'strong' ? 100 : r === 'moderate' ? 60 : 30; }
-function ratingStatus(r: string): '✅' | '⚠️' | '❌' { return r === 'strong' ? '✅' : r === 'moderate' ? '⚠️' : '❌'; }
-function ratingKo(r: string): string { return r === 'strong' ? '강' : r === 'moderate' ? '보통' : '약'; }
-
-function buildScoreMetrics(result: AnalysisResult): { metrics: ScoreMetric[]; overall: number } {
-  const pm = result.video_recipe?.video_recipe?.performance_metrics;
-  const ea = result.video_recipe?.video_recipe?.effectiveness_assessment;
-  if (!pm || !ea) return { metrics: [], overall: 0 };
-
-  const productRatio = pm.product_focus_ratio > 1 ? pm.product_focus_ratio / 100 : pm.product_focus_ratio;
-  const productPct = Math.round(productRatio * 100);
-  const cr = result.temporal?.cut_rhythm;
-  const attnAvg = result.temporal?.attention_curve?.attention_avg ?? pm.attention_avg;
-  const patternKo: Record<string, string> = { accelerating: '가속', decelerating: '감속', constant: '일정', irregular: '불규칙' };
-
-  const appealOk = pm.appeal_count >= 5 && pm.appeal_diversity >= 3;
-  const appealMid = pm.appeal_count >= 3 || pm.appeal_diversity >= 2;
-  const appealScore = appealOk ? 100 : appealMid ? 60 : 30;
-
-  const cutOk = pm.cut_density >= 0.3 && pm.cut_density <= 0.8;
-  const cutMid = pm.cut_density >= 0.15 && pm.cut_density <= 1.2;
-  const rhythmBase = cutOk ? 80 : cutMid ? 55 : 30;
-  const attnBonus = attnAvg >= 60 ? 20 : attnAvg >= 40 ? 10 : 0;
-  const rhythmScore = Math.min(rhythmBase + attnBonus, 100);
-
-  const captionScore = pm.text_readability_score;
-  const productOk = productRatio >= 0.3 && pm.time_to_first_appeal <= 5;
-  const productMid = productRatio >= 0.15 || pm.time_to_first_appeal <= 10;
-  const productScore = productOk ? 100 : productMid ? 60 : 30;
-
-  const hookSc = ratingScore(ea.hook_rating);
-  const ctaSc = ratingScore(ea.cta_strength);
-  const scores = [hookSc, appealScore, rhythmScore, captionScore, productScore, ctaSc];
-  const overall = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-
-  const metrics: ScoreMetric[] = [
-    {
-      emoji: '🎣', label: '훅', value: ratingKo(ea.hook_rating),
-      status: ratingStatus(ea.hook_rating), score: hookSc,
-      evidence: `훅 강도 ${ratingKo(ea.hook_rating)} — ${ea.hook_rating === 'strong' ? '강렬한 오프닝으로 시선 고정' : ea.hook_rating === 'moderate' ? '보통 수준의 훅 효과' : '훅이 약함, 오프닝 보강 필요'}`,
-    },
-    {
-      emoji: '💬', label: '소구', value: `${pm.appeal_count}개·${pm.appeal_diversity}유형`,
-      status: appealOk ? '✅' : appealMid ? '⚠️' : '❌', score: appealScore,
-      evidence: `소구 ${pm.appeal_count}개, ${pm.appeal_diversity}가지 유형 — ${appealOk ? '다양하고 풍부한 소구 구조' : appealMid ? '기본 소구는 갖췄으나 다양성 보강 권장' : '소구 포인트 부족, 추가 필요'}`,
-    },
-    {
-      emoji: '✂️', label: '리듬',
-      value: cr ? `${cr.avg_interval}s·${patternKo[cr.pattern] || cr.pattern}` : `${pm.cut_density.toFixed(2)}/s`,
-      status: rhythmScore >= 80 ? '✅' : rhythmScore >= 55 ? '⚠️' : '❌', score: rhythmScore,
-      evidence: `컷 밀도 ${pm.cut_density.toFixed(2)}/초${attnAvg ? `, 시각 에너지 평균 ${attnAvg}` : ''}`,
-    },
-    {
-      emoji: '📝', label: '자막', value: `${pm.text_readability_score}점`,
-      status: captionScore >= 80 ? '✅' : captionScore >= 50 ? '⚠️' : '❌', score: captionScore,
-      evidence: `텍스트 가독성 ${pm.text_readability_score}점 — ${captionScore >= 80 ? '자막이 명확하고 읽기 쉬움' : captionScore >= 50 ? '자막 가독성 보통, 개선 여지 있음' : '자막 가독성 낮음, 재검토 필요'}`,
-    },
-    {
-      emoji: '📦', label: '제품 노출', value: `${productPct}%·${pm.time_to_first_appeal.toFixed(1)}s`,
-      status: productOk ? '✅' : productMid ? '⚠️' : '❌', score: productScore,
-      evidence: `제품 비중 ${productPct}%, 첫 등장 ${pm.time_to_first_appeal.toFixed(1)}초 — ${productOk ? '적절한 제품 노출 전략' : productMid ? '제품 노출 개선 여지 있음' : '제품 노출 불충분, 재편집 권장'}`,
-    },
-    {
-      emoji: '🎯', label: 'CTA', value: `${ratingKo(ea.cta_strength)}·${pm.time_to_cta.toFixed(1)}s`,
-      status: ratingStatus(ea.cta_strength), score: ctaSc,
-      evidence: `CTA 강도 ${ratingKo(ea.cta_strength)}, ${pm.time_to_cta.toFixed(1)}초 등장 — ${ea.cta_strength === 'strong' ? '명확하고 강한 행동 유도' : ea.cta_strength === 'moderate' ? 'CTA는 있으나 강도 개선 필요' : 'CTA 약함, 명확한 행동 유도 추가 필요'}`,
-    },
-  ];
-
-  return { metrics, overall };
-}
-
-function getVerdictText(score: number): string {
-  if (score >= 85) return '전반적으로 강한 퍼포먼스 영상';
-  if (score >= 70) return '핵심 지표 양호, 일부 보완 가능';
-  if (score >= 55) return '기본기는 갖췄으나 개선 여지 있음';
-  return '구조 전반적 재검토 권장';
-}
-
-/* ── Key Insights Helpers ─────────────────── */
-
-interface KeyInsightItem {
-  emoji: string;
-  title: string;
-  description: string;
-  sentiment: 'positive' | 'warning' | 'negative';
-  timestamp?: number;
-}
-
-function buildKeyInsights(result: AnalysisResult): KeyInsightItem[] {
-  const pm = result.video_recipe?.video_recipe?.performance_metrics;
-  const ea = result.video_recipe?.video_recipe?.effectiveness_assessment;
-  const pa = result.video_recipe?.video_recipe?.persuasion_analysis;
-  const recipe = result.video_recipe?.video_recipe;
-  const temporal = result.temporal;
-  if (!pm || !ea) return [];
-
-  const productRatio = pm.product_focus_ratio > 1 ? pm.product_focus_ratio / 100 : pm.product_focus_ratio;
-  const productPct = Math.round(productRatio * 100);
-  const hookLine = recipe?.audio?.voice?.hook_line || '';
-  const hookTime = recipe?.structure?.hook_time || 3;
-  const ec = temporal?.exposure_curve;
-  const patternKo: Record<string, string> = { accelerating: '가속', decelerating: '감속', constant: '일정', irregular: '불규칙' };
-
-  const insights: KeyInsightItem[] = [];
-
-  // 1. 훅 효과 (always)
-  insights.push({
-    emoji: '🎣',
-    title: `훅 ${ratingKo(ea.hook_rating)} — 첫 ${hookTime}초`,
-    description: hookLine
-      ? `"${hookLine.slice(0, 40)}${hookLine.length > 40 ? '…' : ''}"으로 주목 유도`
-      : `훅 구간 ${hookTime}초 · 강도 ${ratingKo(ea.hook_rating)}`,
-    sentiment: ea.hook_rating === 'strong' ? 'positive' : ea.hook_rating === 'moderate' ? 'warning' : 'negative',
-    timestamp: 0,
-  });
-
-  // 2. 제품 노출 전략
-  insights.push({
-    emoji: '📦',
-    title: `제품 ${pm.time_to_first_appeal.toFixed(1)}초 첫 등장 · 전체 ${productPct}% 노출`,
-    description: ec
-      ? `사람 ${Math.round(ec.total_human_time_ratio * 100)}% ↔ 제품 ${Math.round(ec.total_product_time_ratio * 100)}%${ec.circulation_pattern ? ' · ' + ec.circulation_pattern : ''}`
-      : `제품 집중도 ${productPct}%${pm.time_to_first_appeal <= 5 ? ' · 빠른 노출 전략' : ' · 노출 지연'}`,
-    sentiment: productRatio >= 0.3 && pm.time_to_first_appeal <= 5 ? 'positive' : 'warning',
-    timestamp: pm.time_to_first_appeal,
-  });
-
-  // 3. 편집 리듬 (temporal 있을 때) or 소구 구조 fallback
-  if (temporal?.cut_rhythm) {
-    const cr = temporal.cut_rhythm;
-    const arc = temporal.attention_curve?.attention_arc || '';
-    insights.push({
-      emoji: '✂️',
-      title: `${cr.avg_interval}초 컷 · ${patternKo[cr.pattern] || cr.pattern} 패턴`,
-      description: arc ? `시각 에너지 "${arc}"` : `총 ${cr.total_cuts}컷 · ${cr.min_interval}s~${cr.max_interval}s`,
-      sentiment: cr.pattern === 'irregular' ? 'warning' : 'positive',
-    });
-  } else {
-    const primaryAppeal = pa?.primary_appeal || '';
-    const layering = pa?.appeal_layering || '';
-    insights.push({
-      emoji: '💬',
-      title: `${pm.appeal_count}개 소구 · ${pm.appeal_diversity}가지 유형`,
-      description: [primaryAppeal ? primaryAppeal + ' 중심' : '', layering ? layering + ' 전개' : ''].filter(Boolean).join(' · '),
-      sentiment: pm.appeal_count >= 5 && pm.appeal_diversity >= 3 ? 'positive' : pm.appeal_count >= 3 ? 'warning' : 'negative',
-    });
-  }
-
-  return insights;
-}
 
 
 interface StructuredSummary {
@@ -450,14 +288,20 @@ const APPEAL_LABELS: Record<string, string> = {
   curiosity: '호기심 유발',
   humor: '유머',
   trust: '신뢰 구축',
-  ingredient: '성분/원료',
+  ingredient: '성분',
   manufacturing: '제조 과정',
   comparison: '비교',
   transformation: '변화/전후',
   community: '커뮤니티',
   convenience: '편의성',
-  sensory: '감각 자극',
+  sensory: '감각',
   narrative: '스토리텔링',
+  myth_bust: '신화 깨기',
+  authenticity: '진정성',
+  achievement: '실적',
+  guarantee: '보증',
+  process: '공정',
+  specification: '스펙',
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -947,104 +791,231 @@ function FrameworkLens({ fw, seekTo }: { fw: FrameworkMatch; seekTo: (s: number)
   );
 }
 
-/* ── Score Card Component ─────────────────── */
+/* ── Video Structure Summary ──────────────── */
 
-function ScoreCardSection({ result }: { result: AnalysisResult }) {
-  const [activeIdx, setActiveIdx] = useState<number | null>(null);
-  const { metrics, overall } = buildScoreMetrics(result);
-  if (!metrics.length) return null;
-
-  const overallColor =
-    overall >= 85 ? 'text-green-600' :
-    overall >= 70 ? 'text-blue-600' :
-    overall >= 55 ? 'text-amber-600' : 'text-red-600';
-  const overallBadge =
-    overall >= 85 ? 'bg-green-50 text-green-700' :
-    overall >= 70 ? 'bg-blue-50 text-blue-700' :
-    overall >= 55 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700';
-
+function StructureRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <Card icon={BarChart2} title="영상 성적표">
-      <div className="flex items-center gap-4 mb-5">
-        <div className="text-center shrink-0">
-          <p className={`text-5xl font-bold leading-none ${overallColor}`}>{overall}</p>
-          <p className="text-xs text-gray-400 mt-1">/ 100</p>
-        </div>
-        <div>
-          <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-1.5 ${overallBadge}`}>
-            {overall >= 85 ? '우수' : overall >= 70 ? '양호' : overall >= 55 ? '보통' : '미흡'}
-          </span>
-          <p className="text-sm text-gray-600">{getVerdictText(overall)}</p>
-        </div>
+    <div className="flex items-start gap-3 py-2.5 border-b border-gray-50 last:border-0">
+      <span className="text-xs text-gray-400 w-20 shrink-0 pt-0.5">{label}</span>
+      <div className="flex-1 flex flex-wrap gap-1.5 items-center min-w-0">
+        {children}
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-        {metrics.map((m, i) => (
-          <button
-            key={m.label}
-            onClick={() => setActiveIdx(activeIdx === i ? null : i)}
-            className={`flex flex-col items-center gap-1 p-3 rounded-xl border transition-all ${
-              activeIdx === i
-                ? 'border-gray-300 bg-gray-50'
-                : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            <span className="text-xl leading-none">{m.emoji}</span>
-            <span className="text-[10px] text-gray-400 mt-0.5">{m.label}</span>
-            <span className="text-[11px] font-medium text-gray-700 truncate w-full text-center leading-tight">{m.value}</span>
-            <span className="text-base leading-none">{m.status}</span>
-          </button>
-        ))}
-      </div>
-      {activeIdx !== null && (
-        <div className="mt-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-600 leading-relaxed">{metrics[activeIdx].evidence}</p>
-        </div>
-      )}
-    </Card>
+    </div>
   );
 }
 
-/* ── Key Insights Component ───────────────── */
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-block text-[11px] px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded-full font-medium">
+      {children}
+    </span>
+  );
+}
 
-function KeyInsightsSection({ result, seekTo }: { result: AnalysisResult; seekTo: (s: number) => void }) {
-  const insights = buildKeyInsights(result);
-  if (!insights.length) return null;
+const CATEGORY_ICONS: Record<string, string> = {
+  food: '🍽️', beauty: '💄', health: '💊', fashion: '👗',
+  electronics: '📱', home: '🏠', sports: '🏋️', pet: '🐾',
+  kids: '🧸', travel: '✈️',
+};
 
-  const sentimentCls = {
-    positive: { wrap: 'bg-green-50 border-green-100', title: 'text-green-700' },
-    warning:  { wrap: 'bg-amber-50 border-amber-100',  title: 'text-amber-700' },
-    negative: { wrap: 'bg-red-50 border-red-100',      title: 'text-red-700' },
-  };
+const PRESENTER_TYPE_KO: Record<string, string> = {
+  narrator: '내레이터', expert: '전문가', celebrity: '셀럽',
+  user: '사용자', actor: '배우', anonymous: '익명',
+};
+
+const TECHNIQUE_KO: Record<string, string> = {
+  ingredient_shot: '성분컷', package_shot: '패키지', process_shot: '공정',
+  graph_number: '수치', text_overlay: '텍스트', closeup: '클로즈업',
+  demo_shot: '시연', before_after: '비포애프터', comparison: '비교',
+  testimonial: '후기',
+};
+
+const CUT_PATTERN_KO: Record<string, string> = {
+  accelerating: '가속 패턴', decelerating: '감속 패턴',
+  constant: '일정 패턴', irregular: '불규칙 패턴',
+};
+
+function VideoStructureSummary({ result }: { result: AnalysisResult }) {
+  const recipe = result.video_recipe?.video_recipe;
+  const product = result.product;
+  const pa = recipe?.persuasion_analysis;
+  const structure = recipe?.structure;
+  const meta = recipe?.meta;
+  const temporal = result.temporal;
+
+  if (!recipe) return null;
+
+  // Product header
+  const categoryIcon = CATEGORY_ICONS[meta?.category || ''] || '📦';
+  const productLine = [product?.product_name, product?.brand, product?.category]
+    .filter(Boolean).join(' · ');
+
+  // Hook
+  const hookLine = recipe.audio?.voice?.hook_line || '';
+  const firstAppealType = pa?.appeal_points?.[0]?.type || '';
+
+  // Appeal unique types
+  const appealTypes: string[] = Array.from(
+    new Set((pa?.appeal_points || []).map((a: any) => a.type as string))
+  );
+  const appealCount = pa?.appeal_points?.length || 0;
+
+  // Persuasion flow: appeal_structure.groups → scene_sequence deduped
+  let persuasionFlow: string[] = [];
+  if (result.appeal_structure?.groups?.length) {
+    persuasionFlow = result.appeal_structure.groups.map((g: any) => g.name as string);
+  } else if (structure?.scene_sequence?.length) {
+    const seen = new Set<string>();
+    for (const s of structure.scene_sequence) {
+      if (s.role && !seen.has(s.role)) { seen.add(s.role); persuasionFlow.push(roleLabel(s.role)); }
+    }
+  }
+
+  // CTA
+  const ctaStart = structure?.cta_start;
+  const ctaLine = recipe.audio?.voice?.cta_line || '';
+
+  // Video stats
+  const duration = meta?.duration || 0;
+  const cutCount = structure?.scene_sequence?.length || 0;
+  const avgCut = temporal?.cut_rhythm?.avg_interval ?? recipe.visual_style?.avg_cut_interval;
+
+  // Product exposure
+  const productRatioRaw = recipe.visual_style?.product_screen_time_ratio
+    ?? (recipe.performance_metrics?.product_focus_ratio != null
+      ? (recipe.performance_metrics.product_focus_ratio > 1
+        ? recipe.performance_metrics.product_focus_ratio / 100
+        : recipe.performance_metrics.product_focus_ratio)
+      : null);
+  const productPct = productRatioRaw != null ? Math.round(productRatioRaw * 100) : null;
+  const firstAppear = structure?.product_first_appear;
+
+  // Presenter
+  const presenterType = pa?.presenter?.type || '';
+  const faceShown = pa?.presenter?.face_shown;
+
+  // Emphasis techniques from visual_proof
+  const techniques: string[] = Array.from(new Set(
+    (pa?.appeal_points || [])
+      .map((a: any) => a.visual_proof?.technique as string)
+      .filter((t: string) => t && t !== 'none')
+  ));
+
+  // Cut pattern
+  const cutPattern = temporal?.cut_rhythm?.pattern;
 
   return (
-    <Card icon={Lightbulb} title="핵심 인사이트">
-      <div className="space-y-3">
-        {insights.map((ins, i) => {
-          const cls = sentimentCls[ins.sentiment];
-          return (
-            <div key={i} className={`${cls.wrap} border rounded-xl p-4`}>
-              <div className="flex items-start gap-3">
-                <span className="text-xl shrink-0 leading-none mt-0.5">{ins.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <p className={`text-sm font-semibold ${cls.title}`}>{ins.title}</p>
-                    {ins.timestamp !== undefined && (
-                      <button
-                        onClick={() => seekTo(ins.timestamp!)}
-                        className="text-[10px] font-mono text-gray-400 hover:text-gray-600 transition-colors shrink-0"
-                      >
-                        {fmtTime(ins.timestamp)} ▶
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{ins.description}</p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      {productLine && (
+        <div className="px-5 py-3.5 border-b border-gray-100 bg-[#fafafa]">
+          <p className="text-sm text-gray-700 font-medium">
+            <span className="mr-1.5">{categoryIcon}</span>{productLine}
+          </p>
+        </div>
+      )}
+
+      <div className="p-5">
+        {/* Script section */}
+        <p className="text-[11px] font-semibold text-gray-400 tracking-wide mb-1">📝 대본</p>
+        <div>
+          {(firstAppealType || hookLine) && (
+            <StructureRow label="훅">
+              {firstAppealType && (
+                <span className="text-sm text-gray-800 font-medium">
+                  {appealLabel(firstAppealType)}
+                </span>
+              )}
+              {hookLine && (
+                <span className="text-sm text-gray-500">— &ldquo;{hookLine}&rdquo;</span>
+              )}
+            </StructureRow>
+          )}
+
+          {appealTypes.length > 0 && (
+            <StructureRow label="소구">
+              {appealTypes.map((type) => (
+                <Pill key={type}>{appealLabel(type)}</Pill>
+              ))}
+            </StructureRow>
+          )}
+
+          {appealCount > 0 && (
+            <StructureRow label="소구 수">
+              <span className="text-sm text-gray-700">{appealCount}개 소구 포인트</span>
+            </StructureRow>
+          )}
+
+          {persuasionFlow.length > 0 && (
+            <StructureRow label="설득 흐름">
+              <span className="text-sm text-gray-700">{persuasionFlow.join(' → ')}</span>
+            </StructureRow>
+          )}
+
+          {ctaStart != null && (
+            <StructureRow label="CTA">
+              <span className="text-sm text-gray-700">
+                {ctaLine ? `${ctaLine.slice(0, 30)}${ctaLine.length > 30 ? '…' : ''}` : 'CTA'} ({Math.round(ctaStart)}초)
+              </span>
+            </StructureRow>
+          )}
+        </div>
+
+        <div className="my-4 border-t border-gray-100" />
+
+        {/* Video section */}
+        <p className="text-[11px] font-semibold text-gray-400 tracking-wide mb-1">🎬 영상</p>
+        <div>
+          {(duration > 0 || cutCount > 0) && (
+            <StructureRow label="길이 · 컷">
+              <span className="text-sm text-gray-700">
+                {duration > 0 ? `${Math.round(duration)}초` : ''}
+                {duration > 0 && cutCount > 0 ? ' · ' : ''}
+                {cutCount > 0 ? `${cutCount}컷` : ''}
+              </span>
+            </StructureRow>
+          )}
+
+          {avgCut != null && (
+            <StructureRow label="편집 속도">
+              <span className="text-sm text-gray-700">평균 {Number(avgCut).toFixed(1)}초/컷</span>
+            </StructureRow>
+          )}
+
+          {(productPct != null || firstAppear != null) && (
+            <StructureRow label="제품 노출">
+              <span className="text-sm text-gray-700">
+                {productPct != null ? `노출 ${productPct}%` : ''}
+                {productPct != null && firstAppear != null ? ' · ' : ''}
+                {firstAppear != null ? `첫 등장 ${firstAppear}초` : ''}
+              </span>
+            </StructureRow>
+          )}
+
+          {presenterType && (
+            <StructureRow label="사람">
+              <span className="text-sm text-gray-700">
+                {PRESENTER_TYPE_KO[presenterType] || presenterType}
+                {faceShown != null ? (faceShown ? ' · 얼굴 노출' : ' · 얼굴 비노출') : ''}
+              </span>
+            </StructureRow>
+          )}
+
+          {techniques.length > 0 && (
+            <StructureRow label="강조 기법">
+              {techniques.map((t) => (
+                <Pill key={t}>{TECHNIQUE_KO[t] || t}</Pill>
+              ))}
+            </StructureRow>
+          )}
+
+          {cutPattern && (
+            <StructureRow label="컷 패턴">
+              <span className="text-sm text-gray-700">{CUT_PATTERN_KO[cutPattern] || cutPattern}</span>
+            </StructureRow>
+          )}
+        </div>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -1101,11 +1072,8 @@ function SummaryTab({ result, seekTo, navigate }: {
         </Card>
       )}
 
-      {/* 1.5 영상 성적표 */}
-      <ScoreCardSection result={result} />
-
-      {/* 1.6 핵심 인사이트 */}
-      <KeyInsightsSection result={result} seekTo={seekTo} />
+      {/* 1.5 영상 구조 요약 */}
+      <VideoStructureSummary result={result} />
 
       {/* 2. 훅 분석 (3초) */}
       {hook && (
