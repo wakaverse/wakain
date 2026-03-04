@@ -6,7 +6,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { getResult, addLibraryItem } from '../lib/api';
-import type { AnalysisResult, AppealPoint, Stt, PersuasionStep, FrameworkMatch } from '../types';
+import type { AnalysisResult, AppealPoint, Stt, PersuasionStep, FrameworkMatch, TemporalData } from '../types';
 
 /* ── Helpers ──────────────────────────────── */
 
@@ -367,9 +367,177 @@ function TabButton({ active, onClick, children }: {
   );
 }
 
-/* ── SVG: Cut Speed Chart ─────────────────── */
+/* ── SVG: Visual Energy Chart (Attention Curve) ── */
 
-function CutSpeedChart({ result }: { result: AnalysisResult }) {
+const SECTION_COLORS: Record<string, string> = {
+  '클라이막스': '#ef4444',
+  '강': '#f97316',
+  '중': '#6366f1',
+  '정적': '#d1d5db',
+};
+
+function VisualEnergyChart({ temporal }: { temporal: TemporalData }) {
+  const pts = temporal.attention_curve.points;
+  if (pts.length < 2) return null;
+
+  const W = 320;
+  const H = 72;
+  const padY = 6;
+  const maxTs = pts[pts.length - 1].timestamp;
+
+  const coords = pts.map((p) => ({
+    x: (p.timestamp / maxTs) * W,
+    y: padY + ((100 - p.score) / 100) * (H - padY * 2),
+    section: p.section,
+    score: p.score,
+  }));
+
+  // 라인 path
+  const linePath = coords.map((c, i) => (i === 0 ? `M${c.x},${c.y}` : `L${c.x},${c.y}`)).join(' ');
+  const areaPath = `${linePath} L${coords[coords.length - 1].x},${H - padY} L${coords[0].x},${H - padY} Z`;
+
+  // 구간별 색상 세그먼트
+  const segments: { path: string; color: string }[] = [];
+  for (let i = 0; i < coords.length - 1; i++) {
+    const c = coords[i];
+    const n = coords[i + 1];
+    segments.push({
+      path: `M${c.x},${c.y} L${n.x},${n.y}`,
+      color: SECTION_COLORS[c.section] || '#6366f1',
+    });
+  }
+
+  // 평균선
+  const avgY = padY + ((100 - temporal.attention_curve.attention_avg) / 100) * (H - padY * 2);
+
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs text-gray-400">👁 시각 에너지</p>
+        <p className="text-xs text-gray-400">
+          평균 <span className="font-medium text-gray-600">{temporal.attention_curve.attention_avg}</span>
+          {' · '}
+          <span className="text-gray-500">{temporal.attention_curve.attention_arc}</span>
+        </p>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H + 16}`} className="w-full">
+        <defs>
+          <linearGradient id="energyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#6366f1" stopOpacity={0.12} />
+            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.01} />
+          </linearGradient>
+        </defs>
+        {/* 영역 */}
+        <path d={areaPath} fill="url(#energyGrad)" />
+        {/* 평균선 */}
+        <line x1={0} y1={avgY} x2={W} y2={avgY} stroke="#d1d5db" strokeWidth={0.5} strokeDasharray="3,3" />
+        {/* 구간별 색상 라인 */}
+        {segments.map((seg, i) => (
+          <path key={i} d={seg.path} fill="none" stroke={seg.color} strokeWidth={1.5} strokeLinecap="round" />
+        ))}
+        {/* 피크 마커 */}
+        {temporal.attention_curve.peak_timestamps.map((ts, i) => {
+          const pt = coords.find(c => Math.abs(c.x - (ts / maxTs) * W) < 2);
+          return pt ? <circle key={i} cx={pt.x} cy={pt.y} r={2.5} fill="#ef4444" opacity={0.8} /> : null;
+        })}
+        {/* 축 라벨 */}
+        <text x={0} y={H + 12} fontSize={8} fill="#999">0s</text>
+        <text x={W} y={H + 12} fontSize={8} fill="#999" textAnchor="end">{Math.round(maxTs)}s</text>
+        <text x={0} y={padY - 1} fontSize={7} fill="#ccc">100</text>
+        <text x={0} y={H - padY + 8} fontSize={7} fill="#ccc">0</text>
+      </svg>
+      {/* 범례 */}
+      <div className="flex gap-3 mt-1.5">
+        {Object.entries(SECTION_COLORS).map(([label, color]) => (
+          <div key={label} className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
+            <span className="text-[10px] text-gray-400">{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+/* ── SVG: Edit Rhythm Chart (Cut Density) ── */
+
+function EditRhythmChart({ temporal }: { temporal: TemporalData }) {
+  const cr = temporal.cut_rhythm;
+  if (cr.intervals.length < 2) return null;
+
+  const W = 320;
+  const H = 56;
+  const padY = 4;
+  const maxTs = cr.cut_timestamps[cr.cut_timestamps.length - 1];
+
+  // 슬라이딩 윈도우 (3초) 컷 밀도
+  const WINDOW = 3;
+  const step = 0.5;
+  const densityPts: { t: number; density: number }[] = [];
+  let maxDensity = 0;
+
+  for (let t = 0; t <= maxTs; t += step) {
+    const count = cr.cut_timestamps.filter(ct => ct >= t && ct < t + WINDOW).length;
+    const density = count / WINDOW; // cuts per second
+    if (density > maxDensity) maxDensity = density;
+    densityPts.push({ t, density });
+  }
+
+  if (maxDensity === 0) return null;
+
+  const coords = densityPts.map((p) => ({
+    x: (p.t / maxTs) * W,
+    y: padY + (1 - p.density / maxDensity) * (H - padY * 2),
+  }));
+
+  const linePath = coords.map((c, i) => (i === 0 ? `M${c.x},${c.y}` : `L${c.x},${c.y}`)).join(' ');
+  const areaPath = `${linePath} L${coords[coords.length - 1].x},${H - padY} L${coords[0].x},${H - padY} Z`;
+
+  // 패턴 한글 매핑
+  const patternKo: Record<string, string> = {
+    accelerating: '가속',
+    decelerating: '감속',
+    constant: '일정',
+    irregular: '불규칙',
+  };
+
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs text-gray-400">✂️ 편집 리듬</p>
+        <p className="text-xs text-gray-400">
+          패턴 <span className="font-medium text-gray-600">{patternKo[cr.pattern] || cr.pattern}</span>
+          {' · '}
+          평균 <span className="font-medium text-gray-600">{cr.avg_interval}초</span>/컷
+        </p>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H + 16}`} className="w-full">
+        <defs>
+          <linearGradient id="rhythmGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#10b981" stopOpacity={0.15} />
+            <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+        <path d={areaPath} fill="url(#rhythmGrad)" />
+        <path d={linePath} fill="none" stroke="#10b981" strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
+        {/* 컷 위치 마커 */}
+        {cr.cut_timestamps.map((ts, i) => (
+          <line key={i} x1={(ts / maxTs) * W} y1={H - padY} x2={(ts / maxTs) * W} y2={H - padY + 4} stroke="#10b981" strokeWidth={1} opacity={0.4} />
+        ))}
+        <text x={0} y={H + 12} fontSize={8} fill="#999">0s</text>
+        <text x={W} y={H + 12} fontSize={8} fill="#999" textAnchor="end">{Math.round(maxTs)}s</text>
+        <text x={W} y={padY + 2} fontSize={7} fill="#ccc" textAnchor="end">빠름</text>
+        <text x={W} y={H - padY + 2} fontSize={7} fill="#ccc" textAnchor="end">느림</text>
+      </svg>
+    </div>
+  );
+}
+
+
+/* ── Legacy fallback: Cut Speed Chart (씬 듀레이션 기반) ── */
+
+function CutSpeedChartFallback({ result }: { result: AnalysisResult }) {
   const scenes = result.appeal_structure?.scenes;
   if (!scenes?.length) return null;
 
@@ -394,7 +562,6 @@ function CutSpeedChart({ result }: { result: AnalysisResult }) {
   const H = 64;
   const padY = 4;
 
-  // 포인트 좌표: X=컷 중간시점, Y=속도(듀레이션 역전 — 짧을수록 위)
   const points = cuts.map((cut) => {
     const midX = ((cut.start + cut.duration / 2) / totalTime) * W;
     const speed = maxDur === minDur ? 0.5 : 1 - (cut.duration - minDur) / (maxDur - minDur);
@@ -402,7 +569,6 @@ function CutSpeedChart({ result }: { result: AnalysisResult }) {
     return { x: midX, y };
   });
 
-  // 부드러운 곡선 (catmull-rom → cubic bezier)
   const linePath = points.map((p, i) => (i === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`)).join(' ');
   const areaPath = `${linePath} L${points[points.length - 1].x},${H} L${points[0].x},${H} Z`;
 
@@ -410,7 +576,6 @@ function CutSpeedChart({ result }: { result: AnalysisResult }) {
     <div className="mt-4">
       <p className="text-xs text-gray-400 mb-2">컷 속도 변화</p>
       <svg viewBox={`0 0 ${W} ${H + 16}`} className="w-full">
-        {/* 영역 채움 */}
         <defs>
           <linearGradient id="speedGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#6366f1" stopOpacity={0.15} />
@@ -418,13 +583,10 @@ function CutSpeedChart({ result }: { result: AnalysisResult }) {
           </linearGradient>
         </defs>
         <path d={areaPath} fill="url(#speedGrad)" />
-        {/* 라인 */}
         <path d={linePath} fill="none" stroke="#6366f1" strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
-        {/* 포인트 */}
         {points.map((p, i) => (
           <circle key={i} cx={p.x} cy={p.y} r={2} fill="#6366f1" />
         ))}
-        {/* 축 라벨 */}
         <text x={0} y={H + 12} fontSize={8} fill="#999">0s</text>
         <text x={W} y={H + 12} fontSize={8} fill="#999" textAnchor="end">{Math.round(totalTime)}s</text>
         <text x={W} y={padY + 2} fontSize={7} fill="#ccc" textAnchor="end">빠름</text>
@@ -726,7 +888,14 @@ function SummaryTab({ result, seekTo, navigate }: {
               <p className="text-xs text-gray-400 mt-0.5">영상 길이</p>
             </div>
           </div>
-          <CutSpeedChart result={result} />
+          {result.temporal ? (
+            <>
+              <VisualEnergyChart temporal={result.temporal} />
+              <EditRhythmChart temporal={result.temporal} />
+            </>
+          ) : (
+            <CutSpeedChartFallback result={result} />
+          )}
         </Card>
       )}
 

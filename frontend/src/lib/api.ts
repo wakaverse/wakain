@@ -138,6 +138,7 @@ export async function getResult(id: string): Promise<AnalysisResult> {
     product: data.product_json || null,
     thumbnails: data.thumbnails || {},
     persuasion_lens: data.persuasion_lens_json || null,
+    temporal: data.temporal_json || null,
   };
 }
 

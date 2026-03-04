@@ -256,11 +256,11 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
         if appeal_json and appeal_json.get("scenes"):
             appeal_json = _clamp_appeal_structure(appeal_json, str(video_path))
             extra["appeal_structure_json"] = appeal_json
-        recipe_json = extra.get("recipe_json")
-        if appeal_json or recipe_json:
+        recipe_for_thumbs = extra.get("recipe_json") or recipe_json
+        if appeal_json or recipe_for_thumbs:
             try:
                 thumb_map = _extract_thumbnails(
-                    str(video_path), appeal_json, job_id, recipe=recipe_json
+                    str(video_path), appeal_json, job_id, recipe=recipe_for_thumbs
                 )
                 if thumb_map:
                     thumbnails_json = thumb_map
@@ -324,6 +324,7 @@ def _load_extra_analysis(analysis_dir: Path, video_name: str) -> dict:
         "stt_json": f"{video_name}_stt.json",
         "product_json": f"{video_name}_product.json",
         "appeal_structure_json": f"{video_name}_appeal_structure.json",
+        "temporal_json": f"{video_name}_temporal.json",
         "style_json": f"{video_name}_style.json",  # backward compat
         "caption_map_json": f"{video_name}_caption_map.json",
         "verdict_json": f"{video_name}_verdict.json",

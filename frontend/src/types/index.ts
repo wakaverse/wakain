@@ -372,6 +372,37 @@ export interface AnalysisResult {
   thumbnails?: Record<string, string>;
   product: ProductInfo | null;
   persuasion_lens?: PersuasionLens | null;
+  temporal?: TemporalData | null;
+}
+
+// ─── Temporal Analysis ───
+
+export interface AttentionPoint {
+  timestamp: number;
+  score: number;
+  section: '클라이막스' | '강' | '중' | '정적';
+}
+
+export interface AttentionCurve {
+  points: AttentionPoint[];
+  peak_timestamps: number[];
+  attention_avg: number;
+  attention_arc: string;
+}
+
+export interface CutRhythm {
+  cut_timestamps: number[];
+  intervals: number[];
+  pattern: 'accelerating' | 'decelerating' | 'constant' | 'irregular';
+  avg_interval: number;
+  min_interval: number;
+  max_interval: number;
+  total_cuts: number;
+}
+
+export interface TemporalData {
+  attention_curve: AttentionCurve;
+  cut_rhythm: CutRhythm;
 }
 
 // ─── Persuasion Lens (Phase 4d) ───
