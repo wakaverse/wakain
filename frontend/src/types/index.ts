@@ -400,9 +400,17 @@ export interface CutRhythm {
   total_cuts: number;
 }
 
+export interface ExposureCurve {
+  segments?: unknown[];
+  total_human_time_ratio: number;
+  total_product_time_ratio: number;
+  circulation_pattern?: string;
+}
+
 export interface TemporalData {
   attention_curve: AttentionCurve;
   cut_rhythm: CutRhythm;
+  exposure_curve?: ExposureCurve;
 }
 
 // ─── Persuasion Lens (Phase 4d) ───
