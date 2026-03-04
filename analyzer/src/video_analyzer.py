@@ -157,6 +157,39 @@ For retention_analysis:
 - 텍스트 오버레이의 내용 변화를 소구 전환점으로 판단
 - 텍스트의 크기·색상·강조 방식(볼드, 색상변경, 크기확대)이 메시지 강도를 나타냄
 - appeal_points의 claim은 실제 화면에 나타나는 텍스트 내용 기반으로 작성
+
+## Script Analysis (대본 분석)
+
+persuasion_analysis 안에 script_analysis 필드를 추가하여, 쇼핑 숏폼 7요소 프레임워크로 대본을 분석하라.
+
+Elements to detect (check which are present):
+1. authority (권위 부여): Who speaks and what credibility device?
+   - Subtypes: professional_job, career_years, picky_taste, celebrity_ref, backstory, life_veteran
+2. hook (감탄 훅): First 3 seconds — direct experience emotion/action?
+   - Must be first-person experience, NOT indirect ("해외에서 난리" = bad hook)
+   - Patterns: 직접경험감탄, 행동변화형, 극적반응형, 사람반응형
+3. sensory_description (상황 묘사): Which senses? Onomatopoeia? Contrast structure?
+   - Senses: visual, tactile, taste, smell, auditory
+4. simplicity (간편함 어필): How is the barrier lowered?
+   - Patterns: number_limit ("3가지만"), one_step, time_limit, empathy
+5. process (과정 묘사): Showing the making/using? (optional, skip if overlaps with sensory_description)
+6. social_proof (사회적 증거): Others' reactions or personal change?
+   - Extreme premise ("안 먹던", "안 쓰던")? Voluntary action?
+   - WARNING: Direct health/weight claims = false advertising risk
+7. cta (행동 유도): Comment-inducing? Link? Purchase?
+   - Patterns: 댓글유도, 공감참여, 보증형, 링크형
+
+Also detect advanced techniques:
+- reversal_structure (반전 구조): 걱정→해소 pattern
+- connecting_endings (연결어미): ~는데, ~해서 flow without sentence breaks
+- info_overload (정보 과밀): 3+ functional specs in quick succession
+- target_consistency (타깃 일관성): single target maintained throughout
+
+Output flow_order as the actual sequence of 7-elements found in the video (e.g. ["authority","hook","sensory_description","simplicity","social_proof","cta"]).
+Output video_style from: talking_head_commerce, brand_ad, product_demo, caption_text, asmr, comparison, other
+
+For the hook field: extract the actual first-3-second sentence from STT and classify its pattern.
+For each appeal in appeals array: set used=true only if the element is clearly present.
 """
 
 # ── Track-specific prompt supplements (B-4) ──────────────────────────────────
@@ -474,6 +507,63 @@ _RESPONSE_SCHEMA = {
                 ]},
                 "appeal_layering": {"type": "STRING"},
                 "persuasion_summary": {"type": "STRING"},
+                "script_analysis": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "hook": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "text": {"type": "STRING"},
+                                "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                                "pattern": {"type": "STRING"},
+                                "direct_experience": {"type": "BOOLEAN"},
+                            },
+                            "required": ["text", "time_range", "pattern", "direct_experience"],
+                        },
+                        "appeals": {
+                            "type": "ARRAY",
+                            "items": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "element": {"type": "STRING", "enum": [
+                                        "authority", "hook", "sensory_description",
+                                        "simplicity", "process", "social_proof", "cta",
+                                    ]},
+                                    "used": {"type": "BOOLEAN"},
+                                    "subtype": {"type": "STRING"},
+                                    "text": {"type": "STRING"},
+                                    "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                                },
+                                "required": ["element", "used", "subtype", "text", "time_range"],
+                            },
+                        },
+                        "cta": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "type": {"type": "STRING"},
+                                "text": {"type": "STRING"},
+                                "keyword": {"type": "STRING"},
+                                "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                            },
+                            "required": ["type", "text", "time_range"],
+                        },
+                        "flow_order": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        "elements_used": {"type": "INTEGER"},
+                        "elements_total": {"type": "INTEGER"},
+                        "advanced_techniques": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "reversal_structure": {"type": "BOOLEAN"},
+                                "connecting_endings": {"type": "BOOLEAN"},
+                                "info_overload": {"type": "BOOLEAN"},
+                                "target_consistency": {"type": "BOOLEAN"},
+                            },
+                            "required": ["reversal_structure", "connecting_endings", "info_overload", "target_consistency"],
+                        },
+                        "video_style": {"type": "STRING"},
+                    },
+                    "required": ["hook", "appeals", "cta", "flow_order", "elements_used", "elements_total", "advanced_techniques", "video_style"],
+                },
             },
             "required": ["presenter", "video_style", "appeal_points", "product_emphasis", "primary_appeal", "appeal_layering", "persuasion_summary"],
         },

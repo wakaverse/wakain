@@ -22,6 +22,50 @@ export interface Job {
   posted_at?: string;
 }
 
+// ─── Script Analysis (7-element framework) ───
+
+export type ScriptElement = 'authority' | 'hook' | 'sensory_description' | 'simplicity' | 'process' | 'social_proof' | 'cta';
+
+export interface ScriptAnalysisAppeal {
+  element: ScriptElement;
+  used: boolean;
+  subtype: string;
+  text: string;
+  time_range: [number, number];
+  senses?: string[];
+  onomatopoeia?: string[];
+  contrast_structure?: boolean;
+  extreme_premise?: boolean;
+  voluntary_action?: boolean;
+  direct_experience?: boolean;
+}
+
+export interface ScriptAnalysis {
+  hook: {
+    text: string;
+    time_range: [number, number];
+    pattern: string;
+    direct_experience: boolean;
+  };
+  appeals: ScriptAnalysisAppeal[];
+  cta: {
+    type: string;
+    text: string;
+    keyword: string | null;
+    time_range: [number, number];
+  };
+  flow_order: string[];
+  elements_used: number;
+  elements_total: number;
+  advanced_techniques: {
+    reversal_structure: boolean;
+    connecting_endings: boolean;
+    info_overload: boolean;
+    target_consistency: boolean;
+  };
+  video_style: string;
+}
+
 export interface AppealPoint {
   type: string;
   claim: string;
@@ -159,6 +203,7 @@ export interface VideoRecipe {
       primary_appeal: string;
       appeal_layering: string;
       persuasion_summary: string;
+      script_analysis?: ScriptAnalysis;
     };
     art_direction: {
       tone_and_manner: string;
