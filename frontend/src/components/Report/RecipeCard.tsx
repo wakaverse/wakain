@@ -37,7 +37,7 @@ export default function RecipeCard({ scriptAnalysis, appealPoints, onNavigate }:
       guarantee: '보증',
       price: '가격',
       manufacturing: '제조',
-      emotional: '감성',
+      emotional: '공감',
       myth_bust: '통념깨기',
       ingredient: '성분',
       spec_data: '스펙',

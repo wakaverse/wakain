@@ -326,6 +326,71 @@ function CutSpeedChartFallback({ result }: { result: AnalysisResult }) {
   );
 }
 
+/* ── Appeal type Korean labels ──────────── */
+
+const APPEAL_TYPE_KO: Record<string, string> = {
+  myth_bust: '통념 깨기',
+  ingredient: '성분/원재료',
+  manufacturing: '제조 공법',
+  track_record: '실적/수상',
+  price: '가격 어필',
+  comparison: '비교',
+  guarantee: '보증/자신감',
+  origin: '원산지',
+  feature_demo: '기능 시연',
+  spec_data: '스펙/수치',
+  design_aesthetic: '디자인',
+  authenticity: '진정성',
+  social_proof: '사회적 증거',
+  urgency: '긴급/한정',
+  lifestyle: '라이프스타일',
+  nostalgia: '향수/추억',
+  authority: '전문성/권위',
+  emotional: '공감',
+};
+
+const STRENGTH_LABEL: Record<string, { text: string; color: string }> = {
+  strong: { text: '강', color: 'text-emerald-600 bg-emerald-50' },
+  moderate: { text: '중', color: 'text-amber-600 bg-amber-50' },
+  weak: { text: '약', color: 'text-gray-400 bg-gray-50' },
+};
+
+/* ── 제품 소구 포인트 섹션 ─────────────── */
+
+function AppealPointsSection({ appealPoints, seekTo }: { appealPoints?: AppealPoint[]; seekTo: (s: number) => void }) {
+  if (!appealPoints?.length) return null;
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-5">
+      <p className="text-sm font-semibold text-gray-900 mb-3">🎯 제품 소구 포인트</p>
+      <div className="space-y-2">
+        {appealPoints.map((ap, i) => {
+          const label = APPEAL_TYPE_KO[ap.type] || ap.type;
+          const strength = STRENGTH_LABEL[ap.strength] || STRENGTH_LABEL.moderate;
+          const ts = ap.visual_proof?.timestamp;
+          return (
+            <div key={i} className="flex items-start gap-2 py-2 border-b border-gray-50 last:border-0">
+              <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium ${strength.color}`}>{strength.text}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-xs font-medium text-gray-500">{label}</span>
+                  {ap.source && <span className="text-[10px] text-gray-300">{ap.source === 'script' ? '📝' : ap.source === 'visual' ? '🎬' : '📝🎬'}</span>}
+                </div>
+                <p className="text-sm text-gray-700 leading-snug">{ap.claim}</p>
+              </div>
+              {ts != null && ts > 0 && (
+                <button onClick={() => seekTo(ts)} className="shrink-0 text-[10px] font-mono text-gray-300 hover:text-gray-500">
+                  {fmtTime(ts)} ▶
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ── Tab: 분석 결과 ───────────────────────── */
 
 function HackingResultTab({ result, seekTo, navigate }: {
@@ -339,13 +404,18 @@ function HackingResultTab({ result, seekTo, navigate }: {
 
   return (
     <div className="space-y-4">
+      {/* 1) 제품 소구 포인트 */}
+      <AppealPointsSection appealPoints={appealPoints} seekTo={seekTo} />
+      {/* 2) 대본 해부 */}
       <ScriptBreakdown
         scriptAnalysis={scriptAnalysis}
         appealPoints={appealPoints}
         hookLine={hookLine}
         seekTo={seekTo}
       />
+      {/* 3) 영상 해부 */}
       <VideoStructure result={result} />
+      {/* 4) 레시피 */}
       <RecipeCard
         scriptAnalysis={scriptAnalysis}
         appealPoints={appealPoints}

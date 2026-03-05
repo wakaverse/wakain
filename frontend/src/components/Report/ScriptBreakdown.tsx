@@ -26,6 +26,58 @@ function Pill({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ── Subtype Korean labels ───────────────── */
+
+const SUBTYPE_KO: Record<string, string> = {
+  // authority subtypes
+  professional_job: '전문직',
+  career_years: '경력/연차',
+  picky_taste: '까다로운 입맛',
+  celebrity_ref: '유명인',
+  backstory: '배경 스토리',
+  life_veteran: '생활 베테랑',
+  // hook patterns
+  '직접경험감탄': '직접경험',
+  '행동변화형': '행동변화',
+  '극적반응형': '극적반응',
+  '사람반응형': '사람반응',
+  direct_experience: '직접경험',
+  behavior_change: '행동변화',
+  dramatic_reaction: '극적반응',
+  people_reaction: '사람반응',
+  // simplicity
+  number_limit: '숫자 한정',
+  one_step: '원스텝',
+  time_limit: '시간 한정',
+  empathy: '공감',
+  // social_proof
+  track_record: '실적',
+  personal_change: '변화 체험',
+  others_reaction: '타인 반응',
+  // cta
+  '댓글유도': '댓글유도',
+  '공감참여': '공감참여',
+  '보증형': '보증형',
+  '링크형': '링크형',
+  comment_inducing: '댓글유도',
+  guarantee: '보증형',
+  link: '링크형',
+  // appeal_points types (fallback)
+  price: '가격',
+  feature_demo: '기능시연',
+  manufacturing: '제조공법',
+  authority: '권위',
+  myth_bust: '통념깨기',
+  ingredient: '성분',
+  spec_data: '스펙',
+  comparison: '비교',
+  emotional: '공감',
+};
+
+function localizeSubtype(subtype: string): string {
+  return SUBTYPE_KO[subtype] || subtype;
+}
+
 /* ── Appeal row ──────────────────────────────── */
 
 function AppealRow({ appeal, seekTo }: { appeal: ScriptAnalysisAppeal; seekTo: (s: number) => void }) {
@@ -38,7 +90,7 @@ function AppealRow({ appeal, seekTo }: { appeal: ScriptAnalysisAppeal; seekTo: (
         <span className="text-xs font-mono text-gray-300">{meta.num}</span>
         <span className="text-sm font-semibold text-gray-900">{meta.name}</span>
         <span className="text-xs text-gray-400">✓</span>
-        {appeal.subtype && <Pill>{appeal.subtype}</Pill>}
+        {appeal.subtype && <Pill>{localizeSubtype(appeal.subtype)}</Pill>}
         {appeal.time_range && (
           <button
             onClick={() => seekTo(appeal.time_range[0])}
