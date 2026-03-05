@@ -21,7 +21,7 @@ const menuItems: MenuItem[] = [
   { key: 'expand', icon: Layers, path: '/app/expand', comingSoon: true },
   { key: 'library', icon: Heart, path: '/app/library' },
   { key: 'compare', icon: ArrowLeftRight, path: '/app/compare', comingSoon: true },
-  { key: 'insight', icon: Lightbulb, path: '/app/insight', comingSoon: true },
+  { key: 'insight', icon: Lightbulb, path: '/app/insight' },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {

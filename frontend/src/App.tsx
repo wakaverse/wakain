@@ -16,6 +16,7 @@ import LoginPage from './pages/LoginPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import RadarPage from './pages/RadarPage';
 import LibraryPage from './pages/LibraryPage';
+import InsightsPage from './pages/InsightsPage';
 import ToastContainer from './components/Toast';
 
 function LandingRoutes() {
@@ -32,7 +33,7 @@ function LandingRoutes() {
       <Route path="app/expand" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="expand" /></AppShell></ProtectedRoute>} />
       <Route path="app/library" element={<ProtectedRoute><AppShell><LibraryPage /></AppShell></ProtectedRoute>} />
       <Route path="app/compare" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="compare" /></AppShell></ProtectedRoute>} />
-      <Route path="app/insight" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="insight" /></AppShell></ProtectedRoute>} />
+      <Route path="app/insight" element={<ProtectedRoute><AppShell><InsightsPage /></AppShell></ProtectedRoute>} />
       <Route path="app/jobs/:id" element={<ProtectedRoute><AppShell><JobStatusPage /></AppShell></ProtectedRoute>} />
       <Route path="app/results/:id" element={<ProtectedRoute><AppShell><ReportPage /></AppShell></ProtectedRoute>} />
       <Route path="dashboard" element={<ProtectedRoute><AppShell><DashboardPage /></AppShell></ProtectedRoute>} />

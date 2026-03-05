@@ -292,3 +292,17 @@ export async function deleteLibraryItem(id: string): Promise<void> {
   });
   if (!res.ok) throw new Error('삭제에 실패했습니다');
 }
+
+// ─── Insights API ───
+
+export async function getInsightCategories(): Promise<{ category: string; count: number }[]> {
+  const res = await fetch(`${API_URL}/api/insights/categories`);
+  if (!res.ok) throw new Error('카테고리 목록을 불러올 수 없습니다');
+  return res.json();
+}
+
+export async function getInsightCategory(categoryName: string): Promise<any> {
+  const res = await fetch(`${API_URL}/api/insights/category/${encodeURIComponent(categoryName)}`);
+  if (!res.ok) throw new Error('카테고리 인사이트를 불러올 수 없습니다');
+  return res.json();
+}
