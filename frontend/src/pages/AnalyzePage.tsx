@@ -16,7 +16,7 @@ function truncateTitle(s: string, max = 40): string {
 
 const MAX_SIZE = 200 * 1024 * 1024;
 const ACCEPTED_TYPES = { 'video/mp4': ['.mp4'], 'video/quicktime': ['.mov'], 'video/webm': ['.webm'] };
-const TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+const TIMEOUT_MS = 20 * 60 * 1000; // 20 minutes (pipeline includes 5 parallel Gemini calls)
 
 function timeAgo(dateStr: string): string {
   if (!dateStr) return '';
