@@ -579,6 +579,81 @@ _SCRIPT_ANALYSIS_SCHEMA = {
     "required": ["script_analysis"],
 }
 
+# Separate schema for script_alpha (α 레이어: 감정/구조/연결 기법) — separate Gemini call
+_SCRIPT_ALPHA_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
+        "script_alpha": {
+            "type": "OBJECT",
+            "properties": {
+                "utterances": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "text": {"type": "STRING"},
+                            "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                            "element": {"type": "STRING"},
+                            "emotion_layer": {"type": "STRING"},
+                            "structure_layer": {"type": "STRING"},
+                            "connection_layer": {"type": "STRING"},
+                        },
+                        "required": ["text", "time_range"],
+                    },
+                },
+                "emotion_techniques": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "type": {"type": "STRING", "enum": [
+                                "empathy", "fomo", "anticipation", "relief",
+                                "curiosity", "pride", "nostalgia", "frustration",
+                            ]},
+                            "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                            "trigger_text": {"type": "STRING"},
+                        },
+                        "required": ["type", "time_range", "trigger_text"],
+                    },
+                },
+                "structure_techniques": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "type": {"type": "STRING", "enum": [
+                                "reversal", "contrast", "repetition",
+                                "info_density", "escalation", "before_after",
+                                "problem_solution", "story_arc",
+                            ]},
+                            "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                            "description": {"type": "STRING"},
+                        },
+                        "required": ["type", "time_range", "description"],
+                    },
+                },
+                "connection_techniques": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "type": {"type": "STRING", "enum": [
+                                "bridge_sentence", "rhythm_shift", "callback",
+                                "question_answer", "pause_emphasis",
+                            ]},
+                            "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                            "text": {"type": "STRING"},
+                        },
+                        "required": ["type", "time_range", "text"],
+                    },
+                },
+            },
+            "required": ["utterances", "emotion_techniques", "structure_techniques", "connection_techniques"],
+        },
+    },
+    "required": ["script_alpha"],
+}
+
 # Separate schema for art_direction (to stay under Gemini schema complexity limit)
 _ART_DIRECTION_SCHEMA = {
     "type": "OBJECT",
@@ -1090,8 +1165,83 @@ Also detect advanced techniques: reversal_structure, connecting_endings, info_ov
                         print(f"  ⚠ Script analysis failed after {max_retries} retries, skipping: {e}")
                         return ("script", None)
 
-        print("  Analysing art direction + engagement + script (parallel)...")
-        parallel_results = await asyncio.gather(_do_4b(), _do_4c(), _do_4d(), return_exceptions=True)
+        async def _do_4e():
+            """Phase 4e: Script α layer (감정/구조/연결 기법) — separate call."""
+            alpha_prompt = f"""Analyse this shortform commerce video's script techniques BEYOND the 7 persuasion elements.
+
+{track_supplement}
+
+Focus on HOW the script delivers its message, not WHAT it says.
+
+1. **utterances**: Break the script into individual sentences/utterances. For each:
+   - text: exact words spoken
+   - time_range: [start_sec, end_sec]
+   - element: which 7-element it belongs to (authority/hook/sensory_description/simplicity/process/social_proof/cta) or "none"
+   - emotion_layer: what emotion technique is used (empathy/fomo/anticipation/relief/curiosity/pride/nostalgia/frustration) or empty
+   - structure_layer: what structure technique is used (reversal/contrast/repetition/info_density/escalation/before_after/problem_solution/story_arc) or empty
+   - connection_layer: what connection technique is used (bridge_sentence/rhythm_shift/callback/question_answer/pause_emphasis) or empty
+
+2. **emotion_techniques**: List all emotion techniques found with time ranges and trigger text
+   - empathy: "이런 적 있으시죠?" type shared experience
+   - fomo: fear of missing out, urgency
+   - anticipation: building curiosity/expectation
+   - relief: resolving tension/anxiety
+   - curiosity: making viewer want to know more
+   - pride: making viewer feel smart/special
+   - nostalgia: triggering memories
+   - frustration: identifying pain points
+
+3. **structure_techniques**: List all structural techniques
+   - reversal: flipping expectations ("근데 이 가격이요...")
+   - contrast: A vs B comparison framing
+   - repetition: repeating key words/phrases for emphasis ("바삭, 더 바삭, 바삭바삭")
+   - info_density: cramming many claims into short time
+   - escalation: building intensity gradually
+   - before_after: showing transformation
+   - problem_solution: pain → product solves it
+   - story_arc: narrative with beginning/middle/end
+
+4. **connection_techniques**: List all connection/transition techniques
+   - bridge_sentence: sentences linking two ideas ("그래서", "근데 더 놀라운 건")
+   - rhythm_shift: sudden change in speaking pace/energy
+   - callback: referencing something said earlier
+   - question_answer: rhetorical or real Q&A pattern
+   - pause_emphasis: strategic pause before key point
+
+Be precise with time_ranges matching the actual video timestamps."""
+
+            for attempt in range(max_retries):
+                try:
+                    alpha_response = await client.aio.models.generate_content(
+                        model=MODEL,
+                        contents=[
+                            types.Part.from_uri(
+                                file_uri=uploaded_file.uri,
+                                mime_type=uploaded_file.mime_type,
+                            ),
+                            types.Part.from_text(text=alpha_prompt),
+                        ],
+                        config=types.GenerateContentConfig(
+                            system_instruction=SYSTEM_INSTRUCTION,
+                            response_mime_type="application/json",
+                            response_schema=_SCRIPT_ALPHA_SCHEMA,
+                            temperature=0.1,
+                        ),
+                    )
+                    alpha_data = json.loads(alpha_response.text)
+                    print("  ✓ Script α layer (감정/구조/연결) complete")
+                    return ("alpha", alpha_data)
+                except Exception as e:
+                    wait = 2 ** attempt * 5
+                    if attempt < max_retries - 1:
+                        print(f"  ⚠ Script α retry {attempt+1}/{max_retries} ({type(e).__name__}), waiting {wait}s...")
+                        await asyncio.sleep(wait)
+                    else:
+                        print(f"  ⚠ Script α failed after {max_retries} retries, skipping: {e}")
+                        return ("alpha", None)
+
+        print("  Analysing art direction + engagement + script + α (parallel)...")
+        parallel_results = await asyncio.gather(_do_4b(), _do_4c(), _do_4d(), _do_4e(), return_exceptions=True)
 
         for res in parallel_results:
             if isinstance(res, Exception):
@@ -1108,6 +1258,8 @@ Also detect advanced techniques: reversal_structure, connecting_endings, info_ov
                 result["retention_analysis"] = data.get("retention_analysis", {})
             elif tag == "script":
                 result["script_analysis"] = data.get("script_analysis", data)
+            elif tag == "alpha":
+                result["script_alpha"] = data.get("script_alpha", data)
 
         return result
     finally:

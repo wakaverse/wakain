@@ -66,6 +66,36 @@ export interface ScriptAnalysis {
   video_style: string;
 }
 
+/* ── Script α layer (감정/구조/연결 기법) ── */
+
+export type EmotionType = 'empathy' | 'fomo' | 'anticipation' | 'relief' | 'curiosity' | 'pride' | 'nostalgia' | 'frustration';
+export type StructureType = 'reversal' | 'contrast' | 'repetition' | 'info_density' | 'escalation' | 'before_after' | 'problem_solution' | 'story_arc';
+export type ConnectionType = 'bridge_sentence' | 'rhythm_shift' | 'callback' | 'question_answer' | 'pause_emphasis';
+
+export interface ScriptUtterance {
+  text: string;
+  time_range: [number, number];
+  element?: string;
+  emotion_layer?: string;
+  structure_layer?: string;
+  connection_layer?: string;
+}
+
+export interface AlphaTechnique {
+  type: string;
+  time_range: [number, number];
+  trigger_text?: string;
+  text?: string;
+  description?: string;
+}
+
+export interface ScriptAlpha {
+  utterances: ScriptUtterance[];
+  emotion_techniques: AlphaTechnique[];
+  structure_techniques: AlphaTechnique[];
+  connection_techniques: AlphaTechnique[];
+}
+
 export interface AppealPoint {
   type: string;
   claim: string;
@@ -205,6 +235,7 @@ export interface VideoRecipe {
       persuasion_summary: string;
     };
     script_analysis?: ScriptAnalysis;
+    script_alpha?: ScriptAlpha;
     art_direction: {
       tone_and_manner: string;
       heading_font?: string;

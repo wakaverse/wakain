@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { getResult, addLibraryItem } from '../lib/api';
 import type { AnalysisResult, AppealPoint, Stt, TemporalData, ScriptElement } from '../types';
-import ScriptBreakdown from '../components/Report/ScriptBreakdown';
+import ScriptTimeline from '../components/Report/ScriptTimeline';
 import VideoStructure from '../components/Report/VideoStructure';
 import RecipeCard from '../components/Report/RecipeCard';
 
@@ -443,18 +443,19 @@ function HackingResultTab({ result, seekTo, navigate }: {
   const vr = result.video_recipe?.video_recipe;
   const pa = vr?.persuasion_analysis;
   const scriptAnalysis = vr?.script_analysis ?? (pa as any)?.script_analysis;
+  const scriptAlpha = vr?.script_alpha;
   const appealPoints = pa?.appeal_points;
-  const hookLine = vr?.audio?.voice?.hook_line;
+  const duration = vr?.meta?.duration ?? 30;
 
   return (
     <div className="space-y-4">
       {/* 1) 제품 소구 포인트 */}
       <AppealPointsSection appealPoints={appealPoints} seekTo={seekTo} />
-      {/* 2) 대본 해부 */}
-      <ScriptBreakdown
+      {/* 2) 대본 해부 — 새 타임라인 뷰 (α 데이터 있을 때) + 기존 뷰 폴백 */}
+      <ScriptTimeline
         scriptAnalysis={scriptAnalysis}
-        appealPoints={appealPoints}
-        hookLine={hookLine}
+        scriptAlpha={scriptAlpha}
+        duration={duration}
         seekTo={seekTo}
       />
       {/* 3) 영상 해부 */}
