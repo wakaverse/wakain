@@ -568,7 +568,7 @@ _RESPONSE_SCHEMA = {
             "required": ["hook", "appeals", "cta", "flow_order", "elements_used", "elements_total", "advanced_techniques", "video_style"],
         },
     },
-    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis", "script_analysis"],
+    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis"],
 }
 
 # Separate schema for art_direction (to stay under Gemini schema complexity limit)

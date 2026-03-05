@@ -357,11 +357,11 @@ def _build_summary(recipe_json: dict) -> dict:
     """Extract key fields for quick dashboard rendering."""
     recipe = recipe_json.get("video_recipe", recipe_json)
     meta = recipe.get("meta", {})
-    effectiveness = recipe.get("effectiveness_assessment", {})
-    structure = recipe.get("structure", {})
-    scenes = recipe.get("scenes", [])
-    dropoff = recipe.get("dropoff_analysis", {})
-    performance = recipe.get("performance_metrics", {})
+    effectiveness = recipe.get("effectiveness_assessment") or {}
+    structure = recipe.get("structure") or {}
+    scenes = recipe.get("scenes") or []
+    dropoff = recipe.get("dropoff_analysis") or {}
+    performance = recipe.get("performance_metrics") or {}
     return {
         "duration_sec": meta.get("duration"),
         "scene_count": len(scenes),
