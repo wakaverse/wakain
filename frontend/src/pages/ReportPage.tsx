@@ -403,7 +403,7 @@ function AppealPointsSection({ appealPoints, seekTo }: { appealPoints?: AppealPo
               >
                 <span className="text-sm font-medium text-gray-700">{group.label}</span>
                 <span className="text-xs text-gray-400">×{group.items.length}</span>
-                <span className="ml-auto text-[10px] text-gray-300 leading-none truncate max-w-[60%] text-right">
+                <span className="ml-auto text-[11px] text-gray-500 leading-none truncate max-w-[60%] text-right">
                   {group.items.map(a => a.claim).join(' · ').slice(0, 60)}{group.items.map(a => a.claim).join(' · ').length > 60 ? '...' : ''}
                 </span>
                 <span className="shrink-0 text-gray-300 text-xs">{isExpanded ? '▾' : '▸'}</span>
@@ -416,7 +416,7 @@ function AppealPointsSection({ appealPoints, seekTo }: { appealPoints?: AppealPo
                     return (
                       <div key={i} className="flex items-start gap-2 py-1.5">
                         <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium ${strength.color}`}>{strength.text}</span>
-                        <p className="flex-1 text-sm text-gray-600 leading-snug">{ap.claim}</p>
+                        <p className="flex-1 text-sm text-gray-700 leading-snug">{ap.claim}</p>
                         {ts != null && ts > 0 && (
                           <button onClick={() => seekTo(ts)} className="shrink-0 text-[10px] font-mono text-gray-300 hover:text-gray-500">
                             {fmtTime(ts)} ▶
@@ -705,44 +705,57 @@ export default function ReportPage() {
   const product = result.product;
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Video player */}
-      {result.video_url && (
-        <div className="mb-6 rounded-2xl overflow-hidden bg-black">
-          <video
-            ref={videoRef}
-            src={result.video_url}
-            controls
-            className="w-full max-h-[400px] object-contain"
-          />
+    <div className="max-w-6xl mx-auto">
+      {/* Desktop: 2-column (video sticky left + results right) / Mobile: stacked */}
+      <div className="lg:flex lg:gap-6">
+        {/* Left column: Video + Product info (sticky on desktop) */}
+        <div className="lg:w-[340px] lg:shrink-0">
+          <div className="lg:sticky lg:top-4">
+            {result.video_url && (
+              <div className="mb-4 rounded-2xl overflow-hidden bg-black">
+                <video
+                  ref={videoRef}
+                  src={result.video_url}
+                  controls
+                  className="w-full lg:max-h-[600px] max-h-[400px] object-contain"
+                />
+              </div>
+            )}
+            {product?.product_name && (
+              <div className="flex items-center gap-2 text-sm mb-3">
+                <span className="font-medium text-gray-900">{product.product_name}</span>
+                {product.category && <span className="text-gray-400">· {product.category}</span>}
+                {product.brand && <span className="text-gray-400">· {product.brand}</span>}
+              </div>
+            )}
+            <div className="hidden lg:block">
+              <ElementSummaryHeader result={result} />
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Product header */}
-      {product?.product_name && (
-        <div className="flex items-center gap-2 text-sm mb-3">
-          <span className="font-medium text-gray-900">{product.product_name}</span>
-          {product.category && <span className="text-gray-400">· {product.category}</span>}
-          {product.brand && <span className="text-gray-400">· {product.brand}</span>}
+        {/* Right column: Analysis results */}
+        <div className="flex-1 min-w-0">
+          {/* Mobile only: element summary */}
+          <div className="lg:hidden">
+            <ElementSummaryHeader result={result} />
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
+            <TabButton active={tab === 'hacking'} onClick={() => setTab('hacking')}>분석 결과</TabButton>
+            <TabButton active={tab === 'cuts'} onClick={() => setTab('cuts')}>컷 뷰</TabButton>
+          </div>
+
+          {/* Tab content */}
+          {tab === 'hacking' && (
+            <HackingResultTab result={result} seekTo={seekTo} navigate={navigate} />
+          )}
+          {tab === 'cuts' && (
+            <CutViewTab result={result} seekTo={seekTo} />
+          )}
         </div>
-      )}
-
-      {/* Element summary */}
-      <ElementSummaryHeader result={result} />
-
-      {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
-        <TabButton active={tab === 'hacking'} onClick={() => setTab('hacking')}>분석 결과</TabButton>
-        <TabButton active={tab === 'cuts'} onClick={() => setTab('cuts')}>컷 뷰</TabButton>
       </div>
-
-      {/* Tab content */}
-      {tab === 'hacking' && (
-        <HackingResultTab result={result} seekTo={seekTo} navigate={navigate} />
-      )}
-      {tab === 'cuts' && (
-        <CutViewTab result={result} seekTo={seekTo} />
-      )}
     </div>
   );
 }
