@@ -445,7 +445,6 @@ function HackingResultTab({ result, seekTo, navigate }: {
   const scriptAnalysis = vr?.script_analysis ?? (pa as any)?.script_analysis;
   const scriptAlpha = vr?.script_alpha;
   const appealPoints = pa?.appeal_points;
-  const duration = vr?.meta?.duration ?? 30;
 
   return (
     <div className="space-y-4">
@@ -455,7 +454,6 @@ function HackingResultTab({ result, seekTo, navigate }: {
       <ScriptTimeline
         scriptAnalysis={scriptAnalysis}
         scriptAlpha={scriptAlpha}
-        duration={duration}
         seekTo={seekTo}
       />
       {/* 3) 영상 해부 */}

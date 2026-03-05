@@ -1,16 +1,16 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import type { ScriptAnalysis, ScriptAlpha, ScriptUtterance } from '../../types';
 
 /* ── Korean labels ─────────────────────────── */
 
-const ELEMENT_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-  authority:           { bg: 'bg-purple-100', text: 'text-purple-700', label: '①권위' },
-  hook:                { bg: 'bg-red-100',    text: 'text-red-700',    label: '②훅' },
-  sensory_description: { bg: 'bg-orange-100', text: 'text-orange-700', label: '③묘사' },
-  simplicity:          { bg: 'bg-green-100',  text: 'text-green-700',  label: '④간편' },
-  process:             { bg: 'bg-blue-100',   text: 'text-blue-700',   label: '⑤과정' },
-  social_proof:        { bg: 'bg-yellow-100', text: 'text-yellow-700', label: '⑥증거' },
-  cta:                 { bg: 'bg-pink-100',   text: 'text-pink-700',   label: '⑦CTA' },
+const ELEMENT_META: Record<string, { num: string; name: string; color: string }> = {
+  authority:           { num: '①', name: '권위',   color: 'bg-purple-50 text-purple-700' },
+  hook:                { num: '②', name: '훅',     color: 'bg-red-50 text-red-700' },
+  sensory_description: { num: '③', name: '묘사',   color: 'bg-orange-50 text-orange-700' },
+  simplicity:          { num: '④', name: '간편',   color: 'bg-green-50 text-green-700' },
+  process:             { num: '⑤', name: '과정',   color: 'bg-blue-50 text-blue-700' },
+  social_proof:        { num: '⑥', name: '증거',   color: 'bg-yellow-50 text-yellow-700' },
+  cta:                 { num: '⑦', name: 'CTA',   color: 'bg-pink-50 text-pink-700' },
 };
 
 const EMOTION_KO: Record<string, string> = {
@@ -20,7 +20,7 @@ const EMOTION_KO: Record<string, string> = {
 
 const STRUCTURE_KO: Record<string, string> = {
   reversal: '반전', contrast: '대조', repetition: '반복', info_density: '정보압축',
-  escalation: '에스컬레이션', before_after: '비포→애프터', problem_solution: '문제→해결', story_arc: '스토리',
+  escalation: '고조', before_after: '비포→애프터', problem_solution: '문제→해결', story_arc: '스토리',
 };
 
 const CONNECTION_KO: Record<string, string> = {
@@ -28,142 +28,125 @@ const CONNECTION_KO: Record<string, string> = {
   question_answer: 'Q&A', pause_emphasis: '멈춤강조',
 };
 
-/* ── Timeline bar (B) ──────────────────────── */
-
-function TimelineBar({
-  utterances,
-  duration,
-  onClickUtterance,
-}: {
-  utterances: ScriptUtterance[];
-  duration: number;
-  onClickUtterance: (index: number) => void;
-}) {
-  if (!duration || duration <= 0) return null;
-
-  // Build element segments (merge consecutive same-element)
-  type Segment = { element: string; start: number; end: number; indices: number[] };
-  const segments: Segment[] = [];
-  for (let i = 0; i < utterances.length; i++) {
-    const u = utterances[i];
-    const el = u.element || 'none';
-    const start = u.time_range[0];
-    const end = u.time_range[1];
-    const last = segments[segments.length - 1];
-    if (last && last.element === el && Math.abs(start - last.end) < 1) {
-      last.end = end;
-      last.indices.push(i);
-    } else {
-      segments.push({ element: el, start, end, indices: [i] });
-    }
-  }
-
-  return (
-    <div className="space-y-2">
-      {/* Element layer */}
-      <div className="relative h-7 bg-gray-50 rounded-lg overflow-hidden">
-        {segments.filter(s => s.element !== 'none').map((seg, i) => {
-          const colors = ELEMENT_COLORS[seg.element] || { bg: 'bg-gray-200', text: 'text-gray-600', label: seg.element };
-          const left = (seg.start / duration) * 100;
-          const width = Math.max(((seg.end - seg.start) / duration) * 100, 3);
-          return (
-            <button
-              key={i}
-              onClick={() => onClickUtterance(seg.indices[0])}
-              className={`absolute top-0 h-full ${colors.bg} flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity border-r border-white/50`}
-              style={{ left: `${left}%`, width: `${width}%` }}
-              title={colors.label}
-            >
-              <span className={`text-[9px] font-bold ${colors.text} truncate px-0.5`}>{colors.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Alpha layers removed from timeline — shown only in utterance detail */}
-    </div>
-  );
-}
-
-/* AlphaLayerBar removed — α detail shown in utterance list only */
-
-/* ── Utterance list (A — expandable) ────── */
-
-function UtteranceList({
-  utterances,
-  seekTo,
-  highlightIndex,
-  listRef,
-}: {
-  utterances: ScriptUtterance[];
-  seekTo: (s: number) => void;
-  highlightIndex: number | null;
-  listRef: React.RefObject<HTMLDivElement | null>;
-}) {
-  return (
-    <div ref={listRef} className="space-y-1 max-h-[400px] overflow-y-auto">
-      {utterances.map((u, i) => {
-        const elColors = ELEMENT_COLORS[u.element || ''];
-        const isHighlighted = highlightIndex === i;
-        const emotionLabel = u.emotion_layer ? EMOTION_KO[u.emotion_layer] || u.emotion_layer : null;
-        const structLabel = u.structure_layer ? STRUCTURE_KO[u.structure_layer] || u.structure_layer : null;
-        const connLabel = u.connection_layer ? CONNECTION_KO[u.connection_layer] || u.connection_layer : null;
-        return (
-          <div
-            key={i}
-            data-utt-index={i}
-            className={`py-2 px-3 rounded-lg transition-colors ${isHighlighted ? 'bg-blue-50 ring-1 ring-blue-200' : 'hover:bg-gray-50'}`}
-          >
-            <div className="flex items-start gap-2">
-              <button
-                onClick={() => seekTo(u.time_range[0])}
-                className="shrink-0 text-[10px] font-mono text-gray-400 hover:text-gray-600 mt-0.5"
-              >
-                {fmtTime(u.time_range[0])}
-              </button>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-800 leading-relaxed">&ldquo;{u.text}&rdquo;</p>
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  {elColors && (
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${elColors.bg} ${elColors.text} font-medium`}>
-                      {elColors.label}
-                    </span>
-                  )}
-                  {emotionLabel && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-50 text-rose-500 font-medium">
-                      💭 {emotionLabel}
-                    </span>
-                  )}
-                  {structLabel && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-500 font-medium">
-                      🔀 {structLabel}
-                    </span>
-                  )}
-                  {connLabel && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-teal-50 text-teal-500 font-medium">
-                      🔗 {connLabel}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <button
-                onClick={() => seekTo(u.time_range[0])}
-                className="shrink-0 text-[10px] text-gray-300 hover:text-gray-500"
-              >
-                ▶
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function fmtTime(sec: number): string {
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
   return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+/* ── 7요소 표 ─────────────────────────────── */
+
+function ElementTable({
+  utterances,
+  seekTo,
+}: {
+  utterances: ScriptUtterance[];
+  seekTo: (s: number) => void;
+}) {
+  // Group utterances by element, keep first occurrence time
+  const elementRows: { element: string; meta: typeof ELEMENT_META[string]; texts: { text: string; time: number }[] }[] = [];
+  const seen = new Map<string, number>();
+
+  for (const u of utterances) {
+    const el = u.element;
+    if (!el || !ELEMENT_META[el]) continue;
+    if (!seen.has(el)) {
+      seen.set(el, elementRows.length);
+      elementRows.push({ element: el, meta: ELEMENT_META[el], texts: [] });
+    }
+    elementRows[seen.get(el)!].texts.push({ text: u.text, time: u.time_range[0] });
+  }
+
+  if (elementRows.length === 0) return null;
+
+  return (
+    <div className="space-y-1.5">
+      {elementRows.map((row) => (
+        <div key={row.element} className="flex items-start gap-2 py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors">
+          <span className={`shrink-0 text-[11px] px-2 py-0.5 rounded font-semibold ${row.meta.color}`}>
+            {row.meta.num} {row.meta.name}
+          </span>
+          <div className="flex-1 min-w-0">
+            {row.texts.map((t, i) => (
+              <p key={i} className="text-sm text-gray-700 leading-relaxed">
+                &ldquo;{t.text}&rdquo;
+              </p>
+            ))}
+          </div>
+          <button
+            onClick={() => seekTo(row.texts[0].time)}
+            className="shrink-0 text-[11px] font-mono text-gray-400 hover:text-gray-600"
+          >
+            {fmtTime(row.texts[0].time)} ▶
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── α 기법 표 ────────────────────────────── */
+
+function AlphaTable({
+  scriptAlpha,
+  seekTo,
+}: {
+  scriptAlpha: ScriptAlpha;
+  seekTo: (s: number) => void;
+}) {
+  type AlphaRow = { icon: string; category: string; label: string; text: string; time: number };
+  const rows: AlphaRow[] = [];
+
+  for (const t of scriptAlpha.emotion_techniques || []) {
+    rows.push({
+      icon: '💭',
+      category: '감정',
+      label: EMOTION_KO[t.type] || t.type,
+      text: t.trigger_text || t.text || '',
+      time: t.time_range[0],
+    });
+  }
+  for (const t of scriptAlpha.structure_techniques || []) {
+    rows.push({
+      icon: '🔀',
+      category: '구조',
+      label: STRUCTURE_KO[t.type] || t.type,
+      text: t.description || t.text || '',
+      time: t.time_range[0],
+    });
+  }
+  for (const t of scriptAlpha.connection_techniques || []) {
+    rows.push({
+      icon: '🔗',
+      category: '연결',
+      label: CONNECTION_KO[t.type] || t.type,
+      text: t.text || t.trigger_text || '',
+      time: t.time_range[0],
+    });
+  }
+
+  // Sort by time
+  rows.sort((a, b) => a.time - b.time);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <div className="space-y-1">
+      {rows.map((row, i) => (
+        <div key={i} className="flex items-start gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 transition-colors">
+          <span className="shrink-0 text-[11px]">{row.icon}</span>
+          <span className="shrink-0 text-[11px] font-medium text-gray-500 w-14">{row.label}</span>
+          <p className="flex-1 text-sm text-gray-600 leading-relaxed truncate">{row.text}</p>
+          <button
+            onClick={() => seekTo(row.time)}
+            className="shrink-0 text-[11px] font-mono text-gray-400 hover:text-gray-600"
+          >
+            {fmtTime(row.time)} ▶
+          </button>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 /* ── Main component ────────────────────── */
@@ -171,17 +154,13 @@ function fmtTime(sec: number): string {
 export default function ScriptTimeline({
   scriptAnalysis,
   scriptAlpha,
-  duration,
   seekTo,
 }: {
   scriptAnalysis?: ScriptAnalysis;
   scriptAlpha?: ScriptAlpha;
-  duration: number;
   seekTo: (s: number) => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const [highlightIndex, setHighlightIndex] = useState<number | null>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+  const [alphaExpanded, setAlphaExpanded] = useState(false);
 
   // Build utterances: prefer script_alpha, fallback to script_analysis appeals
   const utterances: ScriptUtterance[] = scriptAlpha?.utterances
@@ -194,81 +173,44 @@ export default function ScriptTimeline({
 
   if (utterances.length === 0) return null;
 
-  const effectiveDuration = duration || Math.max(...utterances.map(u => u.time_range[1]), 30);
-
-  // Alpha technique summaries
+  // Alpha counts
   const emotionCount = scriptAlpha?.emotion_techniques?.length ?? 0;
   const structureCount = scriptAlpha?.structure_techniques?.length ?? 0;
   const connectionCount = scriptAlpha?.connection_techniques?.length ?? 0;
   const alphaTotal = emotionCount + structureCount + connectionCount;
 
-  const handleClickUtterance = (index: number) => {
-    setExpanded(true);
-    setHighlightIndex(index);
-    // Scroll to utterance
-    setTimeout(() => {
-      const el = listRef.current?.querySelector(`[data-utt-index="${index}"]`);
-      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-    // Seek video
-    if (utterances[index]) {
-      seekTo(utterances[index].time_range[0]);
-    }
-  };
-
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
-      <div className="flex items-center gap-2 mb-3">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-4">
         <p className="text-sm font-semibold text-gray-900">📝 대본 해부</p>
         {scriptAnalysis && (
           <span className="text-xs text-gray-400">
             {scriptAnalysis.elements_used}/{scriptAnalysis.elements_total} 요소
           </span>
         )}
-        {alphaTotal > 0 && (
-          <span className="text-xs text-gray-400 ml-auto">
-            +{alphaTotal} 기법
-          </span>
-        )}
       </div>
 
-      {/* Timeline bar (B) — always visible */}
-      <TimelineBar
-        utterances={utterances}
-        duration={effectiveDuration}
-        onClickUtterance={handleClickUtterance}
-      />
+      {/* 7요소 표 */}
+      <ElementTable utterances={utterances} seekTo={seekTo} />
 
-      {/* Alpha summary — compact counts */}
-      {alphaTotal > 0 && (
-        <div className="flex gap-3 mt-2">
-          {emotionCount > 0 && (
-            <span className="text-[11px] text-rose-500">💭 감정 ×{emotionCount}</span>
+      {/* α 기법 — 접기/펼치기 */}
+      {alphaTotal > 0 && scriptAlpha && (
+        <>
+          <button
+            onClick={() => setAlphaExpanded(!alphaExpanded)}
+            className="mt-4 w-full flex items-center gap-2 py-2 border-t border-gray-100"
+          >
+            <span className="text-sm font-semibold text-gray-900">✦ 대본 기법</span>
+            <span className="text-xs text-gray-400">
+              💭{emotionCount} 🔀{structureCount} 🔗{connectionCount}
+            </span>
+            <span className="ml-auto text-xs text-gray-300">{alphaExpanded ? '▾' : '▸'}</span>
+          </button>
+          {alphaExpanded && (
+            <AlphaTable scriptAlpha={scriptAlpha} seekTo={seekTo} />
           )}
-          {structureCount > 0 && (
-            <span className="text-[11px] text-indigo-500">🔀 구조 ×{structureCount}</span>
-          )}
-          {connectionCount > 0 && (
-            <span className="text-[11px] text-teal-500">🔗 연결 ×{connectionCount}</span>
-          )}
-        </div>
-      )}
-
-      {/* Expandable utterance list (A) */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="mt-3 w-full flex items-center justify-center gap-1 py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors"
-      >
-        {expanded ? '▾ 대본 접기' : '▸ 대본 상세 보기'}
-      </button>
-
-      {expanded && (
-        <UtteranceList
-          utterances={utterances}
-          seekTo={seekTo}
-          highlightIndex={highlightIndex}
-          listRef={listRef}
-        />
+        </>
       )}
     </div>
   );
