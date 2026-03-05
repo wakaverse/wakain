@@ -355,33 +355,77 @@ const STRENGTH_LABEL: Record<string, { text: string; color: string }> = {
   weak: { text: '약', color: 'text-gray-400 bg-gray-50' },
 };
 
-/* ── 제품 소구 포인트 섹션 ─────────────── */
+/* ── 제품 소구 포인트 섹션 (유형별 그룹핑) ── */
+
+interface AppealGroup {
+  type: string;
+  label: string;
+  items: AppealPoint[];
+}
+
+function groupAppeals(points: AppealPoint[]): AppealGroup[] {
+  const map = new Map<string, AppealPoint[]>();
+  for (const ap of points) {
+    const list = map.get(ap.type) || [];
+    list.push(ap);
+    map.set(ap.type, list);
+  }
+  // Sort by count desc
+  return Array.from(map.entries())
+    .sort((a, b) => b[1].length - a[1].length)
+    .map(([type, items]) => ({
+      type,
+      label: APPEAL_TYPE_KO[type] || type,
+      items,
+    }));
+}
 
 function AppealPointsSection({ appealPoints, seekTo }: { appealPoints?: AppealPoint[]; seekTo: (s: number) => void }) {
+  const [expandedType, setExpandedType] = useState<string | null>(null);
+
   if (!appealPoints?.length) return null;
+
+  const groups = groupAppeals(appealPoints);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
-      <p className="text-sm font-semibold text-gray-900 mb-3">🎯 제품 소구 포인트</p>
-      <div className="space-y-2">
-        {appealPoints.map((ap, i) => {
-          const label = APPEAL_TYPE_KO[ap.type] || ap.type;
-          const strength = STRENGTH_LABEL[ap.strength] || STRENGTH_LABEL.moderate;
-          const ts = ap.visual_proof?.timestamp;
+      <p className="text-sm font-semibold text-gray-900 mb-3">
+        🎯 제품 소구 포인트 <span className="text-xs font-normal text-gray-400">({appealPoints.length}개)</span>
+      </p>
+      <div className="space-y-1.5">
+        {groups.map((group) => {
+          const isExpanded = expandedType === group.type;
           return (
-            <div key={i} className="flex items-start gap-2 py-2 border-b border-gray-50 last:border-0">
-              <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium ${strength.color}`}>{strength.text}</span>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-xs font-medium text-gray-500">{label}</span>
-                  {ap.source && <span className="text-[10px] text-gray-300">{ap.source === 'script' ? '📝' : ap.source === 'visual' ? '🎬' : '📝🎬'}</span>}
+            <div key={group.type}>
+              <button
+                onClick={() => setExpandedType(isExpanded ? null : group.type)}
+                className="w-full flex items-center gap-2 py-2 px-3 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <span className="text-sm font-medium text-gray-700">{group.label}</span>
+                <span className="text-xs text-gray-400">×{group.items.length}</span>
+                <span className="ml-auto text-[10px] text-gray-300 leading-none truncate max-w-[60%] text-right">
+                  {group.items.map(a => a.claim).join(' · ').slice(0, 60)}{group.items.map(a => a.claim).join(' · ').length > 60 ? '...' : ''}
+                </span>
+                <span className="shrink-0 text-gray-300 text-xs">{isExpanded ? '▾' : '▸'}</span>
+              </button>
+              {isExpanded && (
+                <div className="ml-3 pl-3 border-l-2 border-gray-100 space-y-1 pb-2">
+                  {group.items.map((ap, i) => {
+                    const strength = STRENGTH_LABEL[ap.strength] || STRENGTH_LABEL.moderate;
+                    const ts = ap.visual_proof?.timestamp;
+                    return (
+                      <div key={i} className="flex items-start gap-2 py-1.5">
+                        <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded font-medium ${strength.color}`}>{strength.text}</span>
+                        <p className="flex-1 text-sm text-gray-600 leading-snug">{ap.claim}</p>
+                        {ts != null && ts > 0 && (
+                          <button onClick={() => seekTo(ts)} className="shrink-0 text-[10px] font-mono text-gray-300 hover:text-gray-500">
+                            {fmtTime(ts)} ▶
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-                <p className="text-sm text-gray-700 leading-snug">{ap.claim}</p>
-              </div>
-              {ts != null && ts > 0 && (
-                <button onClick={() => seekTo(ts)} className="shrink-0 text-[10px] font-mono text-gray-300 hover:text-gray-500">
-                  {fmtTime(ts)} ▶
-                </button>
               )}
             </div>
           );
