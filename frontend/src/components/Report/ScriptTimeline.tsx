@@ -80,75 +80,12 @@ function TimelineBar({
         })}
       </div>
 
-      {/* Alpha layers: emotion + structure + connection */}
-      <AlphaLayerBar
-        utterances={utterances}
-        duration={duration}
-        layerKey="emotion_layer"
-        labelMap={EMOTION_KO}
-        color="text-rose-500"
-        bgColor="bg-rose-50"
-        icon="💭"
-      />
-      <AlphaLayerBar
-        utterances={utterances}
-        duration={duration}
-        layerKey="structure_layer"
-        labelMap={STRUCTURE_KO}
-        color="text-indigo-500"
-        bgColor="bg-indigo-50"
-        icon="🔀"
-      />
-      <AlphaLayerBar
-        utterances={utterances}
-        duration={duration}
-        layerKey="connection_layer"
-        labelMap={CONNECTION_KO}
-        color="text-teal-500"
-        bgColor="bg-teal-50"
-        icon="🔗"
-      />
+      {/* Alpha layers removed from timeline — shown only in utterance detail */}
     </div>
   );
 }
 
-function AlphaLayerBar({
-  utterances, duration, layerKey, labelMap, color, bgColor, icon,
-}: {
-  utterances: ScriptUtterance[];
-  duration: number;
-  layerKey: 'emotion_layer' | 'structure_layer' | 'connection_layer';
-  labelMap: Record<string, string>;
-  color: string;
-  bgColor: string;
-  icon: string;
-}) {
-  const items = utterances
-    .map((u, i) => ({ value: u[layerKey], time_range: u.time_range, index: i }))
-    .filter(x => x.value);
-
-  if (items.length === 0) return null;
-
-  return (
-    <div className="relative h-5 bg-gray-50/50 rounded overflow-hidden">
-      {items.map((item, i) => {
-        const left = (item.time_range[0] / duration) * 100;
-        const width = Math.max(((item.time_range[1] - item.time_range[0]) / duration) * 100, 4);
-        const label = labelMap[item.value!] || item.value;
-        return (
-          <div
-            key={i}
-            className={`absolute top-0 h-full ${bgColor} flex items-center px-0.5`}
-            style={{ left: `${left}%`, width: `${width}%` }}
-            title={`${icon} ${label}`}
-          >
-            <span className={`text-[8px] font-medium ${color} truncate`}>{label}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+/* AlphaLayerBar removed — α detail shown in utterance list only */
 
 /* ── Utterance list (A — expandable) ────── */
 
@@ -302,24 +239,18 @@ export default function ScriptTimeline({
         onClickUtterance={handleClickUtterance}
       />
 
-      {/* Alpha summary chips */}
+      {/* Alpha summary — compact counts */}
       {alphaTotal > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {scriptAlpha?.emotion_techniques?.map((t, i) => (
-            <span key={`e${i}`} className="text-[10px] px-2 py-0.5 rounded-full bg-rose-50 text-rose-500">
-              💭 {EMOTION_KO[t.type] || t.type}
-            </span>
-          ))}
-          {scriptAlpha?.structure_techniques?.map((t, i) => (
-            <span key={`s${i}`} className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-500">
-              🔀 {STRUCTURE_KO[t.type] || t.type}
-            </span>
-          ))}
-          {scriptAlpha?.connection_techniques?.map((t, i) => (
-            <span key={`c${i}`} className="text-[10px] px-2 py-0.5 rounded-full bg-teal-50 text-teal-500">
-              🔗 {CONNECTION_KO[t.type] || t.type}
-            </span>
-          ))}
+        <div className="flex gap-3 mt-2">
+          {emotionCount > 0 && (
+            <span className="text-[11px] text-rose-500">💭 감정 ×{emotionCount}</span>
+          )}
+          {structureCount > 0 && (
+            <span className="text-[11px] text-indigo-500">🔀 구조 ×{structureCount}</span>
+          )}
+          {connectionCount > 0 && (
+            <span className="text-[11px] text-teal-500">🔗 연결 ×{connectionCount}</span>
+          )}
         </div>
       )}
 
