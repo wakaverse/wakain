@@ -510,6 +510,14 @@ _RESPONSE_SCHEMA = {
             },
             "required": ["presenter", "video_style", "appeal_points", "product_emphasis", "primary_appeal", "appeal_layering", "persuasion_summary"],
         },
+    },
+    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis"],
+}
+
+# Separate schema for script_analysis (7요소 프레임워크) — separate Gemini call to avoid schema complexity limit
+_SCRIPT_ANALYSIS_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
         "script_analysis": {
             "type": "OBJECT",
             "properties": {
@@ -568,7 +576,7 @@ _RESPONSE_SCHEMA = {
             "required": ["hook", "appeals", "cta", "flow_order", "elements_used", "elements_total", "advanced_techniques", "video_style"],
         },
     },
-    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis"],
+    "required": ["script_analysis"],
 }
 
 # Separate schema for art_direction (to stay under Gemini schema complexity limit)
@@ -1030,8 +1038,60 @@ Focus on what makes viewers FEEL, STAY, and SHARE."""
                         print(f"  ⚠ Engagement analysis failed after {max_retries} retries, skipping: {e}")
                         return ("eng", None)
 
-        print("  Analysing art direction + engagement (parallel)...")
-        parallel_results = await asyncio.gather(_do_4b(), _do_4c(), return_exceptions=True)
+        async def _do_4d():
+            """Phase 4d: Script analysis (7요소 프레임워크) — separate call."""
+            script_prompt = f"""Analyse this shortform commerce video's script using the 7-element framework.
+
+{track_supplement}
+
+Detect which of the 7 elements are present and in what order:
+1. authority (권위 부여) — credibility device (professional_job/career_years/picky_taste/celebrity_ref/backstory/life_veteran)
+2. hook (감탄 훅) — first 3 seconds, direct experience emotion (직접경험감탄/행동변화형/극적반응형/사람반응형)
+3. sensory_description (상황 묘사) — multi-sensory description (visual/tactile/taste/smell/auditory)
+4. simplicity (간편함 어필) — lowering barriers (number_limit/one_step/time_limit/empathy)
+5. process (과정 묘사) — showing making/using (optional)
+6. social_proof (사회적 증거) — others' reactions, personal change
+7. cta (행동 유도) — 댓글유도/공감참여/보증형/링크형
+
+For hook: extract the actual first-3-second sentence and classify its pattern.
+For each element: set used=true only if clearly present. Include the actual text from the video.
+flow_order: actual sequence of elements found (e.g. ["authority","hook","sensory_description","cta"])
+video_style: talking_head_commerce/brand_ad/product_demo/caption_text/asmr/comparison/other
+
+Also detect advanced techniques: reversal_structure, connecting_endings, info_overload, target_consistency."""
+
+            for attempt in range(max_retries):
+                try:
+                    sa_response = await client.aio.models.generate_content(
+                        model=MODEL,
+                        contents=[
+                            types.Part.from_uri(
+                                file_uri=uploaded_file.uri,
+                                mime_type=uploaded_file.mime_type,
+                            ),
+                            types.Part.from_text(text=script_prompt),
+                        ],
+                        config=types.GenerateContentConfig(
+                            system_instruction=SYSTEM_INSTRUCTION,
+                            response_mime_type="application/json",
+                            response_schema=_SCRIPT_ANALYSIS_SCHEMA,
+                            temperature=0.1,
+                        ),
+                    )
+                    sa_data = json.loads(sa_response.text)
+                    print("  ✓ Script analysis (7요소) complete")
+                    return ("script", sa_data)
+                except Exception as e:
+                    wait = 2 ** attempt * 5
+                    if attempt < max_retries - 1:
+                        print(f"  ⚠ Script analysis retry {attempt+1}/{max_retries} ({type(e).__name__}), waiting {wait}s...")
+                        await asyncio.sleep(wait)
+                    else:
+                        print(f"  ⚠ Script analysis failed after {max_retries} retries, skipping: {e}")
+                        return ("script", None)
+
+        print("  Analysing art direction + engagement + script (parallel)...")
+        parallel_results = await asyncio.gather(_do_4b(), _do_4c(), _do_4d(), return_exceptions=True)
 
         for res in parallel_results:
             if isinstance(res, Exception):
@@ -1046,6 +1106,8 @@ Focus on what makes viewers FEEL, STAY, and SHARE."""
                 result["empathy_triggers"] = data.get("empathy_triggers", [])
                 result["narrative_analysis"] = data.get("narrative_analysis", {})
                 result["retention_analysis"] = data.get("retention_analysis", {})
+            elif tag == "script":
+                result["script_analysis"] = data.get("script_analysis", data)
 
         return result
     finally:

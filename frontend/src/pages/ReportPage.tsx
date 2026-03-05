@@ -326,7 +326,7 @@ function CutSpeedChartFallback({ result }: { result: AnalysisResult }) {
   );
 }
 
-/* ── Tab: 해킹 결과 ───────────────────────── */
+/* ── Tab: 분석 결과 ───────────────────────── */
 
 function HackingResultTab({ result, seekTo, navigate }: {
   result: AnalysisResult; seekTo: (s: number) => void; navigate: (p: string) => void;
@@ -618,7 +618,7 @@ export default function ReportPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
-        <TabButton active={tab === 'hacking'} onClick={() => setTab('hacking')}>해킹 결과</TabButton>
+        <TabButton active={tab === 'hacking'} onClick={() => setTab('hacking')}>분석 결과</TabButton>
         <TabButton active={tab === 'cuts'} onClick={() => setTab('cuts')}>컷 뷰</TabButton>
       </div>
 
