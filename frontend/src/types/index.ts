@@ -203,8 +203,8 @@ export interface VideoRecipe {
       primary_appeal: string;
       appeal_layering: string;
       persuasion_summary: string;
-      script_analysis?: ScriptAnalysis;
     };
+    script_analysis?: ScriptAnalysis;
     art_direction: {
       tone_and_manner: string;
       heading_font?: string;

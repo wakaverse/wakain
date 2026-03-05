@@ -331,10 +331,11 @@ function CutSpeedChartFallback({ result }: { result: AnalysisResult }) {
 function HackingResultTab({ result, seekTo, navigate }: {
   result: AnalysisResult; seekTo: (s: number) => void; navigate: (p: string) => void;
 }) {
-  const pa = result.video_recipe?.video_recipe?.persuasion_analysis;
-  const scriptAnalysis = pa?.script_analysis;
+  const vr = result.video_recipe?.video_recipe;
+  const pa = vr?.persuasion_analysis;
+  const scriptAnalysis = vr?.script_analysis ?? (pa as any)?.script_analysis;
   const appealPoints = pa?.appeal_points;
-  const hookLine = result.video_recipe?.video_recipe?.audio?.voice?.hook_line;
+  const hookLine = vr?.audio?.voice?.hook_line;
 
   return (
     <div className="space-y-4">
@@ -462,8 +463,9 @@ function CutViewTab({ result, seekTo }: {
 /* ── Element header summary ───────────────── */
 
 function ElementSummaryHeader({ result }: { result: AnalysisResult }) {
-  const pa = result.video_recipe?.video_recipe?.persuasion_analysis;
-  const scriptAnalysis = pa?.script_analysis;
+  const vr = result.video_recipe?.video_recipe;
+  const pa = vr?.persuasion_analysis;
+  const scriptAnalysis = vr?.script_analysis ?? (pa as any)?.script_analysis;
 
   if (!scriptAnalysis && !pa?.appeal_points?.length) return null;
 
@@ -472,7 +474,7 @@ function ElementSummaryHeader({ result }: { result: AnalysisResult }) {
   let flowOrder: string[] = [];
 
   if (scriptAnalysis) {
-    usedElements = scriptAnalysis.appeals.filter(a => a.used).map(a => a.element);
+    usedElements = scriptAnalysis.appeals.filter((a: any) => a.used).map((a: any) => a.element);
     flowOrder = scriptAnalysis.flow_order;
   } else {
     // Fallback: derive from appeal_points types

@@ -160,7 +160,7 @@ For retention_analysis:
 
 ## Script Analysis (대본 분석)
 
-persuasion_analysis 안에 script_analysis 필드를 추가하여, 쇼핑 숏폼 7요소 프레임워크로 대본을 분석하라.
+최상위 script_analysis 필드에 쇼핑 숏폼 7요소 프레임워크로 대본을 분석하라. (persuasion_analysis와 별개 필드)
 
 Elements to detect (check which are present):
 1. authority (권위 부여): Who speaks and what credibility device?
@@ -507,68 +507,68 @@ _RESPONSE_SCHEMA = {
                 ]},
                 "appeal_layering": {"type": "STRING"},
                 "persuasion_summary": {"type": "STRING"},
-                "script_analysis": {
-                    "type": "OBJECT",
-                    "properties": {
-                        "hook": {
-                            "type": "OBJECT",
-                            "properties": {
-                                "text": {"type": "STRING"},
-                                "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
-                                "pattern": {"type": "STRING"},
-                                "direct_experience": {"type": "BOOLEAN"},
-                            },
-                            "required": ["text", "time_range", "pattern", "direct_experience"],
-                        },
-                        "appeals": {
-                            "type": "ARRAY",
-                            "items": {
-                                "type": "OBJECT",
-                                "properties": {
-                                    "element": {"type": "STRING", "enum": [
-                                        "authority", "hook", "sensory_description",
-                                        "simplicity", "process", "social_proof", "cta",
-                                    ]},
-                                    "used": {"type": "BOOLEAN"},
-                                    "subtype": {"type": "STRING"},
-                                    "text": {"type": "STRING"},
-                                    "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
-                                },
-                                "required": ["element", "used", "subtype", "text", "time_range"],
-                            },
-                        },
-                        "cta": {
-                            "type": "OBJECT",
-                            "properties": {
-                                "type": {"type": "STRING"},
-                                "text": {"type": "STRING"},
-                                "keyword": {"type": "STRING"},
-                                "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
-                            },
-                            "required": ["type", "text", "time_range"],
-                        },
-                        "flow_order": {"type": "ARRAY", "items": {"type": "STRING"}},
-                        "elements_used": {"type": "INTEGER"},
-                        "elements_total": {"type": "INTEGER"},
-                        "advanced_techniques": {
-                            "type": "OBJECT",
-                            "properties": {
-                                "reversal_structure": {"type": "BOOLEAN"},
-                                "connecting_endings": {"type": "BOOLEAN"},
-                                "info_overload": {"type": "BOOLEAN"},
-                                "target_consistency": {"type": "BOOLEAN"},
-                            },
-                            "required": ["reversal_structure", "connecting_endings", "info_overload", "target_consistency"],
-                        },
-                        "video_style": {"type": "STRING"},
-                    },
-                    "required": ["hook", "appeals", "cta", "flow_order", "elements_used", "elements_total", "advanced_techniques", "video_style"],
-                },
             },
             "required": ["presenter", "video_style", "appeal_points", "product_emphasis", "primary_appeal", "appeal_layering", "persuasion_summary"],
         },
+        "script_analysis": {
+            "type": "OBJECT",
+            "properties": {
+                "hook": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "text": {"type": "STRING"},
+                        "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                        "pattern": {"type": "STRING"},
+                        "direct_experience": {"type": "BOOLEAN"},
+                    },
+                    "required": ["text", "time_range", "pattern", "direct_experience"],
+                },
+                "appeals": {
+                    "type": "ARRAY",
+                    "items": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "element": {"type": "STRING", "enum": [
+                                "authority", "hook", "sensory_description",
+                                "simplicity", "process", "social_proof", "cta",
+                            ]},
+                            "used": {"type": "BOOLEAN"},
+                            "subtype": {"type": "STRING"},
+                            "text": {"type": "STRING"},
+                            "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                        },
+                        "required": ["element", "used", "subtype", "text", "time_range"],
+                    },
+                },
+                "cta": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "type": {"type": "STRING"},
+                        "text": {"type": "STRING"},
+                        "keyword": {"type": "STRING"},
+                        "time_range": {"type": "ARRAY", "items": {"type": "NUMBER"}},
+                    },
+                    "required": ["type", "text", "time_range"],
+                },
+                "flow_order": {"type": "ARRAY", "items": {"type": "STRING"}},
+                "elements_used": {"type": "INTEGER"},
+                "elements_total": {"type": "INTEGER"},
+                "advanced_techniques": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "reversal_structure": {"type": "BOOLEAN"},
+                        "connecting_endings": {"type": "BOOLEAN"},
+                        "info_overload": {"type": "BOOLEAN"},
+                        "target_consistency": {"type": "BOOLEAN"},
+                    },
+                    "required": ["reversal_structure", "connecting_endings", "info_overload", "target_consistency"],
+                },
+                "video_style": {"type": "STRING"},
+            },
+            "required": ["hook", "appeals", "cta", "flow_order", "elements_used", "elements_total", "advanced_techniques", "video_style"],
+        },
     },
-    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis"],
+    "required": ["meta", "structure", "audio", "product_strategy", "effectiveness_assessment", "text_effects", "scene_roles", "persuasion_analysis", "script_analysis"],
 }
 
 # Separate schema for art_direction (to stay under Gemini schema complexity limit)
