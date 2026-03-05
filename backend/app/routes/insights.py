@@ -128,33 +128,32 @@ async def category_detail(category_name: str):
         if not rj or not isinstance(rj, dict):
             continue
 
-        vr = rj.get("video_recipe", {})
-        pa = vr.get("persuasion_analysis", {})
+        vr = rj.get("video_recipe", rj) or {}
+        pa = vr.get("persuasion_analysis") or {}
 
-        # Appeal types
-        for appeal in pa.get("appeal_types", []):
-            atype = appeal if isinstance(appeal, str) else appeal.get("type", "")
+        # Appeal types — field is "appeal_points" not "appeal_types"
+        for appeal in (pa.get("appeal_points") or []):
+            atype = appeal.get("type", "") if isinstance(appeal, dict) else str(appeal)
             if atype:
                 appeal_counter[atype] += 1
 
-        # Script analysis — 7 elements
-        sa = vr.get("script_analysis", {})
-        flow_order = sa.get("flow_order", [])
-        for elem_obj in sa.get("elements", []):
-            etype = elem_obj.get("type", "") if isinstance(elem_obj, dict) else str(elem_obj)
-            if etype:
-                element_counter[etype] += 1
+        # Script analysis — 7 elements, field is "appeals" not "elements"
+        sa = vr.get("script_analysis") or {}
+        flow_order = sa.get("flow_order") or []
+        for elem_obj in (sa.get("appeals") or []):
+            if isinstance(elem_obj, dict) and elem_obj.get("used"):
+                etype = elem_obj.get("element", "")
+                if etype:
+                    element_counter[etype] += 1
 
         if flow_order:
             flow_str = "→".join(flow_order)
             flow_counter[flow_str] += 1
 
-        # Alpha techniques
-        alpha = vr.get("script_alpha", {})
-        for layer_key in ("emotion", "structure", "connection"):
-            layer_data = alpha.get(layer_key, {})
-            techniques = layer_data.get("techniques", [])
-            for tech in techniques:
+        # Alpha techniques — fields are "emotion_techniques", "structure_techniques", "connection_techniques"
+        alpha = vr.get("script_alpha") or {}
+        for layer_key, field_key in [("emotion", "emotion_techniques"), ("structure", "structure_techniques"), ("connection", "connection_techniques")]:
+            for tech in (alpha.get(field_key) or []):
                 ttype = tech.get("type", "") if isinstance(tech, dict) else str(tech)
                 if ttype:
                     alpha_counters[layer_key][ttype] += 1
@@ -197,9 +196,9 @@ async def category_detail(category_name: str):
     # Sample videos (up to 10)
     sample_videos = []
     for row in items[:10]:
-        pj = row.get("product_json", {})
+        pj = row.get("product_json") or {}
         sample_videos.append({
-            "job_id": row.get("id", ""),
+            "job_id": row.get("job_id", row.get("id", "")),
             "product_name": pj.get("product_name", ""),
             "title": pj.get("product_name", ""),
         })
