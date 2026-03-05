@@ -179,14 +179,13 @@ async def _analyse_batch(
             except Exception as e:
                 wait = 2 ** attempt * 5  # 5, 10, 20, 40, 80s
                 err_name = type(e).__name__
+                ts_range = f"{timestamps[0]:.1f}s-{timestamps[-1]:.1f}s"
                 if attempt < max_retries - 1:
-                    ts_range = f"{timestamps[0]:.1f}s-{timestamps[-1]:.1f}s"
                     print(f"  ⚠ Batch [{ts_range}] retry {attempt+1}/{max_retries} ({err_name}), waiting {wait}s...")
                     await asyncio.sleep(wait)
                 else:
-                    raise RuntimeError(
-                        f"Batch [{timestamps[0]:.1f}s-{timestamps[-1]:.1f}s] failed after {max_retries} retries: {e}"
-                    ) from e
+                    print(f"  ⚠ Batch [{ts_range}] failed after {max_retries} retries, skipping: {e}")
+                    return []  # skip this batch instead of crashing the pipeline
 
     return []  # unreachable but satisfies type checker
 
