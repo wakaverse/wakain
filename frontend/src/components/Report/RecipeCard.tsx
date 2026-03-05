@@ -32,12 +32,22 @@ export default function RecipeCard({ scriptAnalysis, appealPoints, onNavigate }:
     const typeMap: Record<string, string> = {
       authority: '권위',
       social_proof: '증거',
-      feature_demo: '묘사',
-      track_record: '증거',
-      guarantee: 'CTA',
-      price: '간편',
-      manufacturing: '과정',
-      emotional: '훅',
+      feature_demo: '시연',
+      track_record: '실적',
+      guarantee: '보증',
+      price: '가격',
+      manufacturing: '제조',
+      emotional: '감성',
+      myth_bust: '통념깨기',
+      ingredient: '성분',
+      spec_data: '스펙',
+      comparison: '비교',
+      design_aesthetic: '디자인',
+      lifestyle: '라이프',
+      origin: '원산지',
+      urgency: '긴급',
+      nostalgia: '향수',
+      authenticity: '진정성',
     };
     for (const ap of appealPoints) {
       const label = typeMap[ap.type] || ap.type;

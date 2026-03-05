@@ -79,14 +79,15 @@ export default function VideoStructure({ result }: Props) {
 
   // Product exposure
   const productRatioRaw =
+    paAny?.product_emphasis?.screen_time_ratio ??
     recipe.visual_style?.product_screen_time_ratio ??
     (recipe.performance_metrics?.product_focus_ratio != null
       ? (recipe.performance_metrics.product_focus_ratio > 1
           ? recipe.performance_metrics.product_focus_ratio / 100
           : recipe.performance_metrics.product_focus_ratio)
       : null);
-  const productPct = productRatioRaw != null ? Math.round(productRatioRaw * 100) : null;
-  const firstAppear = paAny?.product_emphasis?.first_appear ?? structure?.product_first_appear;
+  const productPct = productRatioRaw != null && productRatioRaw > 0 ? Math.round(productRatioRaw * 100) : null;
+  const firstAppear = paAny?.product_emphasis?.first_appear ?? structure?.product_first_appear ?? (recipe as any).product_strategy?.reveal_timing_sec;
 
   // Emphasis techniques
   const emphasisTechs: string[] = Array.from(
@@ -122,12 +123,12 @@ export default function VideoStructure({ result }: Props) {
           </Row>
         )}
 
-        {(productPct != null || firstAppear != null) && (
+        {(productPct != null || (firstAppear != null && firstAppear > 0)) && (
           <Row label="제품 노출">
             <span className="text-sm text-gray-700">
               {productPct != null ? `${productPct}%` : ''}
-              {productPct != null && firstAppear != null ? ' · ' : ''}
-              {firstAppear != null ? `첫 등장 ${Math.round(firstAppear)}초` : ''}
+              {productPct != null && firstAppear != null && firstAppear > 0 ? ' · ' : ''}
+              {firstAppear != null && firstAppear > 0 ? `첫 등장 ${Math.round(firstAppear)}초` : ''}
             </span>
           </Row>
         )}
