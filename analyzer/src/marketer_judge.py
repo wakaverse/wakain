@@ -260,20 +260,20 @@ def run_marketer_judge(
     Returns:
         MarketingVerdict with parsed results
     """
-    api_key = os.getenv("GEMINI_API_KEY_PRO") or os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        print("[Marketer Judge] ⚠️ GEMINI_API_KEY_PRO not set, skipping")
+    from .gemini_client import make_gemini_client
+    try:
+        client = make_gemini_client()
+    except RuntimeError:
+        print("[Marketer Judge] ⚠️ Gemini client not available, skipping")
         return MarketingVerdict(
             verdict="N/A",
-            verdict_summary="API 키 없음",
+            verdict_summary="Gemini 클라이언트 없음",
             evidence="",
             action_plan="",
             full_markdown="",
             product_name=product_name,
             product_category=product_category,
         )
-    
-    client = genai.Client(api_key=api_key)
     
     # Build evidence
     evidence_data = _build_evidence_summary(

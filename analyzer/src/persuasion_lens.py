@@ -20,10 +20,8 @@ MODEL = "gemini-2.5-flash"
 
 
 def _make_client() -> genai.Client:
-    api_key = os.environ.get("GEMINI_API_KEY_PRO", "") or os.environ.get("GEMINI_API_KEY", "")
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY or GEMINI_API_KEY_PRO not set.")
-    return genai.Client(api_key=api_key)
+    from .gemini_client import make_gemini_client
+    return make_gemini_client()
 
 
 def _extract_json(text: str) -> Any:

@@ -175,7 +175,8 @@ def _prepare_video_for_upload(video_path: str, max_size_mb: int = 20) -> str:
 
 def classify_style_auto(video_path: str) -> StyleClassification:
     """Auto-classify video style using Gemini Flash Lite."""
-    client = genai.Client()
+    from .gemini_client import make_gemini_client
+    client = make_gemini_client()
 
     # Upload video
     upload_path = _prepare_video_for_upload(video_path)

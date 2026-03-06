@@ -111,15 +111,8 @@ def _fill_defaults(item: dict) -> dict:
 
 
 def _make_client() -> genai.Client:
-    api_key = os.environ.get("GEMINI_API_KEY_PRO", "") or os.environ.get("GEMINI_API_KEY", "")
-    if not api_key:
-        raise RuntimeError(
-            "GEMINI_API_KEY or GEMINI_API_KEY_PRO environment variable is not set. "
-            "Copy .env.example to .env and fill in your key."
-        )
-    key_type = "PRO (Tier 3)" if os.environ.get("GEMINI_API_KEY_PRO") else "Free"
-    print(f"  Using Gemini API key: {key_type}")
-    return genai.Client(api_key=api_key)
+    from .gemini_client import make_gemini_client
+    return make_gemini_client()
 
 
 async def _analyse_batch(

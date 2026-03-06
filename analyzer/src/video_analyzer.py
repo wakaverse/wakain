@@ -749,12 +749,8 @@ _ENGAGEMENT_SCHEMA = {
 
 
 def _make_client() -> genai.Client:
-    api_key = os.environ.get("GEMINI_API_KEY_PRO") or os.environ.get("GEMINI_API_KEY", "")
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY not set")
-    key_label = "PRO" if os.environ.get("GEMINI_API_KEY_PRO") else "FREE"
-    print(f"  Using Gemini API key: {key_label}")
-    return genai.Client(api_key=api_key)
+    from .gemini_client import make_gemini_client
+    return make_gemini_client()
 
 
 def _resize_video(video_path: str | Path, max_mb: int = MAX_UPLOAD_SIZE_MB, resolution: int = 720) -> Path:

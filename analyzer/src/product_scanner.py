@@ -109,7 +109,8 @@ def _prepare_video_for_upload(video_path: str, max_size_mb: int = 20) -> str:
 
 def scan_product(video_path: str) -> ProductScanResult:
     """Scan video for product category, name, brand using Gemini Flash Lite."""
-    client = genai.Client()
+    from .gemini_client import make_gemini_client
+    client = make_gemini_client()
 
     upload_path = _prepare_video_for_upload(video_path)
     try:
