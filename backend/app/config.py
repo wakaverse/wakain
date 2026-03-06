@@ -36,7 +36,8 @@ ANALYZER_DIR = os.getenv(
 PORT = int(os.getenv("PORT", "8080"))
 
 # CORS allowed origins (comma-separated)
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+_origins_raw = os.getenv("ALLOWED_ORIGINS", "*")
+ALLOWED_ORIGINS = [o.strip() for o in _origins_raw.replace(",", " ").split() if o.strip()]
 
 # Temp dir for uploaded videos
 UPLOAD_DIR = Path(__file__).parent.parent / "uploads"
