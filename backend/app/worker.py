@@ -1,6 +1,8 @@
-"""Background worker: runs video-analyzer pipeline via subprocess, saves results to Supabase."""
+"""Background worker: runs V2 pipeline directly, saves results to Supabase."""
 
+import asyncio
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -13,7 +15,6 @@ from supabase import create_client
 from app.config import (
     SUPABASE_URL,
     SUPABASE_SERVICE_KEY,
-    ANALYZER_DIR,
     OUTPUT_DIR,
     UPLOAD_DIR,
     R2_ACCESS_KEY_ID,
@@ -72,71 +73,58 @@ def _clamp_appeal_structure(appeal_structure: dict, video_path: str) -> dict:
     return appeal_structure
 
 
-def _extract_thumbnails(video_path: str, appeal_structure: dict, job_id: str, recipe: dict | None = None) -> dict:
-    """Extract thumbnail frames for each cut using ffmpeg, upload to R2, return URL map."""
+def _extract_thumbnails(video_path: str, scenes: list[dict], job_id: str) -> dict:
+    """Extract thumbnail frames for each scene using ffmpeg, upload to R2, return URL map."""
     import tempfile
-    scenes = appeal_structure.get("scenes", [])
-    
-    # Fallback: if no appeal_structure scenes, use recipe scenes
-    if not scenes and recipe:
-        recipe_scenes = recipe.get("video_recipe", {}).get("scenes", [])
-        if recipe_scenes:
-            scenes = []
-            for rs in recipe_scenes:
-                scenes.append({
-                    "scene_id": rs.get("scene_id", 0),
-                    "cuts": [{"cut_id": rs.get("scene_id", 0), "time_range": rs.get("time_range", [0, 0])}],
-                })
-    
+
     if not scenes:
         return {}
 
     s3 = _s3()
-    thumb_map = {}  # cutKey -> r2_key
+    thumb_map = {}  # sceneKey -> r2_key
 
     for scene in scenes:
-        for cut in scene.get("cuts", []):
-            cut_id = cut.get("cut_id", 0)
-            tr = cut.get("time_range", [0, 0])
-            mid_t = (tr[0] + tr[1]) / 2
-            cut_key = f"{scene['scene_id']}-{cut_id}"
+        scene_id = scene.get("scene_id", 0)
+        tr = scene.get("time_range", [0, 0])
+        mid_t = (tr[0] + tr[1]) / 2
+        cut_key = f"{scene_id}"
 
-            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
-                tmp_path = tmp.name
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+            tmp_path = tmp.name
 
-            try:
-                cmd = [
-                    "ffmpeg", "-y",
-                    "-ss", str(mid_t),
-                    "-i", video_path,
-                    "-frames:v", "1",
-                    "-q:v", "5",
-                    "-vf", "scale=320:-1",
+        try:
+            cmd = [
+                "ffmpeg", "-y",
+                "-ss", str(mid_t),
+                "-i", video_path,
+                "-frames:v", "1",
+                "-q:v", "5",
+                "-vf", "scale=320:-1",
+                tmp_path,
+            ]
+            subprocess.run(cmd, capture_output=True, timeout=10)
+
+            if Path(tmp_path).exists() and Path(tmp_path).stat().st_size > 0:
+                r2_thumb_key = f"thumbnails/{job_id}/{cut_key}.jpg"
+                s3.upload_file(
                     tmp_path,
-                ]
-                subprocess.run(cmd, capture_output=True, timeout=10)
-
-                if Path(tmp_path).exists() and Path(tmp_path).stat().st_size > 0:
-                    r2_thumb_key = f"thumbnails/{job_id}/{cut_key}.jpg"
-                    s3.upload_file(
-                        tmp_path,
-                        R2_BUCKET_NAME,
-                        r2_thumb_key,
-                        ExtraArgs={"ContentType": "image/jpeg"},
-                    )
-                    thumb_map[cut_key] = r2_thumb_key
+                    R2_BUCKET_NAME,
+                    r2_thumb_key,
+                    ExtraArgs={"ContentType": "image/jpeg"},
+                )
+                thumb_map[cut_key] = r2_thumb_key
+        except Exception:
+            pass
+        finally:
+            try:
+                Path(tmp_path).unlink(missing_ok=True)
             except Exception:
                 pass
-            finally:
-                try:
-                    Path(tmp_path).unlink(missing_ok=True)
-                except Exception:
-                    pass
 
     return thumb_map
 
 def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, product_category: str | None = None) -> None:
-    """Download video from R2, run pipeline, persist results, clean up."""
+    """Download video from R2, run V2 pipeline, persist results, clean up."""
     output_dir = str(OUTPUT_DIR / job_id)
 
     # Determine local path for downloaded video
@@ -178,74 +166,29 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
             if downscaled_path.exists():
                 downscaled_path.unlink()
 
-        # Use the current Python interpreter (works in both local and container)
-        python_bin = sys.executable
+        # ── V2 Pipeline: direct async call ──────────────────────────────────
+        from core.orchestrator import PipelineConfig, run_pipeline
 
-        cmd = [
-            python_bin,
-            "main.py",
-            "analyze",
-            str(video_path),
-            "--output",
-            output_dir,
-        ]
-        if product_name:
-            cmd.extend(["--product-name", product_name])
-        if product_category:
-            cmd.extend(["--product-category", product_category])
-
-        proc = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            cwd=ANALYZER_DIR,
-            env={**__import__('os').environ, "PYTHONUNBUFFERED": "1"},
+        config = PipelineConfig(
+            video_path=str(video_path),
+            output_dir=output_dir,
+            gemini_api_key=os.environ.get("GEMINI_API_KEY"),
+            gemini_api_key_pro=os.environ.get("GEMINI_API_KEY_PRO"),
+            soniox_api_key=os.environ.get("SONIOX_API_KEY"),
         )
 
-        # Stream output to Cloud Logging in real-time via print (stdout → Cloud Logging)
-        output_lines = []
-        for line in proc.stdout:
-            line = line.rstrip()
-            if line:
-                print(f"[pipeline:{job_id[:8]}] {line}", flush=True)
-                output_lines.append(line)
+        pipeline_result = asyncio.run(run_pipeline(config))
 
-        proc.wait(timeout=600)
-
-        if proc.returncode != 0:
-            error_msg = "\n".join(output_lines[-50:]) or "Pipeline exited non-zero"
+        if pipeline_result.recipe is None:
             _update_job(
                 job_id,
                 status="failed",
                 completed_at=_now(),
-                error_message=error_msg[-2000:],
+                error_message="V2 pipeline completed but recipe is None",
             )
             return
 
-        # Find the recipe JSON produced by the pipeline.
-        # The pipeline's _resolve_output_dir avoids double-nesting when output_dir already
-        # ends with the video stem (job_id), so the recipe lives directly in output_dir/.
-        video_name = Path(video_path).stem
-        recipe_path = Path(output_dir) / f"{video_name}_video_recipe.json"
-        if not recipe_path.exists():
-            # Fallback: pipeline may have nested further
-            recipe_path = Path(output_dir) / video_name / f"{video_name}_video_recipe.json"
-
-        if not recipe_path.exists():
-            _update_job(
-                job_id,
-                status="failed",
-                completed_at=_now(),
-                error_message=f"Recipe file not found at {recipe_path}",
-            )
-            return
-
-        recipe_json = json.loads(recipe_path.read_text(encoding="utf-8"))
-
-        # Load additional analysis files (optional — may not exist)
-        analysis_dir = recipe_path.parent
-        extra = _load_extra_analysis(analysis_dir, video_name)
+        recipe_json = pipeline_result.recipe.model_dump()
 
         # Build a lightweight summary for fast loading
         try:
@@ -254,33 +197,20 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
             print(f"[pipeline:{job_id[:8]}] ⚠️ Summary build failed: {exc}", flush=True)
             summary = {}
 
-        # Extract thumbnails for each cut
+        # Extract thumbnails from V2 scenes
         thumbnails_json = None
-        appeal_json = extra.get("appeal_structure_json") or {}
-        if appeal_json and appeal_json.get("scenes"):
-            appeal_json = _clamp_appeal_structure(appeal_json, str(video_path))
-            extra["appeal_structure_json"] = appeal_json
-        recipe_for_thumbs = extra.get("recipe_json") or recipe_json
-        if appeal_json or recipe_for_thumbs:
+        v2_scenes = recipe_json.get("visual", {}).get("scenes", [])
+        if v2_scenes:
+            # Clamp time_ranges to actual video duration
+            clamped = _clamp_appeal_structure({"scenes": v2_scenes}, str(video_path))
+            v2_scenes = clamped.get("scenes", v2_scenes)
             try:
-                thumb_map = _extract_thumbnails(
-                    str(video_path), appeal_json, job_id, recipe=recipe_for_thumbs
-                )
+                thumb_map = _extract_thumbnails(str(video_path), v2_scenes, job_id)
                 if thumb_map:
                     thumbnails_json = thumb_map
                     print(f"[pipeline:{job_id[:8]}] Extracted {len(thumb_map)} thumbnails", flush=True)
             except Exception as exc:
                 print(f"[pipeline:{job_id[:8]}] Thumbnail extraction failed: {exc}", flush=True)
-
-        # Phase 4d: Persuasion Lens analysis
-        persuasion_lens_json = None
-        try:
-            from src.persuasion_lens import analyze_persuasion_lens
-            stt_text = extra.get('stt_json', {}).get('full_transcript', '') if extra.get('stt_json') else ''
-            persuasion_lens_json = analyze_persuasion_lens(recipe_json, stt_text or None)
-            print(f'[pipeline:{job_id[:8]}] Persuasion lens analysis complete', flush=True)
-        except Exception as exc:
-            print(f'[pipeline:{job_id[:8]}] Persuasion lens failed (non-fatal): {exc}', flush=True)
 
         # Save to results table
         try:
@@ -289,12 +219,7 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
                 "recipe_json": recipe_json,
                 "summary_json": summary,
                 "thumbnails_json": thumbnails_json,
-                "persuasion_lens_json": persuasion_lens_json,
             }
-            # Merge extra fields, skipping None values that might cause issues
-            for k, v in extra.items():
-                if v is not None:
-                    insert_data[k] = v
             _supabase().table("results").insert(insert_data).execute()
         except Exception as exc:
             print(f"[pipeline:{job_id[:8]}] ⚠️ Results insert failed: {exc}", flush=True)
@@ -305,13 +230,6 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
         # Mark job completed
         _update_job(job_id, status="completed", completed_at=_now())
 
-    except subprocess.TimeoutExpired:
-        _update_job(
-            job_id,
-            status="failed",
-            completed_at=_now(),
-            error_message="Pipeline timed out (>10 min)",
-        )
     except Exception as exc:  # noqa: BLE001
         _update_job(
             job_id,
@@ -354,24 +272,33 @@ def _load_extra_analysis(analysis_dir: Path, video_name: str) -> dict:
 
 
 def _build_summary(recipe_json: dict) -> dict:
-    """Extract key fields for quick dashboard rendering."""
-    recipe = recipe_json.get("video_recipe", recipe_json)
-    meta = recipe.get("meta", {})
-    effectiveness = recipe.get("effectiveness_assessment") or {}
-    structure = recipe.get("structure") or {}
-    scenes = recipe.get("scenes") or []
-    dropoff = recipe.get("dropoff_analysis") or {}
-    performance = recipe.get("performance_metrics") or {}
+    """Extract key fields from V2 recipe for quick dashboard rendering."""
+    identity = recipe_json.get("identity", {})
+    product = recipe_json.get("product", {})
+    style = recipe_json.get("style", {})
+    visual = recipe_json.get("visual", {})
+    scenes = visual.get("scenes", [])
+    engagement = recipe_json.get("engagement", {})
+    meta = recipe_json.get("meta", {})
+    summary_block = recipe_json.get("summary", {})
+    script = recipe_json.get("script", {})
+    retention = engagement.get("retention_analysis", {})
+    dropoff = engagement.get("dropoff_analysis", {})
+
     return {
         "duration_sec": meta.get("duration"),
         "scene_count": len(scenes),
-        "category": meta.get("category"),
-        "platform": meta.get("platform"),
-        "structure_type": structure.get("type"),
-        "overall_score": effectiveness.get("viral_potential_score") or effectiveness.get("hook_rating"),
-        "retention_score": dropoff.get("overall_retention_score"),
-        "attention_avg": performance.get("attention_avg"),
-        "strengths": effectiveness.get("standout_elements", effectiveness.get("strengths", []))[:3],
-        "weaknesses": effectiveness.get("weak_points", effectiveness.get("weaknesses", []))[:3],
-        "improvement_suggestions": effectiveness.get("improvement_suggestions", [])[:3],
+        "category": identity.get("category") or product.get("category"),
+        "platform": identity.get("platform") or meta.get("platform"),
+        "style_primary": style.get("primary"),
+        "style_secondary": style.get("secondary"),
+        "strategy": summary_block.get("strategy"),
+        "hook_strength": retention.get("hook_strength"),
+        "hook_reason": retention.get("hook_reason"),
+        "risk_zones_count": len(dropoff.get("risk_zones", [])),
+        "product_name": product.get("name"),
+        "brand": product.get("brand"),
+        "claims_count": len(product.get("claims", [])),
+        "block_count": len(script.get("blocks", [])),
+        "flow_order": script.get("flow_order", []),
     }

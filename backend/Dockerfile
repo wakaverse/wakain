@@ -11,8 +11,8 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy video-analyzer code (bundled at build time)
-COPY analyzer/ /app/video-analyzer/
+# Copy V2 core engine
+COPY core/ /app/core/
 
 # Copy backend app
 COPY backend/app/ /app/app/

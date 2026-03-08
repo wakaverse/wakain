@@ -1,0 +1,159 @@
+"""P9: ENGAGE — 리텐션 + 이탈 위험 분석.
+
+영상 전체 + P1 STT 결과를 gemini-2.5-flash에 보내
+리텐션/이탈 위험만 분석한다.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import logging
+from pathlib import Path
+
+from google.genai import types
+
+from core.gemini_utils import make_client, upload_video
+from core.schemas.pipeline import EngageOutput, ScanOutput, STTOutput
+
+logger = logging.getLogger(__name__)
+
+MODEL = "gemini-2.5-flash"
+MAX_RETRIES = 3
+
+PROMPT_TEMPLATE = """You are a viewer retention analyst for shortform marketing videos.
+
+## Video Context
+- Category: {category}
+- Duration: {duration}s
+
+{stt_transcript}
+
+## Task: Analyse retention and drop-off risk ONLY.
+
+1. retention_analysis:
+   - hook_strength: strong/moderate/weak
+   - hook_reason: 1 sentence
+   - rewatch_triggers: [{{time: float, trigger: string}}]
+   - share_triggers: [{{time: float, trigger: string}}]
+   - comment_triggers: [{{time: float, trigger: string}}]
+
+2. dropoff_analysis:
+   - risk_zones: [{{time_range: [start, end], risk_level: high/medium/low, reason: string}}]
+   - safe_zones: [{{time_range: [start, end], reason: string}}]
+
+## Language Rules
+- Enum/key values: ALWAYS English (e.g., "food", "hook", "fomo")
+- Product name & brand: Keep ORIGINAL as spoken/shown in video
+- STT transcript references: Keep ORIGINAL language
+- All descriptions, reasons, analyses, explanations: Write in {output_language}
+
+Response (JSON only):"""
+
+
+def _build_prompt(
+    stt_output: STTOutput | None,
+    scan_output: ScanOutput | None,
+    output_language: str = "ko",
+) -> str:
+    """P1/P2 결과를 프롬프트에 동적 삽입."""
+    category = "other"
+    duration = 0.0
+    stt_transcript = ""
+
+    if scan_output:
+        category = scan_output.product.category
+        duration = scan_output.meta.duration
+
+    if stt_output:
+        stt_transcript = stt_output.full_text
+
+    return PROMPT_TEMPLATE.format(
+        category=category,
+        duration=duration,
+        stt_transcript=stt_transcript,
+        output_language=output_language,
+    )
+
+
+async def run(
+    video_path: str,
+    output_dir: str,
+    stt_output: STTOutput | None = None,
+    scan_output: ScanOutput | None = None,
+    api_key: str | None = None,
+    output_language: str = "ko",
+) -> EngageOutput:
+    """P9 ENGAGE 실행.
+
+    Args:
+        video_path: 영상 파일 경로
+        output_dir: 결과 저장 디렉토리
+        stt_output: P1 STT 결과 (프롬프트 삽입용)
+        scan_output: P2 SCAN 결과 (프롬프트 삽입용)
+        api_key: Gemini API 키
+
+    Returns:
+        EngageOutput
+    """
+    client = make_client(api_key)
+
+    # 영상 업로드 (캐시 재사용)
+    uploaded = upload_video(video_path, client=client)
+
+    # 프롬프트 생성
+    prompt = _build_prompt(stt_output, scan_output, output_language)
+
+    # Gemini 호출
+    result = await _call_gemini(client, uploaded, prompt)
+
+    # 결과 저장
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "p09_engage.json"
+    out_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
+    logger.info("P9 결과 저장: %s", out_path)
+
+    return result
+
+
+async def _call_gemini(
+    client, uploaded_file: types.File, prompt: str
+) -> EngageOutput:
+    """Gemini API 호출 + 재시도."""
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = await client.aio.models.generate_content(
+                model=MODEL,
+                contents=[
+                    types.Part.from_uri(
+                        file_uri=uploaded_file.uri,
+                        mime_type=uploaded_file.mime_type,
+                    ),
+                    types.Part.from_text(text=prompt),
+                ],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=EngageOutput,
+                    temperature=0.1,
+                ),
+            )
+            data = json.loads(response.text)
+            return EngageOutput.model_validate(data)
+        except Exception as e:
+            wait = 2**attempt * 5
+            if attempt < MAX_RETRIES - 1:
+                logger.warning(
+                    "P9 ENGAGE 재시도 %d/%d (%s), %ds 대기...",
+                    attempt + 1,
+                    MAX_RETRIES,
+                    type(e).__name__,
+                    wait,
+                )
+                await asyncio.sleep(wait)
+            else:
+                raise RuntimeError(
+                    f"P9 ENGAGE 실패 ({MAX_RETRIES}회 시도): {e}"
+                ) from e
+    # unreachable
+    raise RuntimeError("P9 ENGAGE 실패")
