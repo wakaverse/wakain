@@ -2,15 +2,15 @@ import { useEffect, useState, useRef, useCallback, Fragment } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2, ArrowLeft, ChevronDown, ChevronUp, Layers } from 'lucide-react';
-import { getResult } from '../lib/api';
+import { getResultV1 } from '../lib/api';
 import type { AnalysisResult, AppealScene, AppealGroup, AppealPoint, Prescription, Stt, SceneCard as SceneCardType } from '../types';
-import VideoPlayer, { type VideoPlayerHandle } from '../components/Report/VideoPlayer';
-import AppealTimelineBar from '../components/Report/AppealTimelineBar';
-import DimensionChart from '../components/Report/DimensionChart';
-import FlowTimeline from '../components/Report/FlowTimeline';
-import GroupHeader from '../components/Report/GroupHeader';
-import CutCard from '../components/Report/CutCard';
-import CutDetail from '../components/Report/CutDetail';
+import VideoPlayer, { type VideoPlayerHandle } from '../components/Report_v1/VideoPlayer';
+import AppealTimelineBar from '../components/Report_v1/AppealTimelineBar';
+import DimensionChart from '../components/Report_v1/DimensionChart';
+import FlowTimeline from '../components/Report_v1/FlowTimeline';
+import GroupHeader from '../components/Report_v1/GroupHeader';
+import CutCard from '../components/Report_v1/CutCard';
+import CutDetail from '../components/Report_v1/CutDetail';
 
 /* ── Helpers ──────────────────────────────────────────── */
 
@@ -116,7 +116,7 @@ export default function ReportPage() {
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    getResult(id)
+    getResultV1(id)
       .then(setResult)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));

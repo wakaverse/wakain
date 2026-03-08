@@ -13,10 +13,10 @@ import DashboardPage from './pages/DashboardPage';
 import DemoReportPage from './pages/DemoReportPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
-import ComingSoonPage from './pages/ComingSoonPage';
 import RadarPage from './pages/RadarPage';
 import LibraryPage from './pages/LibraryPage';
 import InsightsPage from './pages/InsightsPage';
+import GuidePage from './pages/GuidePage';
 import ToastContainer from './components/Toast';
 
 function LandingRoutes() {
@@ -26,19 +26,18 @@ function LandingRoutes() {
       <Route path="contact" element={<Layout><ContactPage /></Layout>} />
       <Route path="login" element={<LoginPage />} />
       <Route path="demo" element={<DemoReportPage />} />
-      <Route path="app" element={<ProtectedRoute><AppShell><Navigate to="/app/radar" replace /></AppShell></ProtectedRoute>} />
-      <Route path="app/radar" element={<ProtectedRoute><AppShell><RadarPage /></AppShell></ProtectedRoute>} />
-      <Route path="app/hack" element={<ProtectedRoute><AppShell><AnalyzePage /></AppShell></ProtectedRoute>} />
-      <Route path="app/script" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="script" /></AppShell></ProtectedRoute>} />
-      <Route path="app/expand" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="expand" /></AppShell></ProtectedRoute>} />
+      <Route path="app" element={<ProtectedRoute><AppShell><Navigate to="/app/analyze" replace /></AppShell></ProtectedRoute>} />
+      <Route path="app/analyze" element={<ProtectedRoute><AppShell><AnalyzePage /></AppShell></ProtectedRoute>} />
       <Route path="app/library" element={<ProtectedRoute><AppShell><LibraryPage /></AppShell></ProtectedRoute>} />
-      <Route path="app/compare" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="compare" /></AppShell></ProtectedRoute>} />
+      <Route path="app/radar" element={<ProtectedRoute><AppShell><RadarPage /></AppShell></ProtectedRoute>} />
       <Route path="app/insight" element={<ProtectedRoute><AppShell><InsightsPage /></AppShell></ProtectedRoute>} />
+      <Route path="app/guide" element={<ProtectedRoute><AppShell><GuidePage /></AppShell></ProtectedRoute>} />
+      <Route path="app/hack" element={<Navigate to="/app/analyze" replace />} />
       <Route path="app/jobs/:id" element={<ProtectedRoute><AppShell><JobStatusPage /></AppShell></ProtectedRoute>} />
       <Route path="app/results/:id" element={<ProtectedRoute><AppShell><ReportPage /></AppShell></ProtectedRoute>} />
       <Route path="dashboard" element={<ProtectedRoute><AppShell><DashboardPage /></AppShell></ProtectedRoute>} />
       {/* Legacy redirects */}
-      <Route path="analyze" element={<Navigate to="/app/hack" replace />} />
+      <Route path="analyze" element={<Navigate to="/app/analyze" replace />} />
       <Route path="jobs/:id" element={<Navigate to="/app/jobs/:id" replace />} />
       <Route path="results/:id" element={<Navigate to="/app/results/:id" replace />} />
     </>

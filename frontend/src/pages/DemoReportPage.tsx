@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import type { AnalysisResult } from '../types';
-import VideoPlayer, { type VideoPlayerHandle } from '../components/Report/VideoPlayer';
-import DimensionChart from '../components/Report/DimensionChart';
-import AppealAnalysis from '../components/Report/AppealAnalysis';
-import DiagnosisPanel from '../components/Report/DiagnosisPanel';
-import ArtDirectionPanel from '../components/Report/ArtDirectionPanel';
-import PersuasionStructure from '../components/Report/PersuasionStructure';
-import AppealTimelineBar from '../components/Report/AppealTimelineBar';
+import VideoPlayer, { type VideoPlayerHandle } from '../components/Report_v1/VideoPlayer';
+import DimensionChart from '../components/Report_v1/DimensionChart';
+import AppealAnalysis from '../components/Report_v1/AppealAnalysis';
+import DiagnosisPanel from '../components/Report_v1/DiagnosisPanel';
+import ArtDirectionPanel from '../components/Report_v1/ArtDirectionPanel';
+import PersuasionStructure from '../components/Report_v1/PersuasionStructure';
+import AppealTimelineBar from '../components/Report_v1/AppealTimelineBar';
 
 type TabId = 'structure' | 'scores' | 'art';
 

@@ -1,4 +1,5 @@
-import type { Job, AnalysisResult } from '../types';
+import type { Job } from '../types';
+import type { RecipeJSON } from '../types/recipe';
 import { supabase } from './supabase';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -117,7 +118,27 @@ export async function createJobFromUrl(
   return { id: data.job_id };
 }
 
-export async function getResult(id: string): Promise<AnalysisResult> {
+export interface V2Result {
+  recipe: RecipeJSON;
+  video_url: string | null;
+}
+
+export async function getResult(id: string): Promise<V2Result> {
+  const res = await fetch(`${API_URL}/api/results/${id}`, {
+    headers: await authHeaders(),
+  });
+  if (!res.ok) {
+    throw new Error('결과를 찾을 수 없습니다');
+  }
+  const data = await res.json();
+  return {
+    recipe: data.recipe_json,
+    video_url: data.video_url || null,
+  };
+}
+
+/** @deprecated V1 결과 가져오기 — DemoReportPage, ReportPage_v2 등 레거시용 */
+export async function getResultV1(id: string): Promise<import('../types').AnalysisResult> {
   const res = await fetch(`${API_URL}/api/results/${id}`, {
     headers: await authHeaders(),
   });

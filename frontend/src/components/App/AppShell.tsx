@@ -2,26 +2,24 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  FlaskConical, Radar, ScanLine, FileText, Layers, Heart, ArrowLeftRight, Lightbulb,
+  FlaskConical, Radar, ScanLine, Heart, Lightbulb, BookOpen,
   LogOut, ChevronLeft, ChevronRight, Menu,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface MenuItem {
   key: string;
+  label: string;
   icon: React.ElementType;
   path: string;
-  comingSoon?: boolean;
 }
 
 const menuItems: MenuItem[] = [
-  { key: 'radar', icon: Radar, path: '/app/radar' },
-  { key: 'hack', icon: ScanLine, path: '/app/hack' },
-  { key: 'script', icon: FileText, path: '/app/script', comingSoon: true },
-  { key: 'expand', icon: Layers, path: '/app/expand', comingSoon: true },
-  { key: 'library', icon: Heart, path: '/app/library' },
-  { key: 'compare', icon: ArrowLeftRight, path: '/app/compare', comingSoon: true },
-  { key: 'insight', icon: Lightbulb, path: '/app/insight' },
+  { key: 'analyze', label: '분석', icon: ScanLine, path: '/app/analyze' },
+  { key: 'library', label: '라이브러리', icon: Heart, path: '/app/library' },
+  { key: 'radar', label: '레이더', icon: Radar, path: '/app/radar' },
+  { key: 'insight', label: '인사이트', icon: Lightbulb, path: '/app/insight' },
+  { key: 'guide', label: '가이드', icon: BookOpen, path: '/app/guide' },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -53,7 +51,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       `}>
         {/* Logo */}
         <div className="h-12 flex items-center px-4 border-b border-gray-200/60 shrink-0">
-          <Link to="/app/hack" className="flex items-center gap-2">
+          <Link to="/app/analyze" className="flex items-center gap-2">
             <FlaskConical className="w-5 h-5 text-gray-900 shrink-0" />
             {!collapsed && <span className="font-semibold text-sm text-gray-900">WakaLab</span>}
           </Link>
@@ -61,27 +59,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Menu */}
         <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-          {menuItems.map(({ key, icon: Icon, path, comingSoon }) => {
+          {menuItems.map(({ key, label, icon: Icon, path }) => {
             const active = location.pathname.startsWith(path);
             return (
               <Link
                 key={key}
-                to={comingSoon ? '#' : path}
-                onClick={(e) => {
-                  if (comingSoon) e.preventDefault();
-                  setMobileOpen(false);
-                }}
+                to={path}
+                onClick={() => setMobileOpen(false)}
                 className={`
                   flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
-                  ${active ? 'bg-gray-900 text-white' : comingSoon ? 'text-gray-300 cursor-default' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                  ${active ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
                 `}
               >
                 <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={1.5} />
                 {!collapsed && (
-                  <span className="flex-1 truncate">{t(`menu.${key}`)}</span>
-                )}
-                {!collapsed && comingSoon && (
-                  <span className="text-[9px] tracking-wider uppercase text-gray-300 bg-gray-100 px-1.5 py-0.5 rounded-full">Soon</span>
+                  <span className="flex-1 truncate">{label}</span>
                 )}
               </Link>
             );
