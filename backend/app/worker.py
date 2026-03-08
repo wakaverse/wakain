@@ -188,7 +188,7 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
             )
             return
 
-        recipe_json = pipeline_result.recipe.model_dump()
+        recipe_json = pipeline_result.recipe.model_dump(mode="json")
 
         # Build a lightweight summary for fast loading
         try:
