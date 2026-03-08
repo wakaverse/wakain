@@ -13,10 +13,7 @@ import DashboardPage from './pages/DashboardPage';
 import DemoReportPage from './pages/DemoReportPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
-import RadarPage from './pages/RadarPage';
-import LibraryPage from './pages/LibraryPage';
-import InsightsPage from './pages/InsightsPage';
-import GuidePage from './pages/GuidePage';
+import ComingSoonPage from './pages/ComingSoonPage';
 import ToastContainer from './components/Toast';
 
 function LandingRoutes() {
@@ -28,10 +25,12 @@ function LandingRoutes() {
       <Route path="demo" element={<DemoReportPage />} />
       <Route path="app" element={<ProtectedRoute><AppShell><Navigate to="/app/analyze" replace /></AppShell></ProtectedRoute>} />
       <Route path="app/analyze" element={<ProtectedRoute><AppShell><AnalyzePage /></AppShell></ProtectedRoute>} />
-      <Route path="app/library" element={<ProtectedRoute><AppShell><LibraryPage /></AppShell></ProtectedRoute>} />
-      <Route path="app/radar" element={<ProtectedRoute><AppShell><RadarPage /></AppShell></ProtectedRoute>} />
-      <Route path="app/insight" element={<ProtectedRoute><AppShell><InsightsPage /></AppShell></ProtectedRoute>} />
-      <Route path="app/guide" element={<ProtectedRoute><AppShell><GuidePage /></AppShell></ProtectedRoute>} />
+      <Route path="app/library" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="library" /></AppShell></ProtectedRoute>} />
+      <Route path="app/radar" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="radar" /></AppShell></ProtectedRoute>} />
+      <Route path="app/compare" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="compare" /></AppShell></ProtectedRoute>} />
+      <Route path="app/insights" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="insight" /></AppShell></ProtectedRoute>} />
+      <Route path="app/guide" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="guide" /></AppShell></ProtectedRoute>} />
+      <Route path="app/insight" element={<Navigate to="/app/insights" replace />} />
       <Route path="app/hack" element={<Navigate to="/app/analyze" replace />} />
       <Route path="app/jobs/:id" element={<ProtectedRoute><AppShell><JobStatusPage /></AppShell></ProtectedRoute>} />
       <Route path="app/results/:id" element={<ProtectedRoute><AppShell><ReportPage /></AppShell></ProtectedRoute>} />

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  FlaskConical, Radar, ScanLine, Heart, Lightbulb, BookOpen,
+  FlaskConical, Microscope, Radar, BookOpen, ArrowLeftRight, BarChart3, Pencil,
   LogOut, ChevronLeft, ChevronRight, Menu,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -12,14 +12,16 @@ interface MenuItem {
   label: string;
   icon: React.ElementType;
   path: string;
+  comingSoon?: boolean;
 }
 
 const menuItems: MenuItem[] = [
-  { key: 'analyze', label: '분석', icon: ScanLine, path: '/app/analyze' },
-  { key: 'library', label: '라이브러리', icon: Heart, path: '/app/library' },
-  { key: 'radar', label: '레이더', icon: Radar, path: '/app/radar' },
-  { key: 'insight', label: '인사이트', icon: Lightbulb, path: '/app/insight' },
-  { key: 'guide', label: '가이드', icon: BookOpen, path: '/app/guide' },
+  { key: 'analyze', label: '분석', icon: Microscope, path: '/app/analyze' },
+  { key: 'radar', label: '레이더', icon: Radar, path: '/app/radar', comingSoon: true },
+  { key: 'library', label: '라이브러리', icon: BookOpen, path: '/app/library', comingSoon: true },
+  { key: 'compare', label: '비교', icon: ArrowLeftRight, path: '/app/compare', comingSoon: true },
+  { key: 'insights', label: '인사이트', icon: BarChart3, path: '/app/insights', comingSoon: true },
+  { key: 'guide', label: '제작가이드', icon: Pencil, path: '/app/guide', comingSoon: true },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -59,8 +61,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Menu */}
         <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-          {menuItems.map(({ key, label, icon: Icon, path }) => {
+          {menuItems.map(({ key, label, icon: Icon, path, comingSoon }) => {
             const active = location.pathname.startsWith(path);
+
+            if (comingSoon) {
+              return (
+                <span
+                  key={key}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-not-allowed opacity-40"
+                >
+                  <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={1.5} />
+                  {!collapsed && (
+                    <>
+                      <span className="flex-1 truncate">{label}</span>
+                      <span className="text-[10px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full whitespace-nowrap">준비중</span>
+                    </>
+                  )}
+                </span>
+              );
+            }
+
             return (
               <Link
                 key={key}
