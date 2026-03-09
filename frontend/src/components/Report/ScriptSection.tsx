@@ -5,7 +5,12 @@ import {
   BLOCK_LABELS,
   BLOCK_BORDER_COLORS,
   ALPHA_COLORS,
+  ALPHA_EMOTION_LABELS,
+  ALPHA_STRUCTURE_LABELS,
+  ALPHA_CONNECTION_LABELS,
+  BLOCK_SUBTYPE_LABELS,
   formatTimeRange,
+  labelKo,
 } from '../../lib/recipe-utils';
 
 interface Props {
@@ -53,19 +58,19 @@ export default function ScriptSection({ data, seekTo }: Props) {
             {emotionTotal > 0 && (
               <div>
                 <span className="text-gray-400">감정:</span>{' '}
-                {Object.entries(alphaSummary.emotion).map(([k, v]) => `${k}(${v})`).join(', ')}
+                {Object.entries(alphaSummary.emotion).map(([k, v]) => `${labelKo(k, ALPHA_EMOTION_LABELS)}(${v})`).join(', ')}
               </div>
             )}
             {structureTotal > 0 && (
               <div>
                 <span className="text-gray-400">구조:</span>{' '}
-                {Object.entries(alphaSummary.structure).map(([k, v]) => `${k}(${v})`).join(', ')}
+                {Object.entries(alphaSummary.structure).map(([k, v]) => `${labelKo(k, ALPHA_STRUCTURE_LABELS)}(${v})`).join(', ')}
               </div>
             )}
             {connectionTotal > 0 && (
               <div>
                 <span className="text-gray-400">연결:</span>{' '}
-                {Object.entries(alphaSummary.connection).map(([k, v]) => `${k}(${v})`).join(', ')}
+                {Object.entries(alphaSummary.connection).map(([k, v]) => `${labelKo(k, ALPHA_CONNECTION_LABELS)}(${v})`).join(', ')}
               </div>
             )}
           </div>
@@ -141,16 +146,21 @@ function BlockTag({ block, sub }: { block: string; sub?: string }) {
       style={{ backgroundColor: `${hex}18`, color: hex }}
     >
       {BLOCK_LABELS[block] || block}
-      {sub && <span className="ml-0.5 opacity-70">·{sub}</span>}
+      {sub && <span className="ml-0.5 opacity-70">·{BLOCK_SUBTYPE_LABELS[sub] || sub}</span>}
     </span>
   );
 }
 
 function AlphaTag({ type, label }: { type: 'emotion' | 'structure' | 'connection'; label: string }) {
   const c = ALPHA_COLORS[type];
+  const labelMap: Record<string, Record<string, string>> = {
+    emotion: ALPHA_EMOTION_LABELS,
+    structure: ALPHA_STRUCTURE_LABELS,
+    connection: ALPHA_CONNECTION_LABELS,
+  };
   return (
     <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${c.bg} ${c.text}`}>
-      {c.icon}{label}
+      {c.icon}{labelKo(label, labelMap[type])}
     </span>
   );
 }

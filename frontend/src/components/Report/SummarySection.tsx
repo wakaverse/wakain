@@ -1,5 +1,5 @@
 import type { RecipeJSON } from '../../types/recipe';
-import { formatTime, STYLE_BAR_COLORS, BLOCK_LABELS, BLOCK_HEX } from '../../lib/recipe-utils';
+import { formatTime, STYLE_BAR_COLORS, BLOCK_LABELS, BLOCK_HEX, STYLE_LABELS, ENERGY_LABELS, HOOK_STRENGTH_LABELS, labelKo } from '../../lib/recipe-utils';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface Props {
@@ -18,7 +18,7 @@ export default function SummarySection({ data }: Props) {
     .filter(([, v]) => v > 0)
     .sort(([, a], [, b]) => b - a)
     .map(([style, pct]) => ({
-      label: style,
+      label: labelKo(style, STYLE_LABELS),
       pct: totalStylePct > 0 ? (pct / totalStylePct) * 100 : 0,
       color: STYLE_BAR_COLORS[style] || '#71717A',
     }));
@@ -42,7 +42,7 @@ export default function SummarySection({ data }: Props) {
           </span>
           {visual.style_primary && (
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-50 text-orange-600">
-              {visual.style_primary}
+              {labelKo(visual.style_primary, STYLE_LABELS)}
             </span>
           )}
           <HookBadge strength={data.engagement.retention_analysis.hook_strength} />
@@ -69,7 +69,7 @@ export default function SummarySection({ data }: Props) {
               <div className="flex justify-between items-center mb-1">
                 <span className="text-[11px] text-gray-400">시각 에너지</span>
                 <span className="text-[11px] text-gray-400">
-                  평균 {rhythm.attention_curve.avg} · {rhythm.attention_arc}
+                  평균 {rhythm.attention_curve.avg} · {labelKo(rhythm.attention_arc, ENERGY_LABELS)}
                 </span>
               </div>
               <ResponsiveContainer width="100%" height={60}>
@@ -162,7 +162,7 @@ function HookBadge({ strength }: { strength: string }) {
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${colors[strength] || colors.medium}`}>
-      hook: {strength}
+      훅: {HOOK_STRENGTH_LABELS[strength] || strength}
     </span>
   );
 }

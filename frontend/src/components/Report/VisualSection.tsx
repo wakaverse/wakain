@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Film, ChevronDown } from 'lucide-react';
 import type { RecipeJSON } from '../../types/recipe';
-import { STYLE_COLORS, formatTimeRange } from '../../lib/recipe-utils';
+import { STYLE_COLORS, STYLE_LABELS, ENERGY_LABELS, formatTimeRange, labelKo } from '../../lib/recipe-utils';
 
 interface Props {
   data: RecipeJSON;
@@ -38,7 +38,7 @@ export default function VisualSection({ data, seekTo }: Props) {
           <div className="flex items-center gap-4 text-xs text-gray-500">
             <span>리듬: {rhythm.cut_rhythm}</span>
             <span>템포: {rhythm.tempo_level}</span>
-            <span>아크: {rhythm.attention_arc}</span>
+            <span>아크: {labelKo(rhythm.attention_arc, ENERGY_LABELS)}</span>
             <span>{rhythm.total_cuts}컷 · {rhythm.avg_cut_duration.toFixed(1)}초/컷</span>
           </div>
         </div>
@@ -120,7 +120,7 @@ function StyleTag({ style }: { style: string }) {
   const c = STYLE_COLORS[style] || { bg: 'bg-gray-100', text: 'text-gray-600' };
   return (
     <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${c.bg} ${c.text}`}>
-      {style}
+      {labelKo(style, STYLE_LABELS)}
     </span>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Shield, AlertTriangle, Eye, MessageCircle, Share2, ChevronDown } from 'lucide-react';
 import type { RecipeJSON } from '../../types/recipe';
-import { formatTime, formatTimeRange } from '../../lib/recipe-utils';
+import { formatTime, formatTimeRange, HOOK_STRENGTH_LABELS, RISK_LEVEL_LABELS } from '../../lib/recipe-utils';
 
 interface Props {
   data: RecipeJSON;
@@ -115,7 +115,7 @@ function HookBadge({ strength }: { strength: string }) {
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${colors[strength] || colors.medium}`}>
-      {strength}
+      {HOOK_STRENGTH_LABELS[strength] || strength}
     </span>
   );
 }
@@ -128,7 +128,7 @@ function RiskBadge({ level }: { level: string }) {
   };
   return (
     <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium shrink-0 ${colors[level] || colors.medium}`}>
-      {level}
+      {RISK_LEVEL_LABELS[level] || level}
     </span>
   );
 }

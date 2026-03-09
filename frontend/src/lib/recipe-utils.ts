@@ -71,6 +71,106 @@ export const CLAIM_TYPE_INFO: Record<string, { label: string; icon: string }> = 
   comparison: { label: '비교/차별', icon: '🔄' },
 };
 
+// ─── Korean label mappings ───
+
+export const STYLE_LABELS: Record<string, string> = {
+  demo: '데모',
+  review: '리뷰',
+  problem_solution: '문제해결',
+  before_after: '전후비교',
+  story: '스토리',
+  listicle: '리스트',
+  trend_ride: '트렌드',
+  promotion: '프로모션',
+  sensory: '감성',
+};
+
+export const ENERGY_LABELS: Record<string, string> = {
+  decelerating: '감속형',
+  building: '상승형',
+  peak: '정점형',
+  fade: '페이드',
+  sustain: '유지형',
+  accelerating: '가속형',
+  climax: '클라이맥스',
+  flat: '평탄형',
+  wave: '파동형',
+};
+
+export const ALPHA_EMOTION_LABELS: Record<string, string> = {
+  fomo: 'FOMO',
+  relief: '안도감',
+  anticipation: '기대감',
+  curiosity: '호기심',
+  surprise: '놀라움',
+  empathy: '공감',
+  fear: '공포',
+  joy: '기쁨',
+  trust: '신뢰',
+  urgency: '긴박감',
+};
+
+export const ALPHA_STRUCTURE_LABELS: Record<string, string> = {
+  info_density: '정보밀도',
+  problem_solution: '문제해결',
+  contrast: '대비',
+  repetition: '반복',
+  escalation: '고조',
+  pattern_break: '패턴전환',
+  before_after: '전후비교',
+  list: '나열',
+};
+
+export const ALPHA_CONNECTION_LABELS: Record<string, string> = {
+  social_proof: '사회적증거',
+  authority: '권위',
+  relatability: '공감대',
+  community: '커뮤니티',
+  testimony: '증언',
+  question: '질문',
+  direct_address: '직접호칭',
+};
+
+export const BLOCK_SUBTYPE_LABELS: Record<string, string> = {
+  emotional: '감성',
+  functional: '기능',
+  process: '프로세스',
+  comparative: '비교',
+  social: '사회적',
+  visual: '시각적',
+  question: '질문형',
+  statement: '선언형',
+  action: '행동형',
+  statistic: '통계',
+  story: '스토리',
+  direct: '직접',
+};
+
+export const HOOK_STRENGTH_LABELS: Record<string, string> = {
+  strong: '강력',
+  medium: '보통',
+  weak: '약함',
+};
+
+export const RISK_LEVEL_LABELS: Record<string, string> = {
+  high: '높음',
+  medium: '보통',
+  low: '낮음',
+};
+
+export function labelKo(key: string, map?: Record<string, string>): string {
+  if (map && map[key]) return map[key];
+  const allMaps = [
+    STYLE_LABELS, ENERGY_LABELS, ALPHA_EMOTION_LABELS,
+    ALPHA_STRUCTURE_LABELS, ALPHA_CONNECTION_LABELS,
+    BLOCK_LABELS, BLOCK_SUBTYPE_LABELS,
+  ];
+  for (const m of allMaps) {
+    if (m[key]) return m[key];
+  }
+  return key.replace(/_/g, ' ');
+}
+
 // ─── Alpha colors ───
 
 export const ALPHA_COLORS: Record<string, { icon: string; bg: string; text: string }> = {
