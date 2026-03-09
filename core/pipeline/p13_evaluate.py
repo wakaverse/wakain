@@ -251,6 +251,58 @@ def _build_structure(recipe: RecipeJSON) -> StructureEval:
     )
 
 
+# ── Recipe 요약 (토큰 절약) ────────────────────────────────────────────────
+
+
+def _build_recipe_summary(recipe: RecipeJSON) -> dict:
+    """LLM에 전달할 recipe 요약본. 전체 대비 ~85% 토큰 절약."""
+    return {
+        "identity": {
+            "name": recipe.identity.name,
+            "brand": recipe.identity.brand,
+            "category_ko": recipe.identity.category_ko,
+            "sub_category_ko": recipe.identity.sub_category_ko,
+            "target_audience": recipe.identity.target_audience,
+        },
+        "product": {
+            "claims": [
+                {"type": c.type.value if hasattr(c.type, "value") else str(c.type),
+                 "claim": c.claim, "layer": c.layer.value if hasattr(c.layer, "value") else str(c.layer)}
+                for c in recipe.product.claims
+            ],
+        },
+        "script": {
+            "flow_order": [b.value if hasattr(b, "value") else str(b) for b in recipe.script.flow_order],
+            "blocks": [
+                {"block": b.block.value if hasattr(b.block, "value") else str(b.block),
+                 "time_range": list(b.time_range),
+                 "text": b.text[:100]}
+                for b in recipe.script.blocks
+            ],
+        },
+        "visual": {
+            "style_distribution": recipe.visual.style_distribution,
+            "style_primary": recipe.visual.style_primary,
+        },
+        "scenes": [
+            {"scene_id": s.scene_id, "time_range": list(s.time_range),
+             "style": s.style, "role": s.role,
+             "description": (s.description or "")[:80]}
+            for s in recipe.scenes
+        ],
+        "meta": {
+            "duration": recipe.meta.duration,
+            "platform": recipe.meta.platform.value if hasattr(recipe.meta.platform, "value") else str(recipe.meta.platform),
+            "product_first_appear": recipe.meta.product_first_appear,
+        },
+        "engagement": {
+            "hook_strength": recipe.engagement.retention_analysis.hook_strength.value
+            if hasattr(recipe.engagement.retention_analysis.hook_strength, "value")
+            else str(recipe.engagement.retention_analysis.hook_strength),
+        },
+    }
+
+
 # ── LLM 프롬프트 ──────────────────────────────────────────────────────────
 
 _LLM_PROMPT = """\
@@ -264,7 +316,7 @@ to provide coaching insights.
 - Duration: {duration}s
 - Output language: {output_language}
 
-## Recipe JSON (full):
+## Recipe JSON (summary — key fields only):
 {recipe_json}
 
 ## Checklist Results (rule-based, already computed):
@@ -324,7 +376,8 @@ async def _call_llm(
     """Gemini Flash 1콜로 강점/개선/요약/레시피 평가 생성."""
     client = make_client(api_key)
 
-    recipe_dict = recipe.model_dump(mode="json")
+    # 토큰 절약: recipe_json 전체 대신 요약본 전달 (~85% 절약)
+    recipe_summary = _build_recipe_summary(recipe)
     checklist_dicts = [c.model_dump() for c in checklist]
     structure_dict = structure.model_dump(mode="json")
 
@@ -335,7 +388,7 @@ async def _call_llm(
         platform=recipe.meta.platform.value if hasattr(recipe.meta.platform, "value") else str(recipe.meta.platform),
         duration=recipe.meta.duration,
         output_language=recipe.meta.output_language or "ko",
-        recipe_json=json.dumps(recipe_dict, ensure_ascii=False, indent=2),
+        recipe_json=json.dumps(recipe_summary, ensure_ascii=False, indent=2),
         checklist_json=json.dumps(checklist_dicts, ensure_ascii=False, indent=2),
         structure_json=json.dumps(structure_dict, ensure_ascii=False, indent=2),
     )
