@@ -91,6 +91,16 @@ def _build_prompt(
     )
 
 
+def _extract_usage(response) -> dict:
+    """Gemini response에서 usage_metadata 추출."""
+    usage = {"input_tokens": 0, "output_tokens": 0, "model": MODEL}
+    meta = getattr(response, "usage_metadata", None)
+    if meta:
+        usage["input_tokens"] = getattr(meta, "prompt_token_count", 0) or 0
+        usage["output_tokens"] = getattr(meta, "candidates_token_count", 0) or 0
+    return usage
+
+
 async def run(
     video_path: str,
     output_dir: str,
@@ -98,7 +108,7 @@ async def run(
     scan_output: ScanOutput | None = None,
     api_key: str | None = None,
     output_language: str = "ko",
-) -> ProductOutput:
+) -> tuple[ProductOutput, dict]:
     """P7 PRODUCT 실행.
 
     Args:
@@ -109,7 +119,7 @@ async def run(
         api_key: Gemini API 키
 
     Returns:
-        ProductOutput
+        (ProductOutput, usage_dict)
     """
     client = make_client(api_key)
 
@@ -120,7 +130,7 @@ async def run(
     prompt = _build_prompt(stt_output, scan_output, output_language)
 
     # Gemini 호출
-    result = await _call_gemini(client, uploaded, prompt)
+    result, usage = await _call_gemini(client, uploaded, prompt)
 
     # 결과 저장
     out_dir = Path(output_dir)
@@ -129,12 +139,12 @@ async def run(
     out_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     logger.info("P7 결과 저장: %s", out_path)
 
-    return result
+    return result, usage
 
 
 async def _call_gemini(
     client, uploaded_file: types.File, prompt: str
-) -> ProductOutput:
+) -> tuple[ProductOutput, dict]:
     """Gemini API 호출 + 재시도."""
     for attempt in range(MAX_RETRIES):
         try:
@@ -154,7 +164,7 @@ async def _call_gemini(
                 ),
             )
             data = json.loads(response.text)
-            return ProductOutput.model_validate(data)
+            return ProductOutput.model_validate(data), _extract_usage(response)
         except Exception as e:
             wait = 2**attempt * 5
             if attempt < MAX_RETRIES - 1:

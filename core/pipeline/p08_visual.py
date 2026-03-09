@@ -97,13 +97,23 @@ Response (JSON only):
 }}"""
 
 
+def _extract_usage(response) -> dict:
+    """Gemini response에서 usage_metadata 추출."""
+    usage = {"input_tokens": 0, "output_tokens": 0, "model": MODEL}
+    meta = getattr(response, "usage_metadata", None)
+    if meta:
+        usage["input_tokens"] = getattr(meta, "prompt_token_count", 0) or 0
+        usage["output_tokens"] = getattr(meta, "candidates_token_count", 0) or 0
+    return usage
+
+
 async def run(
     video_path: str,
     output_dir: str,
     scene_boundaries: list[list[float]],
     api_key: str | None = None,
     output_language: str = "ko",
-) -> VisualOutput:
+) -> tuple[VisualOutput, dict]:
     """P8 VISUAL 실행.
 
     Args:
@@ -113,13 +123,13 @@ async def run(
         api_key: Gemini API 키 (None이면 .env에서 로드)
 
     Returns:
-        VisualOutput
+        (VisualOutput, usage_dict)
     """
     client = make_client(api_key)
     uploaded = upload_video(video_path, client=client)
 
     # 1콜로 전체 씬 분석 (Gemini 2.5 Flash 응답 길이 충분)
-    all_scenes = await _call_gemini(client, uploaded, scene_boundaries, output_language)
+    all_scenes, usage = await _call_gemini(client, uploaded, scene_boundaries, output_language)
 
     result = VisualOutput(scenes=all_scenes)
 
@@ -130,7 +140,7 @@ async def run(
     out_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     logger.info("P8 결과 저장: %s", out_path)
 
-    return result
+    return result, usage
 
 
 async def _call_gemini(
@@ -138,7 +148,7 @@ async def _call_gemini(
     uploaded_file: types.File,
     boundaries: list[list[float]],
     output_language: str = "ko",
-) -> list[VisualSceneAnalysis]:
+) -> tuple[list[VisualSceneAnalysis], dict]:
     """Gemini API 호출 + 재시도."""
     scene_text = _build_scene_list(boundaries)
     prompt = _build_prompt(scene_text, output_language)
@@ -162,7 +172,7 @@ async def _call_gemini(
             )
             data = json.loads(response.text)
             parsed = VisualOutput.model_validate(data)
-            return parsed.scenes
+            return parsed.scenes, _extract_usage(response)
         except Exception as e:
             wait = 2**attempt * 5
             if attempt < MAX_RETRIES - 1:

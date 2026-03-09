@@ -132,6 +132,16 @@ def _build_prompt(
     return prompt + "\n" + RESPONSE_EXAMPLE
 
 
+def _extract_usage(response) -> dict:
+    """Gemini response에서 usage_metadata 추출."""
+    usage = {"input_tokens": 0, "output_tokens": 0, "model": MODEL}
+    meta = getattr(response, "usage_metadata", None)
+    if meta:
+        usage["input_tokens"] = getattr(meta, "prompt_token_count", 0) or 0
+        usage["output_tokens"] = getattr(meta, "candidates_token_count", 0) or 0
+    return usage
+
+
 async def run(
     video_path: str,
     output_dir: str,
@@ -140,7 +150,7 @@ async def run(
     product_output: ProductOutput | None = None,
     api_key: str | None = None,
     output_language: str = "ko",
-) -> ScriptOutput:
+) -> tuple[ScriptOutput, dict]:
     """P10 SCRIPT 실행.
 
     Args:
@@ -152,7 +162,7 @@ async def run(
         api_key: Gemini API 키
 
     Returns:
-        ScriptOutput
+        (ScriptOutput, usage_dict)
     """
     client = make_client(api_key)
 
@@ -163,7 +173,7 @@ async def run(
     prompt = _build_prompt(stt_output, scan_output, product_output, output_language)
 
     # Gemini 호출
-    result = await _call_gemini(client, uploaded, prompt)
+    result, usage = await _call_gemini(client, uploaded, prompt)
 
     # 결과 저장
     out_dir = Path(output_dir)
@@ -172,7 +182,7 @@ async def run(
     out_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     logger.info("P10 결과 저장: %s", out_path)
 
-    return result
+    return result, usage
 
 
 _VALID_BENEFIT_SUBS = {"sensory", "functional", "emotional", "process"}
@@ -198,7 +208,7 @@ def _normalize_response(data: dict) -> None:
 
 async def _call_gemini(
     client, uploaded_file: types.File, prompt: str
-) -> ScriptOutput:
+) -> tuple[ScriptOutput, dict]:
     """Gemini API 호출 + 재시도."""
     for attempt in range(MAX_RETRIES):
         try:
@@ -218,7 +228,7 @@ async def _call_gemini(
             )
             data = json.loads(response.text)
             _normalize_response(data)
-            return ScriptOutput.model_validate(data)
+            return ScriptOutput.model_validate(data), _extract_usage(response)
         except Exception as e:
             wait = 2**attempt * 5
             if attempt < MAX_RETRIES - 1:

@@ -243,6 +243,22 @@ class RecipeMeta(BaseModel):
     video_language: str | None = Field(default=None, description="STT가 감지한 원본 언어")
 
 
+# ── Token Usage ───────────────────────────────────────────────────────────
+
+
+class StageUsage(BaseModel):
+    input_tokens: int = 0
+    output_tokens: int = 0
+    model: str = ""
+
+
+class TokenUsage(BaseModel):
+    stages: dict[str, StageUsage] = Field(default_factory=dict)
+    total_input: int = 0
+    total_output: int = 0
+    estimated_cost_usd: float = 0.0
+
+
 # ── Pipeline Info ─────────────────────────────────────────────────────────
 
 
@@ -252,6 +268,7 @@ class PipelineInfo(BaseModel):
     model_versions: dict[str, str] = Field(
         default_factory=dict, description="Phase별 모델 버전"
     )
+    token_usage: TokenUsage | None = None
 
 
 # ── Identity (P2 SCAN에서 추출) ───────────────────────────────────────────

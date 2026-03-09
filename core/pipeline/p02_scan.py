@@ -46,12 +46,22 @@ Response (JSON only):"""
 MAX_RETRIES = 3
 
 
+def _extract_usage(response) -> dict:
+    """Gemini response에서 usage_metadata 추출."""
+    usage = {"input_tokens": 0, "output_tokens": 0, "model": MODEL}
+    meta = getattr(response, "usage_metadata", None)
+    if meta:
+        usage["input_tokens"] = getattr(meta, "prompt_token_count", 0) or 0
+        usage["output_tokens"] = getattr(meta, "candidates_token_count", 0) or 0
+    return usage
+
+
 async def run(
     video_path: str,
     output_dir: str,
     api_key: str | None = None,
     output_language: str = "ko",
-) -> ScanOutput:
+) -> tuple[ScanOutput, dict]:
     """P2 SCAN 실행.
 
     Args:
@@ -60,7 +70,7 @@ async def run(
         api_key: Gemini API 키 (None이면 .env에서 로드)
 
     Returns:
-        ScanOutput
+        (ScanOutput, usage_dict)
     """
     client = make_client(api_key)
 
@@ -71,7 +81,7 @@ async def run(
     prompt = PROMPT_TEMPLATE.format(output_language=output_language)
 
     # Gemini 호출 (async)
-    result = await _call_gemini(client, uploaded, prompt)
+    result, usage = await _call_gemini(client, uploaded, prompt)
 
     # 결과 저장
     out_dir = Path(output_dir)
@@ -80,10 +90,10 @@ async def run(
     out_path.write_text(result.model_dump_json(indent=2), encoding="utf-8")
     logger.info("P2 결과 저장: %s", out_path)
 
-    return result
+    return result, usage
 
 
-async def _call_gemini(client, uploaded_file: types.File, prompt: str) -> ScanOutput:
+async def _call_gemini(client, uploaded_file: types.File, prompt: str) -> tuple[ScanOutput, dict]:
     """Gemini API 호출 + 재시도."""
     for attempt in range(MAX_RETRIES):
         try:
@@ -103,7 +113,7 @@ async def _call_gemini(client, uploaded_file: types.File, prompt: str) -> ScanOu
                 ),
             )
             data = json.loads(response.text)
-            return ScanOutput.model_validate(data)
+            return ScanOutput.model_validate(data), _extract_usage(response)
         except Exception as e:
             wait = 2**attempt * 5
             if attempt < MAX_RETRIES - 1:

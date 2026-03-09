@@ -74,10 +74,20 @@ _RESPONSE_SCHEMA = {
 }
 
 
+def _extract_usage(response) -> dict:
+    """Gemini response에서 usage_metadata 추출."""
+    usage = {"input_tokens": 0, "output_tokens": 0, "model": MODEL}
+    meta = getattr(response, "usage_metadata", None)
+    if meta:
+        usage["input_tokens"] = getattr(meta, "prompt_token_count", 0) or 0
+        usage["output_tokens"] = getattr(meta, "candidates_token_count", 0) or 0
+    return usage
+
+
 async def _classify_batch(
     client,
     batch: list[tuple[float, bytes]],
-) -> list[ClassifyFrame]:
+) -> tuple[list[ClassifyFrame], dict]:
     """단일 배치 (최대 8장) 분류."""
     # 이미지 파트 + 프롬프트 구성
     contents: list[types.Part] = []
@@ -104,7 +114,7 @@ async def _classify_batch(
                 if i < len(batch):
                     item["timestamp"] = batch[i][0]
                 frames.append(ClassifyFrame.model_validate(item))
-            return frames
+            return frames, _extract_usage(response)
 
         except Exception as e:
             if attempt < MAX_RETRIES:
@@ -127,7 +137,7 @@ async def run(
     frames_dir: str,
     timestamps: list[float],
     api_key: str | None = None,
-) -> ClassifyOutput:
+) -> tuple[ClassifyOutput, dict]:
     """P4 CLASSIFY 실행.
 
     Args:
@@ -136,7 +146,7 @@ async def run(
         api_key: Gemini API 키
 
     Returns:
-        ClassifyOutput
+        (ClassifyOutput, usage_dict)
     """
     frames_path = Path(frames_dir)
     client = make_client(api_key)
@@ -153,16 +163,20 @@ async def run(
 
     logger.info("P4 CLASSIFY: %d 프레임 로드, %d 배치", len(frame_data), -(-len(frame_data) // BATCH_SIZE))
 
-    # 배치 분할 및 순차 처리
+    # 배치 분할 및 순차 처리 (usage 누적)
     all_frames: list[ClassifyFrame] = []
+    total_input = 0
+    total_output = 0
     for i in range(0, len(frame_data), BATCH_SIZE):
         batch = frame_data[i : i + BATCH_SIZE]
         batch_num = i // BATCH_SIZE + 1
         total_batches = -(-len(frame_data) // BATCH_SIZE)
         logger.info("  배치 %d/%d (%d장)...", batch_num, total_batches, len(batch))
 
-        result = await _classify_batch(client, batch)
+        result, batch_usage = await _classify_batch(client, batch)
         all_frames.extend(result)
+        total_input += batch_usage.get("input_tokens", 0)
+        total_output += batch_usage.get("output_tokens", 0)
 
         # 마지막 배치가 아니면 딜레이
         if i + BATCH_SIZE < len(frame_data):
@@ -172,4 +186,5 @@ async def run(
     all_frames.sort(key=lambda f: f.timestamp)
     logger.info("P4 CLASSIFY 완료: %d 프레임 분류", len(all_frames))
 
-    return ClassifyOutput(frames=all_frames)
+    usage = {"input_tokens": total_input, "output_tokens": total_output, "model": MODEL}
+    return ClassifyOutput(frames=all_frames), usage

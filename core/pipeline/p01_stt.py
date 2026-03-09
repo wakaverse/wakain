@@ -238,9 +238,10 @@ def _detect_narration_type(total_speech_sec: float) -> NarrationType:
 # ── run 인터페이스 ──────────────────────────────────────────────────────────
 
 
-def _run_sync(video_path: str, output_dir: str, api_key: str | None = None) -> STTOutput:
+def _run_sync(video_path: str, output_dir: str, api_key: str | None = None) -> tuple[STTOutput, dict]:
     """동기 실행 본체."""
     audio_path = None
+    usage: dict = {}
     try:
         audio_path = _extract_audio(video_path)
         logger.info(f"[P1] Audio extracted: {audio_path}")
@@ -269,6 +270,14 @@ def _run_sync(video_path: str, output_dir: str, api_key: str | None = None) -> S
             total_speech_sec=round(total_speech_sec, 2),
         )
 
+        # 사용량 추적
+        usage = {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "model": "soniox",
+            "audio_duration_sec": round(total_speech_sec, 2),
+        }
+
         # 중간 산출물 저장
         out_dir = Path(output_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -278,7 +287,7 @@ def _run_sync(video_path: str, output_dir: str, api_key: str | None = None) -> S
         )
         logger.info(f"[P1] Saved: {out_path}")
 
-        return result
+        return result, usage
 
     except Exception as e:
         logger.error(f"[P1] STT failed: {e}")
@@ -288,7 +297,7 @@ def _run_sync(video_path: str, output_dir: str, api_key: str | None = None) -> S
             segments=[],
             full_text="",
             total_speech_sec=0.0,
-        )
+        ), usage
 
     finally:
         if audio_path and os.path.exists(audio_path):
@@ -302,7 +311,7 @@ async def run(
     video_path: str,
     output_dir: str,
     api_key: str | None = None,
-) -> STTOutput:
+) -> tuple[STTOutput, dict]:
     """P1 STT 비동기 진입점.
 
     Soniox API가 동기이므로 asyncio.to_thread로 래핑.

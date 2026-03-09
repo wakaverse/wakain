@@ -387,12 +387,22 @@ Provide coaching insights in **{output_language}** as JSON with this exact struc
 # ── LLM 호출 ──────────────────────────────────────────────────────────────
 
 
+def _extract_usage(response) -> dict:
+    """Gemini response에서 usage_metadata 추출."""
+    usage = {"input_tokens": 0, "output_tokens": 0, "model": MODEL}
+    meta = getattr(response, "usage_metadata", None)
+    if meta:
+        usage["input_tokens"] = getattr(meta, "prompt_token_count", 0) or 0
+        usage["output_tokens"] = getattr(meta, "candidates_token_count", 0) or 0
+    return usage
+
+
 async def _call_llm(
     recipe: RecipeJSON,
     checklist: list[ChecklistItem],
     structure: StructureEval,
     api_key: str | None = None,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], dict]:
     """Gemini Flash 1콜로 강점/개선/요약/레시피 평가 생성."""
     client = make_client(api_key)
 
@@ -421,7 +431,7 @@ async def _call_llm(
         ),
     )
 
-    return json.loads(response.text)
+    return json.loads(response.text), _extract_usage(response)
 
 
 # ── 조립 ──────────────────────────────────────────────────────────────────
@@ -453,7 +463,7 @@ def _parse_improvements(items: list[dict]) -> list[Improvement]:
 async def run(
     recipe: RecipeJSON,
     api_key: str | None = None,
-) -> EvaluationOutput:
+) -> tuple[EvaluationOutput, dict]:
     """P13 실행: recipe_json → EvaluationOutput.
 
     Args:
@@ -461,7 +471,7 @@ async def run(
         api_key: Gemini API key (None이면 환경변수)
 
     Returns:
-        EvaluationOutput
+        (EvaluationOutput, usage_dict)
     """
     logger.info("P13 EVALUATE 시작")
 
@@ -476,7 +486,7 @@ async def run(
                 structure.hook.time_range, structure.body.time_range, structure.cta.time_range)
 
     # 3. LLM 호출 (강점/개선/요약/레시피 평가)
-    llm_result = await _call_llm(recipe, checklist, structure, api_key)
+    llm_result, usage = await _call_llm(recipe, checklist, structure, api_key)
     logger.info("LLM 코칭 완료")
 
     # 4. 조립
@@ -503,4 +513,4 @@ async def run(
     )
 
     logger.info("P13 EVALUATE 완료")
-    return output
+    return output, usage

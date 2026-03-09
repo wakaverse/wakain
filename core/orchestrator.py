@@ -37,7 +37,7 @@ from core.pipeline import (
     p12_build,
     p13_evaluate,
 )
-from core.schemas.recipe import RecipeJSON
+from core.schemas.recipe import RecipeJSON, StageUsage, TokenUsage
 
 logger = logging.getLogger(__name__)
 
@@ -61,13 +61,24 @@ class PipelineResult:
     total_time: float = 0.0
 
 
-async def _run_phase(name: str, coro, phase_results: dict, phase_times: dict) -> Any:
-    """Phase 실행 래퍼: 타이밍 기록 + 에러 핸들링."""
+async def _run_phase(
+    name: str, coro, phase_results: dict, phase_times: dict, phase_usages: dict,
+) -> Any:
+    """Phase 실행 래퍼: 타이밍 기록 + usage 수집 + 에러 핸들링.
+
+    run() 함수가 (result, usage_dict) 튜플을 리턴하면 자동 언패킹.
+    """
     logger.info("▶ %s 시작", name)
     t0 = time.perf_counter()
     try:
-        result = await coro
+        raw = await coro
         elapsed = round(time.perf_counter() - t0, 2)
+        # 튜플 언패킹: (result, usage_dict)
+        if isinstance(raw, tuple) and len(raw) == 2 and isinstance(raw[1], dict):
+            result, usage = raw
+            phase_usages[name] = usage
+        else:
+            result = raw
         phase_results[name] = result
         phase_times[name] = elapsed
         logger.info("✔ %s 완료 (%.2fs)", name, elapsed)
@@ -95,6 +106,55 @@ def _save_phase_output(output_dir: str, filename: str, data) -> None:
     logger.info("  💾 %s saved", filename)
 
 
+# ── Token Usage 집계 ──────────────────────────────────────────────────────
+
+# 가격: $/1M tokens
+_PRICING = {
+    "gemini-2.5-flash": {"input": 0.30, "output": 2.50},
+    "gemini-2.5-flash-lite": {"input": 0.10, "output": 0.40},
+    "soniox": {"input": 0.0, "output": 0.0},  # 별도 과금
+}
+
+
+def _build_token_usage(phase_usages: dict[str, dict]) -> TokenUsage:
+    """phase_usages dict → TokenUsage 객체."""
+    stages: dict[str, StageUsage] = {}
+    total_input = 0
+    total_output = 0
+    estimated_cost = 0.0
+
+    for phase_name, usage in phase_usages.items():
+        inp = usage.get("input_tokens", 0)
+        out = usage.get("output_tokens", 0)
+        model = usage.get("model", "")
+
+        stages[phase_name] = StageUsage(
+            input_tokens=inp,
+            output_tokens=out,
+            model=model,
+        )
+        total_input += inp
+        total_output += out
+
+        # 비용 계산
+        pricing = _PRICING.get(model, {"input": 0.0, "output": 0.0})
+        estimated_cost += inp * pricing["input"] / 1_000_000
+        estimated_cost += out * pricing["output"] / 1_000_000
+
+    # Soniox 비용: audio_duration_sec 기반
+    stt_usage = phase_usages.get("P1_STT", {})
+    audio_sec = stt_usage.get("audio_duration_sec", 0)
+    if audio_sec > 0:
+        estimated_cost += audio_sec * (0.01 / 30)
+
+    return TokenUsage(
+        stages=stages,
+        total_input=total_input,
+        total_output=total_output,
+        estimated_cost_usd=round(estimated_cost, 6),
+    )
+
+
 # ── Pipeline 실행 ─────────────────────────────────────────────────────────
 
 
@@ -113,6 +173,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
 
     phase_results: dict[str, Any] = {}
     phase_times: dict[str, float] = {}
+    phase_usages: dict[str, dict] = {}
 
     video_path = config.video_path
 
@@ -121,17 +182,17 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         _run_phase(
             "P1_STT",
             p01_stt.run(video_path, output_dir, api_key=config.soniox_api_key),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         ),
         _run_phase(
             "P2_SCAN",
             p02_scan.run(video_path, output_dir, api_key=config.gemini_api_key, output_language=config.output_language),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         ),
         _run_phase(
             "P3_EXTRACT",
             p03_extract.run(video_path, output_dir, config.fps),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         ),
     )
 
@@ -148,7 +209,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         _run_phase(
             "P4_CLASSIFY",
             p04_classify.run(frames_dir, timestamps, api_key=config.gemini_api_key),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         ),
         _run_phase(
             "P7_PRODUCT",
@@ -158,7 +219,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
                 api_key=config.gemini_api_key,
                 output_language=config.output_language,
             ),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         ),
         _run_phase(
             "P8_VISUAL",
@@ -168,7 +229,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
                 api_key=config.gemini_api_key,
                 output_language=config.output_language,
             ),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         ),
         _run_phase(
             "P9_ENGAGE",
@@ -178,7 +239,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
                 api_key=config.gemini_api_key,
                 output_language=config.output_language,
             ),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         ),
     )
 
@@ -188,7 +249,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         p5_result = await _run_phase(
             "P5_TEMPORAL",
             p05_temporal.run(p3_result),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         )
     else:
         logger.warning("P3 실패 → P5 건너뜀")
@@ -200,7 +261,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         p6_result = await _run_phase(
             "P6_SCENE",
             p06_scene.run(p3_result, p4_result),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         )
     else:
         logger.warning("P3 실패 → P6 건너뜀")
@@ -216,7 +277,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
             api_key=config.gemini_api_key,
             output_language=config.output_language,
         ),
-        phase_results, phase_times,
+        phase_results, phase_times, phase_usages,
     )
 
     # ── 순차 : P11(MERGE) ← P6 + P8 + P10 ─────────────────────────────────
@@ -225,7 +286,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         p11_result = await _run_phase(
             "P11_MERGE",
             p11_merge.run(p6_result, p8_result, p10_result),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         )
         _save_phase_output(output_dir, "p11_merge.json", p11_result)
     else:
@@ -246,7 +307,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
             p10_output=p10_result,
             output_language=config.output_language,
         ),
-        phase_results, phase_times,
+        phase_results, phase_times, phase_usages,
     )
 
     # ── 순차 : P13(EVALUATE) ← P12 ────────────────────────────────────────
@@ -254,13 +315,22 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         eval_result = await _run_phase(
             "P13_EVALUATE",
             p13_evaluate.run(recipe, api_key=config.gemini_api_key),
-            phase_results, phase_times,
+            phase_results, phase_times, phase_usages,
         )
         if eval_result:
             recipe.evaluation = eval_result
     else:
         logger.warning("P12 실패 → P13 건너뜀")
         phase_results["P13_EVALUATE"] = None
+
+    # ── Token Usage 집계 ───────────────────────────────────────────────────
+    if recipe:
+        token_usage = _build_token_usage(phase_usages)
+        recipe.pipeline.token_usage = token_usage
+        logger.info(
+            "Token usage: input=%d, output=%d, cost=$%.4f",
+            token_usage.total_input, token_usage.total_output, token_usage.estimated_cost_usd,
+        )
 
     # RecipeJSON 저장
     if recipe:
