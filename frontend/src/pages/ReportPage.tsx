@@ -21,6 +21,7 @@ export default function ReportPage() {
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<RecipeJSON | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('analysis');
@@ -33,6 +34,7 @@ export default function ReportPage() {
       .then((data) => {
         setRecipe(data.recipe);
         setVideoUrl(data.video_url);
+        setThumbnails(data.thumbnails);
         // Add to library
         if (data.recipe) {
           addLibraryItem({
@@ -147,7 +149,7 @@ export default function ReportPage() {
 
           {/* Tab content */}
           {tab === 'analysis' && (
-            <AnalysisTab recipe={recipe} seekTo={seekTo} />
+            <AnalysisTab recipe={recipe} seekTo={seekTo} thumbnails={thumbnails} />
           )}
           {tab === 'scenes' && (
             <ScenesTab recipe={recipe} seekTo={seekTo} />
@@ -198,15 +200,15 @@ function RecipeFlowSummary({ recipe }: { recipe: RecipeJSON }) {
 
 /* ── Tab: 분석 결과 ─────────────────────────── */
 
-function AnalysisTab({ recipe, seekTo }: {
-  recipe: RecipeJSON; seekTo: (s: number) => void;
+function AnalysisTab({ recipe, seekTo, thumbnails }: {
+  recipe: RecipeJSON; seekTo: (s: number) => void; thumbnails: Record<string, string>;
 }) {
   return (
     <div className="space-y-4">
       <SummarySection data={recipe} />
       <ProductSection data={recipe} seekTo={seekTo} />
       <ScriptSection data={recipe} seekTo={seekTo} />
-      <VisualSection data={recipe} seekTo={seekTo} />
+      <VisualSection data={recipe} seekTo={seekTo} thumbnails={thumbnails} />
 
       {/* Engagement */}
       <div>

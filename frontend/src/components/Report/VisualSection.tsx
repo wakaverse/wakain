@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Film, ChevronDown } from 'lucide-react';
+import { Film, ChevronDown, Video } from 'lucide-react';
 import type { RecipeJSON } from '../../types/recipe';
 import { STYLE_COLORS, STYLE_LABELS, ENERGY_LABELS, formatTimeRange, labelKo } from '../../lib/recipe-utils';
 
 interface Props {
   data: RecipeJSON;
   seekTo: (sec: number) => void;
+  thumbnails?: Record<string, string>;
 }
 
-export default function VisualSection({ data, seekTo }: Props) {
+export default function VisualSection({ data, seekTo, thumbnails = {} }: Props) {
   const [expanded, setExpanded] = useState(false);
   const scenes = data.visual.scenes;
   const rhythm = data.visual.rhythm;
@@ -53,9 +54,17 @@ export default function VisualSection({ data, seekTo }: Props) {
               className="flex gap-3 py-3 border-b border-gray-100 last:border-0 cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => seekTo(s.time_range[0])}
             >
-              <div className="w-16 h-10 rounded bg-gray-100 flex items-center justify-center shrink-0">
-                <span className="text-[9px] text-gray-400">씬 {s.scene_id}</span>
-              </div>
+              {thumbnails[String(s.scene_id)] ? (
+                <img
+                  src={thumbnails[String(s.scene_id)]}
+                  alt={`씬 ${s.scene_id}`}
+                  className="w-16 h-10 rounded object-cover shrink-0"
+                />
+              ) : (
+                <div className="w-16 h-10 rounded bg-gray-100 flex items-center justify-center shrink-0">
+                  <Video className="w-4 h-3 text-gray-300" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                   <span className="text-[11px] font-mono text-gray-400">

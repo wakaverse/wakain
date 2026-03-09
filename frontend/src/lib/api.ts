@@ -121,6 +121,7 @@ export async function createJobFromUrl(
 export interface V2Result {
   recipe: RecipeJSON;
   video_url: string | null;
+  thumbnails: Record<string, string>;
 }
 
 export async function getResult(id: string): Promise<V2Result> {
@@ -134,6 +135,7 @@ export async function getResult(id: string): Promise<V2Result> {
   return {
     recipe: data.recipe_json,
     video_url: data.video_url || null,
+    thumbnails: data.thumbnails || {},
   };
 }
 
