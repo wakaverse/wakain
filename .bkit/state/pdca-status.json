@@ -1,11 +1,14 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-09T10:04:42.356Z",
+  "lastUpdated": "2026-03-09T14:18:54.857Z",
   "activeFeatures": [
     "backend",
     "frontend",
     "Report",
-    "App"
+    "App",
+    "pipeline",
+    "schemas",
+    "core"
   ],
   "primaryFeature": "backend",
   "features": {
@@ -60,6 +63,45 @@
         "lastUpdated": "2026-03-08T12:38:56.558Z"
       },
       "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/frontend/src/components/App/AppShell.tsx"
+    },
+    "pipeline": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-09T14:18:29.892Z",
+        "lastUpdated": "2026-03-09T14:18:29.892Z"
+      },
+      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/core/pipeline/p13_evaluate.py"
+    },
+    "schemas": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-09T14:18:34.780Z",
+        "lastUpdated": "2026-03-09T14:18:41.542Z"
+      },
+      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/core/schemas/recipe.py"
+    },
+    "core": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-09T14:18:46.690Z",
+        "lastUpdated": "2026-03-09T14:18:54.857Z"
+      },
+      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/core/orchestrator.py"
     }
   },
   "pipeline": {
@@ -70,7 +112,7 @@
   "session": {
     "startedAt": "2026-03-08T09:40:41.487Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-09T10:04:42.356Z"
+    "lastActivity": "2026-03-09T14:18:54.857Z"
   },
   "history": [
     {
@@ -460,6 +502,36 @@
     {
       "timestamp": "2026-03-09T10:04:42.356Z",
       "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-09T14:18:29.892Z",
+      "feature": "pipeline",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-09T14:18:34.780Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-09T14:18:41.542Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-09T14:18:46.690Z",
+      "feature": "core",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-09T14:18:54.857Z",
+      "feature": "core",
       "phase": "do",
       "action": "updated"
     }

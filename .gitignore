@@ -9,3 +9,5 @@ frontend/.env
 analyzer/output/
 analyzer/samples/
 analyzer/.env
+core/__pycache__/
+core/**/__pycache__/

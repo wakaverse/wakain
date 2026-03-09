@@ -6,6 +6,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from core.schemas.evaluation import EvaluationOutput
 from core.schemas.enums import (
     AttentionArc,
     BlockType,
@@ -299,6 +300,9 @@ class RecipeJSON(BaseModel):
     visual: RecipeVisual = Field(description="영상 축 (P6 + P8 + P11)")
     engagement: RecipeEngagement = Field(description="인게이지먼트 (P9)")
     meta: RecipeMeta = Field(description="영상 메타 (P2)")
+    evaluation: EvaluationOutput | None = Field(
+        default=None, description="영상 코칭 평가 (P13)"
+    )
     pipeline: PipelineInfo = Field(
         default_factory=PipelineInfo, description="파이프라인 정보"
     )

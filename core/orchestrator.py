@@ -35,6 +35,7 @@ from core.pipeline import (
     p10_script,
     p11_merge,
     p12_build,
+    p13_evaluate,
 )
 from core.schemas.recipe import RecipeJSON
 
@@ -247,6 +248,19 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         ),
         phase_results, phase_times,
     )
+
+    # ── 순차 : P13(EVALUATE) ← P12 ────────────────────────────────────────
+    if recipe:
+        eval_result = await _run_phase(
+            "P13_EVALUATE",
+            p13_evaluate.run(recipe, api_key=config.gemini_api_key),
+            phase_results, phase_times,
+        )
+        if eval_result:
+            recipe.evaluation = eval_result
+    else:
+        logger.warning("P12 실패 → P13 건너뜀")
+        phase_results["P13_EVALUATE"] = None
 
     # RecipeJSON 저장
     if recipe:
