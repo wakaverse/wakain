@@ -46,6 +46,16 @@ Watch the FULL video for context.
 ## Scene Boundaries (from SceneDetect — use THESE, do NOT create your own):
 {scene_text}
 
+## IMPORTANT: "style" = the visual presentation technique of EACH scene, NOT the video's overall purpose.
+Even in a promotional video, individual scenes use different techniques:
+- Showing product features/specs → demo
+- Closeup of texture, taste, ASMR → sensory
+- Unboxing or comparing products → review
+- Showing transformation or results → before_after
+- Price, discount, limited offer → promotion
+- Telling a narrative/story → story
+A video can have 5+ different styles across its scenes. Do NOT assign the same style to all scenes.
+
 ## For EACH scene above, analyse:
 
 1. style: demo / review / problem_solution / before_after / story / listicle / trend_ride / promotion / sensory
