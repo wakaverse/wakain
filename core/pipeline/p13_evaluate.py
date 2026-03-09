@@ -39,7 +39,7 @@ def _check_product_first_appear(recipe: RecipeJSON) -> ChecklistItem:
         category="hook",
         item="3초 내 제품 등장",
         passed=t < 3.0,
-        evidence=f"product_first_appear: {t:.1f}s",
+        evidence=f"제품 첫 등장: {t:.1f}초" if t > 0 else "영상 시작부터 제품 노출",
     )
 
 
@@ -84,11 +84,12 @@ def _check_text_hook(recipe: RecipeJSON) -> ChecklistItem:
 def _check_benefit(recipe: RecipeJSON) -> ChecklistItem:
     flow = [b.value if hasattr(b, "value") else str(b) for b in recipe.script.flow_order]
     passed = "benefit" in flow
+    count = flow.count("benefit")
     return ChecklistItem(
         category="body",
-        item="benefit 블록 존재",
+        item="장점/매력 소개",
         passed=passed,
-        evidence=f"flow_order: {flow}",
+        evidence=f"장점 소개 {count}회 포함" if passed else "장점 소개 구간 없음",
     )
 
 
@@ -97,9 +98,9 @@ def _check_proof(recipe: RecipeJSON) -> ChecklistItem:
     passed = "proof" in flow
     return ChecklistItem(
         category="body",
-        item="proof/evidence 존재",
+        item="증거/근거 장면",
         passed=passed,
-        evidence=f"flow_order: {flow}",
+        evidence="근거 제시 구간 있음" if passed else "근거 제시 구간 없음",
     )
 
 
@@ -108,9 +109,9 @@ def _check_social_proof(recipe: RecipeJSON) -> ChecklistItem:
     passed = "social_proof" in flow
     return ChecklistItem(
         category="body",
-        item="social_proof 존재",
+        item="후기/반응 장면",
         passed=passed,
-        evidence=f"flow_order: {flow}",
+        evidence="후기·반응 구간 있음" if passed else "후기·반응 구간 없음",
     )
 
 
@@ -122,9 +123,9 @@ def _check_pain_point(recipe: RecipeJSON) -> ChecklistItem:
             break
     return ChecklistItem(
         category="body",
-        item="pain_point 존재",
+        item="공감 장면 ('이런 고민 있죠?')",
         passed=found,
-        evidence="씬 role에서 pain/problem 발견" if found else "pain/problem role 씬 없음",
+        evidence="고민/문제 공감 장면 있음" if found else "고민/문제 공감 장면 없음",
     )
 
 
@@ -134,7 +135,7 @@ def _check_style_diversity(recipe: RecipeJSON) -> ChecklistItem:
         category="body",
         item="다양한 영상 스타일 (2종 이상)",
         passed=n >= 2,
-        evidence=f"style_distribution 키 수: {n}",
+        evidence=f"{n}가지 스타일 사용" if n >= 2 else "1가지 스타일만 사용",
     )
 
 
@@ -143,9 +144,9 @@ def _check_cta_exists(recipe: RecipeJSON) -> ChecklistItem:
     passed = "cta" in flow
     return ChecklistItem(
         category="cta",
-        item="CTA 블록 존재",
+        item="행동 유도 (구매/댓글/팔로우)",
         passed=passed,
-        evidence=f"flow_order: {flow}",
+        evidence="행동 유도 구간 있음" if passed else "행동 유도 구간 없음",
     )
 
 
@@ -161,9 +162,9 @@ def _check_cta_urgency(recipe: RecipeJSON) -> ChecklistItem:
     passed = len(found_in) > 0
     return ChecklistItem(
         category="cta",
-        item="긴급성 요소",
+        item="마감/긴급 멘트",
         passed=passed,
-        evidence=f"발견 키워드: {found_in}" if found_in else "CTA 텍스트에 긴급성 키워드 없음",
+        evidence=f"'{', '.join(found_in)}' 키워드 사용" if found_in else "마감·긴급 키워드 없음",
     )
 
 
