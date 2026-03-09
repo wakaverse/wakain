@@ -29,7 +29,7 @@ export default function EvaluationSection({ data }: Props) {
   const totalCount = evaluation.checklist.length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Summary */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <p className="text-base font-semibold text-gray-900 leading-relaxed">
@@ -63,8 +63,8 @@ export default function EvaluationSection({ data }: Props) {
                         <XCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
                       )}
                       <div className="min-w-0">
-                        <span className="text-sm text-gray-800">{item.item}</span>
-                        <p className="text-xs text-gray-400 mt-0.5">{item.evidence}</p>
+                        <span className="text-base text-gray-800 leading-loose">{item.item}</span>
+                        <p className="text-sm text-gray-400 mt-0.5 leading-relaxed">{item.evidence}</p>
                       </div>
                     </div>
                   ))}
@@ -87,8 +87,8 @@ export default function EvaluationSection({ data }: Props) {
             <div className="space-y-3">
               {evaluation.strengths.map((s, i) => (
                 <div key={i}>
-                  <p className="text-sm text-gray-800">{s.fact}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{s.comment}</p>
+                  <p className="text-base text-gray-800 leading-loose">{s.fact}</p>
+                  <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">{s.comment}</p>
                 </div>
               ))}
             </div>
@@ -105,9 +105,9 @@ export default function EvaluationSection({ data }: Props) {
             <div className="space-y-3">
               {evaluation.improvements.map((imp, i) => (
                 <div key={i}>
-                  <p className="text-sm text-gray-800">{imp.fact}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{imp.comment}</p>
-                  <p className="text-xs text-blue-600 mt-1">💡 {imp.suggestion}</p>
+                  <p className="text-base text-gray-800 leading-loose">{imp.fact}</p>
+                  <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">{imp.comment}</p>
+                  <p className="text-sm text-blue-600 mt-1 leading-relaxed">💡 {imp.suggestion}</p>
                 </div>
               ))}
             </div>

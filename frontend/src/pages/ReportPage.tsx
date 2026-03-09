@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2, Copy, Check, RefreshCw } from 'lucide-react';
 import { getResult, addLibraryItem } from '../lib/api';
-import type { RecipeJSON, ScriptBlock } from '../types/recipe';
+import type { RecipeJSON } from '../types/recipe';
 import type { LibraryItem } from '../types';
 import SummarySection from '../components/Report/SummarySection';
 import EvaluationSection from '../components/Report/EvaluationSection';
@@ -138,7 +138,7 @@ export default function ReportPage() {
             <RecipeFlowSummary recipe={recipe} />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* 1. Evaluation (coaching) or fallback to Summary */}
             {hasEvaluation ? (
               <EvaluationSection data={recipe} />
@@ -185,18 +185,15 @@ function RecipeFlowSummary({ recipe }: { recipe: RecipeJSON }) {
   );
 }
 
-/* ── Scene cards with utterances ─────────────── */
+/* ── Scene cards — grouped by script block ──── */
 
-function getBlocksForScene(
-  blocks: ScriptBlock[],
-  sceneStart: number,
-  sceneEnd: number,
-): ScriptBlock[] {
-  return blocks.filter((b) => {
-    const bStart = b.time_range[0];
-    const bEnd = b.time_range[1];
-    // Overlap check
-    return bStart < sceneEnd && bEnd > sceneStart;
+function getScenesForBlock(
+  scenes: RecipeJSON['visual']['scenes'],
+  blockStart: number,
+  blockEnd: number,
+) {
+  return scenes.filter((s) => {
+    return s.time_range[0] < blockEnd && s.time_range[1] > blockStart;
   });
 }
 
@@ -208,108 +205,81 @@ function SceneCards({ recipe, seekTo, thumbnails }: {
   const scenes = recipe.visual.scenes;
   const blocks = recipe.script.blocks;
 
-  if (!scenes.length) return null;
+  if (!blocks.length) return null;
 
   return (
     <div className="space-y-3">
       <p className="text-sm font-semibold text-gray-900">씬 분석</p>
-      {scenes.map((scene) => {
-        const matchedBlocks = getBlocksForScene(blocks, scene.time_range[0], scene.time_range[1]);
+      {blocks.map((block, bi) => {
+        const color = BLOCK_EVAL_COLORS[block.block] || '#6B7280';
+        const matchedScenes = getScenesForBlock(scenes, block.time_range[0], block.time_range[1]);
 
         return (
           <div
-            key={scene.scene_id}
-            className="bg-white rounded-2xl border border-gray-100 p-4 hover:border-gray-200 transition-colors cursor-pointer group"
-            onClick={() => seekTo(scene.time_range[0])}
+            key={bi}
+            className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
           >
-            {/* Top: thumbnail + visual info */}
-            <div className="flex items-start gap-3">
-              <div className="w-24 h-16 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 overflow-hidden">
-                {thumbnails[String(scene.scene_id)] ? (
-                  <img src={thumbnails[String(scene.scene_id)]} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-lg font-bold text-gray-200">
-                    {String(scene.scene_id).padStart(2, '0')}
-                  </span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[11px] font-mono text-gray-400">
-                    {formatTime(scene.time_range[0])}–{formatTime(scene.time_range[1])}
-                  </span>
-                  {scene.role && (
-                    <span className="text-[10px] font-medium px-2 py-0.5 bg-gray-900 text-white rounded-full">
-                      {scene.role}
-                    </span>
-                  )}
-                  {scene.style && (
-                    <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                      {scene.style}
-                    </span>
-                  )}
-                </div>
-                {scene.description && (
-                  <p className="text-sm text-gray-700 leading-relaxed mb-1.5">{scene.description}</p>
-                )}
-                {scene.visual_forms.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {scene.visual_forms.map((f, j) => (
-                      <span key={j} className="text-[10px] px-2 py-0.5 bg-gray-50 text-gray-500 rounded-full">
-                        {f.form}({f.method})
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                <span className="text-xs text-gray-400">▶</span>
-              </div>
+            {/* Header: block type tag + time range */}
+            <div
+              className="flex items-center gap-2 px-4 py-2.5 cursor-pointer"
+              style={{ borderLeft: `3px solid ${color}` }}
+              onClick={() => seekTo(block.time_range[0])}
+            >
+              <span
+                className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                style={{ backgroundColor: `${color}18`, color }}
+              >
+                {BLOCK_LABELS[block.block] || block.block}
+              </span>
+              <span className="text-[11px] font-mono text-gray-400">
+                {formatTime(block.time_range[0])}–{formatTime(block.time_range[1])}
+              </span>
             </div>
 
-            {/* Bottom: utterances with block type color line */}
-            {matchedBlocks.length > 0 && (
-              <div className="mt-3 border-t border-gray-50 pt-3 space-y-2">
-                {matchedBlocks.map((block, bi) => {
-                  const color = BLOCK_EVAL_COLORS[block.block] || '#6B7280';
-                  return (
-                    <div key={bi} className="flex gap-2">
-                      <div
-                        className="w-1 rounded-full shrink-0"
-                        style={{ backgroundColor: color }}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <span
-                          className="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
-                          style={{
-                            backgroundColor: `${color}18`,
-                            color: color,
-                          }}
-                        >
-                          {BLOCK_LABELS[block.block] || block.block}
-                        </span>
-                        {block.utterances?.length ? (
-                          <div className="mt-1 space-y-0.5">
-                            {block.utterances.map((u, ui) => (
-                              <p key={ui} className="text-xs text-gray-600 leading-relaxed">
-                                <span className="text-[10px] text-gray-400 font-mono mr-1">
-                                  {formatTime(u.time_range[0])}
-                                </span>
-                                {u.text}
-                              </p>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">
-                            {block.text}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+            {/* Thumbnail strip */}
+            {matchedScenes.length > 0 && (
+              <div className="flex gap-1 px-4 pb-2 overflow-x-auto">
+                {matchedScenes.map((scene) => (
+                  <button
+                    key={scene.scene_id}
+                    className="w-20 h-14 rounded-lg bg-gray-50 shrink-0 overflow-hidden hover:ring-2 hover:ring-offset-1 transition-all relative group"
+                    style={{ '--tw-ring-color': color } as React.CSSProperties}
+                    onClick={() => seekTo(scene.time_range[0])}
+                  >
+                    {thumbnails[String(scene.scene_id)] ? (
+                      <img src={thumbnails[String(scene.scene_id)]} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-xs font-bold text-gray-200 flex items-center justify-center h-full">
+                        {String(scene.scene_id).padStart(2, '0')}
+                      </span>
+                    )}
+                    <span className="absolute bottom-0 inset-x-0 bg-black/50 text-[9px] text-white text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {formatTime(scene.time_range[0])}
+                    </span>
+                  </button>
+                ))}
               </div>
             )}
+
+            {/* Utterances / block text */}
+            <div className="px-4 pb-3 border-t border-gray-50 pt-2">
+              {block.utterances?.length ? (
+                <div className="space-y-1">
+                  {block.utterances.map((u, ui) => (
+                    <p key={ui} className="text-xs text-gray-600 leading-relaxed">
+                      <span className="text-[10px] text-gray-400 font-mono mr-1">
+                        {formatTime(u.time_range[0])}
+                      </span>
+                      {u.text}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  {block.text}
+                </p>
+              )}
+            </div>
           </div>
         );
       })}

@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import type { RecipeJSON, SegmentEval } from '../../types/recipe';
 import { formatTime, BLOCK_LABELS, BLOCK_EVAL_COLORS, ENERGY_LABELS, labelKo } from '../../lib/recipe-utils';
-import { TrendingUp, Lightbulb } from 'lucide-react';
+import { TrendingUp, Lightbulb, ChevronDown } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -41,7 +42,7 @@ export default function StructureSection({ data, seekTo }: Props) {
   const blocks = data.script.blocks;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Energy graph + block bar */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <div className="flex items-center justify-between mb-4">
@@ -193,63 +194,91 @@ function SegmentCard({ label, segment, seekTo }: {
   segment: SegmentEval;
   seekTo: (sec: number) => void;
 }) {
+  const [open, setOpen] = useState(false);
   const hasContent = segment.strengths.length > 0 || segment.improvements.length > 0;
   if (!hasContent) return null;
 
+  const strengthCount = segment.strengths.length;
+  const improvementCount = segment.improvements.length;
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-semibold text-gray-900">{label}</p>
-        <button
-          onClick={() => seekTo(segment.time_range[0])}
-          className="text-[10px] text-gray-400 hover:text-gray-600 font-mono"
-        >
-          {formatTime(segment.time_range[0])}–{formatTime(segment.time_range[1])}
-        </button>
-      </div>
-
-      {/* Block types */}
-      {segment.block_types.length > 0 && (
-        <div className="flex gap-1 mb-3 flex-wrap">
-          {segment.block_types.map((bt, i) => (
-            <span
-              key={i}
-              className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
-              style={{
-                backgroundColor: `${BLOCK_EVAL_COLORS[bt] || '#6B7280'}18`,
-                color: BLOCK_EVAL_COLORS[bt] || '#6B7280',
-              }}
-            >
-              {BLOCK_LABELS[bt] || bt}
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      {/* Accordion header */}
+      <button
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+        onClick={() => setOpen(!open)}
+      >
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-semibold text-gray-900">{label}</p>
+          <span
+            className="text-[10px] text-gray-400 font-mono cursor-pointer hover:text-gray-600"
+            onClick={(e) => { e.stopPropagation(); seekTo(segment.time_range[0]); }}
+          >
+            {formatTime(segment.time_range[0])}–{formatTime(segment.time_range[1])}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {strengthCount > 0 && (
+            <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
+              강점 {strengthCount}
             </span>
-          ))}
+          )}
+          {improvementCount > 0 && (
+            <span className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+              개선 {improvementCount}
+            </span>
+          )}
+          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
         </div>
-      )}
+      </button>
 
-      {/* Strengths */}
-      {segment.strengths.length > 0 && (
-        <div className="mb-2">
-          {segment.strengths.map((s, i) => (
-            <div key={i} className="flex items-start gap-1.5 mb-1.5">
-              <TrendingUp className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
-              <p className="text-xs text-gray-700 leading-relaxed">{s.comment}</p>
+      {/* Accordion body */}
+      {open && (
+        <div className="px-4 pb-4 space-y-3">
+          {/* Block types */}
+          {segment.block_types.length > 0 && (
+            <div className="flex gap-1 flex-wrap">
+              {segment.block_types.map((bt, i) => (
+                <span
+                  key={i}
+                  className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                  style={{
+                    backgroundColor: `${BLOCK_EVAL_COLORS[bt] || '#6B7280'}18`,
+                    color: BLOCK_EVAL_COLORS[bt] || '#6B7280',
+                  }}
+                >
+                  {BLOCK_LABELS[bt] || bt}
+                </span>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
 
-      {/* Improvements */}
-      {segment.improvements.length > 0 && (
-        <div>
-          {segment.improvements.map((imp, i) => (
-            <div key={i} className="flex items-start gap-1.5 mb-1.5">
-              <Lightbulb className="w-3 h-3 text-amber-500 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-xs text-gray-700 leading-relaxed">{imp.comment}</p>
-                <p className="text-[10px] text-blue-600 mt-0.5">{imp.suggestion}</p>
-              </div>
+          {/* Strengths */}
+          {segment.strengths.length > 0 && (
+            <div className="space-y-1.5">
+              {segment.strengths.map((s, i) => (
+                <div key={i} className="flex items-start gap-1.5">
+                  <TrendingUp className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
+                  <p className="text-sm text-gray-700 leading-relaxed">{s.comment}</p>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {/* Improvements */}
+          {segment.improvements.length > 0 && (
+            <div className="space-y-1.5">
+              {segment.improvements.map((imp, i) => (
+                <div key={i} className="flex items-start gap-1.5">
+                  <Lightbulb className="w-3 h-3 text-amber-500 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm text-gray-700 leading-relaxed">{imp.comment}</p>
+                    <p className="text-xs text-blue-600 mt-0.5">{imp.suggestion}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
