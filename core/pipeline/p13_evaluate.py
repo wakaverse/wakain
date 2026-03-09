@@ -276,7 +276,11 @@ def _build_recipe_summary(recipe: RecipeJSON) -> dict:
             "blocks": [
                 {"block": b.block.value if hasattr(b.block, "value") else str(b.block),
                  "time_range": list(b.time_range),
-                 "text": b.text}
+                 "text": b.text,
+                 "utterances": [
+                     {"text": u.text, "time_range": list(u.time_range)}
+                     for u in b.utterances
+                 ]}
                 for b in recipe.script.blocks
             ],
         },
