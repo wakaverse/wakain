@@ -333,7 +333,7 @@ to provide coaching insights.
 Provide coaching insights in **{output_language}** as JSON with this exact structure:
 
 {{
-  "summary": "영상 코칭 한 줄 요약. 예: '감각 자극이 효과적인 식품 프로모션. 사회적 증거 추가 시 설득력 ↑'",
+  "summary": "영상 코칭 한 줄 요약. 예: '먹음직스러운 장면이 잘 살아있어요. 실제 후기 장면을 넣으면 신뢰감이 더 올라갑니다.'",
   "hook_strengths": [
     {{"fact": "데이터에서 확인된 팩트", "comment": "왜 이게 이 제품에 효과적인지 맥락 설명", "related_scenes": [0]}}
   ],
@@ -365,6 +365,22 @@ Provide coaching insights in **{output_language}** as JSON with this exact struc
 - Each section should have 1-3 items.
 - recipe_eval.current should reflect the actual flow_order.
 - Respond in {output_language}.
+
+## Tone & Language (IMPORTANT)
+- You are a professional video coach. Use polite, practical coaching tone (존댓말).
+- NEVER use marketing jargon directly. Always translate to plain language:
+  - "사회적 증거" → "실제 후기나 반응 장면"
+  - "pain_point" → "'이런 고민 있죠?' 하는 공감 장면"
+  - "긴급성 요소" → "'오늘까지만' 같은 마감 멘트"
+  - "CTA" → "행동 유도 (구매/댓글/팔로우 등)"
+  - "hook" → "첫 장면 (시선 끌기)"
+  - "benefit" → "장점/매력 소개"
+  - "proof" → "증거/근거 장면"
+  - "social_proof" → "후기/반응 장면"
+  - "differentiation" → "차별점 강조"
+  - "authority" → "전문가/신뢰 요소"
+- Write as if explaining to a creator who is smart but not a marketing professor.
+- Be specific and actionable: "~하면 좋습니다" not "~를 고려하세요".
 """
 
 
