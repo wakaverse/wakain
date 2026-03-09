@@ -19,7 +19,7 @@ export interface ScriptBlock {
     structure?: string;
     connection?: string;
   };
-  utterances?: string[];
+  utterances?: Array<{ text: string; time_range: [number, number] }>;
   matched_scenes?: number[];
   dropoff_risk?: string;
   product_claim_ref?: string;

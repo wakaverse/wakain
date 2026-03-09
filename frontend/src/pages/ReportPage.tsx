@@ -292,7 +292,10 @@ function SceneCards({ recipe, seekTo, thumbnails }: {
                           <div className="mt-1 space-y-0.5">
                             {block.utterances.map((u, ui) => (
                               <p key={ui} className="text-xs text-gray-600 leading-relaxed">
-                                {u}
+                                <span className="text-[10px] text-gray-400 font-mono mr-1">
+                                  {formatTime(u.time_range[0])}
+                                </span>
+                                {u.text}
                               </p>
                             ))}
                           </div>
