@@ -152,7 +152,7 @@ export default function ReportPage() {
             <AnalysisTab recipe={recipe} seekTo={seekTo} thumbnails={thumbnails} />
           )}
           {tab === 'scenes' && (
-            <ScenesTab recipe={recipe} seekTo={seekTo} />
+            <ScenesTab recipe={recipe} seekTo={seekTo} thumbnails={thumbnails} />
           )}
         </div>
       </div>
@@ -226,8 +226,8 @@ function AnalysisTab({ recipe, seekTo, thumbnails }: {
 
 /* ── Tab: 씬 뷰 (V2 scenes) ────────────────── */
 
-function ScenesTab({ recipe, seekTo }: {
-  recipe: RecipeJSON; seekTo: (s: number) => void;
+function ScenesTab({ recipe, seekTo, thumbnails }: {
+  recipe: RecipeJSON; seekTo: (s: number) => void; thumbnails: Record<string, string>;
 }) {
   const scenes = recipe.visual.scenes;
   const duration = recipe.meta.duration;
@@ -275,10 +275,14 @@ function ScenesTab({ recipe, seekTo }: {
           onClick={() => seekTo(scene.time_range[0])}
         >
           <div className="flex items-start gap-3">
-            <div className="w-24 h-16 rounded-lg bg-gray-50 flex items-center justify-center shrink-0">
-              <span className="text-lg font-bold text-gray-200">
-                {String(scene.scene_id).padStart(2, '0')}
-              </span>
+            <div className="w-24 h-16 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 overflow-hidden">
+              {thumbnails[String(scene.scene_id)] ? (
+                <img src={thumbnails[String(scene.scene_id)]} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-lg font-bold text-gray-200">
+                  {String(scene.scene_id).padStart(2, '0')}
+                </span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
