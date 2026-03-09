@@ -1,0 +1,174 @@
+import { useState } from 'react';
+import { ChevronDown, TrendingUp, Lightbulb } from 'lucide-react';
+import type { RecipeJSON, SegmentEval } from '../../types/recipe';
+import { formatTime, BLOCK_LABELS, BLOCK_EVAL_COLORS } from '../../lib/recipe-utils';
+
+interface Props {
+  data: RecipeJSON;
+}
+
+const SEGMENT_LABELS: Record<string, string> = {
+  hook: 'Hook',
+  body: 'Body',
+  cta: 'CTA',
+};
+
+export default function CoachingCard({ data }: Props) {
+  const evaluation = data.evaluation;
+  if (!evaluation) return null;
+
+  const { strengths, improvements, recipe_eval, structure } = evaluation;
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-4">
+      <p className="text-sm font-semibold text-gray-900 mb-4">코칭</p>
+
+      {/* Strengths */}
+      {strengths.length > 0 && (
+        <div className="mb-4">
+          <p className="text-xs font-medium text-gray-500 mb-2">✅ 잘 된 점</p>
+          <div className="space-y-2">
+            {strengths.map((s, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-base text-gray-800 leading-loose">{s.fact}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{s.comment}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Improvements */}
+      {improvements.length > 0 && (
+        <div className="mb-4">
+          <p className="text-xs font-medium text-gray-500 mb-2">💡 이렇게 하면 더 좋아요</p>
+          <div className="space-y-2">
+            {improvements.map((imp, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <Lightbulb className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-base text-gray-800 leading-loose">{imp.fact}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{imp.comment}</p>
+                  <p className="text-sm text-blue-600 mt-0.5 leading-relaxed">{imp.suggestion}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recipe eval (current vs suggestion) */}
+      {recipe_eval && (
+        <div className="mb-4">
+          <p className="text-xs font-medium text-gray-500 mb-2">📐 추천 구조</p>
+          <div className="bg-gray-50 rounded-xl p-3 mb-2">
+            <p className="text-[10px] text-gray-400 mb-1">현재</p>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {recipe_eval.current.map((block, i) => (
+                <span key={i} className="flex items-center gap-1.5">
+                  <span
+                    className="text-xs font-medium px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: `${BLOCK_EVAL_COLORS[block] || '#6B7280'}18`,
+                      color: BLOCK_EVAL_COLORS[block] || '#6B7280',
+                    }}
+                  >
+                    {BLOCK_LABELS[block] || block}
+                  </span>
+                  {i < recipe_eval.current.length - 1 && (
+                    <span className="text-gray-300 text-xs">→</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="bg-blue-50 rounded-xl p-3">
+            <p className="text-[10px] text-blue-500 mb-1">제안</p>
+            <p className="text-sm text-blue-800 leading-relaxed">{recipe_eval.suggestion}</p>
+            <p className="text-xs text-blue-600 mt-1">{recipe_eval.reason}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Structure segment coaching (accordion, default collapsed) */}
+      {structure && (
+        <div className="border-t border-gray-100 pt-3 space-y-2">
+          <p className="text-xs font-medium text-gray-500 mb-1">구간별 코칭</p>
+          {(['hook', 'body', 'cta'] as const).map((seg) => {
+            const segEval = structure[seg];
+            if (!segEval) return null;
+            return (
+              <SegmentAccordion
+                key={seg}
+                label={SEGMENT_LABELS[seg]}
+                segment={segEval}
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SegmentAccordion({ label, segment }: {
+  label: string;
+  segment: SegmentEval;
+}) {
+  const [open, setOpen] = useState(false);
+  const hasContent = segment.strengths.length > 0 || segment.improvements.length > 0;
+  if (!hasContent) return null;
+
+  return (
+    <div className="border border-gray-100 rounded-xl overflow-hidden">
+      <button
+        className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors"
+        onClick={() => setOpen(!open)}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-800">{label}</span>
+          <span className="text-[10px] font-mono text-gray-400">
+            {formatTime(segment.time_range[0])}–{formatTime(segment.time_range[1])}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {segment.block_types.length > 0 && (
+            <div className="flex gap-0.5">
+              {segment.block_types.map((bt, i) => (
+                <span
+                  key={i}
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: BLOCK_EVAL_COLORS[bt] || '#6B7280' }}
+                />
+              ))}
+            </div>
+          )}
+          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        </div>
+      </button>
+
+      {open && (
+        <div className="px-3 pb-3 space-y-2">
+          {segment.strengths.map((s, i) => (
+            <div key={`s-${i}`} className="flex items-start gap-1.5">
+              <TrendingUp className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
+              <p className="text-sm text-gray-700 leading-relaxed">{s.comment}</p>
+            </div>
+          ))}
+          {segment.improvements.map((imp, i) => (
+            <div key={`i-${i}`} className="flex items-start gap-1.5">
+              <Lightbulb className="w-3 h-3 text-amber-500 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-sm text-gray-700 leading-relaxed">{imp.comment}</p>
+                <p className="text-xs text-blue-600 mt-0.5">{imp.suggestion}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

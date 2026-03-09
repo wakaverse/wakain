@@ -83,6 +83,26 @@ export interface SafeZone {
   reason: string;
 }
 
+// ─── P13 Positioning & Hook Analysis types ───
+
+export interface ContentPositioning {
+  unique_angle: string;
+  storytelling_format: string;
+  why_it_works: string;
+  contrast?: {
+    common_belief: string;
+    contrarian_reality: string;
+  };
+}
+
+export interface HookAnalysis {
+  strength: 'strong' | 'moderate' | 'weak';
+  reason: string;
+  title_hook_alignment: string;
+  product_appear_sec: number;
+  first_3s_energy: string;
+}
+
 // ─── P13 Evaluation types ───
 
 export interface ChecklistItem {
@@ -124,6 +144,8 @@ export interface RecipeEval {
 
 export interface Evaluation {
   summary: string;
+  positioning?: ContentPositioning;
+  hook_analysis?: HookAnalysis;
   checklist: ChecklistItem[];
   structure: StructureEval;
   strengths: EvalInsight[];

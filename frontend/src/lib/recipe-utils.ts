@@ -13,13 +13,14 @@ export function formatTimeRange(range: [number, number]): string {
 // ─── Block colors ───
 
 export const BLOCK_LABELS: Record<string, string> = {
-  hook: '훅',
-  authority: '권위',
-  benefit: '베네핏',
-  proof: '입증',
-  differentiation: '차별화',
-  social_proof: '사회적증거',
-  cta: 'CTA',
+  hook: '첫 장면',
+  authority: '전문가/신뢰',
+  benefit: '장점 소개',
+  proof: '증거/근거',
+  differentiation: '차별점',
+  social_proof: '후기/반응',
+  cta: '행동 유도',
+  promotion: '프로모션',
 };
 
 export const BLOCK_BORDER_COLORS: Record<string, string> = {
@@ -42,7 +43,8 @@ export const BLOCK_EVAL_COLORS: Record<string, string> = {
   differentiation: '#8B5CF6',
   social_proof: '#F59E0B',
   cta: '#EC4899',
-  authority: '#8B5CF6',
+  authority: '#6366f1',
+  promotion: '#F97316',
 };
 
 // ─── Style colors ───
