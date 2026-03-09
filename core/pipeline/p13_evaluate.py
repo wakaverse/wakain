@@ -70,7 +70,7 @@ def _check_text_hook(recipe: RecipeJSON) -> ChecklistItem:
     for scene in recipe.scenes:
         if scene.role and "hook" in scene.role.lower():
             for vf in scene.visual_forms:
-                if vf.form in (VisualForm.EXPLANATION, VisualForm.TEXT_OVERLAY):
+                if vf.form in (VisualForm.EXPLANATION, VisualForm.EVIDENCE):
                     found = True
                     evidence_parts.append(f"scene {scene.scene_id}: {vf.form.value}")
     return ChecklistItem(
