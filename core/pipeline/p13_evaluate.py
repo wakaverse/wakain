@@ -16,7 +16,10 @@ from google.genai import types
 from core.gemini_utils import make_client
 from core.schemas.evaluation import (
     ChecklistItem,
+    ContentPositioning,
+    ContrastMechanism,
     EvaluationOutput,
+    HookAnalysis,
     Improvement,
     Insight,
     RecipeEval,
@@ -300,11 +303,14 @@ def _build_recipe_summary(recipe: RecipeJSON) -> dict:
             "platform": recipe.meta.platform.value if hasattr(recipe.meta.platform, "value") else str(recipe.meta.platform),
             "product_first_appear": recipe.meta.product_first_appear,
         },
+        "script_alpha_summary": recipe.script.alpha_summary if hasattr(recipe.script, "alpha_summary") else {},
         "engagement": {
             "hook_strength": recipe.engagement.retention_analysis.hook_strength.value
             if hasattr(recipe.engagement.retention_analysis.hook_strength, "value")
             else str(recipe.engagement.retention_analysis.hook_strength),
+            "hook_reason": recipe.engagement.retention_analysis.hook_reason or "",
         },
+        "product_exposure_pct": recipe.meta.product_exposure_pct if hasattr(recipe.meta, "product_exposure_pct") else 0,
     }
 
 
@@ -334,7 +340,23 @@ to provide coaching insights.
 Provide coaching insights in **{output_language}** as JSON with this exact structure:
 
 {{
-  "summary": "영상 코칭 한 줄 요약. 예: '먹음직스러운 장면이 잘 살아있어요. 실제 후기 장면을 넣으면 신뢰감이 더 올라갑니다.'",
+  "summary": "영상 전략 요약 2~3줄. 이 영상이 무엇을 하고 있는지, 어떤 전략으로 설득하는지 서술.",
+  "positioning": {{
+    "unique_angle": "이 영상의 차별화된 접근 각도 (1~2문장). 예: '일상의 불편함에서 시작해 하나의 제품으로 해결하는 경험 공유'",
+    "storytelling_format": "스토리텔링 포맷명 (예: 문제해결 리뷰, Before/After, 언박싱, 체험기, 비교 리뷰, 튜토리얼...)",
+    "why_it_works": "이 포맷이 이 제품/카테고리에서 왜 효과적인지 2~3문장",
+    "contrast": {{
+      "common_belief": "시청자의 일반적 통념 (예: '브라탑은 지지력이 약해서 외출용이 아니다')",
+      "contrarian_reality": "이 영상이 보여주는 반전 (예: '이 브라탑은 속옷 없이도 외출 가능할 정도로 안정적')"
+    }}
+  }},
+  "hook_analysis": {{
+    "strength": "strong/moderate/weak",
+    "reason": "훅 강도 판단 이유 1~2문장",
+    "title_hook_alignment": "영상 제목(또는 첫 자막)과 훅의 정합성 평가 1~2문장",
+    "product_appear_sec": 0.5,
+    "first_3s_energy": "첫 3초 시각 에너지 평가 (예: '정적인 제품 샷으로 시작하여 에너지 낮음')"
+  }},
   "hook_strengths": [
     {{"fact": "데이터에서 확인된 팩트", "comment": "왜 이게 이 제품에 효과적인지 맥락 설명", "related_scenes": [0]}}
   ],
@@ -500,8 +522,35 @@ async def run(
 
     re = llm_result.get("recipe_eval", {})
 
+    # 포지셔닝 파싱
+    pos_data = llm_result.get("positioning", {})
+    contrast_data = pos_data.get("contrast")
+    positioning = ContentPositioning(
+        unique_angle=pos_data.get("unique_angle", ""),
+        storytelling_format=pos_data.get("storytelling_format", ""),
+        why_it_works=pos_data.get("why_it_works", ""),
+        contrast=ContrastMechanism(
+            common_belief=contrast_data.get("common_belief", ""),
+            contrarian_reality=contrast_data.get("contrarian_reality", ""),
+        ) if contrast_data else None,
+    )
+
+    # 훅 분석 파싱
+    hook_data = llm_result.get("hook_analysis", {})
+    hook_analysis = HookAnalysis(
+        strength=hook_data.get("strength", "moderate"),
+        reason=hook_data.get("reason", ""),
+        title_hook_alignment=hook_data.get("title_hook_alignment", ""),
+        product_appear_sec=hook_data.get("product_appear_sec", recipe.meta.product_first_appear),
+        first_3s_energy=hook_data.get("first_3s_energy", ""),
+    )
+
+    re = llm_result.get("recipe_eval", {})
+
     output = EvaluationOutput(
         summary=llm_result.get("summary", ""),
+        positioning=positioning,
+        hook_analysis=hook_analysis,
         structure=structure,
         checklist=checklist,
         strengths=_parse_insights(llm_result.get("overall_strengths", [])),

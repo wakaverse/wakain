@@ -78,6 +78,42 @@ class RecipeEval(BaseModel):
     reason: str = Field(description="제안 이유 (한국어)")
 
 
+# ── 콘텐츠 포지셔닝 ──────────────────────────────────────────────────────
+
+
+class ContrastMechanism(BaseModel):
+    """통념 vs 반전 대비 구조."""
+
+    common_belief: str = Field(description="시청자의 일반적 통념")
+    contrarian_reality: str = Field(description="이 영상이 보여주는 반전")
+
+
+class ContentPositioning(BaseModel):
+    """콘텐츠 포지셔닝 분석."""
+
+    unique_angle: str = Field(description="이 영상의 차별화된 접근 각도 (1~2문장)")
+    storytelling_format: str = Field(description="스토리텔링 포맷 (예: 문제해결 리뷰, Before/After, 언박싱...)")
+    why_it_works: str = Field(description="이 포맷이 왜 효과적인지 (2~3문장)")
+    contrast: ContrastMechanism | None = Field(
+        default=None, description="대비 구조 (없으면 None)"
+    )
+
+
+# ── 훅 분석 ──────────────────────────────────────────────────────────────
+
+
+class HookAnalysis(BaseModel):
+    """훅 상세 분석."""
+
+    strength: str = Field(description="strong / moderate / weak")
+    reason: str = Field(description="훅 강도 판단 이유 (1~2문장)")
+    title_hook_alignment: str = Field(
+        description="제목과 훅의 정합성 평가 (1~2문장)"
+    )
+    product_appear_sec: float = Field(description="제품 첫 등장 (초)")
+    first_3s_energy: str = Field(description="첫 3초 시각 에너지 평가")
+
+
 # ── P13 최종 출력 ─────────────────────────────────────────────────────────
 
 
@@ -87,8 +123,14 @@ class EvaluationOutput(BaseModel):
     # 한 줄 요약
     summary: str = Field(
         description="영상 코칭 한 줄 요약 (한국어). "
-        "예: '감각 자극이 효과적인 식품 프로모션. 사회적 증거 추가 시 설득력 ↑'"
+        "예: '먹음직스러운 장면이 잘 살아있어요. 실제 후기 장면을 넣으면 신뢰감이 더 올라갑니다.'"
     )
+
+    # 콘텐츠 포지셔닝 (신규)
+    positioning: ContentPositioning = Field(description="콘텐츠 포지셔닝 분석")
+
+    # 훅 분석 (신규)
+    hook_analysis: HookAnalysis = Field(description="훅 상세 분석")
 
     # Hook / Body / CTA 구조 평가
     structure: StructureEval = Field(description="3단 구조 평가")
