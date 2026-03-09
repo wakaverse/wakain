@@ -118,6 +118,9 @@ async def run(
             _call_gemini(client, uploaded, first_half, output_language),
             _call_gemini(client, uploaded, second_half, output_language),
         )
+        # 2번째 콜의 scene_index를 offset만큼 보정
+        for s in scenes_2:
+            s.scene_index += mid
         all_scenes = scenes_1 + scenes_2
     else:
         # 1콜
