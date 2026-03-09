@@ -83,6 +83,54 @@ export interface SafeZone {
   reason: string;
 }
 
+// ─── P13 Evaluation types ───
+
+export interface ChecklistItem {
+  category: string;
+  item: string;
+  passed: boolean;
+  evidence: string;
+}
+
+export interface EvalInsight {
+  fact: string;
+  comment: string;
+  related_scenes: number[];
+}
+
+export interface EvalImprovement extends EvalInsight {
+  suggestion: string;
+}
+
+export interface SegmentEval {
+  time_range: [number, number];
+  scene_ids: number[];
+  block_types: string[];
+  strengths: EvalInsight[];
+  improvements: EvalImprovement[];
+}
+
+export interface StructureEval {
+  hook: SegmentEval;
+  body: SegmentEval;
+  cta: SegmentEval;
+}
+
+export interface RecipeEval {
+  current: string[];
+  suggestion: string;
+  reason: string;
+}
+
+export interface Evaluation {
+  summary: string;
+  checklist: ChecklistItem[];
+  structure: StructureEval;
+  strengths: EvalInsight[];
+  improvements: EvalImprovement[];
+  recipe_eval: RecipeEval;
+}
+
 export interface RecipeJSON {
   schema_version: string;
   summary: {
@@ -171,4 +219,5 @@ export interface RecipeJSON {
     analyzed_at: string;
     model_versions: Record<string, string>;
   };
+  evaluation?: Evaluation;
 }

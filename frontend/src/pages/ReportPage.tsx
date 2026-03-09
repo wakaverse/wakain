@@ -2,19 +2,15 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2, Copy, Check, RefreshCw } from 'lucide-react';
 import { getResult, addLibraryItem } from '../lib/api';
-import type { RecipeJSON } from '../types/recipe';
+import type { RecipeJSON, ScriptBlock } from '../types/recipe';
 import type { LibraryItem } from '../types';
 import SummarySection from '../components/Report/SummarySection';
+import EvaluationSection from '../components/Report/EvaluationSection';
+import StructureSection from '../components/Report/StructureSection';
 import ProductSection from '../components/Report/ProductSection';
-import ScriptSection from '../components/Report/ScriptSection';
-import VisualSection from '../components/Report/VisualSection';
-import EngagementSection from '../components/Report/EngagementSection';
-import AttentionCurveSection from '../components/Report/AttentionCurveSection';
-import { formatTime, BLOCK_LABELS } from '../lib/recipe-utils';
+import { formatTime, BLOCK_LABELS, BLOCK_EVAL_COLORS } from '../lib/recipe-utils';
 
 /* ── Main Component ───────────────────────── */
-
-type Tab = 'analysis' | 'scenes';
 
 export default function ReportPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +20,6 @@ export default function ReportPage() {
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>('analysis');
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -100,6 +95,8 @@ export default function ReportPage() {
     );
   }
 
+  const hasEvaluation = !!recipe.evaluation;
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="lg:flex lg:gap-6">
@@ -134,46 +131,36 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Right column: Analysis results */}
+        {/* Right column: Single view */}
         <div className="flex-1 min-w-0">
           {/* Mobile: Recipe flow summary */}
           <div className="lg:hidden">
             <RecipeFlowSummary recipe={recipe} />
           </div>
 
-          {/* Tabs */}
-          <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
-            <TabButton active={tab === 'analysis'} onClick={() => setTab('analysis')}>분석 결과</TabButton>
-            <TabButton active={tab === 'scenes'} onClick={() => setTab('scenes')}>씬 뷰</TabButton>
-          </div>
+          <div className="space-y-4">
+            {/* 1. Evaluation (coaching) or fallback to Summary */}
+            {hasEvaluation ? (
+              <EvaluationSection data={recipe} />
+            ) : (
+              <SummarySection data={recipe} />
+            )}
 
-          {/* Tab content */}
-          {tab === 'analysis' && (
-            <AnalysisTab recipe={recipe} seekTo={seekTo} thumbnails={thumbnails} />
-          )}
-          {tab === 'scenes' && (
-            <ScenesTab recipe={recipe} seekTo={seekTo} thumbnails={thumbnails} />
-          )}
+            {/* 2. Structure (energy graph + block bar + coaching) */}
+            <StructureSection data={recipe} seekTo={seekTo} />
+
+            {/* 3. Scene cards (with utterances) */}
+            <SceneCards recipe={recipe} seekTo={seekTo} thumbnails={thumbnails} />
+
+            {/* 4. Product */}
+            <ProductSection data={recipe} seekTo={seekTo} />
+
+            {/* 5. Recipe card (current → suggestion) */}
+            <RecipeCard recipe={recipe} />
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-/* ── Tab button ─────────────────────────────── */
-
-function TabButton({ active, onClick, children }: {
-  active: boolean; onClick: () => void; children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-        active ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-      }`}
-    >
-      {children}
-    </button>
   );
 }
 
@@ -198,141 +185,141 @@ function RecipeFlowSummary({ recipe }: { recipe: RecipeJSON }) {
   );
 }
 
-/* ── Tab: 분석 결과 ─────────────────────────── */
+/* ── Scene cards with utterances ─────────────── */
 
-function AnalysisTab({ recipe, seekTo, thumbnails }: {
-  recipe: RecipeJSON; seekTo: (s: number) => void; thumbnails: Record<string, string>;
-}) {
-  return (
-    <div className="space-y-4">
-      <SummarySection data={recipe} />
-      <ProductSection data={recipe} seekTo={seekTo} />
-      <ScriptSection data={recipe} seekTo={seekTo} />
-      <VisualSection data={recipe} seekTo={seekTo} thumbnails={thumbnails} />
-
-      {/* Engagement */}
-      <div>
-        <p className="text-sm font-semibold text-gray-900 mb-3">인게이지먼트</p>
-        <EngagementSection data={recipe} seekTo={seekTo} />
-      </div>
-
-      <AttentionCurveSection data={recipe} />
-
-      {/* Recipe action card */}
-      <RecipeActionCard recipe={recipe} />
-    </div>
-  );
+function getBlocksForScene(
+  blocks: ScriptBlock[],
+  sceneStart: number,
+  sceneEnd: number,
+): ScriptBlock[] {
+  return blocks.filter((b) => {
+    const bStart = b.time_range[0];
+    const bEnd = b.time_range[1];
+    // Overlap check
+    return bStart < sceneEnd && bEnd > sceneStart;
+  });
 }
 
-/* ── Tab: 씬 뷰 (V2 scenes) ────────────────── */
-
-function ScenesTab({ recipe, seekTo, thumbnails }: {
-  recipe: RecipeJSON; seekTo: (s: number) => void; thumbnails: Record<string, string>;
+function SceneCards({ recipe, seekTo, thumbnails }: {
+  recipe: RecipeJSON;
+  seekTo: (s: number) => void;
+  thumbnails: Record<string, string>;
 }) {
   const scenes = recipe.visual.scenes;
-  const duration = recipe.meta.duration;
+  const blocks = recipe.script.blocks;
+
+  if (!scenes.length) return null;
 
   return (
-    <div className="space-y-4">
-      {/* Attention curve chart */}
-      <AttentionCurveSection data={recipe} />
+    <div className="space-y-3">
+      <p className="text-sm font-semibold text-gray-900">씬 분석</p>
+      {scenes.map((scene) => {
+        const matchedBlocks = getBlocksForScene(blocks, scene.time_range[0], scene.time_range[1]);
 
-      {/* Timeline overview */}
-      {duration > 0 && scenes.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-4">
-          <div className="flex items-center gap-0.5 overflow-x-auto pb-2">
-            {scenes.map((scene) => {
-              const dur = scene.time_range[1] - scene.time_range[0];
-              const pct = (dur / duration) * 100;
-              return (
-                <button
-                  key={scene.scene_id}
-                  onClick={() => seekTo(scene.time_range[0])}
-                  className="h-7 rounded bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center text-[9px] text-gray-500 font-mono shrink-0"
-                  style={{ minWidth: '24px', width: `${Math.max(pct, 3)}%` }}
-                  title={`${formatTime(scene.time_range[0])}–${formatTime(scene.time_range[1])}${scene.role ? ` (${scene.role})` : ''}`}
-                >
-                  {scene.role || scene.scene_id}
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex justify-between text-[9px] text-gray-300 mt-1 px-0.5">
-            <span>0:00</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-          <p className="text-xs text-gray-400 mt-1">
-            {recipe.visual.rhythm.total_cuts}컷 · 평균 {recipe.visual.rhythm.avg_cut_duration.toFixed(1)}초/컷
-          </p>
-        </div>
-      )}
-
-      {/* Scene cards */}
-      {scenes.map((scene) => (
-        <div
-          key={scene.scene_id}
-          className="bg-white rounded-2xl border border-gray-100 p-4 hover:border-gray-200 transition-colors cursor-pointer group"
-          onClick={() => seekTo(scene.time_range[0])}
-        >
-          <div className="flex items-start gap-3">
-            <div className="w-24 h-16 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 overflow-hidden">
-              {thumbnails[String(scene.scene_id)] ? (
-                <img src={thumbnails[String(scene.scene_id)]} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-lg font-bold text-gray-200">
-                  {String(scene.scene_id).padStart(2, '0')}
-                </span>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[11px] font-mono text-gray-400">
-                  {formatTime(scene.time_range[0])}–{formatTime(scene.time_range[1])}
-                </span>
-                {scene.role && (
-                  <span className="text-[10px] font-medium px-2 py-0.5 bg-gray-900 text-white rounded-full">
-                    {scene.role}
-                  </span>
-                )}
-                {scene.style && (
-                  <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                    {scene.style}
+        return (
+          <div
+            key={scene.scene_id}
+            className="bg-white rounded-2xl border border-gray-100 p-4 hover:border-gray-200 transition-colors cursor-pointer group"
+            onClick={() => seekTo(scene.time_range[0])}
+          >
+            {/* Top: thumbnail + visual info */}
+            <div className="flex items-start gap-3">
+              <div className="w-24 h-16 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 overflow-hidden">
+                {thumbnails[String(scene.scene_id)] ? (
+                  <img src={thumbnails[String(scene.scene_id)]} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-lg font-bold text-gray-200">
+                    {String(scene.scene_id).padStart(2, '0')}
                   </span>
                 )}
               </div>
-              {scene.description && (
-                <p className="text-sm text-gray-700 leading-relaxed mb-1.5">{scene.description}</p>
-              )}
-              {scene.visual_forms.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {scene.visual_forms.map((f, j) => (
-                    <span key={j} className="text-[10px] px-2 py-0.5 bg-gray-50 text-gray-500 rounded-full">
-                      {f.form}({f.method})
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[11px] font-mono text-gray-400">
+                    {formatTime(scene.time_range[0])}–{formatTime(scene.time_range[1])}
+                  </span>
+                  {scene.role && (
+                    <span className="text-[10px] font-medium px-2 py-0.5 bg-gray-900 text-white rounded-full">
+                      {scene.role}
                     </span>
-                  ))}
+                  )}
+                  {scene.style && (
+                    <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+                      {scene.style}
+                    </span>
+                  )}
                 </div>
-              )}
-              <div className="text-[10px] text-gray-400 mt-1">
-                {scene.production.dominant_shot_type} · {scene.production.dominant_color_tone}
+                {scene.description && (
+                  <p className="text-sm text-gray-700 leading-relaxed mb-1.5">{scene.description}</p>
+                )}
+                {scene.visual_forms.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {scene.visual_forms.map((f, j) => (
+                      <span key={j} className="text-[10px] px-2 py-0.5 bg-gray-50 text-gray-500 rounded-full">
+                        {f.form}({f.method})
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <span className="text-xs text-gray-400">▶</span>
               </div>
             </div>
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-              <span className="text-xs text-gray-400">▶</span>
-            </div>
+
+            {/* Bottom: utterances with block type color line */}
+            {matchedBlocks.length > 0 && (
+              <div className="mt-3 border-t border-gray-50 pt-3 space-y-2">
+                {matchedBlocks.map((block, bi) => {
+                  const color = BLOCK_EVAL_COLORS[block.block] || '#6B7280';
+                  return (
+                    <div key={bi} className="flex gap-2">
+                      <div
+                        className="w-1 rounded-full shrink-0"
+                        style={{ backgroundColor: color }}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <span
+                          className="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: `${color}18`,
+                            color: color,
+                          }}
+                        >
+                          {BLOCK_LABELS[block.block] || block.block}
+                        </span>
+                        {block.utterances?.length ? (
+                          <div className="mt-1 space-y-0.5">
+                            {block.utterances.map((u, ui) => (
+                              <p key={ui} className="text-xs text-gray-600 leading-relaxed">
+                                {u}
+                              </p>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">
+                            {block.text}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
-/* ── Recipe action card ─────────────────────── */
+/* ── Recipe card (current → suggestion) ────── */
 
-function RecipeActionCard({ recipe }: {
-  recipe: RecipeJSON;
-}) {
+function RecipeCard({ recipe }: { recipe: RecipeJSON }) {
   const [copied, setCopied] = useState(false);
   const flowOrder = recipe.script.flow_order;
+  const recipeEval = recipe.evaluation?.recipe_eval;
 
   if (!flowOrder?.length) return null;
 
@@ -348,11 +335,20 @@ function RecipeActionCard({ recipe }: {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       <p className="text-sm font-semibold text-gray-900 mb-3">레시피</p>
-      <div className="bg-[#fafafa] rounded-xl px-4 py-3 mb-4">
+
+      {/* Current recipe */}
+      <div className="bg-[#fafafa] rounded-xl px-4 py-3 mb-3">
+        <div className="text-[10px] text-gray-400 mb-1.5">현재</div>
         <div className="flex flex-wrap items-center gap-1.5">
           {flowOrder.map((block, i) => (
             <span key={i} className="flex items-center gap-1.5">
-              <span className="text-sm font-medium text-gray-800">
+              <span
+                className="text-xs font-medium px-2 py-0.5 rounded-full"
+                style={{
+                  backgroundColor: `${BLOCK_EVAL_COLORS[block] || '#6B7280'}18`,
+                  color: BLOCK_EVAL_COLORS[block] || '#6B7280',
+                }}
+              >
                 {BLOCK_LABELS[block] || block}
               </span>
               {i < flowOrder.length - 1 && (
@@ -362,6 +358,16 @@ function RecipeActionCard({ recipe }: {
           ))}
         </div>
       </div>
+
+      {/* Suggestion (if evaluation exists) */}
+      {recipeEval && (
+        <div className="bg-blue-50 rounded-xl px-4 py-3 mb-3">
+          <div className="text-[10px] text-blue-500 mb-1.5">제안</div>
+          <p className="text-sm text-blue-800 leading-relaxed">{recipeEval.suggestion}</p>
+          <p className="text-xs text-blue-600 mt-1">{recipeEval.reason}</p>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-2">
         <button
           onClick={handleCopy}

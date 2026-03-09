@@ -34,6 +34,17 @@ export const BLOCK_BORDER_COLORS: Record<string, string> = {
 
 export const BLOCK_HEX = BLOCK_BORDER_COLORS;
 
+// Evaluation-specific block colors (brighter palette)
+export const BLOCK_EVAL_COLORS: Record<string, string> = {
+  hook: '#EF4444',
+  benefit: '#3B82F6',
+  proof: '#10B981',
+  differentiation: '#8B5CF6',
+  social_proof: '#F59E0B',
+  cta: '#EC4899',
+  authority: '#8B5CF6',
+};
+
 // ─── Style colors ───
 
 export const STYLE_BAR_COLORS: Record<string, string> = {
