@@ -276,7 +276,7 @@ def _build_recipe_summary(recipe: RecipeJSON) -> dict:
             "blocks": [
                 {"block": b.block.value if hasattr(b.block, "value") else str(b.block),
                  "time_range": list(b.time_range),
-                 "text": b.text[:100]}
+                 "text": b.text}
                 for b in recipe.script.blocks
             ],
         },
@@ -287,7 +287,7 @@ def _build_recipe_summary(recipe: RecipeJSON) -> dict:
         "scenes": [
             {"scene_id": s.scene_id, "time_range": list(s.time_range),
              "style": s.style, "role": s.role,
-             "description": (s.description or "")[:80]}
+             "description": s.description or ""}
             for s in recipe.scenes
         ],
         "meta": {
