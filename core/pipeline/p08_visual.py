@@ -2,7 +2,7 @@
 
 영상 전체 + P3 씬 경계를 gemini-2.5-flash에 보내
 씬별 style, style_sub, role, visual_forms, description을 분석한다.
-씬 >10개면 2콜 분할, ≤10개면 1콜.
+전체 씬을 1콜로 분석.
 """
 
 from __future__ import annotations
@@ -108,23 +108,8 @@ async def run(
     client = make_client(api_key)
     uploaded = upload_video(video_path, client=client)
 
-    if len(scene_boundaries) > 10:
-        # 2콜 분할
-        mid = len(scene_boundaries) // 2
-        first_half = scene_boundaries[:mid]
-        second_half = scene_boundaries[mid:]
-
-        scenes_1, scenes_2 = await asyncio.gather(
-            _call_gemini(client, uploaded, first_half, output_language),
-            _call_gemini(client, uploaded, second_half, output_language),
-        )
-        # 2번째 콜의 scene_index를 offset만큼 보정
-        for s in scenes_2:
-            s.scene_index += mid
-        all_scenes = scenes_1 + scenes_2
-    else:
-        # 1콜
-        all_scenes = await _call_gemini(client, uploaded, scene_boundaries, output_language)
+    # 1콜로 전체 씬 분석 (Gemini 2.5 Flash 응답 길이 충분)
+    all_scenes = await _call_gemini(client, uploaded, scene_boundaries, output_language)
 
     result = VisualOutput(scenes=all_scenes)
 
