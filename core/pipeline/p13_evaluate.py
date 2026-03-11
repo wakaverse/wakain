@@ -304,7 +304,7 @@ def _build_recipe_summary(recipe: RecipeJSON) -> dict:
             "platform": recipe.meta.platform.value if hasattr(recipe.meta.platform, "value") else str(recipe.meta.platform),
             "product_first_appear": recipe.meta.product_first_appear,
         },
-        "script_alpha_summary": recipe.script.alpha_summary if hasattr(recipe.script, "alpha_summary") else {},
+        "script_alpha_summary": recipe.script.alpha_summary.model_dump(mode="json") if hasattr(recipe.script, "alpha_summary") and recipe.script.alpha_summary else {},
         "engagement": {
             "hook_strength": recipe.engagement.retention_analysis.hook_strength.value
             if hasattr(recipe.engagement.retention_analysis.hook_strength, "value")
