@@ -1,4 +1,4 @@
-"""P10: SCRIPT — 대본 블록(7종) + 화법(α기법 21종) 분석.
+"""P10: SCRIPT — 대본 블록(10종) + 화법(α기법 21종) 분석.
 
 P1 STT 전체 텍스트(타임스탬프 포함) + P7 claims를
 gemini-2.5-flash에 보내 대본 블록 구조 + 화법을 분석한다.
@@ -43,7 +43,7 @@ PROMPT_TEMPLATE = """You are a script structure analyst for shortform marketing 
 
 ## Task: Break script into persuasion blocks.
 
-Block types (뼈대 7종):
+Block types (뼈대 10종):
 - hook: 첫 3초 시청자 주의 포착
 - authority: 권위/신뢰 부여
 - benefit: 핵심 베네핏 (sub: sensory/functional/emotional/process)
@@ -51,6 +51,9 @@ Block types (뼈대 7종):
 - differentiation: 차별화
 - social_proof: 사회적 증거
 - cta: 행동 유도
+- pain_point: 문제 제기, 공감 유도 ('이런 거 불편하셨죠?')
+- demo: 사용법/시연 ('이렇게 바르시면 됩니다')
+- promotion: 할인/혜택/한정 ('오늘만 50% 할인')
 
 Alpha techniques (화법) — for EACH block:
   emotion: empathy/fomo/anticipation/relief/curiosity/pride/nostalgia/frustration/null
@@ -186,6 +189,10 @@ async def run(
 
 
 _VALID_BENEFIT_SUBS = {"sensory", "functional", "emotional", "process"}
+_VALID_BLOCK_TYPES = {
+    "hook", "authority", "benefit", "proof", "differentiation",
+    "social_proof", "cta", "pain_point", "demo", "promotion",
+}
 
 
 def _normalize_response(data: dict) -> None:
@@ -195,6 +202,11 @@ def _normalize_response(data: dict) -> None:
         data["blocks"] = data.pop("persuasion_blocks")
 
     for block in data.get("blocks", []):
+        # block type: 유효하지 않은 값 → benefit 폴백
+        btype = block.get("block")
+        if btype and btype not in _VALID_BLOCK_TYPES:
+            block["block"] = "benefit"
+
         # product_claim_ref: list → 첫 번째 문자열로
         ref = block.get("product_claim_ref")
         if isinstance(ref, list):

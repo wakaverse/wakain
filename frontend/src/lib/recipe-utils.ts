@@ -20,7 +20,9 @@ export const BLOCK_LABELS: Record<string, string> = {
   differentiation: '차별점',
   social_proof: '후기/반응',
   cta: '행동 유도',
-  promotion: '프로모션',
+  pain_point: '문제/공감',
+  demo: '시연/사용법',
+  promotion: '할인/혜택',
 };
 
 export const BLOCK_BORDER_COLORS: Record<string, string> = {
@@ -31,6 +33,9 @@ export const BLOCK_BORDER_COLORS: Record<string, string> = {
   differentiation: '#6940A5',
   social_proof: '#DFAB01',
   cta: '#D9730D',
+  pain_point: '#DC2626',
+  demo: '#059669',
+  promotion: '#F97316',
 };
 
 export const BLOCK_HEX = BLOCK_BORDER_COLORS;
@@ -44,6 +49,8 @@ export const BLOCK_EVAL_COLORS: Record<string, string> = {
   social_proof: '#F59E0B',
   cta: '#EC4899',
   authority: '#6366f1',
+  pain_point: '#DC2626',
+  demo: '#059669',
   promotion: '#F97316',
 };
 

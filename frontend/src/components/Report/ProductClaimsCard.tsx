@@ -20,6 +20,14 @@ const TYPE_COLORS: Record<string, string> = {
   value: '#EC4899',
 };
 
+const STRATEGY_LABELS: Record<string, string> = {
+  experience_shift: '경험 전환',
+  loss_aversion: '손실 회피',
+  info_preempt: '정보 선점',
+  social_evidence: '사회적 증거',
+  price_anchor: '가격 앵커링',
+};
+
 export default function ProductClaimsCard({ data }: Props) {
   const claims = data.product.claims;
   const { product_exposure_pct, product_first_appear } = data.meta;
@@ -71,11 +79,24 @@ export default function ProductClaimsCard({ data }: Props) {
                   </div>
                 </div>
               </div>
-              <div className="pl-12 space-y-0.5">
+              <div className="pl-12 space-y-1.5">
                 {items.map((c, i) => (
-                  <p key={i} className="text-sm text-gray-600 leading-relaxed">
-                    {c.claim}
-                  </p>
+                  <div key={i}>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {c.claim}
+                    </p>
+                    {c.translation && (
+                      <div className="flex items-start gap-1.5 mt-0.5 ml-2">
+                        <span className="text-xs text-gray-400 shrink-0">→</span>
+                        <p className="text-xs text-gray-500 leading-relaxed">{c.translation}</p>
+                        {c.strategy && (
+                          <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 font-medium">
+                            {STRATEGY_LABELS[c.strategy] || c.strategy}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>

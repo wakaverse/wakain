@@ -242,7 +242,7 @@ class VideoStyleSubSensory(StrEnum):
     OTHER = "other"
 
 
-# ── 대본 뼈대 블록 (7종) ──────────────────────────────────────────────────
+# ── 대본 뼈대 블록 (10종) ─────────────────────────────────────────────────
 
 
 class BlockType(StrEnum):
@@ -253,6 +253,9 @@ class BlockType(StrEnum):
     DIFFERENTIATION = "differentiation"  # 차별화
     SOCIAL_PROOF = "social_proof"        # 사회적 증거
     CTA = "cta"                          # 행동 유도
+    PAIN_POINT = "pain_point"            # 문제/공감 제기
+    DEMO = "demo"                        # 시연/사용법
+    PROMOTION = "promotion"              # 할인/혜택/한정
 
 
 class BenefitSub(StrEnum):
@@ -328,6 +331,14 @@ class ClaimSource(StrEnum):
     TEXT_OVERLAY = "text_overlay"
     VISUAL = "visual"
     SCRIPT_VISUAL = "script+visual"
+
+
+class PersuasionStrategy(StrEnum):
+    EXPERIENCE_SHIFT = "experience_shift"    # 경험 전환형: 스펙→일상 경험
+    LOSS_AVERSION = "loss_aversion"          # 손실 회피형: 안 사면 손해
+    INFO_PREEMPT = "info_preempt"            # 정보 선점형: 정보→신뢰→전환
+    SOCIAL_EVIDENCE = "social_evidence"      # 사회적 증거형: 타인 반응
+    PRICE_ANCHOR = "price_anchor"            # 가격 앵커링형: 비교 가격
 
 
 # ── 영상 연출 ─────────────────────────────────────────────────────────────

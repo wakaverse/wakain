@@ -7,6 +7,9 @@ export interface ProductClaim {
   verifiable: boolean;
   time_range: [number, number];
   source: string;
+  // 2계층 — 설득 번역
+  translation?: string;
+  strategy?: string;
 }
 
 export interface ScriptBlock {

@@ -26,6 +26,7 @@ from core.schemas.evaluation import (
     SegmentEval,
     StructureEval,
 )
+from core.schemas.enums import PersuasionStrategy
 from core.schemas.recipe import RecipeJSON
 
 logger = logging.getLogger(__name__)
@@ -377,7 +378,14 @@ Provide coaching insights in **{output_language}** as JSON with this exact struc
     "current": ["hook", "benefit", "proof", "cta"],
     "suggestion": "개선 제안 (한국어)",
     "reason": "제안 이유 (한국어)"
-  }}
+  }},
+  "claim_translations": [
+    {{
+      "claim_text": "원본 claim 텍스트 (product.claims에서 가져온 것)",
+      "translation": "이 스펙이 영상에서 소비자 경험으로 어떻게 번역되었는지 (예: '세라마이드 3종 함유' → '세수 후에도 당기지 않는 촉촉함')",
+      "strategy": "experience_shift | loss_aversion | info_preempt | social_evidence | price_anchor"
+    }}
+  ]
 }}
 
 ## Guidelines
@@ -387,6 +395,14 @@ Provide coaching insights in **{output_language}** as JSON with this exact struc
 - Keep insights actionable and specific, not generic.
 - Each section should have 1-3 items.
 - recipe_eval.current should reflect the actual flow_order.
+- For claim_translations: analyze how each product claim (spec/fact) was translated into
+  consumer experience in the video. Strategies:
+  - experience_shift: 스펙→일상 경험으로 전환 ("세라마이드 3종" → "세수 후 촉촉함")
+  - loss_aversion: 안 사면 손해 ("이거 안 쓰면 피부 건조해질 수 있어요")
+  - info_preempt: 정보 선점→신뢰 구축 ("성분표 직접 보여드릴게요")
+  - social_evidence: 타인 반응/후기 ("댓글에 다들 재구매한다고...")
+  - price_anchor: 가격 비교/앵커링 ("백화점 제품 반값")
+  - If no translation is evident in the video, skip that claim.
 - Respond in {output_language}.
 
 ## Tone & Language (IMPORTANT)
@@ -471,6 +487,30 @@ def _parse_insights(items: list[dict]) -> list[Insight]:
     ]
 
 
+_VALID_STRATEGIES = {s.value for s in PersuasionStrategy}
+
+
+def _apply_claim_translations(recipe: RecipeJSON, translations: list[dict]) -> None:
+    """LLM claim_translations 결과를 recipe.product.claims에 매핑."""
+    if not translations:
+        return
+    # claim_text → (translation, strategy) 매핑
+    trans_map: dict[str, tuple[str, str | None]] = {}
+    for t in translations:
+        ct = t.get("claim_text", "")
+        tr = t.get("translation", "")
+        st = t.get("strategy")
+        if ct and tr:
+            trans_map[ct] = (tr, st if st in _VALID_STRATEGIES else None)
+
+    for claim in recipe.product.claims:
+        match = trans_map.get(claim.claim)
+        if match:
+            claim.translation = match[0]
+            if match[1]:
+                claim.strategy = PersuasionStrategy(match[1])
+
+
 def _parse_improvements(items: list[dict]) -> list[Improvement]:
     return [
         Improvement(
@@ -512,7 +552,10 @@ async def run(
     llm_result, usage = await _call_llm(recipe, checklist, structure, api_key)
     logger.info("LLM 코칭 완료")
 
-    # 4. 조립
+    # 4. claim 설득 번역 매핑
+    _apply_claim_translations(recipe, llm_result.get("claim_translations", []))
+
+    # 5. 조립
     structure.hook.strengths = _parse_insights(llm_result.get("hook_strengths", []))
     structure.hook.improvements = _parse_improvements(llm_result.get("hook_improvements", []))
     structure.body.strengths = _parse_insights(llm_result.get("body_strengths", []))

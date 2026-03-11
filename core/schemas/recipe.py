@@ -21,6 +21,7 @@ from core.schemas.enums import (
     FaceExposure,
     HookStrength,
     HumanPresenceType,
+    PersuasionStrategy,
     Platform,
     RiskLevel,
     ShotType,
@@ -48,6 +49,9 @@ class RecipeClaim(BaseModel):
     verifiable: bool = Field(description="검증 가능 여부")
     time_range: list[float] = Field(description="[시작, 종료]")
     source: ClaimSource = Field(description="소스")
+    # 2계층 — 설득 번역
+    translation: str | None = Field(default=None, description="소비자 경험으로 번역된 표현")
+    strategy: PersuasionStrategy | None = Field(default=None, description="설득 전략 유형")
 
 
 class RecipeProduct(BaseModel):
