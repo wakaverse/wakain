@@ -220,12 +220,23 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
                 "summary_json": summary,
                 "thumbnails_json": thumbnails_json,
             }
-            _supabase().table("results").insert(insert_data).execute()
+            resp = _supabase().table("results").insert(insert_data).execute()
+            result_id = resp.data[0]["id"] if resp.data else None
         except Exception as exc:
             print(f"[pipeline:{job_id[:8]}] ⚠️ Results insert failed: {exc}", flush=True)
             import traceback
             traceback.print_exc()
             raise
+
+        # Save normalized analysis data (claims + blocks)
+        if result_id and recipe_json:
+            try:
+                _save_normalized_data(result_id, recipe_json, job_id)
+            except Exception as exc:
+                print(f"[pipeline:{job_id[:8]}] ⚠️ Normalized data insert failed: {exc}", flush=True)
+                import traceback
+                traceback.print_exc()
+                # Non-fatal: don't fail the job
 
         # Mark job completed
         _update_job(job_id, status="completed", completed_at=_now())
@@ -302,3 +313,92 @@ def _build_summary(recipe_json: dict) -> dict:
         "block_count": len(script.get("blocks", [])),
         "flow_order": script.get("flow_order", []),
     }
+
+
+# ── 카테고리 ID 매핑 ──────────────────────────────────────────────────────
+
+_CATEGORY_KO_TO_ID = {
+    "식품": "food", "전자제품": "electronics", "뷰티": "beauty",
+    "패션": "fashion", "건강": "health", "건강/의료": "health",
+    "생활": "home", "생활/가전": "home", "스포츠": "sports",
+    "스포츠/레저": "sports", "교육": "education", "금융": "finance",
+    "금융/보험": "finance", "여행": "travel", "유아": "kids",
+    "유아/아동": "kids", "반려동물": "pet", "자동차": "auto",
+    "엔터테인먼트": "entertainment",
+}
+
+
+def _resolve_category_id(recipe_json: dict) -> str | None:
+    """recipe_json에서 카테고리 ID를 추출."""
+    identity = recipe_json.get("identity", {})
+    cat_ko = identity.get("category_ko", "")
+    if not cat_ko:
+        return None
+    # 정확 매칭
+    if cat_ko in _CATEGORY_KO_TO_ID:
+        return _CATEGORY_KO_TO_ID[cat_ko]
+    # 부분 매칭
+    for k, v in _CATEGORY_KO_TO_ID.items():
+        if k in cat_ko or cat_ko in k:
+            return v
+    return "other"
+
+
+def _save_normalized_data(result_id: str, recipe_json: dict, job_id: str) -> None:
+    """분석 결과를 정규화 테이블(analysis_claims, analysis_blocks)에 저장."""
+    sb = _supabase()
+    category_id = _resolve_category_id(recipe_json)
+    product = recipe_json.get("product", {})
+    script = recipe_json.get("script", {})
+
+    # ── Claims INSERT ──
+    claims = product.get("claims", [])
+    claim_rows = []
+    for c in claims:
+        claim_rows.append({
+            "result_id": result_id,
+            "claim": c.get("claim", ""),
+            "claim_type": c.get("type"),
+            "claim_layer": c.get("layer"),
+            "verifiable": c.get("verifiable"),
+            "source": c.get("source"),
+            "translation": c.get("translation"),
+            "strategy": c.get("strategy"),
+            "category_id": category_id,
+        })
+
+    claim_id_map: dict[str, str] = {}  # claim text → DB id
+    if claim_rows:
+        resp = sb.table("analysis_claims").insert(claim_rows).execute()
+        if resp.data:
+            for row in resp.data:
+                claim_id_map[row["claim"]] = row["id"]
+        print(f"[pipeline:{job_id[:8]}] 💾 {len(claim_rows)} claims saved", flush=True)
+
+    # ── Blocks INSERT ──
+    blocks = script.get("blocks", [])
+    block_rows = []
+    for i, b in enumerate(blocks):
+        # block → claim FK 연결
+        claim_ref = b.get("product_claim_ref", "")
+        claim_id = claim_id_map.get(claim_ref)
+
+        alpha = b.get("alpha", {})
+        block_rows.append({
+            "result_id": result_id,
+            "claim_id": claim_id,
+            "block_order": i,
+            "block_type": b.get("block", ""),
+            "block_text": b.get("text", ""),
+            "alpha_emotion": alpha.get("emotion"),
+            "alpha_structure": alpha.get("structure"),
+            "alpha_connection": alpha.get("connection"),
+            "product_claim_ref": claim_ref or None,
+            "benefit_sub": b.get("benefit_sub"),
+            "category_id": category_id,
+            "time_range": b.get("time_range"),
+        })
+
+    if block_rows:
+        sb.table("analysis_blocks").insert(block_rows).execute()
+        print(f"[pipeline:{job_id[:8]}] 💾 {len(block_rows)} blocks saved", flush=True)
