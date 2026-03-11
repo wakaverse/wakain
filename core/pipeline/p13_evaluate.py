@@ -260,58 +260,59 @@ def _build_structure(recipe: RecipeJSON) -> StructureEval:
 
 
 def _build_recipe_summary(recipe: RecipeJSON) -> dict:
-    """LLM에 전달할 recipe 요약본. 전체 대비 ~85% 토큰 절약."""
+    """LLM에 전달할 recipe 요약본. model_dump로 안전하게 직렬화."""
+    full = recipe.model_dump(mode="json")
     return {
         "identity": {
-            "name": recipe.identity.name,
-            "brand": recipe.identity.brand,
-            "category_ko": recipe.identity.category_ko,
-            "sub_category_ko": recipe.identity.sub_category_ko,
-            "target_audience": recipe.identity.target_audience,
+            k: full["identity"].get(k)
+            for k in ("name", "brand", "category_ko", "sub_category_ko", "target_audience")
         },
         "product": {
             "claims": [
-                {"type": c.type.value if hasattr(c.type, "value") else str(c.type),
-                 "claim": c.claim, "layer": c.layer.value if hasattr(c.layer, "value") else str(c.layer)}
-                for c in recipe.product.claims
+                {"type": c.get("type"), "claim": c.get("claim"), "layer": c.get("layer")}
+                for c in full["product"].get("claims", [])
             ],
         },
         "script": {
-            "flow_order": [b.value if hasattr(b, "value") else str(b) for b in recipe.script.flow_order],
+            "flow_order": full["script"].get("flow_order", []),
             "blocks": [
-                {"block": b.block.value if hasattr(b.block, "value") else str(b.block),
-                 "time_range": list(b.time_range),
-                 "text": b.text,
-                 "utterances": [
-                     {"text": u.text, "time_range": list(u.time_range)}
-                     for u in b.utterances
-                 ]}
-                for b in recipe.script.blocks
+                {
+                    "block": b.get("block"),
+                    "time_range": b.get("time_range"),
+                    "text": b.get("text"),
+                    "utterances": [
+                        {"text": u.get("text"), "time_range": u.get("time_range")}
+                        for u in b.get("utterances", [])
+                    ],
+                }
+                for b in full["script"].get("blocks", [])
             ],
         },
         "visual": {
-            "style_distribution": recipe.visual.style_distribution,
-            "style_primary": recipe.visual.style_primary,
+            "style_distribution": full["visual"].get("style_distribution"),
+            "style_primary": full["visual"].get("style_primary"),
         },
         "scenes": [
-            {"scene_id": s.scene_id, "time_range": list(s.time_range),
-             "style": s.style, "role": s.role,
-             "description": s.description or ""}
-            for s in recipe.scenes
+            {
+                "scene_id": s.get("scene_id"),
+                "time_range": s.get("time_range"),
+                "style": s.get("style"),
+                "role": s.get("role"),
+                "description": s.get("description", ""),
+            }
+            for s in full.get("scenes", [])
         ],
         "meta": {
-            "duration": recipe.meta.duration,
-            "platform": recipe.meta.platform.value if hasattr(recipe.meta.platform, "value") else str(recipe.meta.platform),
-            "product_first_appear": recipe.meta.product_first_appear,
+            "duration": full["meta"].get("duration"),
+            "platform": full["meta"].get("platform"),
+            "product_first_appear": full["meta"].get("product_first_appear"),
         },
-        "script_alpha_summary": recipe.script.alpha_summary.model_dump(mode="json") if hasattr(recipe.script, "alpha_summary") and recipe.script.alpha_summary else {},
+        "script_alpha_summary": full["script"].get("alpha_summary", {}),
         "engagement": {
-            "hook_strength": recipe.engagement.retention_analysis.hook_strength.value
-            if hasattr(recipe.engagement.retention_analysis.hook_strength, "value")
-            else str(recipe.engagement.retention_analysis.hook_strength),
-            "hook_reason": recipe.engagement.retention_analysis.hook_reason or "",
+            "hook_strength": full["engagement"].get("retention_analysis", {}).get("hook_strength", ""),
+            "hook_reason": full["engagement"].get("retention_analysis", {}).get("hook_reason", ""),
         },
-        "product_exposure_pct": recipe.meta.product_exposure_pct if hasattr(recipe.meta, "product_exposure_pct") else 0,
+        "product_exposure_pct": full["meta"].get("product_exposure_pct", 0),
     }
 
 
