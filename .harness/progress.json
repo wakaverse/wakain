@@ -132,9 +132,11 @@
       "commit": "d6105f0"
     },
     "T16": {
-      "status": "pending",
+      "status": "done",
       "round": "R19",
-      "description": "RapidAPI 소셜미디어 대안 확보"
+      "description": "RapidAPI 소셜미디어 대안 확보",
+      "commit": "794be57",
+      "result": "1순위 Apify 추천, 현행 RapidAPI + graceful degradation 병행"
     },
     "T7": {
       "status": "pending",
@@ -157,5 +159,5 @@
     "Cloud Run 빌드는 프로젝트 루트에서 실행 (Dockerfile 경로 기준)",
     "포지 완료 후 즉시 Act(progress 업데이트) 수행 — 빠뜨리지 말 것"
   ],
-  "last_updated": "2026-03-14T00:28:00+09:00"
+  "last_updated": "2026-03-14T00:30:00+09:00"
 }
