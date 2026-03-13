@@ -2,7 +2,7 @@
   "project": "wakain",
   "created": "2026-03-13T23:30:00+09:00",
   "source": "WAKALAB_TODO_20260313.md",
-  "current_round": "R19",
+  "current_round": "R20",
   "rounds": {
     "R18": {
       "name": "베타 품질 다듬기 (P0)",
@@ -31,7 +31,7 @@
     },
     "R19": {
       "name": "파이프라인 안정성 + 성능 (P1~P1.7)",
-      "status": "in_progress",
+      "status": "done",
       "tasks": [
         "T11",
         "T15",
@@ -41,7 +41,8 @@
         "T6",
         "T16",
         "T12"
-      ]
+      ],
+      "completed_at": "2026-03-14T00:40:00+09:00"
     },
     "R20": {
       "name": "베타 오픈 구성 (P2)",
@@ -109,9 +110,10 @@
       "commit": "d6105f0"
     },
     "T12": {
-      "status": "pending",
+      "status": "done",
       "round": "R19",
-      "description": "P13 EVALUATE 스트리밍"
+      "description": "P13 EVALUATE 스트리밍",
+      "commit": "a818f99"
     },
     "T13": {
       "status": "done",
@@ -159,5 +161,5 @@
     "Cloud Run 빌드는 프로젝트 루트에서 실행 (Dockerfile 경로 기준)",
     "포지 완료 후 즉시 Act(progress 업데이트) 수행 — 빠뜨리지 말 것"
   ],
-  "last_updated": "2026-03-14T00:30:00+09:00"
+  "last_updated": "2026-03-14T00:40:00+09:00"
 }
