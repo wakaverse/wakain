@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, Pencil } from 'lucide-react';
 import { getResult, addLibraryItem } from '../lib/api';
 import type { RecipeJSON } from '../types/recipe';
 import type { LibraryItem } from '../types';
@@ -119,6 +119,17 @@ export default function ReportPage() {
         {/* Right column: Cards in order */}
         <div className="flex-1 min-w-0">
           <div className="space-y-3">
+            {/* 제작가이드 버튼 */}
+            <div className="flex justify-end">
+              <button
+                onClick={() => navigate(`/app/guide/${id}`)}
+                className="flex items-center gap-1.5 px-4 py-1.5 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                제작가이드
+              </button>
+            </div>
+
             {/* 1. 영상 요약 — 항상 열림 */}
             <VideoSummaryCard data={recipe} />
 

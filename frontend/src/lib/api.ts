@@ -214,6 +214,19 @@ export async function subscribeJobProgress(
   return es;
 }
 
+export async function generateScript(resultId: string): Promise<{ script: string }> {
+  const res = await fetch(`${API_URL}/api/generate-script`, {
+    method: 'POST',
+    headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ result_id: resultId }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: '대본 생성에 실패했습니다' }));
+    throw new Error(err.detail || '대본 생성에 실패했습니다');
+  }
+  return res.json();
+}
+
 export { API_URL };
 
 // ─── Radar API ───

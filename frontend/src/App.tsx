@@ -14,6 +14,7 @@ import DemoReportPage from './pages/DemoReportPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import GuideReportPage from './pages/GuideReportPage';
 import ToastContainer from './components/Toast';
 
 function LandingRoutes() {
@@ -30,6 +31,7 @@ function LandingRoutes() {
       <Route path="app/compare" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="compare" /></AppShell></ProtectedRoute>} />
       <Route path="app/insights" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="insight" /></AppShell></ProtectedRoute>} />
       <Route path="app/guide" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="guide" /></AppShell></ProtectedRoute>} />
+      <Route path="app/guide/:resultId" element={<ProtectedRoute><AppShell><GuideReportPage /></AppShell></ProtectedRoute>} />
       <Route path="app/insight" element={<Navigate to="/app/insights" replace />} />
       <Route path="app/hack" element={<Navigate to="/app/analyze" replace />} />
       <Route path="app/jobs/:id" element={<ProtectedRoute><AppShell><JobStatusPage /></AppShell></ProtectedRoute>} />
