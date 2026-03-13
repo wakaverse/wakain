@@ -175,6 +175,7 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
             gemini_api_key=os.environ.get("GEMINI_API_KEY"),
             gemini_api_key_pro=os.environ.get("GEMINI_API_KEY_PRO"),
             soniox_api_key=os.environ.get("SONIOX_API_KEY"),
+            job_id=job_id,
         )
 
         pipeline_result = asyncio.run(run_pipeline(config))

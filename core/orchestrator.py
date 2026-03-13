@@ -15,8 +15,10 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import time
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +44,16 @@ from core.schemas.recipe import RecipeJSON, StageUsage, TokenUsage
 logger = logging.getLogger(__name__)
 
 
+def _get_supabase():
+    """Supabase client for pipeline_logs. Returns None if env vars missing."""
+    url = os.environ.get("SUPABASE_URL", "")
+    key = os.environ.get("SUPABASE_SERVICE_KEY", "")
+    if url and key:
+        from supabase import create_client
+        return create_client(url, key)
+    return None
+
+
 @dataclass
 class PipelineConfig:
     video_path: str
@@ -51,6 +63,7 @@ class PipelineConfig:
     gemini_api_key_pro: str | None = None
     soniox_api_key: str | None = None
     output_language: str = "ko"
+    job_id: str | None = None
 
 
 @dataclass
@@ -63,13 +76,31 @@ class PipelineResult:
 
 async def _run_phase(
     name: str, coro, phase_results: dict, phase_times: dict, phase_usages: dict,
+    *, job_id: str | None = None,
 ) -> Any:
-    """Phase 실행 래퍼: 타이밍 기록 + usage 수집 + 에러 핸들링.
+    """Phase 실행 래퍼: 타이밍 기록 + usage 수집 + 에러 핸들링 + pipeline_logs 기록.
 
     run() 함수가 (result, usage_dict) 튜플을 리턴하면 자동 언패킹.
     """
     logger.info("▶ %s 시작", name)
     t0 = time.perf_counter()
+
+    # ── pipeline_logs INSERT (status=running) ──
+    log_id = None
+    sb = _get_supabase() if job_id else None
+    if sb:
+        try:
+            row = {
+                "job_id": job_id,
+                "phase_name": name,
+                "status": "running",
+            }
+            resp = sb.table("pipeline_logs").insert(row).execute()
+            if resp.data:
+                log_id = resp.data[0]["id"]
+        except Exception:
+            logger.debug("pipeline_logs INSERT 실패 (non-fatal)", exc_info=True)
+
     try:
         raw = await coro
         elapsed = round(time.perf_counter() - t0, 2)
@@ -79,15 +110,50 @@ async def _run_phase(
             phase_usages[name] = usage
         else:
             result = raw
+            usage = {}
         phase_results[name] = result
         phase_times[name] = elapsed
         logger.info("✔ %s 완료 (%.2fs)", name, elapsed)
+
+        # ── pipeline_logs UPDATE (status=success) ──
+        if sb and log_id:
+            try:
+                model = usage.get("model", "")
+                tokens_in = usage.get("input_tokens", 0)
+                tokens_out = usage.get("output_tokens", 0)
+                pricing = _PRICING.get(model, {"input": 0.0, "output": 0.0})
+                cost = (tokens_in * pricing["input"] + tokens_out * pricing["output"]) / 1_000_000
+                sb.table("pipeline_logs").update({
+                    "status": "success",
+                    "finished_at": datetime.now(timezone.utc).isoformat(),
+                    "duration_ms": int(elapsed * 1000),
+                    "model_used": model or None,
+                    "tokens_in": tokens_in,
+                    "tokens_out": tokens_out,
+                    "cost_usd": round(cost, 6),
+                }).eq("id", log_id).execute()
+            except Exception:
+                logger.debug("pipeline_logs UPDATE(success) 실패 (non-fatal)", exc_info=True)
+
         return result
-    except Exception:
+    except Exception as exc:
         elapsed = round(time.perf_counter() - t0, 2)
         phase_times[name] = elapsed
         phase_results[name] = None
         logger.exception("✘ %s 실패 (%.2fs)", name, elapsed)
+
+        # ── pipeline_logs UPDATE (status=fail) ──
+        if sb and log_id:
+            try:
+                sb.table("pipeline_logs").update({
+                    "status": "fail",
+                    "finished_at": datetime.now(timezone.utc).isoformat(),
+                    "duration_ms": int(elapsed * 1000),
+                    "error_message": str(exc)[:2000],
+                }).eq("id", log_id).execute()
+            except Exception:
+                logger.debug("pipeline_logs UPDATE(fail) 실패 (non-fatal)", exc_info=True)
+
         return None
 
 
@@ -174,6 +240,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
     phase_results: dict[str, Any] = {}
     phase_times: dict[str, float] = {}
     phase_usages: dict[str, dict] = {}
+    jid = config.job_id
 
     video_path = config.video_path
 
@@ -182,17 +249,17 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         _run_phase(
             "P1_STT",
             p01_stt.run(video_path, output_dir, api_key=config.soniox_api_key),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         ),
         _run_phase(
             "P2_SCAN",
             p02_scan.run(video_path, output_dir, api_key=config.gemini_api_key, output_language=config.output_language),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         ),
         _run_phase(
             "P3_EXTRACT",
             p03_extract.run(video_path, output_dir, config.fps),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         ),
     )
 
@@ -209,7 +276,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         _run_phase(
             "P4_CLASSIFY",
             p04_classify.run(frames_dir, timestamps, api_key=config.gemini_api_key),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         ),
         _run_phase(
             "P7_PRODUCT",
@@ -219,7 +286,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
                 api_key=config.gemini_api_key,
                 output_language=config.output_language,
             ),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         ),
         _run_phase(
             "P8_VISUAL",
@@ -229,7 +296,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
                 api_key=config.gemini_api_key,
                 output_language=config.output_language,
             ),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         ),
         _run_phase(
             "P9_ENGAGE",
@@ -239,7 +306,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
                 api_key=config.gemini_api_key,
                 output_language=config.output_language,
             ),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         ),
     )
 
@@ -249,7 +316,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         p5_result = await _run_phase(
             "P5_TEMPORAL",
             p05_temporal.run(p3_result),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         )
     else:
         logger.warning("P3 실패 → P5 건너뜀")
@@ -261,7 +328,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         p6_result = await _run_phase(
             "P6_SCENE",
             p06_scene.run(p3_result, p4_result),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         )
     else:
         logger.warning("P3 실패 → P6 건너뜀")
@@ -277,7 +344,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
             api_key=config.gemini_api_key,
             output_language=config.output_language,
         ),
-        phase_results, phase_times, phase_usages,
+        phase_results, phase_times, phase_usages, job_id=jid,
     )
 
     # ── 순차 : P11(MERGE) ← P6 + P8 + P10 ─────────────────────────────────
@@ -286,7 +353,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         p11_result = await _run_phase(
             "P11_MERGE",
             p11_merge.run(p6_result, p8_result, p10_result),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         )
         _save_phase_output(output_dir, "p11_merge.json", p11_result)
     else:
@@ -307,7 +374,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
             p10_output=p10_result,
             output_language=config.output_language,
         ),
-        phase_results, phase_times, phase_usages,
+        phase_results, phase_times, phase_usages, job_id=jid,
     )
 
     # ── 순차 : P13(EVALUATE) ← P12 ────────────────────────────────────────
@@ -315,7 +382,7 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         eval_result = await _run_phase(
             "P13_EVALUATE",
             p13_evaluate.run(recipe, api_key=config.gemini_api_key),
-            phase_results, phase_times, phase_usages,
+            phase_results, phase_times, phase_usages, job_id=jid,
         )
         if eval_result:
             recipe.evaluation = eval_result
