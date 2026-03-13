@@ -2,7 +2,7 @@
   "project": "wakain",
   "created": "2026-03-13T23:30:00+09:00",
   "source": "WAKALAB_TODO_20260313.md",
-  "current_round": "R20",
+  "current_round": "R21",
   "rounds": {
     "R18": {
       "name": "베타 품질 다듬기 (P0)",
@@ -46,11 +46,12 @@
     },
     "R20": {
       "name": "베타 오픈 구성 (P2)",
-      "status": "pending",
+      "status": "done",
       "tasks": [
         "T7",
         "T8"
-      ]
+      ],
+      "completed_at": "2026-03-14T00:55:00+09:00"
     },
     "R21": {
       "name": "온톨로지 브릿지 (P3)",
@@ -147,9 +148,10 @@
       "commit": "c7e58d6"
     },
     "T8": {
-      "status": "pending",
+      "status": "done",
       "round": "R20",
-      "description": "레이더 메뉴 MVP"
+      "description": "레이더 메뉴 MVP",
+      "commit": "1fa3bee"
     },
     "T9": {
       "status": "pending",
@@ -162,5 +164,5 @@
     "Cloud Run 빌드는 프로젝트 루트에서 실행 (Dockerfile 경로 기준)",
     "포지 완료 후 즉시 Act(progress 업데이트) 수행 — 빠뜨리지 말 것"
   ],
-  "last_updated": "2026-03-14T00:50:00+09:00"
+  "last_updated": "2026-03-14T00:55:00+09:00"
 }
