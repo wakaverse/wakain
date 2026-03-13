@@ -53,14 +53,14 @@ def _check_visual_energy(recipe: RecipeJSON) -> ChecklistItem:
         first3 = rhythm.attention_curve.points[:3]
         avg = sum(p.score for p in first3) / len(first3) if first3 else 0
         passed = avg > 50
-        evidence = f"첫 3포인트 평균 어텐션: {avg:.0f}"
+        evidence = f"첫 3포인트 평균 시각 변화량: {avg:.0f}"
     else:
         avg = 0
         passed = False
-        evidence = "어텐션 커브 데이터 없음"
+        evidence = "시각 변화량 데이터 없음"
     return ChecklistItem(
         category="hook",
-        item="시각적 변화 (에너지)",
+        item="시각적 변화 (변화량)",
         passed=passed,
         evidence=evidence,
     )

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { RecipeJSON } from '../../types/recipe';
 import { formatTime } from '../../lib/recipe-utils';
 import {
@@ -12,6 +13,14 @@ import {
   ReferenceArea,
 } from 'recharts';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+function getGradeBadge(score: number): { label: string; emoji: string; cls: string } {
+  if (score <= 30) return { label: '낮음', emoji: '\u{1F535}', cls: 'bg-blue-50 text-blue-700' };
+  if (score <= 60) return { label: '보통', emoji: '\u{1F7E1}', cls: 'bg-yellow-50 text-yellow-700' };
+  return { label: '높음', emoji: '\u{1F534}', cls: 'bg-red-50 text-red-700' };
+}
+
 interface Props {
   data: RecipeJSON;
 }
@@ -19,6 +28,16 @@ interface Props {
 export default function AttentionCurveSection({ data }: Props) {
   const rhythm = data.visual.rhythm;
   const { dropoff_analysis } = data.engagement;
+  const [globalAvg, setGlobalAvg] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/stats/dynamics-avg`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.global_avg > 0) setGlobalAvg(d.global_avg);
+      })
+      .catch(() => {});
+  }, []);
 
   if (!rhythm?.attention_curve?.points?.length) return null;
 
@@ -28,11 +47,17 @@ export default function AttentionCurveSection({ data }: Props) {
   }));
 
   const avg = rhythm.attention_curve.avg;
+  const badge = getGradeBadge(avg);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5">
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-semibold text-gray-900">어텐션 커브</p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-semibold text-gray-900">시각 변화량</p>
+          <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${badge.cls}`}>
+            {badge.emoji} {badge.label}
+          </span>
+        </div>
         <div className="flex items-center gap-3 text-[11px] text-gray-400">
           <span>평균 {avg}</span>
           <span>아크: {rhythm.attention_arc}</span>
@@ -70,7 +95,7 @@ export default function AttentionCurveSection({ data }: Props) {
               borderRadius: '6px',
               fontSize: '11px',
             }}
-            formatter={(value: unknown) => [`${value}`, '어텐션']}
+            formatter={(value: unknown) => [`${value}`, '변화량']}
             labelFormatter={(label: unknown) => formatTime(Number(label))}
           />
           {/* Risk zones */}
@@ -83,7 +108,7 @@ export default function AttentionCurveSection({ data }: Props) {
               fillOpacity={1}
             />
           ))}
-          {/* Average line */}
+          {/* This video average line */}
           <ReferenceLine
             y={avg}
             stroke="#d1d5db"
@@ -95,6 +120,20 @@ export default function AttentionCurveSection({ data }: Props) {
               fill: '#9ca3af',
             }}
           />
+          {/* Global average line */}
+          {globalAvg !== null && (
+            <ReferenceLine
+              y={globalAvg}
+              stroke="#f59e0b"
+              strokeDasharray="6 3"
+              label={{
+                value: `전체 평균 ${globalAvg}`,
+                position: 'right',
+                fontSize: 10,
+                fill: '#f59e0b',
+              }}
+            />
+          )}
           <Area
             type="monotone"
             dataKey="score"
@@ -120,8 +159,14 @@ export default function AttentionCurveSection({ data }: Props) {
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-6 border-t border-dashed border-gray-400" />
-          평균 어텐션
+          평균 변화량
         </span>
+        {globalAvg !== null && (
+          <span className="flex items-center gap-1.5">
+            <span className="w-6 border-t border-dashed border-amber-400" />
+            전체 평균
+          </span>
+        )}
       </div>
     </div>
   );

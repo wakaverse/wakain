@@ -55,6 +55,16 @@ export default function VideoSummaryCard({ data }: Props) {
           </div>
         ))}
       </div>
+
+      {/* Coaching highlight */}
+      {evaluation?.summary && (
+        <div className="mt-3 bg-gray-50 rounded-xl px-3 py-2.5">
+          <p className="text-xs font-medium text-gray-500 mb-1">💡 핵심 코칭</p>
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {evaluation.summary.split(/[.!?]\s+/).slice(0, 2).join('. ').replace(/\.?$/, '.')}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,47 @@
+{
+  "project": "wakain",
+  "created": "2026-03-13T23:30:00+09:00",
+  "source": "WAKALAB_TODO_20260313.md",
+  "current_round": "R18",
+  "rounds": {
+    "R18": {
+      "name": "베타 품질 다듬기 (P0)",
+      "status": "planning",
+      "tasks": ["T1", "T2", "T3", "T4"]
+    },
+    "R19": {
+      "name": "파이프라인 안정성 + 성능 (P1~P1.7)",
+      "status": "pending",
+      "tasks": ["T5", "T6", "T10_SKIP", "T11", "T12", "T13", "T14", "T15", "T16"]
+    },
+    "R20": {
+      "name": "베타 오픈 구성 (P2)",
+      "status": "pending",
+      "tasks": ["T7", "T8"]
+    },
+    "R21": {
+      "name": "온톨로지 브릿지 (P3)",
+      "status": "pending",
+      "tasks": ["T9"]
+    }
+  },
+  "tasks": {
+    "T1":  { "status": "pending", "round": "R18", "description": "시각 변화량 이름 변경 + 기준선" },
+    "T2":  { "status": "pending", "round": "R18", "description": "훅 스코어링 투명화" },
+    "T3":  { "status": "pending", "round": "R18", "description": "체크리스트 제거 + 섹션 재배치 + 접기/펼치기" },
+    "T4":  { "status": "pending", "round": "R18", "description": "통합 타임라인 뷰" },
+    "T5":  { "status": "pending", "round": "R19", "description": "P9 ENGAGE Phase 분리 검토" },
+    "T6":  { "status": "pending", "round": "R19", "description": "scenes 테이블 정규화" },
+    "T10_SKIP": { "status": "done", "round": "R19", "description": "영상 업로드 캐싱 — 이미 구현됨 (gemini_utils._upload_cache)" },
+    "T11": { "status": "pending", "round": "R19", "description": "P4 CLASSIFY 안정화" },
+    "T12": { "status": "pending", "round": "R19", "description": "P13 EVALUATE 스트리밍" },
+    "T13": { "status": "pending", "round": "R19", "description": "Cloud Run 스펙 조정" },
+    "T14": { "status": "pending", "round": "R19", "description": "파이프라인 모니터링 테이블" },
+    "T15": { "status": "pending", "round": "R19", "description": "Gemini API 장애 대응 (P13 재시도 추가 포함)" },
+    "T16": { "status": "pending", "round": "R19", "description": "RapidAPI 소셜미디어 대안 확보" },
+    "T7":  { "status": "pending", "round": "R20", "description": "제작가이드 메뉴 완성 + 대본 초안 생성 MVP" },
+    "T8":  { "status": "pending", "round": "R20", "description": "레이더 메뉴 MVP" },
+    "T9":  { "status": "pending", "round": "R21", "description": "시간축 겹침 기반 엔티티 관계 쿼리" }
+  },
+  "last_updated": "2026-03-13T23:30:00+09:00"
+}

@@ -43,7 +43,7 @@ export default function StructureSection({ data, seekTo }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Energy graph + block bar */}
+      {/* Dynamics graph + block bar */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5">
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm font-semibold text-gray-900">영상 구조</p>
@@ -56,7 +56,7 @@ export default function StructureSection({ data, seekTo }: Props) {
           </div>
         </div>
 
-        {/* Attention curve chart */}
+        {/* Dynamics curve chart */}
         {hasChart && (
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
@@ -88,7 +88,7 @@ export default function StructureSection({ data, seekTo }: Props) {
                   borderRadius: '6px',
                   fontSize: '11px',
                 }}
-                formatter={(value: unknown) => [`${value}`, '어텐션']}
+                formatter={(value: unknown) => [`${value}`, '변화량']}
                 labelFormatter={(label: unknown) => formatTime(Number(label))}
               />
               {dropoff_analysis.risk_zones.map((zone, i) => (

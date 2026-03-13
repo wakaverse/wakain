@@ -65,7 +65,7 @@ export default function TimelineCard({ data }: Props) {
               borderRadius: '6px',
               fontSize: '11px',
             }}
-            formatter={(value: unknown) => [`${value}`, '에너지']}
+            formatter={(value: unknown) => [`${value}`, '변화량']}
             labelFormatter={(label: unknown) => formatTime(Number(label))}
           />
 
@@ -118,7 +118,7 @@ export default function TimelineCard({ data }: Props) {
             }}
           />
 
-          {/* Layer 1: Energy curve */}
+          {/* Layer 1: Dynamics curve */}
           <Area
             type="monotone"
             dataKey="score"
