@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -22,6 +23,8 @@ from app.config import (
     R2_BUCKET_NAME,
     R2_ENDPOINT,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _supabase():
@@ -346,7 +349,7 @@ def _resolve_category_id(recipe_json: dict) -> str | None:
 
 
 def _save_normalized_data(result_id: str, recipe_json: dict, job_id: str) -> None:
-    """분석 결과를 정규화 테이블(analysis_claims, analysis_blocks)에 저장."""
+    """분석 결과를 정규화 테이블(analysis_claims, analysis_blocks, analysis_scenes)에 저장."""
     sb = _supabase()
     category_id = _resolve_category_id(recipe_json)
     product = recipe_json.get("product", {})
@@ -403,3 +406,29 @@ def _save_normalized_data(result_id: str, recipe_json: dict, job_id: str) -> Non
     if block_rows:
         sb.table("analysis_blocks").insert(block_rows).execute()
         print(f"[pipeline:{job_id[:8]}] 💾 {len(block_rows)} blocks saved", flush=True)
+
+    # ── Scenes INSERT ──
+    scenes = recipe_json.get("visual", {}).get("scenes", [])
+    scene_rows = []
+    for i, scene in enumerate(scenes):
+        tr = scene.get("time_range", [0, 0])
+        scene_rows.append({
+            "result_id": result_id,
+            "category_id": category_id,
+            "scene_order": i + 1,
+            "time_start": tr[0] if len(tr) > 0 else 0,
+            "time_end": tr[1] if len(tr) > 1 else 0,
+            "style": scene.get("style"),
+            "style_sub": scene.get("style_sub"),
+            "role": scene.get("role"),
+            "visual_forms": json.dumps(scene.get("visual_forms", [])),
+            "block_refs": json.dumps(scene.get("block_refs", [])),
+            "description": scene.get("description"),
+        })
+
+    if scene_rows:
+        try:
+            sb.table("analysis_scenes").insert(scene_rows).execute()
+            print(f"[pipeline:{job_id[:8]}] 💾 {len(scene_rows)} scenes saved", flush=True)
+        except Exception as e:
+            logger.warning(f"[pipeline:{job_id[:8]}] scenes insert failed: {e}")
