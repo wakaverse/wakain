@@ -141,9 +141,10 @@
       "result": "1순위 Apify 추천, 현행 RapidAPI + graceful degradation 병행"
     },
     "T7": {
-      "status": "pending",
+      "status": "done",
       "round": "R20",
-      "description": "제작가이드 메뉴 완성 + 대본 초안 생성 MVP"
+      "description": "제작가이드 메뉴 완성 + 대본 초안 생성 MVP",
+      "commit": "c7e58d6"
     },
     "T8": {
       "status": "pending",
@@ -161,5 +162,5 @@
     "Cloud Run 빌드는 프로젝트 루트에서 실행 (Dockerfile 경로 기준)",
     "포지 완료 후 즉시 Act(progress 업데이트) 수행 — 빠뜨리지 말 것"
   ],
-  "last_updated": "2026-03-14T00:40:00+09:00"
+  "last_updated": "2026-03-14T00:50:00+09:00"
 }
