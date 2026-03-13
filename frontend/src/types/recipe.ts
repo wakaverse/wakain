@@ -70,6 +70,24 @@ export interface VisualRhythm {
   attention_curve: AttentionCurve;
 }
 
+export interface HookElement {
+  appeal_type?: string;
+  text_banner: boolean;
+  text_banner_content?: string;
+  person_appear: boolean;
+  product_appear: boolean;
+  sound_change: boolean;
+  cut_count: number;
+  dominant_element: string;
+}
+
+export interface HookScan {
+  first_3s: HookElement;
+  first_8s: HookElement;
+  hook_type: string;
+  summary: string;
+}
+
 export interface TriggerItem {
   time: number;
   trigger: string;
@@ -215,6 +233,7 @@ export interface RecipeJSON {
     retention_analysis: {
       hook_strength: string;
       hook_reason: string;
+      hook_scan?: HookScan;
       rewatch_triggers: TriggerItem[];
       share_triggers: TriggerItem[];
       comment_triggers: TriggerItem[];

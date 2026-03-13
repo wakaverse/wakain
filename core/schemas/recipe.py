@@ -174,9 +174,28 @@ class RecipeEngageTrigger(BaseModel):
     trigger: str = Field(description="트리거 설명")
 
 
+class RecipeHookElement(BaseModel):
+    appeal_type: str | None = Field(default=None, description="소구점 유형")
+    text_banner: bool = Field(default=False, description="텍스트 배너 유무")
+    text_banner_content: str | None = Field(default=None, description="배너 내용")
+    person_appear: bool = Field(default=False, description="인물 등장 유무")
+    product_appear: bool = Field(default=False, description="제품 직접 노출 유무")
+    sound_change: bool = Field(default=False, description="효과음/BGM 변화 유무")
+    cut_count: int = Field(default=0, description="화면 전환 횟수")
+    dominant_element: str = Field(default="", description="가장 지배적인 요소")
+
+
+class RecipeHookScan(BaseModel):
+    first_3s: RecipeHookElement = Field(description="0~3초 구간 요소 분석")
+    first_8s: RecipeHookElement = Field(description="0~8초 구간 요소 분석")
+    hook_type: str = Field(description="후킹 유형 분류")
+    summary: str = Field(description="후킹 전략 1줄 요약")
+
+
 class RecipeRetention(BaseModel):
     hook_strength: HookStrength = Field(description="훅 강도")
     hook_reason: str = Field(description="훅 강도 근거")
+    hook_scan: RecipeHookScan | None = Field(default=None, description="후킹 구간 2단 분해 (3초+8초)")
     rewatch_triggers: list[RecipeEngageTrigger] = Field(default_factory=list)
     share_triggers: list[RecipeEngageTrigger] = Field(default_factory=list)
     comment_triggers: list[RecipeEngageTrigger] = Field(default_factory=list)

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Shield, AlertTriangle, Eye, MessageCircle, Share2, ChevronDown } from 'lucide-react';
-import type { RecipeJSON } from '../../types/recipe';
+import { Shield, AlertTriangle, Eye, MessageCircle, Share2, ChevronDown, Timer, User, Package, Volume2, Scissors, Type, Zap } from 'lucide-react';
+import type { RecipeJSON, HookElement } from '../../types/recipe';
 import { formatTime, formatTimeRange, HOOK_STRENGTH_LABELS, RISK_LEVEL_LABELS } from '../../lib/recipe-utils';
 
 interface Props {
@@ -24,6 +24,11 @@ export default function EngagementSection({ data, seekTo }: Props) {
           {retention_analysis.hook_reason}
         </p>
       </div>
+
+      {/* Hook Scan — 3초/8초 2단 분해 */}
+      {retention_analysis.hook_scan && (
+        <HookScanCard scan={retention_analysis.hook_scan} />
+      )}
 
       {/* Triggers */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -163,6 +168,85 @@ function TriggerCard({
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function HookScanCard({ scan }: { scan: NonNullable<RecipeJSON['engagement']['retention_analysis']['hook_scan']> }) {
+  const HOOK_TYPE_LABELS: Record<string, string> = {
+    question: '질문형',
+    shock: '충격형',
+    curiosity: '호기심형',
+    benefit: '혜택형',
+    story: '스토리형',
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Timer className="w-4 h-4 text-indigo-600" />
+        <span className="text-sm font-semibold text-gray-900">후킹 구간 분석</span>
+        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+          {HOOK_TYPE_LABELS[scan.hook_type] || scan.hook_type}
+        </span>
+      </div>
+      <p className="text-xs text-gray-500 mb-3">{scan.summary}</p>
+
+      <div className="grid grid-cols-2 gap-3">
+        <ElementColumn label="0 ~ 3초" element={scan.first_3s} accent="amber" />
+        <ElementColumn label="0 ~ 8초" element={scan.first_8s} accent="blue" />
+      </div>
+    </div>
+  );
+}
+
+function ElementColumn({ label, element, accent }: { label: string; element: HookElement; accent: 'amber' | 'blue' }) {
+  const accentBg = accent === 'amber' ? 'bg-amber-50' : 'bg-blue-50';
+  const accentText = accent === 'amber' ? 'text-amber-700' : 'text-blue-700';
+
+  const badges: { icon: React.ReactNode; label: string; active: boolean }[] = [
+    { icon: <User className="w-3 h-3" />, label: '인물', active: element.person_appear },
+    { icon: <Package className="w-3 h-3" />, label: '제품', active: element.product_appear },
+    { icon: <Type className="w-3 h-3" />, label: '텍스트', active: element.text_banner },
+    { icon: <Volume2 className="w-3 h-3" />, label: '사운드', active: element.sound_change },
+  ];
+
+  return (
+    <div className={`rounded-xl ${accentBg} p-3`}>
+      <p className={`text-[11px] font-semibold ${accentText} mb-2`}>{label}</p>
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        {badges.map((b) => (
+          <span
+            key={b.label}
+            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
+              b.active
+                ? 'bg-white text-gray-800 shadow-sm'
+                : 'bg-transparent text-gray-400'
+            }`}
+          >
+            {b.icon}
+            {b.label}
+          </span>
+        ))}
+      </div>
+      {element.appeal_type && (
+        <p className="text-[10px] text-gray-500">
+          소구: <span className="font-medium text-gray-700">{element.appeal_type}</span>
+        </p>
+      )}
+      {element.cut_count > 0 && (
+        <p className="text-[10px] text-gray-500 flex items-center gap-1">
+          <Scissors className="w-3 h-3" /> 컷 전환 {element.cut_count}회
+        </p>
+      )}
+      {element.text_banner_content && (
+        <p className="text-[10px] text-gray-500 mt-1 truncate" title={element.text_banner_content}>
+          배너: "{element.text_banner_content}"
+        </p>
+      )}
+      <p className="text-[11px] text-gray-700 mt-1.5 font-medium flex items-center gap-1">
+        <Zap className="w-3 h-3" /> {element.dominant_element}
+      </p>
     </div>
   );
 }

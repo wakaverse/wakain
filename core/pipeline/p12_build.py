@@ -306,11 +306,40 @@ def _build_visual(
 def _build_engagement(p9_output: EngageOutput | None) -> RecipeEngagement:
     """인게이지먼트 조립."""
     if p9_output:
-        from core.schemas.recipe import RecipeEngageTrigger, RecipeRiskZone, RecipeSafeZone
+        from core.schemas.recipe import (
+            RecipeEngageTrigger,
+            RecipeHookElement,
+            RecipeHookScan,
+            RecipeRiskZone,
+            RecipeSafeZone,
+        )
+
+        # hook_scan 매핑
+        hook_scan = None
+        src_scan = p9_output.retention_analysis.hook_scan
+        if src_scan:
+            def _map_element(el) -> RecipeHookElement:
+                return RecipeHookElement(
+                    appeal_type=el.appeal_type,
+                    text_banner=el.text_banner,
+                    text_banner_content=el.text_banner_content,
+                    person_appear=el.person_appear,
+                    product_appear=el.product_appear,
+                    sound_change=el.sound_change,
+                    cut_count=el.cut_count,
+                    dominant_element=el.dominant_element,
+                )
+            hook_scan = RecipeHookScan(
+                first_3s=_map_element(src_scan.first_3s),
+                first_8s=_map_element(src_scan.first_8s),
+                hook_type=src_scan.hook_type,
+                summary=src_scan.summary,
+            )
 
         retention = RecipeRetention(
             hook_strength=p9_output.retention_analysis.hook_strength,
             hook_reason=p9_output.retention_analysis.hook_reason,
+            hook_scan=hook_scan,
             rewatch_triggers=[
                 RecipeEngageTrigger(time=t.time, trigger=t.trigger)
                 for t in p9_output.retention_analysis.rewatch_triggers

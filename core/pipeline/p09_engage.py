@@ -29,11 +29,23 @@ PROMPT_TEMPLATE = """You are a viewer retention analyst for shortform marketing 
 
 {stt_transcript}
 
-## Task: Analyse retention and drop-off risk ONLY.
+## Task: Analyse retention, hook elements, and drop-off risk.
 
 1. retention_analysis:
    - hook_strength: strong/moderate/weak
    - hook_reason: 1 sentence
+   - hook_scan: Decompose hooking elements in 2 time windows:
+     - first_3s (0~3s) and first_8s (0~8s), each containing:
+       - appeal_type: appeal type shown (price/experience/information/emotion/null)
+       - text_banner: whether text banner/overlay appears (true/false)
+       - text_banner_content: banner text content if present (string/null)
+       - person_appear: whether a person appears (true/false)
+       - product_appear: whether the product is directly shown (true/false)
+       - sound_change: whether there is a sound effect/BGM change (true/false)
+       - cut_count: number of scene transitions in the window (int)
+       - dominant_element: the single most dominant element in 1 line
+     - hook_type: hooking strategy type (question/shock/curiosity/benefit/story/etc.)
+     - summary: 1-line summary of the hooking strategy
    - rewatch_triggers: [{{time: float, trigger: string}}]
    - share_triggers: [{{time: float, trigger: string}}]
    - comment_triggers: [{{time: float, trigger: string}}]
