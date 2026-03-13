@@ -15,14 +15,14 @@ export default function EngagementSection({ data, seekTo }: Props) {
     <div className="space-y-3">
       {/* Hook strength */}
       <div className="bg-white rounded-2xl border border-gray-100 p-4">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Shield className="w-4 h-4 text-green-600" />
           <span className="text-sm font-semibold text-gray-900">훅 강도</span>
           <HookBadge strength={retention_analysis.hook_strength} />
+          {retention_analysis.hook_reason && (
+            <span className="text-xs text-gray-600">{retention_analysis.hook_reason}</span>
+          )}
         </div>
-        <p className="text-xs text-gray-500 leading-relaxed">
-          {retention_analysis.hook_reason}
-        </p>
       </div>
 
       {/* Hook Scan — 3초/8초 2단 분해 */}

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import ALLOWED_ORIGINS
-from app.routes import analyze, insights, jobs, library, radar, waitlist
+from app.routes import analyze, insights, jobs, library, radar, stats, waitlist
 
 app = FastAPI(title="WakaIn API", version="0.1.0")
 
@@ -20,6 +20,7 @@ app.include_router(waitlist.router, prefix="/api")
 app.include_router(radar.router, prefix="/api")
 app.include_router(library.router, prefix="/api")
 app.include_router(insights.router, prefix="/api")
+app.include_router(stats.router, prefix="/api")
 
 
 @app.get("/api/health")

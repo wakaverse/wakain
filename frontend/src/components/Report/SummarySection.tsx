@@ -23,7 +23,7 @@ export default function SummarySection({ data }: Props) {
       color: STYLE_BAR_COLORS[style] || '#71717A',
     }));
 
-  // Energy chart data
+  // Dynamics chart data
   const energyData = rhythm.attention_curve.points.map((p) => ({
     time: p.t,
     score: p.score,
@@ -46,6 +46,9 @@ export default function SummarySection({ data }: Props) {
             </span>
           )}
           <HookBadge strength={data.engagement.retention_analysis.hook_strength} />
+          {data.engagement.retention_analysis.hook_reason && (
+            <span className="text-xs text-gray-600">{data.engagement.retention_analysis.hook_reason}</span>
+          )}
           <span className="text-xs text-gray-400 ml-auto">
             {product.name} · {data.meta.platform} · {duration}초
           </span>
@@ -67,7 +70,7 @@ export default function SummarySection({ data }: Props) {
           {energyData.length > 1 && (
             <div className="mt-3">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-[11px] text-gray-400">시각 에너지</span>
+                <span className="text-[11px] text-gray-400">시각 변화량</span>
                 <span className="text-[11px] text-gray-400">
                   평균 {rhythm.attention_curve.avg} · {labelKo(rhythm.attention_arc, ENERGY_LABELS)}
                 </span>
@@ -89,7 +92,7 @@ export default function SummarySection({ data }: Props) {
                       borderRadius: '6px',
                       fontSize: '11px',
                     }}
-                    formatter={(value: unknown) => [`${value}`, '에너지']}
+                    formatter={(value: unknown) => [`${value}`, '변화량']}
                     labelFormatter={(label: unknown) => formatTime(Number(label))}
                   />
                   <Area
