@@ -192,6 +192,28 @@ export async function deleteJob(jobId: string): Promise<void> {
   if (!res.ok) throw new Error('삭제에 실패했습니다');
 }
 
+/**
+ * Subscribe to job progress via SSE.
+ * Returns an EventSource that emits phase updates.
+ * Caller must close() when done.
+ */
+export async function subscribeJobProgress(
+  jobId: string,
+  onEvent: (event: import('../types').ProgressEvent) => void,
+): Promise<EventSource> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token || '';
+  // EventSource doesn't support custom headers, so pass token as query param
+  const es = new EventSource(`${API_URL}/api/jobs/${jobId}/progress?token=${token}`);
+  es.onmessage = (e) => {
+    try {
+      const parsed = JSON.parse(e.data);
+      onEvent(parsed);
+    } catch { /* ignore parse errors */ }
+  };
+  return es;
+}
+
 export { API_URL };
 
 // ─── Radar API ───

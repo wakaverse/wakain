@@ -1,7 +1,11 @@
+import asyncio
+import json
+
 import boto3
 from datetime import datetime, timezone
 from botocore.config import Config as BotoConfig
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from supabase import create_client
 
 from app.config import (
@@ -120,5 +124,76 @@ async def delete_job(job_id: str, user: dict = Depends(get_current_user)):
     supabase.table("jobs").update({
         "deleted_at": datetime.now(timezone.utc).isoformat()
     }).eq("id", job_id).execute()
-    
+
     return {"ok": True}
+
+
+@router.get("/jobs/{job_id}/progress")
+async def job_progress(job_id: str, token: str | None = None):
+    """SSE endpoint: stream pipeline phase progress for a job.
+
+    Auth via ?token= query param (EventSource API doesn't support custom headers).
+    """
+    if not token:
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    # Verify token and get user
+    sb_auth = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+    try:
+        resp = sb_auth.auth.get_user(token)
+        if not resp.user:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        user_id = resp.user.id
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=401, detail="Authentication failed")
+
+    supabase = get_supabase()
+
+    # Verify job exists and belongs to user
+    job = supabase.table("jobs").select("user_id, status").eq("id", job_id).single().execute()
+    if not job.data or job.data.get("user_id") != user_id:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # If already terminal, return final event immediately
+    if job.data["status"] in ("completed", "failed"):
+        async def done_event():
+            yield f"data: {json.dumps({'type': 'done', 'status': job.data['status']})}\n\n"
+        return StreamingResponse(done_event(), media_type="text/event-stream")
+
+    sent_ids: set[str] = set()
+
+    async def event_generator():
+        while True:
+            try:
+                logs = (
+                    supabase.table("pipeline_logs")
+                    .select("id, phase_name, status, duration_ms, error_message, created_at, finished_at")
+                    .eq("job_id", job_id)
+                    .order("created_at")
+                    .execute()
+                )
+                for log in logs.data:
+                    key = f"{log['id']}_{log['status']}"
+                    if key not in sent_ids:
+                        sent_ids.add(key)
+                        yield f"data: {json.dumps({'type': 'phase', **log})}\n\n"
+
+                # Check job completion
+                job_check = (
+                    supabase.table("jobs")
+                    .select("status")
+                    .eq("id", job_id)
+                    .single()
+                    .execute()
+                )
+                if job_check.data and job_check.data["status"] in ("completed", "failed"):
+                    yield f"data: {json.dumps({'type': 'done', 'status': job_check.data['status']})}\n\n"
+                    break
+            except Exception:
+                pass
+
+            await asyncio.sleep(2)
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

@@ -22,6 +22,24 @@ export interface Job {
   posted_at?: string;
 }
 
+export interface PhaseLog {
+  type: 'phase';
+  id: string;
+  phase_name: string;
+  status: 'running' | 'success' | 'fail';
+  duration_ms: number | null;
+  error_message: string | null;
+  created_at: string;
+  finished_at: string | null;
+}
+
+export interface PhaseDone {
+  type: 'done';
+  status: 'completed' | 'failed';
+}
+
+export type ProgressEvent = PhaseLog | PhaseDone;
+
 // ─── Script Analysis (7-element framework) ───
 
 export type ScriptElement = 'authority' | 'hook' | 'sensory_description' | 'simplicity' | 'process' | 'social_proof' | 'cta';
