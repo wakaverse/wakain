@@ -8,10 +8,9 @@ import VideoSummaryCard from '../components/Report/VideoSummaryCard';
 import HookAnalysisCard from '../components/Report/HookAnalysisCard';
 import PositioningCard from '../components/Report/PositioningCard';
 import ProductClaimsCard from '../components/Report/ProductClaimsCard';
-import PersuasionFlowCard from '../components/Report/PersuasionFlowCard';
-import TimelineCard from '../components/Report/TimelineCard';
 import CoachingCard from '../components/Report/CoachingCard';
-import SceneAnalysisCard from '../components/Report/SceneAnalysisCard';
+import UnifiedTimeline from '../components/Report/UnifiedTimeline';
+import CollapsibleSection from '../components/Report/CollapsibleSection';
 
 /* ── Main Component ───────────────────────── */
 
@@ -119,30 +118,54 @@ export default function ReportPage() {
 
         {/* Right column: Cards in order */}
         <div className="flex-1 min-w-0">
-          <div className="space-y-6">
-            {/* 1. 영상 요약 */}
+          <div className="space-y-3">
+            {/* 1. 영상 요약 — 항상 열림 */}
             <VideoSummaryCard data={recipe} />
 
-            {/* 2. 훅 분석 */}
-            <HookAnalysisCard data={recipe} />
+            {/* 2. 콘텐츠 포지셔닝 */}
+            <CollapsibleSection
+              title="콘텐츠 포지셔닝"
+              summary={recipe.evaluation?.positioning?.unique_angle || ''}
+              defaultOpen={false}
+            >
+              <PositioningCard data={recipe} />
+            </CollapsibleSection>
 
-            {/* 3. 콘텐츠 포지셔닝 */}
-            <PositioningCard data={recipe} />
+            {/* 3. 훅 분석 */}
+            <CollapsibleSection
+              title="훅 분석"
+              summary={`훅 강도: ${recipe.evaluation?.hook_analysis?.strength || '-'}`}
+              defaultOpen={false}
+            >
+              <HookAnalysisCard data={recipe} />
+            </CollapsibleSection>
 
-            {/* 4. 제품 소구 분석 */}
-            <ProductClaimsCard data={recipe} />
+            {/* 4. 통합 타임라인 (설득 흐름 + 시각 변화량 + 씬 분석 병합) */}
+            <CollapsibleSection
+              title="통합 타임라인"
+              summary="설득 흐름 · 시각 변화량 · 씬 분석"
+              defaultOpen={false}
+            >
+              <UnifiedTimeline data={recipe} seekTo={seekTo} thumbnails={thumbnails} />
+            </CollapsibleSection>
 
-            {/* 5. 설득 흐름 */}
-            <PersuasionFlowCard data={recipe} seekTo={seekTo} />
+            {/* 7. 제품 소구 분석 */}
+            <CollapsibleSection
+              title="제품 소구 분석"
+              summary={`소구점 ${recipe.product?.claims?.length || 0}개`}
+              defaultOpen={false}
+            >
+              <ProductClaimsCard data={recipe} />
+            </CollapsibleSection>
 
-            {/* 6. 타임라인 */}
-            <TimelineCard data={recipe} />
-
-            {/* 7. 코칭 */}
-            <CoachingCard data={recipe} />
-
-            {/* 8. 씬 분석 */}
-            <SceneAnalysisCard data={recipe} seekTo={seekTo} thumbnails={thumbnails} />
+            {/* 8. 코칭 */}
+            <CollapsibleSection
+              title="코칭"
+              summary={recipe.evaluation?.summary ? recipe.evaluation.summary.slice(0, 50) + '...' : ''}
+              defaultOpen={false}
+            >
+              <CoachingCard data={recipe} />
+            </CollapsibleSection>
           </div>
         </div>
       </div>
