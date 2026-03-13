@@ -18,12 +18,21 @@ from google.genai import types
 from core.gemini_utils import make_client
 from core.schemas.pipeline import ClassifyFrame, ClassifyOutput
 
+_DEFAULT_FRAME = {
+    "shot_type": "unknown",
+    "has_text": False,
+    "has_product": False,
+    "has_person": False,
+    "color_tone": "neutral",
+    "text_usage": "none",
+}
+
 logger = logging.getLogger(__name__)
 
 MODEL = "gemini-2.5-flash-lite"
 BATCH_SIZE = 8
 BATCH_DELAY = 1.0  # 배치 간 딜레이 (초)
-MAX_RETRIES = 2
+MAX_RETRIES = 3
 
 PROMPT = """\
 Classify each frame. Return JSON array.
@@ -84,6 +93,44 @@ def _extract_usage(response) -> dict:
     return usage
 
 
+async def _classify_single(
+    client,
+    ts: float,
+    jpeg_bytes: bytes,
+) -> ClassifyFrame:
+    """단일 프레임 분류 (폴백용). 실패 시 기본값 반환."""
+    contents = [
+        types.Part.from_bytes(data=jpeg_bytes, mime_type="image/jpeg"),
+        types.Part.from_text(text=PROMPT),
+    ]
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            response = await client.aio.models.generate_content(
+                model=MODEL,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=_RESPONSE_SCHEMA,
+                    temperature=0.1,
+                ),
+            )
+            items = json.loads(response.text)
+            item = items[0] if items else {}
+            item["timestamp"] = ts
+            return ClassifyFrame.model_validate(item)
+        except Exception as e:
+            if attempt < MAX_RETRIES:
+                wait = 2 ** attempt * 3
+                logger.warning(
+                    "프레임 %.1f 개별 재시도 %d/%d (%s), %ds 대기...",
+                    ts, attempt + 1, MAX_RETRIES, type(e).__name__, wait,
+                )
+                await asyncio.sleep(wait)
+            else:
+                logger.warning("프레임 %.1f 최종 실패, 기본값 사용: %s", ts, e)
+                return ClassifyFrame.model_validate({**_DEFAULT_FRAME, "timestamp": ts})
+
+
 async def _classify_batch(
     client,
     batch: list[tuple[float, bytes]],
@@ -108,12 +155,16 @@ async def _classify_batch(
             )
             items = json.loads(response.text)
 
-            # timestamp를 실제 값으로 덮어쓰기
+            # 개별 프레임 파싱 방어
             frames = []
-            for i, item in enumerate(items):
-                if i < len(batch):
-                    item["timestamp"] = batch[i][0]
-                frames.append(ClassifyFrame.model_validate(item))
+            for i, (ts, _jpeg) in enumerate(batch):
+                try:
+                    item = items[i] if i < len(items) else {}
+                    item["timestamp"] = ts
+                    frames.append(ClassifyFrame.model_validate(item))
+                except Exception as parse_err:
+                    logger.warning("프레임 %.1f 파싱 실패, 기본값 사용: %s", ts, parse_err)
+                    frames.append(ClassifyFrame.model_validate({**_DEFAULT_FRAME, "timestamp": ts}))
             return frames, _extract_usage(response)
 
         except Exception as e:
@@ -128,9 +179,16 @@ async def _classify_batch(
                 )
                 await asyncio.sleep(wait)
             else:
-                raise RuntimeError(
-                    f"배치 분류 실패 (timestamps={[t for t, _ in batch]}): {e}"
-                ) from e
+                # 배치 전체 실패: 프레임 1장씩 개별 API 콜로 폴백
+                logger.warning(
+                    "배치 전체 실패, %d장 개별 폴백 시도: %s",
+                    len(batch), e,
+                )
+                frames = []
+                for ts, jpeg_bytes in batch:
+                    frame = await _classify_single(client, ts, jpeg_bytes)
+                    frames.append(frame)
+                return frames, {"input_tokens": 0, "output_tokens": 0, "model": MODEL}
 
 
 async def run(

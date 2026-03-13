@@ -6,6 +6,7 @@ Gemini Flash 1콜로 LLM 부분 생성.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
@@ -32,6 +33,7 @@ from core.schemas.recipe import RecipeJSON
 logger = logging.getLogger(__name__)
 
 MODEL = "gemini-2.5-flash"
+MAX_RETRIES = 3
 
 
 # ── 체크리스트 (규칙 기반) ─────────────────────────────────────────────────
@@ -463,15 +465,33 @@ async def _call_llm(
         structure_json=json.dumps(structure_dict, ensure_ascii=False, indent=2),
     )
 
-    response = await client.aio.models.generate_content(
-        model=MODEL,
-        contents=[types.Part.from_text(text=prompt)],
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-        ),
-    )
-
-    return json.loads(response.text), _extract_usage(response)
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = await client.aio.models.generate_content(
+                model=MODEL,
+                contents=[types.Part.from_text(text=prompt)],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
+            )
+            return json.loads(response.text), _extract_usage(response)
+        except Exception as e:
+            wait = 2**attempt * 5
+            if attempt < MAX_RETRIES - 1:
+                logger.warning(
+                    "P13 EVALUATE 재시도 %d/%d (%s), %ds 대기...",
+                    attempt + 1,
+                    MAX_RETRIES,
+                    type(e).__name__,
+                    wait,
+                )
+                await asyncio.sleep(wait)
+            else:
+                raise RuntimeError(
+                    f"P13 EVALUATE 실패 ({MAX_RETRIES}회 시도): {e}"
+                ) from e
+    # unreachable
+    raise RuntimeError("P13 EVALUATE 실패")
 
 
 # ── 조립 ──────────────────────────────────────────────────────────────────

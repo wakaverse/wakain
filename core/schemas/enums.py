@@ -350,6 +350,7 @@ class ShotType(StrEnum):
     WIDE = "wide"
     OVERHEAD = "overhead"
     POV = "pov"
+    UNKNOWN = "unknown"
 
 
 class ColorTone(StrEnum):
