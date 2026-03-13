@@ -46,6 +46,8 @@ class ChannelResponse(BaseModel):
     platform: str = "instagram"
     avg_views_30d: float = 0
     is_active: bool = True
+    last_error: str | None = None
+    last_error_at: str | None = None
 
 
 # ─── Channel Management ───
@@ -286,8 +288,21 @@ async def collect_channel(channel_id: str, user: dict = Depends(get_current_user
         raise HTTPException(status_code=404, detail="채널을 찾을 수 없습니다")
 
     channel = ch.data
-    collected = await _dispatch_collect(sb, channel)
-    return {"ok": True, "collected": collected}
+    try:
+        collected = await _dispatch_collect(sb, channel)
+        # Clear error on success
+        sb.table("radar_channels").update({
+            "last_error": None,
+            "last_error_at": None,
+        }).eq("id", channel_id).execute()
+        return {"ok": True, "collected": collected}
+    except Exception as e:
+        # Record error but keep existing data
+        sb.table("radar_channels").update({
+            "last_error": str(e)[:200],
+            "last_error_at": datetime.now(timezone.utc).isoformat(),
+        }).eq("id", channel_id).execute()
+        raise HTTPException(status_code=502, detail=f"수집에 실패했습니다: {str(e)[:100]}")
 
 
 @router.post("/collect-all")
@@ -305,10 +320,125 @@ async def collect_all(user: dict = Depends(get_current_user)):
     for channel in channels.data:
         try:
             total += await _dispatch_collect(sb, channel)
-        except Exception:
+            sb.table("radar_channels").update({
+                "last_error": None,
+                "last_error_at": None,
+            }).eq("id", channel["id"]).execute()
+        except Exception as e:
+            sb.table("radar_channels").update({
+                "last_error": str(e)[:200],
+                "last_error_at": datetime.now(timezone.utc).isoformat(),
+            }).eq("id", channel["id"]).execute()
             continue
 
     return {"ok": True, "collected": total}
+
+
+class AnalyzeReelResponse(BaseModel):
+    job_id: str
+    reel_id: str
+
+
+@router.put("/reels/{reel_id}/analyze")
+async def analyze_reel(reel_id: str, user: dict = Depends(get_current_user)):
+    """Link a radar reel to the analysis pipeline — creates a job and updates reel record."""
+    from fastapi import BackgroundTasks, Request
+    sb = get_supabase()
+
+    # Verify reel belongs to user's channel
+    reel_resp = (
+        sb.table("radar_reels")
+        .select("*, radar_channels!inner(user_id)")
+        .eq("id", reel_id)
+        .single()
+        .execute()
+    )
+    if not reel_resp.data:
+        raise HTTPException(status_code=404, detail="릴을 찾을 수 없습니다")
+    reel = reel_resp.data
+    if reel.get("radar_channels", {}).get("user_id") != user["id"]:
+        raise HTTPException(status_code=403, detail="권한이 없습니다")
+
+    # If already analyzed, return existing job_id
+    if reel.get("job_id"):
+        return {"job_id": reel["job_id"], "reel_id": reel_id}
+
+    # Build video URL
+    platform = reel.get("platform", "instagram")
+    shortcode = reel.get("shortcode", "")
+    if platform == "youtube":
+        video_url = f"https://www.youtube.com/shorts/{shortcode}"
+    elif platform == "tiktok":
+        video_url = reel.get("video_url") or f"https://www.tiktok.com/video/{shortcode}"
+    else:
+        video_url = reel.get("video_url") or f"https://www.instagram.com/reel/{shortcode}/"
+
+    # Call the analyze-url logic inline (avoid circular import of BackgroundTasks)
+    import uuid as _uuid
+    import httpx
+    import boto3
+    from botocore.config import Config as BotoConfig
+    from app.config import (
+        R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_ENDPOINT,
+    )
+    from app.worker import run_analysis
+    from pathlib import Path
+    import asyncio
+
+    # Download video
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=120.0) as client:
+            resp = await client.get(video_url)
+            resp.raise_for_status()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"영상 다운로드 실패: {str(e)[:100]}")
+
+    video_bytes = resp.content
+    file_size_mb = len(video_bytes) / (1024 * 1024)
+    filename = video_url.split("?")[0].split("/")[-1] or "video.mp4"
+    if not Path(filename).suffix:
+        filename += ".mp4"
+
+    # Upload to R2
+    r2_key = f"uploads/{_uuid.uuid4()}/{filename}"
+    s3 = boto3.client(
+        "s3", endpoint_url=R2_ENDPOINT,
+        aws_access_key_id=R2_ACCESS_KEY_ID,
+        aws_secret_access_key=R2_SECRET_ACCESS_KEY,
+        config=BotoConfig(signature_version="s3v4"),
+        region_name="auto",
+    )
+    s3.put_object(Bucket=R2_BUCKET_NAME, Key=r2_key, Body=video_bytes,
+                  ContentType=resp.headers.get("content-type", "video/mp4"))
+
+    # Create job
+    job_id = str(_uuid.uuid4())
+    sb.table("jobs").insert({
+        "id": job_id,
+        "user_id": user["id"],
+        "status": "pending",
+        "video_name": filename,
+        "video_size_mb": round(file_size_mb, 2),
+        "video_url": r2_key,
+        "title": (reel.get("caption") or "")[:80] or shortcode or "Untitled",
+        "thumbnail_url": reel.get("thumbnail_url", ""),
+        "channel_name": reel.get("radar_channels", {}).get("ig_username", ""),
+        "source_url": video_url,
+        "posted_at": reel.get("posted_at"),
+    }).execute()
+
+    # Update reel record
+    sb.table("radar_reels").update({
+        "job_id": job_id,
+        "is_analyzed": True,
+    }).eq("id", reel_id).execute()
+
+    # Run analysis in background thread
+    asyncio.get_event_loop().run_in_executor(
+        None, run_analysis, job_id, r2_key, None, None,
+    )
+
+    return {"job_id": job_id, "reel_id": reel_id}
 
 
 async def _dispatch_collect(sb, channel: dict) -> int:

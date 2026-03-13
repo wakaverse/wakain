@@ -8,7 +8,7 @@ import {
   deleteRadarChannel,
   collectChannel,
   addLibraryItem,
-  createJobFromUrl,
+  analyzeRadarReel,
   getJobStatus,
 } from '../lib/api';
 import type { RadarChannel, RadarReel, RadarFilters, LibraryItem } from '../types';
@@ -674,6 +674,11 @@ function ChannelModal({
                       <p className="text-sm font-medium text-gray-900 truncate">{ch.display_name || ch.ig_username}</p>
                     </div>
                     <p className="text-xs text-gray-400">@{ch.ig_username}{ch.follower_count ? ` · ${formatNumber(ch.follower_count)}` : ''}</p>
+                    {ch.last_error && (
+                      <p className="text-[10px] text-amber-600 mt-0.5" title={ch.last_error}>
+                        ⚠️ 업데이트 실패 {ch.last_error_at ? `(${timeAgo(ch.last_error_at)})` : ''}
+                      </p>
+                    )}
                   </div>
                   <button onClick={() => onCollect(ch.id)} className="text-xs text-blue-500 hover:text-blue-700 mr-1" title="수집">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 8a6 6 0 0112 0" /><path d="M14 8a6 6 0 01-12 0" /><path d="M8 4v4l2 2" /></svg>
@@ -691,11 +696,145 @@ function ChannelModal({
   );
 }
 
+// ─── Analysis View (grouped by channel) ───
+
+function AnalysisView({
+  reels,
+  analyzingJobs,
+  navigate,
+}: {
+  reels: RadarReel[];
+  analyzingJobs: Map<string, { jobId: string; status: string }>;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  // Filter to analyzed reels + currently analyzing
+  const analyzedReels = reels.filter((r) => {
+    if (r.is_analyzed && r.job_id) return true;
+    const status = analyzingJobs.get(r.id);
+    return status && (status.status === 'completed' || status.status === 'processing' || status.status === 'pending');
+  });
+
+  if (analyzedReels.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400"><path d="M9 17H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M15 3h4a2 2 0 012 2v10a2 2 0 01-2 2h-4" /><path d="M12 21V3" /><path d="M3 12h18" /></svg>
+        </div>
+        <p className="text-sm text-gray-500">분석된 영상이 없습니다</p>
+        <p className="text-xs text-gray-400 mt-1">피드에서 영상을 분석해보세요</p>
+      </div>
+    );
+  }
+
+  // Group by channel, sorted by most recent analyzed first
+  const grouped = new Map<string, { channel: RadarChannel; reels: RadarReel[] }>();
+  const sorted = [...analyzedReels].sort((a, b) => new Date(b.posted_at || 0).getTime() - new Date(a.posted_at || 0).getTime());
+
+  for (const reel of sorted) {
+    const chId = reel.channel?.id || 'unknown';
+    if (!grouped.has(chId)) {
+      grouped.set(chId, { channel: reel.channel, reels: [] });
+    }
+    grouped.get(chId)!.reels.push(reel);
+  }
+
+  return (
+    <div className="space-y-8">
+      {Array.from(grouped.entries()).map(([chId, { channel, reels: chReels }]) => (
+        <div key={chId}>
+          {/* Channel header */}
+          <div className="flex items-center gap-2 mb-3">
+            {channel?.profile_pic_url ? (
+              <img src={channel.profile_pic_url} alt="" className="w-7 h-7 rounded-full" />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-gray-200" />
+            )}
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{channel?.display_name || channel?.ig_username || '알 수 없음'}</p>
+              <p className="text-[10px] text-gray-400">@{channel?.ig_username || '—'} · 분석 {chReels.length}건</p>
+            </div>
+          </div>
+
+          {/* Reel cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {chReels.map((reel) => {
+              const jobId = analyzingJobs.get(reel.id)?.jobId || reel.job_id;
+              const status = analyzingJobs.get(reel.id)?.status || (reel.is_analyzed ? 'completed' : 'pending');
+
+              return (
+                <div
+                  key={reel.id}
+                  onClick={() => { if (status === 'completed' && jobId) navigate(`/app/results/${jobId}`); }}
+                  className={`flex gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:shadow-sm transition-shadow ${status === 'completed' ? 'cursor-pointer' : ''}`}
+                >
+                  {/* Thumbnail */}
+                  <div className="w-20 h-28 rounded-lg overflow-hidden bg-gray-100 shrink-0 relative">
+                    {reel.thumbnail_url ? (
+                      <img src={reel.thumbnail_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polygon points="10,8 16,12 10,16" fill="currentColor" /></svg>
+                      </div>
+                    )}
+                    <div className="absolute top-1 right-1">
+                      <PlatformBadge platform={reel.platform} />
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-900 line-clamp-2 mb-1">
+                        {reel.caption?.slice(0, 80) || '제목 없음'}
+                      </p>
+                      <p className="text-[10px] text-gray-400">{reel.posted_at ? timeAgo(reel.posted_at) : ''}</p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      {/* Spike badge */}
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${spikeBadgeClass(reel.spike_multiplier)}`}>
+                        {reel.spike_multiplier.toFixed(1)}x
+                      </span>
+                      {/* Views */}
+                      <span className="text-[10px] text-gray-500">
+                        {formatNumber(reel.view_count)} views
+                      </span>
+                      {/* Status badge */}
+                      {status === 'completed' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 font-medium ml-auto">
+                          결과보기 →
+                        </span>
+                      )}
+                      {(status === 'processing' || status === 'pending') && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 font-medium ml-auto flex items-center gap-1">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          분석중
+                        </span>
+                      )}
+                      {status === 'failed' && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-50 text-red-600 font-medium ml-auto">
+                          실패
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
 // ─── Main Page ───
 
 export default function RadarPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
+  const [activeView, setActiveView] = useState<'feed' | 'analysis'>('feed');
   const [channels, setChannels] = useState<RadarChannel[]>([]);
   const [reels, setReels] = useState<RadarReel[]>([]);
   const [total, setTotal] = useState(0);
@@ -846,13 +985,10 @@ export default function RadarPage() {
     const existing = analyzingJobs.get(reel.id);
     if (existing && (existing.status === 'processing' || existing.status === 'pending')) return;
 
-    let videoUrl: string;
-    if (reel.platform === 'youtube') {
-      videoUrl = `https://www.youtube.com/shorts/${reel.shortcode}`;
-    } else if (reel.platform === 'tiktok') {
-      videoUrl = reel.video_url || `https://www.tiktok.com/video/${reel.shortcode}`;
-    } else {
-      videoUrl = reel.video_url || `https://www.instagram.com/reel/${reel.shortcode}/`;
+    // If already analyzed, navigate to results
+    if (reel.is_analyzed && reel.job_id) {
+      navigate(`/app/results/${reel.job_id}`);
+      return;
     }
 
     try {
@@ -862,13 +998,7 @@ export default function RadarPage() {
         return next;
       });
 
-      const { id: jobId } = await createJobFromUrl(videoUrl, undefined, undefined, {
-        title: reel.caption?.slice(0, 80) || reel.shortcode || 'Untitled',
-        thumbnail_url: reel.thumbnail_url || '',
-        channel_name: reel.channel?.ig_username || '',
-        source_url: videoUrl,
-        posted_at: reel.posted_at || undefined,
-      });
+      const { job_id: jobId } = await analyzeRadarReel(reel.id);
 
       setAnalyzingJobs((prev) => {
         const next = new Map(prev);
@@ -876,7 +1006,7 @@ export default function RadarPage() {
         return next;
       });
 
-      showToast('🔍 분석을 시작했습니다', 'info', '완료되면 분석 탭에서 결과를 확인하세요');
+      showToast('분석을 시작했습니다', 'info', '완료되면 분석 탭에서 결과를 확인하세요');
       startPolling(reel.id, jobId);
     } catch (e) {
       setAnalyzingJobs((prev) => {
@@ -934,53 +1064,89 @@ export default function RadarPage() {
           ⚙️ {t('radar.channelManage', '채널 관리')}
         </button>
       </div>
-      <p className="text-xs text-gray-400 mb-5">{t('radar.subtitle', '떡상한 영상을 찾아 분석하고 저장하세요')}</p>
+      <p className="text-xs text-gray-400 mb-4">{t('radar.subtitle', '떡상한 영상을 찾아 분석하고 저장하세요')}</p>
 
-      {/* Filter Bar */}
-      <div className="bg-white border-b border-gray-200 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-5">
-        <FilterBar filters={filters} setFilters={setFilters} channels={channels} />
+      {/* View Tabs */}
+      <div className="flex items-center gap-1 mb-4 border-b border-gray-200">
+        <button
+          onClick={() => setActiveView('feed')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            activeView === 'feed'
+              ? 'border-gray-900 text-gray-900'
+              : 'border-transparent text-gray-400 hover:text-gray-600'
+          }`}
+        >
+          피드
+        </button>
+        <button
+          onClick={() => setActiveView('analysis')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            activeView === 'analysis'
+              ? 'border-gray-900 text-gray-900'
+              : 'border-transparent text-gray-400 hover:text-gray-600'
+          }`}
+        >
+          분석 결과
+          {reels.filter((r) => r.is_analyzed && r.job_id).length > 0 && (
+            <span className="ml-1.5 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">
+              {reels.filter((r) => r.is_analyzed && r.job_id).length}
+            </span>
+          )}
+        </button>
       </div>
 
-      {/* Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin" />
+      {/* Filter Bar — feed view only */}
+      {activeView === 'feed' && (
+        <div className="bg-white border-b border-gray-200 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-5">
+          <FilterBar filters={filters} setFilters={setFilters} channels={channels} />
         </div>
-      ) : channels.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-300"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-          </div>
-          <p className="text-sm font-medium text-gray-700 mb-1">아직 등록된 채널이 없습니다</p>
-          <p className="text-xs text-gray-400 mb-4">채널을 추가하면 떡상 영상을 자동으로 수집합니다</p>
-          <button onClick={() => setModalOpen(true)} className="text-xs font-medium px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors">
-            + 채널 추가하기
-          </button>
-        </div>
-      ) : reels.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-          </div>
-          <p className="text-sm text-gray-500">{t('radar.empty', '수집된 영상이 없습니다')}</p>
-          <p className="text-xs text-gray-400 mt-1">{t('radar.emptyHint', '채널을 추가하고 수집을 시작하세요')}</p>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {reels.map((reel) => (
-              <ReelCard key={reel.id} reel={reel} onAnalyze={() => handleAnalyze(reel)} onToggleFavorite={() => handleToggleFavorite(reel)} isFavorited={favoritedReels.has(reel.id)} analysisStatus={analyzingJobs.get(reel.id)} />
-            ))}
-          </div>
+      )}
 
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-6">
-              <button onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })} disabled={(filters.page || 1) <= 1} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">이전</button>
-              <span className="text-xs text-gray-400">{filters.page || 1} / {totalPages}</span>
-              <button onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })} disabled={(filters.page || 1) >= totalPages} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">다음</button>
+      {/* Grid */}
+      {activeView === 'feed' ? (
+        loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin" />
+          </div>
+        ) : channels.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-300"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
             </div>
-          )}
-        </>
+            <p className="text-sm font-medium text-gray-700 mb-1">아직 등록된 채널이 없습니다</p>
+            <p className="text-xs text-gray-400 mb-4">채널을 추가하면 떡상 영상을 자동으로 수집합니다</p>
+            <button onClick={() => setModalOpen(true)} className="text-xs font-medium px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors">
+              + 채널 추가하기
+            </button>
+          </div>
+        ) : reels.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
+            </div>
+            <p className="text-sm text-gray-500">{t('radar.empty', '수집된 영상이 없습니다')}</p>
+            <p className="text-xs text-gray-400 mt-1">{t('radar.emptyHint', '채널을 추가하고 수집을 시작하세요')}</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {reels.map((reel) => (
+                <ReelCard key={reel.id} reel={reel} onAnalyze={() => handleAnalyze(reel)} onToggleFavorite={() => handleToggleFavorite(reel)} isFavorited={favoritedReels.has(reel.id)} analysisStatus={analyzingJobs.get(reel.id)} />
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <button onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })} disabled={(filters.page || 1) <= 1} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">이전</button>
+                <span className="text-xs text-gray-400">{filters.page || 1} / {totalPages}</span>
+                <button onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })} disabled={(filters.page || 1) >= totalPages} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">다음</button>
+              </div>
+            )}
+          </>
+        )
+      ) : (
+        /* ─── Analysis View ─── */
+        <AnalysisView reels={reels} analyzingJobs={analyzingJobs} navigate={navigate} />
       )}
 
       <ChannelModal open={modalOpen} onClose={() => setModalOpen(false)} channels={channels} onAdd={handleAddChannel} onDelete={handleDeleteChannel} onCollect={handleCollect} />

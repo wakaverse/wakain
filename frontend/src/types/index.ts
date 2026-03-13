@@ -553,6 +553,8 @@ export interface RadarChannel {
   follower_count: number;
   category: string;
   avg_views_30d: number;
+  last_error?: string;
+  last_error_at?: string;
 }
 
 export interface RadarReel {

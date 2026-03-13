@@ -288,6 +288,18 @@ export async function getRadarFeed(
   return res.json();
 }
 
+export async function analyzeRadarReel(reelId: string): Promise<{ job_id: string; reel_id: string }> {
+  const res = await fetch(`${API_URL}/api/radar/reels/${reelId}/analyze`, {
+    method: 'PUT',
+    headers: await authHeaders(),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: '분석 시작에 실패했습니다' }));
+    throw new Error(err.detail || '분석 시작에 실패했습니다');
+  }
+  return res.json();
+}
+
 export async function collectChannel(channelId: string): Promise<void> {
   const res = await fetch(`${API_URL}/api/radar/collect/${channelId}`, {
     method: 'POST',
