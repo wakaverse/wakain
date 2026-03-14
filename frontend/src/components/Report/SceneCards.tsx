@@ -1,7 +1,7 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { Play } from 'lucide-react';
 import type { RecipeJSON, VisualScene, ProductClaim, ScriptBlock, AttentionPoint } from '../../types/recipe';
-import { formatTime, BLOCK_LABELS, BLOCK_EVAL_COLORS, CLAIM_TYPE_INFO } from '../../lib/recipe-utils';
+import { formatTime, BLOCK_LABELS, CLAIM_TYPE_INFO } from '../../lib/recipe-utils';
 
 /* ── 역할 태그 색상 ─────────────────────── */
 
@@ -42,7 +42,6 @@ function buildSceneDataList(data: RecipeJSON, thumbnails: Record<string, string>
   const claims: ProductClaim[] = data.product?.claims || [];
   const points: AttentionPoint[] = data.visual?.rhythm?.attention_curve?.points || [];
   const overallAvg = data.visual?.rhythm?.attention_curve?.avg ?? 0;
-  const duration = data.meta?.duration ?? 0;
 
   return scenes.map((scene) => {
     const [start, end] = scene.time_range;
