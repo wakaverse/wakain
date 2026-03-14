@@ -1,7 +1,11 @@
 {
   "nav": {
     "contact": "お問い合わせ",
-    "start": "始める"
+    "start": "始める",
+    "login": "ログイン",
+    "free_start": "無料で始める",
+    "features": "機能",
+    "pricing": "料金プラン"
   },
   "hero": {
     "badge": "Commerce Video Intelligence",
@@ -260,12 +264,15 @@
     "집행 불가": "実行不可"
   },
   "footer": {
-    "copyright": "© 2026 CRABs — Creator's AI Bridge"
+    "copyright": "© 2026 CRABs — Creator's AI Bridge",
+    "company": "CRABs Inc. | 代表 キム・テヨン | 事業者登録番号 224-88-02602",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー"
   },
   "seo": {
     "landing": {
-      "title": "WakaLab — コマースショート動画ハッキングプラットフォーム",
-      "description": "バズったコマース動画をカット単位で分析し、あなたの商品に最適なコンテンツを生成するAIプラットフォーム。レシピベースの台本生成付き。"
+      "title": "WakaLab — 競合のショート動画が伸びる理由を教えます",
+      "description": "ショート動画の構造をAIで分析し、競合と比較し、データ基盤のコーチングでより良い動画を作りましょう。TikTok、Instagramリール、YouTubeショーツ対応。"
     },
     "analyze": {
       "title": "動画分析を開始 — WakaLab",

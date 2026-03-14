@@ -1,7 +1,11 @@
 {
   "nav": {
     "contact": "Contact",
-    "start": "Get Started"
+    "start": "Get Started",
+    "login": "Log in",
+    "free_start": "Start Free",
+    "features": "Features",
+    "pricing": "Pricing"
   },
   "hero": {
     "badge": "Commerce Video Intelligence",
@@ -260,12 +264,15 @@
     "집행 불가": "Not Recommended"
   },
   "footer": {
-    "copyright": "© 2026 CRABs — Creator's AI Bridge"
+    "copyright": "© 2026 CRABs — Creator's AI Bridge",
+    "company": "CRABs Inc. | CEO Taeyoung Kim | Reg. No. 224-88-02602",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
   },
   "seo": {
     "landing": {
-      "title": "WakaLab — Commerce Short-form Video Hacking Platform",
-      "description": "AI platform that analyzes viral commerce videos cut by cut and generates optimized content for your product. Recipe-based script generation included."
+      "title": "WakaLab — Find Out Why Competitor Short-form Videos Go Viral",
+      "description": "Analyze short-form video structure with AI, compare with competitors, and get data-driven coaching to create better videos. TikTok, Instagram Reels, YouTube Shorts supported."
     },
     "analyze": {
       "title": "Start Video Analysis — WakaLab",

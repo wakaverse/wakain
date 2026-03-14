@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical, Mail, ChevronDown, LogOut } from 'lucide-react';
+import { FlaskConical, ChevronDown, LogOut, Mail } from 'lucide-react';
 import { SUPPORTED_LANGS, LANG_META, type Lang } from '../i18n';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -46,17 +46,32 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   const prefix = langPrefix(lang);
+  const isLanding = location.pathname === '/' || location.pathname === `/${lang}`;
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-gray-900 flex flex-col">
       <header className="border-b border-gray-200/60 bg-white/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link to={prefix || '/'} className="flex items-center gap-2 font-semibold text-base tracking-tight">
             <FlaskConical className="w-4 h-4 text-gray-900" />
             <span className="text-gray-900">WakaLab</span>
           </Link>
+
+          {isLanding && (
+            <nav className="hidden md:flex items-center gap-6">
+              <a href="#features" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                {t('nav.features')}
+              </a>
+              <a href="#pricing" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                {t('nav.pricing')}
+              </a>
+              <Link to={`${prefix}/contact`} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                {t('nav.contact')}
+              </Link>
+            </nav>
+          )}
+
           <nav className="flex items-center gap-1">
-            {/* Language Switcher */}
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setLangOpen((v) => !v)}
@@ -83,18 +98,20 @@ export default function Layout({ children }: LayoutProps) {
               )}
             </div>
 
-            <Link
-              to={`${prefix}/contact`}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5" />
-              {t('nav.contact')}
-            </Link>
+            {!isLanding && (
+              <Link
+                to={`${prefix}/contact`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                {t('nav.contact')}
+              </Link>
+            )}
 
             {user ? (
               <>
                 <Link
-                  to="/app/hack"
+                  to="/app/analyze"
                   className="ml-2 px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-full transition-colors"
                 >
                   {t('nav.start')}
@@ -108,19 +125,56 @@ export default function Layout({ children }: LayoutProps) {
                 </button>
               </>
             ) : (
-              <button
-                onClick={signInWithGoogle}
-                className="ml-2 px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-full transition-colors"
-              >
-                {t('nav.start')}
-              </button>
+              <>
+                <button
+                  onClick={signInWithGoogle}
+                  className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium"
+                >
+                  {t('nav.login')}
+                </button>
+                <button
+                  onClick={signInWithGoogle}
+                  className="ml-1 px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-full transition-colors"
+                >
+                  {t('nav.free_start')}
+                </button>
+              </>
             )}
           </nav>
         </div>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="border-t border-gray-200/60 py-8 text-center text-gray-400 text-xs tracking-wide">
-        {t('footer.copyright')}
+      <footer className="border-t border-gray-200/60 bg-white">
+        <div className="max-w-5xl mx-auto px-6 py-12">
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-8">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <FlaskConical className="w-4 h-4 text-gray-400" />
+                <span className="font-semibold text-sm text-gray-500">WakaLab</span>
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                {t('footer.company')}
+              </p>
+            </div>
+            <div className="flex gap-8">
+              <div className="flex flex-col gap-2">
+                <Link to={`${prefix}/contact`} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                  {t('nav.contact')}
+                </Link>
+                <a href="mailto:contact@crabs.ai" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                  contact@crabs.ai
+                </a>
+              </div>
+              <div className="flex flex-col gap-2">
+                <span className="text-xs text-gray-400">{t('footer.terms')}</span>
+                <span className="text-xs text-gray-400">{t('footer.privacy')}</span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 pt-6 border-t border-gray-100 text-center text-xs text-gray-300">
+            {t('footer.copyright')}
+          </div>
+        </div>
       </footer>
     </div>
   );
