@@ -217,15 +217,6 @@ export default function RadarPage() {
   };
 
   // Track reel data for CompareBar display (we need the actual reel objects)
-  const handleSelectReelWithData = useCallback((reelId: string, allReels?: RadarReel[]) => {
-    handleSelectReel(reelId);
-    if (allReels) {
-      const reel = allReels.find((r) => r.id === reelId);
-      if (reel && !selectedReelIds.has(reelId)) {
-        setSelectedReelData((prev) => [...prev, reel]);
-      }
-    }
-  }, [selectedReelIds]);
 
   return (
     <div className="max-w-6xl mx-auto">
