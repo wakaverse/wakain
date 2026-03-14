@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { ChevronDown, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import type { RecipeJSON, SegmentEval } from '../../types/recipe';
 import { formatTime, BLOCK_LABELS, BLOCK_EVAL_COLORS, BLOCK_TYPE_KO, translateFieldNames } from '../../lib/recipe-utils';
 
@@ -104,7 +103,7 @@ export default function CoachingCard({ data }: Props) {
             const segEval = structure[seg];
             if (!segEval) return null;
             return (
-              <SegmentAccordion
+              <SegmentSection
                 key={seg}
                 label={SEGMENT_LABELS[seg]}
                 segment={segEval}
@@ -117,27 +116,23 @@ export default function CoachingCard({ data }: Props) {
   );
 }
 
-function SegmentAccordion({ label, segment }: {
+function SegmentSection({ label, segment }: {
   label: string;
   segment: SegmentEval;
 }) {
-  const [open, setOpen] = useState(true);
   const hasContent = segment.strengths.length > 0 || segment.improvements.length > 0;
   if (!hasContent) return null;
 
   return (
     <div className="border border-gray-100 rounded-xl overflow-hidden">
-      <button
-        className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors"
-        onClick={() => setOpen(!open)}
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-800">{label}</span>
-          <span className="text-[10px] font-mono text-gray-400">
-            {formatTime(segment.time_range[0])}–{formatTime(segment.time_range[1])}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="px-3 py-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-800">{label}</span>
+            <span className="text-[10px] font-mono text-gray-400">
+              {formatTime(segment.time_range[0])}–{formatTime(segment.time_range[1])}
+            </span>
+          </div>
           {segment.block_types.length > 0 && (
             <div className="flex gap-1 flex-wrap">
               {segment.block_types.map((bt, i) => (
@@ -154,26 +149,23 @@ function SegmentAccordion({ label, segment }: {
               ))}
             </div>
           )}
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
         </div>
-      </button>
+      </div>
 
-      {open && (
-        <div className="px-3 pb-3 space-y-2">
-          {segment.strengths.map((s, i) => (
-            <div key={`s-${i}`} className="flex items-start gap-1.5">
-              <TrendingUp className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
-              <p className="text-sm text-gray-700 leading-relaxed">{translateFieldNames(s.comment)}</p>
-            </div>
-          ))}
-          {segment.improvements.map((imp, i) => (
-            <div key={`i-${i}`} className="bg-amber-50 rounded-lg px-2.5 py-2">
-              <p className="text-sm font-medium text-gray-700">{translateFieldNames(imp.comment)}</p>
-              <p className="text-xs text-blue-600 mt-0.5">{translateFieldNames(imp.suggestion)}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="px-3 pb-3 space-y-2">
+        {segment.strengths.map((s, i) => (
+          <div key={`s-${i}`} className="flex items-start gap-1.5">
+            <TrendingUp className="w-3 h-3 text-emerald-500 mt-0.5 shrink-0" />
+            <p className="text-sm text-gray-700 leading-relaxed">{translateFieldNames(s.comment)}</p>
+          </div>
+        ))}
+        {segment.improvements.map((imp, i) => (
+          <div key={`i-${i}`} className="bg-amber-50 rounded-lg px-2.5 py-2">
+            <p className="text-sm font-medium text-gray-700">{translateFieldNames(imp.comment)}</p>
+            <p className="text-xs text-blue-600 mt-0.5">{translateFieldNames(imp.suggestion)}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

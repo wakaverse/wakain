@@ -62,10 +62,10 @@ async def compare_videos(
 
     video_labels = [chr(65 + i) for i in range(len(body.result_ids))]  # A, B, C
 
-    structure = build_structure_comparison(dna_rows, body.result_ids)
+    structure = build_structure_comparison(dna_rows, resolved_ids)
 
     # 2. 소구점 매칭 (파트2: Gemini 콜 1)
-    claims_by_video = fetch_recipe_claims(body.result_ids)
+    claims_by_video = fetch_recipe_claims(resolved_ids)
     claim_matching = match_claims_via_gemini(claims_by_video, video_labels)
 
     # 3. AI 코칭 (파트3: Gemini 콜 2)
@@ -75,7 +75,7 @@ async def compare_videos(
         dna_rows=dna_rows,
         claim_matching=claim_matching,
         video_labels=video_labels,
-        result_ids=body.result_ids,
+        result_ids=resolved_ids,
     )
 
     # Increment quota after success
@@ -86,7 +86,7 @@ async def compare_videos(
         user_id=user["id"],
         scenario=body.scenario,
         base_result_id=body.base_result_id,
-        result_ids=body.result_ids,
+        result_ids=resolved_ids,
         claim_matching=claim_matching,
         coaching=coaching,
     )
@@ -95,7 +95,7 @@ async def compare_videos(
         "report_id": report.get("id"),
         "scenario": body.scenario,
         "base_result_id": body.base_result_id,
-        "result_ids": body.result_ids,
+        "result_ids": resolved_ids,
         "video_labels": video_labels,
         "structure": structure,
         "claim_matching": claim_matching,
