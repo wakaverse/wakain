@@ -184,17 +184,34 @@ export default function JobStatusPage() {
           </div>
         )}
 
-        {/* Simple status message — no pipeline details */}
+        {/* Progress status messages — friendly, no internal details */}
         {hasPhaseData ? (
           <div className="text-center py-4">
-            <p className="text-sm text-gray-500">
-              {completedCount < PHASES.length
-                ? (lang === 'ko' ? '영상을 분석하고 있습니다. 잠시만 기다려주세요...' : 'Analyzing your video. Please wait...')
-                : (lang === 'ko' ? '분석이 거의 완료되었습니다!' : 'Almost done!')}
-            </p>
-            <p className="text-xs text-gray-400 mt-2">
-              {lang === 'ko' ? '보통 2~3분 정도 소요됩니다' : 'Usually takes 2-3 minutes'}
-            </p>
+            {(() => {
+              const pct = Math.round((completedCount / PHASES.length) * 100);
+              const messages = lang === 'ko' ? [
+                { threshold: 10, text: '영상을 다운로드하고 있어요...', sub: '잠시만 기다려주세요' },
+                { threshold: 25, text: '영상 구조를 파악하고 있어요...', sub: '컷, 장면 전환을 분석 중' },
+                { threshold: 45, text: '시각 요소를 분석하고 있어요...', sub: '화면 구성과 변화를 읽는 중' },
+                { threshold: 65, text: '스크립트와 소구 전략을 분석 중...', sub: '어떤 메시지로 설득하는지 파악 중' },
+                { threshold: 85, text: 'AI가 코칭을 작성하고 있어요...', sub: '거의 다 됐어요!' },
+                { threshold: 100, text: '분석이 거의 완료되었습니다!', sub: '결과를 정리하는 중...' },
+              ] : [
+                { threshold: 10, text: 'Downloading video...', sub: 'Please wait' },
+                { threshold: 25, text: 'Analyzing video structure...', sub: 'Detecting cuts and scenes' },
+                { threshold: 45, text: 'Analyzing visual elements...', sub: 'Reading composition and dynamics' },
+                { threshold: 65, text: 'Analyzing script & persuasion...', sub: 'Understanding the message strategy' },
+                { threshold: 85, text: 'AI is writing coaching...', sub: 'Almost there!' },
+                { threshold: 100, text: 'Almost done!', sub: 'Wrapping up results...' },
+              ];
+              const msg = messages.find(m => pct <= m.threshold) || messages[messages.length - 1];
+              return (
+                <>
+                  <p className="text-sm text-gray-600 font-medium">{msg.text}</p>
+                  <p className="text-xs text-gray-400 mt-1">{msg.sub}</p>
+                </>
+              );
+            })()}
           </div>
         ) : (
           /* No SSE data yet — simple waiting state */
