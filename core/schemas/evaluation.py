@@ -150,3 +150,15 @@ class EvaluationOutput(BaseModel):
 
     # 레시피 평가
     recipe_eval: RecipeEval = Field(description="레시피 평가 + 개선 제안")
+
+    # 씬별 한줄 평가 (P13 LLM 생성)
+    scene_evaluations: dict[str, str] = Field(
+        default_factory=dict,
+        description="씬 ID → 한줄 평가 (30~50자)",
+    )
+
+    # 핵심 설득 한 문장
+    core_persuasion: str = Field(
+        default="",
+        description="이 영상의 전체 소구를 한 문장으로 압축",
+    )

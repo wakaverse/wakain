@@ -172,6 +172,8 @@ export interface Evaluation {
   strengths: EvalInsight[];
   improvements: EvalImprovement[];
   recipe_eval: RecipeEval;
+  scene_evaluations?: Record<string, string>;
+  core_persuasion?: string;
 }
 
 export interface RecipeJSON {

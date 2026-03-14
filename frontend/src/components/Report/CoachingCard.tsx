@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { ChevronDown, TrendingUp, Lightbulb } from 'lucide-react';
+import { ChevronDown, TrendingUp } from 'lucide-react';
 import type { RecipeJSON, SegmentEval } from '../../types/recipe';
-import { formatTime, BLOCK_LABELS, BLOCK_EVAL_COLORS } from '../../lib/recipe-utils';
+import { formatTime, BLOCK_LABELS, BLOCK_EVAL_COLORS, BLOCK_TYPE_KO } from '../../lib/recipe-utils';
 
 interface Props {
   data: RecipeJSON;
@@ -41,31 +41,32 @@ export default function CoachingCard({ data }: Props) {
         </div>
       )}
 
-      {/* Improvements */}
+      {/* Improvements — 배경색 카드 */}
       {improvements.length > 0 && (
         <div className="mb-4">
-          <p className="text-xs font-medium text-gray-500 mb-2">💡 이렇게 하면 더 좋아요</p>
-          <div className="space-y-2">
+          <p className="text-xs font-medium text-gray-500 mb-2">🔧 핵심 개선 포인트</p>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-3">
             {improvements.map((imp, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <Lightbulb className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-base text-gray-800 leading-loose">{imp.fact}</p>
-                  <p className="text-sm text-gray-500 leading-relaxed">{imp.comment}</p>
-                  <p className="text-sm text-blue-600 mt-0.5 leading-relaxed">{imp.suggestion}</p>
-                </div>
+              <div key={i}>
+                <p className="text-sm font-medium text-gray-800">
+                  {i + 1}. {imp.fact}
+                </p>
+                <p className="text-sm text-gray-600 leading-relaxed mt-0.5">{imp.comment}</p>
+                <p className="text-sm text-blue-700 mt-0.5 leading-relaxed">{imp.suggestion}</p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Recipe eval (current vs suggestion) */}
+      {/* Recipe eval — 구조 개선안 */}
       {recipe_eval && (
         <div className="mb-4">
-          <p className="text-xs font-medium text-gray-500 mb-2">📐 추천 구조</p>
-          <div className="bg-gray-50 rounded-xl p-3 mb-2">
-            <p className="text-[10px] text-gray-400 mb-1">현재</p>
+          <p className="text-xs font-medium text-gray-500 mb-2">📐 구조 개선안</p>
+
+          {/* ❌ 현재 구조 — 연한 빨강 */}
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-2">
+            <p className="text-[10px] text-red-500 mb-1">❌ 현재 구조</p>
             <div className="flex flex-wrap items-center gap-1.5">
               {recipe_eval.current.map((block, i) => (
                 <span key={i} className="flex items-center gap-1.5">
@@ -76,7 +77,7 @@ export default function CoachingCard({ data }: Props) {
                       color: BLOCK_EVAL_COLORS[block] || '#6B7280',
                     }}
                   >
-                    {BLOCK_LABELS[block] || block}
+                    {BLOCK_TYPE_KO[block] || BLOCK_LABELS[block] || block}
                   </span>
                   {i < recipe_eval.current.length - 1 && (
                     <span className="text-gray-300 text-xs">→</span>
@@ -85,10 +86,12 @@ export default function CoachingCard({ data }: Props) {
               ))}
             </div>
           </div>
-          <div className="bg-blue-50 rounded-xl p-3">
-            <p className="text-[10px] text-blue-500 mb-1">제안</p>
-            <p className="text-sm text-blue-800 leading-relaxed">{recipe_eval.suggestion}</p>
-            <p className="text-xs text-blue-600 mt-1">{recipe_eval.reason}</p>
+
+          {/* ✅ 개선안 — 연한 초록 */}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+            <p className="text-[10px] text-emerald-600 mb-1">✅ 개선안</p>
+            <p className="text-sm text-emerald-800 leading-relaxed">{recipe_eval.suggestion}</p>
+            <p className="text-xs text-emerald-600 mt-1">{recipe_eval.reason}</p>
           </div>
         </div>
       )}
@@ -136,13 +139,18 @@ function SegmentAccordion({ label, segment }: {
         </div>
         <div className="flex items-center gap-2">
           {segment.block_types.length > 0 && (
-            <div className="flex gap-0.5">
+            <div className="flex gap-1 flex-wrap">
               {segment.block_types.map((bt, i) => (
                 <span
                   key={i}
-                  className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: BLOCK_EVAL_COLORS[bt] || '#6B7280' }}
-                />
+                  className="text-[9px] px-1.5 py-0.5 rounded-full font-medium"
+                  style={{
+                    backgroundColor: `${BLOCK_EVAL_COLORS[bt] || '#6B7280'}15`,
+                    color: BLOCK_EVAL_COLORS[bt] || '#6B7280',
+                  }}
+                >
+                  {BLOCK_TYPE_KO[bt] || BLOCK_LABELS[bt] || bt}
+                </span>
               ))}
             </div>
           )}
@@ -159,12 +167,9 @@ function SegmentAccordion({ label, segment }: {
             </div>
           ))}
           {segment.improvements.map((imp, i) => (
-            <div key={`i-${i}`} className="flex items-start gap-1.5">
-              <Lightbulb className="w-3 h-3 text-amber-500 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-sm text-gray-700 leading-relaxed">{imp.comment}</p>
-                <p className="text-xs text-blue-600 mt-0.5">{imp.suggestion}</p>
-              </div>
+            <div key={`i-${i}`} className="bg-amber-50 rounded-lg px-2.5 py-2">
+              <p className="text-sm font-medium text-gray-700">{imp.comment}</p>
+              <p className="text-xs text-blue-600 mt-0.5">{imp.suggestion}</p>
             </div>
           ))}
         </div>

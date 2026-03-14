@@ -301,6 +301,7 @@ def _build_recipe_summary(recipe: RecipeJSON) -> dict:
                 "style": s.get("style"),
                 "role": s.get("role"),
                 "description": s.get("description", ""),
+                "dominant_appeal": s.get("dominant_appeal", ""),
             }
             for s in full.get("scenes", [])
         ],
@@ -388,8 +389,47 @@ Provide coaching insights in **{output_language}** as JSON with this exact struc
       "translation": "이 스펙이 영상에서 소비자 경험으로 어떻게 번역되었는지 (예: '세라마이드 3종 함유' → '세수 후에도 당기지 않는 촉촉함')",
       "strategy": "experience_shift | loss_aversion | info_preempt | social_evidence | price_anchor"
     }}
-  ]
+  ],
+  "scene_evaluations": [
+    {{
+      "scene_id": 0,
+      "evaluation": "이 씬의 역할 + 핵심 특징 + 문제점 또는 강점을 한 문장으로 (30~50자)"
+    }}
+  ],
+  "core_persuasion": "이 영상의 전체 소구를 한 문장으로 압축 (예: '편안함 + 스타일 = 속옷 없이도 되는 브라탑')"
 }}
+
+## Scene Evaluations (MANDATORY)
+For each scene in the scenes array, generate a 1-line evaluation (30~50 characters):
+- 이 씬의 역할 (시연/설득/증거/공감 등)
+- 핵심 특징 1개
+- 문제점 또는 강점 1개
+Example: "제품 착용 시연 구간. 소구 밀도 높으나 변화량 낮아 단조로움."
+
+## Core Persuasion (MANDATORY)
+Summarize all product claims into one persuasive sentence that captures the video's selling point.
+Example: "편안함 + 스타일 = 속옷 없이도 되는 브라탑"
+
+## Coaching Context Rules (MANDATORY)
+- 영상의 목적과 타겟 맥락에 따라 코칭 방향을 조정하라.
+- 모든 영상에 높은 시각 변화량이 필요한 것은 아니다.
+- 플랫폼이 upload이고 스타일이 데모이고 주요 소구가 기능/경험 중심이면:
+  → "시각 변화량을 높여라"가 아니라 "시연 구간의 설득력을 높여라"로 코칭.
+- 틱톡/릴스 네이티브 영상과 홈쇼핑/쇼핑 재활용 영상은 코칭 방향이 달라야 한다.
+- 타겟이 구매 의향이 높은 사람(앱 내 시청)이면 훅보다 신뢰/증거/CTA 강화 중심.
+
+## Output Rules (MANDATORY)
+- 영어 필드명, 내부 변수명, 데이터 구조명을 절대 노출하지 마라.
+- product_exposure_pct → "제품 노출 비중"
+- script_alpha_summary → 해당 내용을 한국어로 설명
+- checklist_results → "분석 결과"
+- pain_point → "고민/문제 제기"
+- cta → "행동 유도"
+- social_proof → "사회적 증거"
+- differentiation → "차별점"
+- benefit → "장점/매력"
+- authority → "전문가/권위"
+- 모든 블록 타입, 소구 유형, 전략명을 한국어로 번역하여 출력.
 
 ## Coaching Rules (MANDATORY — follow strictly)
 1. 일반적인 숏폼 제작 조언은 절대 하지 마세요. 사용자는 이미 알고 있습니다.
@@ -630,6 +670,14 @@ async def run(
 
     re = llm_result.get("recipe_eval", {})
 
+    # scene_evaluations 파싱: list[{scene_id, evaluation}] → dict[str, str]
+    scene_evals_raw = llm_result.get("scene_evaluations", [])
+    scene_evals = {
+        str(se.get("scene_id", "")): se.get("evaluation", "")
+        for se in scene_evals_raw
+        if se.get("scene_id") is not None
+    }
+
     output = EvaluationOutput(
         summary=llm_result.get("summary", ""),
         positioning=positioning,
@@ -643,6 +691,8 @@ async def run(
             suggestion=re.get("suggestion", ""),
             reason=re.get("reason", ""),
         ),
+        scene_evaluations=scene_evals,
+        core_persuasion=llm_result.get("core_persuasion", ""),
     )
 
     logger.info("P13 EVALUATE 완료")

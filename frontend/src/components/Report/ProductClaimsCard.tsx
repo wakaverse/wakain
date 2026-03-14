@@ -104,12 +104,49 @@ export default function ProductClaimsCard({ data }: Props) {
         {interpretation}
       </p>
 
-      {/* Grouped claims with collapsible sections */}
-      <div className="space-y-2">
-        {sortedTypes.map(([type, items]) => (
-          <ClaimGroup key={type} type={type} items={items} />
-        ))}
+      {/* 대표 소구 */}
+      <div className="mb-4 space-y-1">
+        <p className="text-xs font-medium text-gray-500 mb-1.5">대표 소구:</p>
+        {sortedTypes.map(([type, items]) => {
+          const label = TYPE_LABELS[type] || type;
+          const representative = items[0];
+          return (
+            <div key={type} className="flex items-start gap-1.5 text-sm text-gray-600">
+              <span className="shrink-0">•</span>
+              <span>
+                <span className="font-medium text-gray-700">{label}</span>
+                <span className="mx-1">—</span>
+                "{representative.claim}"
+              </span>
+            </div>
+          );
+        })}
       </div>
+
+      {/* Grouped claims — 접기 */}
+      <ClaimDetailToggle sortedTypes={sortedTypes} />
+    </div>
+  );
+}
+
+function ClaimDetailToggle({ sortedTypes }: { sortedTypes: [string, Array<{ claim: string; translation?: string; strategy?: string }>][] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        onClick={() => setOpen(!open)}
+      >
+        <span>{open ? '전체 소구 상세 접기 ▲' : '전체 소구 상세 보기 ▼'}</span>
+      </button>
+      {open && (
+        <div className="mt-2 space-y-2">
+          {sortedTypes.map(([type, items]) => (
+            <ClaimGroup key={type} type={type} items={items} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

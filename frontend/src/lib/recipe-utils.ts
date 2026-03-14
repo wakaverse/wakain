@@ -166,6 +166,40 @@ export const BLOCK_SUBTYPE_LABELS: Record<string, string> = {
   direct: '직접',
 };
 
+// ─── Block type → 한국어 매핑 (코칭/요약용) ───
+
+export const BLOCK_TYPE_KO: Record<string, string> = {
+  hook: '훅',
+  benefit: '장점',
+  demo: '시연',
+  cta: '행동유도',
+  pain_point: '고민제기',
+  social_proof: '사회적증거',
+  differentiation: '차별점',
+  authority: '전문가/권위',
+  experience: '경험',
+  spec: '기능',
+  trust: '신뢰',
+  value: '가치',
+  proof: '증거',
+  promotion: '할인/혜택',
+};
+
+// ─── 변화량 해석 ───
+
+export function getDynamicsInterpretation(score: number): string {
+  if (score === 0) return '';
+  if (score >= 50) return '이 구간은 화면 전환이 빠르고 시각 자극이 강합니다';
+  if (score >= 30) return '이 구간은 적절한 시각 변화가 있습니다';
+  return '이 구간은 정적인 화면이 이어지고 있습니다';
+}
+
+export function getDynamicsLevel(score: number): { label: string; color: string } {
+  if (score >= 50) return { label: '역동적', color: 'text-emerald-600' };
+  if (score >= 30) return { label: '보통', color: 'text-gray-500' };
+  return { label: '정적', color: 'text-red-500' };
+}
+
 export const HOOK_STRENGTH_LABELS: Record<string, string> = {
   strong: '강력',
   medium: '보통',

@@ -1,7 +1,7 @@
-import { useRef, useEffect, useMemo } from 'react';
-import { Play } from 'lucide-react';
+import { useRef, useEffect, useMemo, useState } from 'react';
+import { Play, ChevronDown } from 'lucide-react';
 import type { RecipeJSON, VisualScene, ProductClaim, ScriptBlock, AttentionPoint } from '../../types/recipe';
-import { formatTime, BLOCK_LABELS, CLAIM_TYPE_INFO } from '../../lib/recipe-utils';
+import { formatTime, BLOCK_LABELS, CLAIM_TYPE_INFO, getDynamicsInterpretation, getDynamicsLevel } from '../../lib/recipe-utils';
 
 /* ── 역할 태그 색상 ─────────────────────── */
 
@@ -99,18 +99,53 @@ function buildSceneDataList(data: RecipeJSON, thumbnails: Record<string, string>
 
 /* ── 씬 카드 컴포넌트 ─────────────────────── */
 
+/* ── 한줄 평가 생성 (프론트 로직) ─────────────── */
+
+function generateSceneEval(scene: SceneData): string {
+  const roleName = scene.roleConfig.label;
+  const claimCount = scene.claims.length;
+  const dynamics = scene.dynamicsAvg;
+
+  const parts: string[] = [];
+
+  // 역할 설명
+  parts.push(`${roleName} 구간`);
+
+  // 소구 밀도
+  if (claimCount > 5) parts.push(`소구 ${claimCount}개로 밀도 높음`);
+  else if (claimCount > 0) parts.push(`소구 ${claimCount}개`);
+
+  // 변화량 특징
+  if (dynamics >= 50) parts.push('시각적으로 역동적');
+  else if (dynamics > 0 && dynamics < 30) parts.push(`변화량 ${dynamics}로 시각적 단조로움`);
+
+  return parts.join(', ') + '.';
+}
+
+/* ── 소구 유형별 요약 ────────────────────── */
+
+function groupClaimsByType(claims: SceneData['claims']): Record<string, number> {
+  return claims.reduce<Record<string, number>>((acc, c) => {
+    acc[c.type] = (acc[c.type] || 0) + 1;
+    return acc;
+  }, {});
+}
+
 function SceneCard({
   scene,
   isActive,
   onTimeClick,
   onPlay,
+  llmEval,
 }: {
   scene: SceneData;
   isActive: boolean;
   onTimeClick: (start: number, end: number) => void;
   onPlay: (sec: number) => void;
+  llmEval?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [claimsOpen, setClaimsOpen] = useState(false);
 
   useEffect(() => {
     if (isActive && ref.current) {
@@ -120,6 +155,8 @@ function SceneCard({
 
   const { roleConfig, timeRange } = scene;
   const claimInfo = (type: string) => CLAIM_TYPE_INFO[type] || { label: type, icon: '📌' };
+  const claimGroups = useMemo(() => groupClaimsByType(scene.claims), [scene.claims]);
+  const sceneEval = llmEval || generateSceneEval(scene);
 
   return (
     <div
@@ -180,44 +217,79 @@ function SceneCard({
             </p>
           )}
 
-          {/* 소구 태그 */}
+          {/* 💡 한줄 평가 */}
+          <p className="text-xs text-indigo-600 bg-indigo-50 rounded-lg px-2.5 py-1.5">
+            💡 {sceneEval}
+          </p>
+
+          {/* 소구 유형별 개수 + 펼치기 */}
           {scene.claims.length > 0 && (
-            <div className="space-y-1">
-              {scene.claims.map((c, ci) => {
-                const info = claimInfo(c.type);
-                return (
-                  <div key={ci} className="text-xs text-gray-600">
-                    <span className="font-medium text-gray-500">
-                      {info.icon} {info.label}
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[11px] text-gray-400">소구:</span>
+                {Object.entries(claimGroups).map(([type, count]) => {
+                  const info = claimInfo(type);
+                  return (
+                    <span key={type} className="text-[11px] text-gray-500">
+                      {info.label} {count}건
                     </span>
-                    <span className="mx-1">—</span>
-                    <span>{c.claim}</span>
-                    {c.strategy && (
-                      <span className="ml-1.5 text-[10px] text-gray-400">
-                        전략: {c.strategy.replace(/_/g, ' ')}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })}
+                <button
+                  onClick={() => setClaimsOpen(!claimsOpen)}
+                  className="text-[11px] text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-0.5"
+                >
+                  {claimsOpen ? '접기' : '펼치기'}
+                  <ChevronDown className={`w-3 h-3 transition-transform ${claimsOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
+
+              {claimsOpen && (
+                <div className="mt-1.5 space-y-1">
+                  {scene.claims.map((c, ci) => {
+                    const info = claimInfo(c.type);
+                    return (
+                      <div key={ci} className="text-xs text-gray-600">
+                        <span className="font-medium text-gray-500">
+                          {info.icon} {info.label}
+                        </span>
+                        <span className="mx-1">—</span>
+                        <span>{c.claim}</span>
+                        {c.strategy && (
+                          <span className="ml-1.5 text-[10px] text-gray-400">
+                            전략: {c.strategy.replace(/_/g, ' ')}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Footer: 변화량 + 스타일 */}
-      <div className="flex items-center gap-3 mt-3 pt-2 border-t border-gray-50 text-[11px] text-gray-400">
-        {scene.changeLabel !== '-' && (
-          <span>
-            변화량: <span className={scene.isHighlight ? 'text-amber-600 font-medium' : 'text-gray-500'}>
-              {scene.changeLabel}
+      {/* Footer: 변화량 + 한줄 해석 + 스타일 */}
+      <div className="mt-3 pt-2 border-t border-gray-50 text-[11px] text-gray-400 space-y-1">
+        <div className="flex items-center gap-3">
+          {scene.changeLabel !== '-' && (
+            <span>
+              변화량: <span className={scene.isHighlight ? 'text-amber-600 font-medium' : 'text-gray-500'}>
+                {scene.changeLabel}
+              </span>
             </span>
-          </span>
-        )}
-        {(scene.style || scene.colorTone) && (
-          <span>
-            {[scene.style, scene.colorTone].filter(Boolean).join(' · ')}
-          </span>
+          )}
+          {(scene.style || scene.colorTone) && (
+            <span>
+              {[scene.style, scene.colorTone].filter(Boolean).join(' · ')}
+            </span>
+          )}
+        </div>
+        {scene.dynamicsAvg > 0 && (
+          <p className={`text-[11px] ${getDynamicsLevel(scene.dynamicsAvg).color}`}>
+            → {getDynamicsInterpretation(scene.dynamicsAvg)}
+          </p>
         )}
       </div>
     </div>
@@ -236,6 +308,7 @@ interface Props {
 
 export default function SceneCards({ data, seekTo, thumbnails, activeSceneId, onSceneTimeClick }: Props) {
   const sceneDataList = useMemo(() => buildSceneDataList(data, thumbnails), [data, thumbnails]);
+  const sceneEvals = data.evaluation?.scene_evaluations || {};
 
   if (sceneDataList.length === 0) return null;
 
@@ -250,6 +323,7 @@ export default function SceneCards({ data, seekTo, thumbnails, activeSceneId, on
             isActive={activeSceneId === scene.sceneId}
             onTimeClick={onSceneTimeClick}
             onPlay={seekTo}
+            llmEval={sceneEvals[String(scene.sceneId)]}
           />
         ))}
       </div>

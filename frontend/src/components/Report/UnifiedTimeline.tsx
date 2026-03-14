@@ -213,6 +213,7 @@ function ScriptBlocks({ data, duration, seekTo, onBlockClick, selectedBlock }: {
   selectedBlock: number | null;
 }) {
   const blocks = data.script.blocks;
+  const claims = data.product?.claims || [];
   if (!blocks.length || duration <= 0) return null;
 
   return (
@@ -222,7 +223,23 @@ function ScriptBlocks({ data, duration, seekTo, onBlockClick, selectedBlock }: {
         const width = ((block.time_range[1] - block.time_range[0]) / duration) * 100;
         const color = BLOCK_EVAL_COLORS[block.block] || '#6B7280';
         const isSelected = selectedBlock === i;
-        const label = BLOCK_LABELS[block.block] || block.block;
+
+        // 해당 블록에 겹치는 소구 → 가장 많은 유형명 표시
+        const overlapping = claims.filter(
+          (c) => c.time_range[0] < block.time_range[1] && c.time_range[1] > block.time_range[0],
+        );
+        let label: string;
+        if (overlapping.length > 0) {
+          const counts: Record<string, number> = {};
+          for (const c of overlapping) {
+            const info = CLAIM_TYPE_INFO[c.type];
+            const typeName = info?.label || c.type;
+            counts[typeName] = (counts[typeName] || 0) + 1;
+          }
+          label = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+        } else {
+          label = BLOCK_LABELS[block.block] || block.block;
+        }
 
         return (
           <button
