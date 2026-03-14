@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Star, Trash2, Search, SlidersHorizontal, X, Loader2 } from 'lucide-react';
+import { Star, Trash2, Search, SlidersHorizontal, X, Loader2, ArrowLeftRight } from 'lucide-react';
 import {
   getLibraryItems,
   updateLibraryItem,
@@ -167,6 +167,13 @@ export default function LibraryPage() {
     page: 1,
     limit: 30,
   });
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+
+  const toggleCompare = (jobId: string) => {
+    setCompareIds((prev) =>
+      prev.includes(jobId) ? prev.filter((id) => id !== jobId) : prev.length < 3 ? [...prev, jobId] : prev,
+    );
+  };
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -286,9 +293,33 @@ export default function LibraryPage() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {items.map((item) => (
-              <LibraryCard key={item.id} item={item} onHack={() => handleHack(item)} onToggleStar={() => handleToggleStar(item)} onDelete={() => handleDelete(item.id)} onClick={() => { if (item.job_id) { setSelectedJobId(item.job_id); } else if (item.original_url || item.video_url) { window.open(item.original_url || item.video_url, '_blank'); } }} />
+              <div key={item.id} className="relative">
+                {item.job_id && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleCompare(item.job_id!); }}
+                    className={`absolute top-2 right-10 z-10 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
+                      compareIds.includes(item.job_id) ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white/80 border-gray-300 text-transparent hover:border-gray-400'
+                    }`}
+                  >
+                    {compareIds.includes(item.job_id!) && <span className="text-xs font-bold">✓</span>}
+                  </button>
+                )}
+                <LibraryCard item={item} onHack={() => handleHack(item)} onToggleStar={() => handleToggleStar(item)} onDelete={() => handleDelete(item.id)} onClick={() => { if (item.job_id) { setSelectedJobId(item.job_id); } else if (item.original_url || item.video_url) { window.open(item.original_url || item.video_url, '_blank'); } }} />
+              </div>
             ))}
           </div>
+          {/* Floating compare bar */}
+          {compareIds.length >= 2 && (
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+              <button
+                onClick={() => navigate(`/app/compare?ids=${compareIds.join(',')}`)}
+                className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-full shadow-lg hover:bg-gray-800 transition-colors text-sm font-medium"
+              >
+                <ArrowLeftRight className="w-4 h-4" />
+                {compareIds.length}개 영상 비교하기
+              </button>
+            </div>
+          )}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-6">
               <button onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })} disabled={(filters.page || 1) <= 1} className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">이전</button>

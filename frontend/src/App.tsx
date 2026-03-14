@@ -21,6 +21,7 @@ import AdminPipelinePage from './pages/admin/AdminPipelinePage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminContentPage from './pages/admin/AdminContentPage';
 import AdminInquiriesPage from './pages/admin/AdminInquiriesPage';
+import ComparePage from './pages/ComparePage';
 import OnboardingPage from './pages/OnboardingPage';
 import ToastContainer from './components/Toast';
 
@@ -35,7 +36,7 @@ function LandingRoutes() {
       <Route path="app/analyze" element={<ProtectedRoute><AppShell><AnalyzePage /></AppShell></ProtectedRoute>} />
       <Route path="app/library" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="library" /></AppShell></ProtectedRoute>} />
       <Route path="app/radar" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="radar" /></AppShell></ProtectedRoute>} />
-      <Route path="app/compare" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="compare" /></AppShell></ProtectedRoute>} />
+      <Route path="app/compare" element={<ProtectedRoute><AppShell><ComparePage /></AppShell></ProtectedRoute>} />
       <Route path="app/insights" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="insight" /></AppShell></ProtectedRoute>} />
       <Route path="app/guide" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="guide" /></AppShell></ProtectedRoute>} />
       <Route path="app/guide/:resultId" element={<ProtectedRoute><AppShell><GuideReportPage /></AppShell></ProtectedRoute>} />

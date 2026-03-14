@@ -408,3 +408,73 @@ export async function getInsightCategory(categoryName: string): Promise<any> {
   if (!res.ok) throw new Error('카테고리 인사이트를 불러올 수 없습니다');
   return res.json();
 }
+
+// ─── Compare API ───
+
+export interface CompareRequest {
+  result_ids: string[];
+  scenario: 'A' | 'B';
+  base_result_id?: string;
+}
+
+export interface StructureRow {
+  key: string;
+  label: string;
+  values: (string | number | boolean | null | Record<string, number> | string[])[];
+}
+
+export interface ClaimMatch {
+  video: string;
+  result_id: string;
+  claim: string;
+  type: string;
+  time_range?: [number, number];
+  strategy?: string;
+}
+
+export interface MatchedGroup {
+  theme: string;
+  claims: ClaimMatch[];
+}
+
+export interface ClaimMatching {
+  matched_groups: MatchedGroup[];
+  unique_claims: ClaimMatch[];
+}
+
+export interface CoachingItem {
+  topic: string;
+  current: string;
+  suggestion: string;
+  evidence: string;
+}
+
+export interface Coaching {
+  title: string;
+  items: CoachingItem[];
+  pattern_summary?: string;
+}
+
+export interface CompareResponse {
+  report_id: string;
+  scenario: string;
+  base_result_id: string | null;
+  result_ids: string[];
+  video_labels: string[];
+  structure: StructureRow[];
+  claim_matching: ClaimMatching;
+  coaching: Coaching;
+}
+
+export async function compareVideos(body: CompareRequest): Promise<CompareResponse> {
+  const res = await fetch(`${API_URL}/api/compare`, {
+    method: 'POST',
+    headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: '비교 분석에 실패했습니다' }));
+    throw new Error(err.detail || '비교 분석에 실패했습니다');
+  }
+  return res.json();
+}

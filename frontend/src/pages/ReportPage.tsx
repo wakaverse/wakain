@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, ArrowLeftRight } from 'lucide-react';
 import { getResult, addLibraryItem } from '../lib/api';
 import { supabase } from '../lib/supabase';
 import type { RecipeJSON } from '../types/recipe';
@@ -140,6 +140,15 @@ export default function ReportPage() {
                   className="w-full lg:max-h-[600px] max-h-[400px] object-contain"
                 />
               </div>
+            )}
+            {id && (
+              <button
+                onClick={() => navigate(`/app/compare?base=${id}`)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors mb-4"
+              >
+                <ArrowLeftRight className="w-4 h-4" />
+                이 영상과 비교하기
+              </button>
             )}
           </div>
         </div>
