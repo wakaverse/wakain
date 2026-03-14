@@ -13,21 +13,6 @@ const PHASES = [
   'P10_SCRIPT', 'P11_MERGE', 'P12_BUILD', 'P13_EVALUATE',
 ] as const;
 
-const PHASE_LABELS: Record<string, { ko: string; en: string }> = {
-  P1_STT:       { ko: '음성 인식',     en: 'Speech-to-Text' },
-  P2_SCAN:      { ko: '영상 스캔',     en: 'Video Scan' },
-  P3_EXTRACT:   { ko: '프레임 추출',   en: 'Frame Extract' },
-  P4_CLASSIFY:  { ko: '장면 분류',     en: 'Scene Classify' },
-  P5_TEMPORAL:  { ko: '시간 분석',     en: 'Temporal Analysis' },
-  P6_SCENE:     { ko: '씬 구성',       en: 'Scene Build' },
-  P7_PRODUCT:   { ko: '제품 분석',     en: 'Product Analysis' },
-  P8_VISUAL:    { ko: '비주얼 분석',   en: 'Visual Analysis' },
-  P9_ENGAGE:    { ko: '몰입도 분석',   en: 'Engagement Analysis' },
-  P10_SCRIPT:   { ko: '스크립트 분석', en: 'Script Analysis' },
-  P11_MERGE:    { ko: '데이터 통합',   en: 'Data Merge' },
-  P12_BUILD:    { ko: '레시피 생성',   en: 'Recipe Build' },
-  P13_EVALUATE: { ko: '코칭 평가',     en: 'Coaching Evaluation' },
-};
 
 /** Per-phase state derived from SSE events. */
 interface PhaseState {
@@ -35,11 +20,6 @@ interface PhaseState {
   duration_ms: number | null;
 }
 
-function formatDuration(ms: number | null): string {
-  if (ms === null) return '';
-  if (ms < 1000) return `${ms}ms`;
-  return `${(ms / 1000).toFixed(1)}s`;
-}
 
 export default function JobStatusPage() {
   const { id } = useParams<{ id: string }>();
@@ -189,14 +169,14 @@ export default function JobStatusPage() {
           </h2>
           {hasPhaseData && (
             <p className="text-sm text-gray-400 mt-1">
-              {completedCount} / {PHASES.length} {lang === 'ko' ? '단계 완료' : 'phases done'}
+              {Math.round((completedCount / PHASES.length) * 100)}% {lang === 'ko' ? '완료' : 'complete'}
             </p>
           )}
         </div>
 
         {/* Progress bar */}
         {hasPhaseData && (
-          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-6">
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-6">
             <div
               className="h-full bg-blue-600 rounded-full transition-all duration-500"
               style={{ width: `${Math.round((completedCount / PHASES.length) * 100)}%` }}
@@ -204,61 +184,17 @@ export default function JobStatusPage() {
           </div>
         )}
 
-        {/* Phase stepper */}
+        {/* Simple status message — no pipeline details */}
         {hasPhaseData ? (
-          <div className="space-y-1">
-            {PHASES.map((phaseName) => {
-              const state = phases[phaseName];
-              const label = PHASE_LABELS[phaseName]?.[lang] || phaseName;
-
-              if (!state) {
-                // Phase not started yet — show dimmed
-                return (
-                  <div key={phaseName} className="flex items-center gap-3 py-1.5 px-2 rounded-lg">
-                    <div className="w-5 h-5 rounded-full border-2 border-gray-200 shrink-0" />
-                    <span className="text-sm text-gray-300">{label}</span>
-                  </div>
-                );
-              }
-
-              return (
-                <div
-                  key={phaseName}
-                  className={`flex items-center gap-3 py-1.5 px-2 rounded-lg transition-colors ${
-                    state.status === 'running' ? 'bg-blue-50' : ''
-                  }`}
-                >
-                  {/* Status icon */}
-                  <div className="shrink-0">
-                    {state.status === 'running' && (
-                      <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
-                    )}
-                    {state.status === 'success' && (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                    )}
-                    {state.status === 'fail' && (
-                      <XCircle className="w-5 h-5 text-red-500" />
-                    )}
-                  </div>
-
-                  {/* Label */}
-                  <span className={`text-sm flex-1 ${
-                    state.status === 'running' ? 'text-blue-700 font-medium' :
-                    state.status === 'success' ? 'text-gray-600' :
-                    'text-red-600'
-                  }`}>
-                    {label}
-                  </span>
-
-                  {/* Duration */}
-                  {state.status === 'success' && state.duration_ms !== null && (
-                    <span className="text-xs text-gray-400">
-                      {formatDuration(state.duration_ms)}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500">
+              {completedCount < PHASES.length
+                ? (lang === 'ko' ? '영상을 분석하고 있습니다. 잠시만 기다려주세요...' : 'Analyzing your video. Please wait...')
+                : (lang === 'ko' ? '분석이 거의 완료되었습니다!' : 'Almost done!')}
+            </p>
+            <p className="text-xs text-gray-400 mt-2">
+              {lang === 'ko' ? '보통 2~3분 정도 소요됩니다' : 'Usually takes 2-3 minutes'}
+            </p>
           </div>
         ) : (
           /* No SSE data yet — simple waiting state */
