@@ -17,6 +17,8 @@ interface Props {
   data: RecipeJSON;
   seekTo: (sec: number) => void;
   thumbnails: Record<string, string>;
+  highlightRange?: [number, number] | null;
+  onSceneClick?: (sceneId: number) => void;
 }
 
 /* ── Layer 1: 설득 흐름 컬러바 ──────────────── */
@@ -32,21 +34,20 @@ function PersuasionBar({ data, seekTo, duration, onBlockClick }: {
 
   return (
     <div>
-      <div className="flex h-6 rounded-lg overflow-hidden">
+      <div className="relative h-6 rounded-lg overflow-hidden">
         {blocks.map((block, i) => {
-          const blockDur = block.time_range[1] - block.time_range[0];
-          const pct = (blockDur / duration) * 100;
+          const left = (block.time_range[0] / duration) * 100;
+          const width = ((block.time_range[1] - block.time_range[0]) / duration) * 100;
           const color = BLOCK_EVAL_COLORS[block.block] || '#6B7280';
           return (
             <button
               key={i}
-              className="h-full cursor-pointer hover:brightness-110 transition-all relative group"
-              style={{ width: `${Math.max(pct, 2)}%`, backgroundColor: color }}
+              className="absolute top-0 h-full cursor-pointer hover:brightness-110 transition-all group"
+              style={{ left: `${left}%`, width: `${Math.max(width, 1)}%`, backgroundColor: color }}
               onClick={() => { seekTo(block.time_range[0]); onBlockClick(i); }}
               title={`${BLOCK_LABELS[block.block] || block.block} ${formatTime(block.time_range[0])}–${formatTime(block.time_range[1])}`}
             >
-              {/* Label on hover for wider blocks */}
-              {pct > 8 && (
+              {width > 8 && (
                 <span className="absolute inset-0 flex items-center justify-center text-[9px] text-white/80 font-medium opacity-0 group-hover:opacity-100 transition-opacity truncate px-1">
                   {BLOCK_LABELS[block.block] || block.block}
                 </span>
@@ -61,7 +62,7 @@ function PersuasionBar({ data, seekTo, duration, onBlockClick }: {
 
 /* ── Layer 2: 시각 변화량 곡선 ──────────────── */
 
-function AttentionCurve({ data, duration }: { data: RecipeJSON; duration: number }) {
+function AttentionCurve({ data, duration, highlightRange }: { data: RecipeJSON; duration: number; highlightRange?: [number, number] | null }) {
   const rhythm = data.visual.rhythm;
   const { dropoff_analysis } = data.engagement;
   const blocks = data.script.blocks;
@@ -124,6 +125,16 @@ function AttentionCurve({ data, duration }: { data: RecipeJSON; duration: number
           />
         ))}
 
+        {/* Highlight range from scene card click */}
+        {highlightRange && (
+          <ReferenceArea
+            x1={highlightRange[0]}
+            x2={highlightRange[1]}
+            fill="#6366f1"
+            fillOpacity={0.15}
+          />
+        )}
+
         {/* Average line */}
         <ReferenceLine
           y={avg}
@@ -149,11 +160,12 @@ function AttentionCurve({ data, duration }: { data: RecipeJSON; duration: number
 
 /* ── Layer 2.5: 씬 썸네일 행 ─────────────────── */
 
-function SceneThumbnails({ data, duration, seekTo, thumbnails }: {
+function SceneThumbnails({ data, duration, seekTo, thumbnails, onSceneClick }: {
   data: RecipeJSON;
   duration: number;
   seekTo: (sec: number) => void;
   thumbnails: Record<string, string>;
+  onSceneClick?: (sceneId: number) => void;
 }) {
   const scenes = data.visual?.scenes || data.scenes;
   if (!scenes?.length || duration <= 0) return null;
@@ -163,18 +175,18 @@ function SceneThumbnails({ data, duration, seekTo, thumbnails }: {
   if (!hasThumbnails) return null;
 
   return (
-    <div className="flex gap-px h-12">
+    <div className="relative h-12">
       {scenes.map((scene) => {
-        const sceneDur = scene.time_range[1] - scene.time_range[0];
-        const pct = (sceneDur / duration) * 100;
+        const left = (scene.time_range[0] / duration) * 100;
+        const width = ((scene.time_range[1] - scene.time_range[0]) / duration) * 100;
         const thumb = thumbnails[String(scene.scene_id)];
 
         return (
           <button
             key={scene.scene_id}
-            className="h-full rounded overflow-hidden bg-gray-100 hover:ring-2 hover:ring-indigo-300 hover:ring-offset-1 transition-all"
-            style={{ width: `${Math.max(pct, 3)}%` }}
-            onClick={() => seekTo(scene.time_range[0])}
+            className="absolute top-0 h-full rounded overflow-hidden bg-gray-100 hover:ring-2 hover:ring-indigo-300 hover:ring-offset-1 transition-all"
+            style={{ left: `${left}%`, width: `${Math.max(width, 2)}%` }}
+            onClick={() => { seekTo(scene.time_range[0]); onSceneClick?.(scene.scene_id); }}
             title={`씬 ${scene.scene_id} ${formatTime(scene.time_range[0])}–${formatTime(scene.time_range[1])}`}
           >
             {thumb ? (
@@ -204,10 +216,10 @@ function ScriptBlocks({ data, duration, seekTo, onBlockClick, selectedBlock }: {
   if (!blocks.length || duration <= 0) return null;
 
   return (
-    <div className="flex gap-px h-auto min-h-[28px]">
+    <div className="relative h-auto min-h-[28px]">
       {blocks.map((block, i) => {
-        const blockDur = block.time_range[1] - block.time_range[0];
-        const pct = (blockDur / duration) * 100;
+        const left = (block.time_range[0] / duration) * 100;
+        const width = ((block.time_range[1] - block.time_range[0]) / duration) * 100;
         const color = BLOCK_EVAL_COLORS[block.block] || '#6B7280';
         const isSelected = selectedBlock === i;
         const label = BLOCK_LABELS[block.block] || block.block;
@@ -215,11 +227,12 @@ function ScriptBlocks({ data, duration, seekTo, onBlockClick, selectedBlock }: {
         return (
           <button
             key={i}
-            className={`px-1 py-1 text-[10px] leading-tight rounded cursor-pointer transition-all overflow-hidden flex items-center justify-center ${
+            className={`absolute top-0 px-1 py-1 text-[10px] leading-tight rounded cursor-pointer transition-all overflow-hidden flex items-center justify-center ${
               isSelected ? 'ring-2 ring-offset-1' : 'hover:bg-gray-100'
             }`}
             style={{
-              width: `${Math.max(pct, 3)}%`,
+              left: `${left}%`,
+              width: `${Math.max(width, 2)}%`,
               borderBottom: `2px solid ${color}`,
               color: color,
               '--tw-ring-color': color,
@@ -269,7 +282,7 @@ function ClaimTags({ data, duration, seekTo }: {
 
 /* ── Main: UnifiedTimeline ───────────────────── */
 
-export default function UnifiedTimeline({ data, seekTo, thumbnails }: Props) {
+export default function UnifiedTimeline({ data, seekTo, thumbnails, highlightRange, onSceneClick }: Props) {
   const [selectedBlock, setSelectedBlock] = useState<number | null>(null);
   const duration = data.meta?.duration ?? 0;
 
@@ -303,12 +316,12 @@ export default function UnifiedTimeline({ data, seekTo, thumbnails }: Props) {
 
       {/* Layer 1.5: Scene thumbnails */}
       <div className="mb-1">
-        <SceneThumbnails data={data} duration={duration} seekTo={seekTo} thumbnails={thumbnails} />
+        <SceneThumbnails data={data} duration={duration} seekTo={seekTo} thumbnails={thumbnails} onSceneClick={onSceneClick} />
       </div>
 
       {/* Layer 2: Attention curve */}
       <div className="mb-1 -mx-1">
-        <AttentionCurve data={data} duration={duration} />
+        <AttentionCurve data={data} duration={duration} highlightRange={highlightRange} />
       </div>
 
       {/* Layer 3: Script blocks */}

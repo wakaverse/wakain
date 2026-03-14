@@ -26,7 +26,7 @@ PROMPT_TEMPLATE = """Watch this video and identify:
    sub_category, name, brand, multi_product, is_marketing_video
 
 2. Meta: platform (tiktok/reels/shorts/ad), duration, aspect_ratio,
-   target_audience (1 sentence),
+   target_audience (1 sentence, MUST be written in {output_language}),
    product_exposure_pct (% of time product visible),
    product_first_appear (seconds),
    human_presence: {{has_face, type (presenter/model/narrator/none), face_exposure}}

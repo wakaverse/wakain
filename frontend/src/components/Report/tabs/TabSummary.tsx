@@ -3,12 +3,13 @@ import VideoSummaryCard from '../VideoSummaryCard';
 
 interface Props {
   data: RecipeJSON;
+  onTabChange?: (tab: string) => void;
 }
 
-export default function TabSummary({ data }: Props) {
+export default function TabSummary({ data, onTabChange }: Props) {
   return (
     <div className="space-y-3">
-      <VideoSummaryCard data={data} />
+      <VideoSummaryCard data={data} onTabChange={onTabChange} />
     </div>
   );
 }

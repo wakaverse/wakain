@@ -3,10 +3,11 @@ import { STYLE_LABELS } from '../../lib/recipe-utils';
 
 interface Props {
   data: RecipeJSON;
+  onTabChange?: (tab: string) => void;
 }
 
-export default function VideoSummaryCard({ data }: Props) {
-  const { identity, product, meta, visual, evaluation } = data;
+export default function VideoSummaryCard({ data, onTabChange }: Props) {
+  const { identity, product, meta, visual, summary, evaluation } = data;
   const stylePrimary = visual.style_primary;
 
   const specs = [
@@ -39,10 +40,10 @@ export default function VideoSummaryCard({ data }: Props) {
         )}
       </div>
 
-      {/* Strategy summary */}
-      {evaluation?.summary && (
+      {/* Strategy summary — 영상이 뭔지 설명 */}
+      {summary?.strategy && (
         <p className="text-base text-gray-700 leading-loose mb-3">
-          {evaluation.summary}
+          {summary.strategy}
         </p>
       )}
 
@@ -56,13 +57,21 @@ export default function VideoSummaryCard({ data }: Props) {
         ))}
       </div>
 
-      {/* Coaching highlight */}
+      {/* 핵심 코칭 — 가장 고쳐야 할 한 가지 (액션) */}
       {evaluation?.summary && (
         <div className="mt-3 bg-gray-50 rounded-xl px-3 py-2.5">
           <p className="text-xs font-medium text-gray-500 mb-1">💡 핵심 코칭</p>
           <p className="text-sm text-gray-700 leading-relaxed">
-            {evaluation.summary.split(/[.!?]\s+/).slice(0, 2).join('. ').replace(/\.?$/, '.')}
+            {evaluation.summary}
           </p>
+          {onTabChange && (
+            <button
+              onClick={() => onTabChange('coaching')}
+              className="mt-1.5 text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors"
+            >
+              → 코칭 탭에서 상세 확인
+            </button>
+          )}
         </div>
       )}
     </div>

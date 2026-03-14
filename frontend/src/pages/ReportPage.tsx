@@ -164,7 +164,7 @@ export default function ReportPage() {
           </div>
 
           {/* Tab content */}
-          {activeTab === 'summary' && <TabSummary data={recipe} />}
+          {activeTab === 'summary' && <TabSummary data={recipe} onTabChange={(tab) => handleTabChange(tab as TabKey)} />}
           {activeTab === 'timeline' && (
             <TabTimeline data={recipe} seekTo={seekTo} thumbnails={thumbnails} />
           )}
