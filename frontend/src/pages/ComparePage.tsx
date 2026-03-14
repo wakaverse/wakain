@@ -306,6 +306,21 @@ export default function ComparePage() {
             </div>
 
             <div className="p-4 overflow-y-auto max-h-[55vh]">
+              {/* URL 직접 입력 */}
+              <p className="text-xs font-medium text-gray-500 mb-2">URL 직접 입력</p>
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                const input = (e.target as HTMLFormElement).elements.namedItem('videoUrl') as HTMLInputElement;
+                const url = input.value.trim();
+                if (!url) return;
+                // Navigate to analyze with URL, then come back
+                navigate(`/app/analyze?url=${encodeURIComponent(url)}&returnTo=compare`);
+              }} className="flex gap-2 mb-4">
+                <input name="videoUrl" type="text" placeholder="영상 URL을 붙여넣어 주세요" className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                <button type="submit" className="px-3 py-2 text-sm bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">분석</button>
+              </form>
+
+              <div className="border-t border-gray-100 pt-3 mb-3" />
               <p className="text-xs font-medium text-gray-500 mb-3">라이브러리에서 선택</p>
               {loadingJobs ? (
                 <div className="flex items-center justify-center py-8">

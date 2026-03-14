@@ -20,6 +20,21 @@ def _get_gemini() -> genai.Client:
     return genai.Client(api_key=api_key)
 
 
+def resolve_result_ids(job_ids: list[str]) -> list[str]:
+    """job_ids → result_ids 변환. content_dna는 result_id 기반이므로."""
+    sb = _supabase()
+    resp = (
+        sb.table("results")
+        .select("id, job_id")
+        .in_("job_id", job_ids)
+        .execute()
+    )
+    if not resp.data:
+        return job_ids  # fallback: 그대로 사용
+    job_to_result = {r["job_id"]: r["id"] for r in resp.data}
+    return [job_to_result.get(jid, jid) for jid in job_ids]
+
+
 def fetch_content_dna_rows(result_ids: list[str]) -> list[dict]:
     """content_dna 테이블에서 result_ids에 해당하는 행 조회."""
     sb = _supabase()

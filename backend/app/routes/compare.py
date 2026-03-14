@@ -51,8 +51,12 @@ async def compare_videos(
     if exceeded:
         raise HTTPException(status_code=403, detail=exceeded)
 
+    # 0. job_ids → result_ids 변환
+    from app.services.compare import resolve_result_ids
+    resolved_ids = resolve_result_ids(body.result_ids)
+
     # 1. content_dna 조회 (파트1: 구조 비교)
-    dna_rows = fetch_content_dna_rows(body.result_ids)
+    dna_rows = fetch_content_dna_rows(resolved_ids)
     if not dna_rows:
         raise HTTPException(status_code=404, detail="분석 데이터를 찾을 수 없습니다.")
 
