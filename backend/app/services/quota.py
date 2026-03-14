@@ -31,14 +31,17 @@ def _next_reset_at() -> str:
 def get_or_create_quota(user_id: str) -> dict:
     """사용자 quota 조회. 없으면 free 기본값으로 생성."""
     sb = _supabase()
-    resp = (
-        sb.table("user_quotas")
-        .select("*")
-        .eq("user_id", user_id)
-        .maybe_single()
-        .execute()
-    )
-    if resp.data:
+    try:
+        resp = (
+            sb.table("user_quotas")
+            .select("*")
+            .eq("user_id", user_id)
+            .maybe_single()
+            .execute()
+        )
+    except Exception:
+        resp = None
+    if resp and resp.data:
         row = resp.data
         # 월초 리셋 체크
         reset_at = datetime.fromisoformat(row["reset_at"].replace("Z", "+00:00"))
