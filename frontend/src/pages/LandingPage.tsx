@@ -5,7 +5,6 @@ import DemoSection from '../components/Landing/DemoSection';
 import FeaturesSection from '../components/Landing/FeaturesSection';
 import SocialProofSection from '../components/Landing/SocialProofSection';
 import PricingSection from '../components/Landing/PricingSection';
-import EnterpriseSection from '../components/Landing/EnterpriseSection';
 import CTASection from '../components/Landing/CTASection';
 import SEOHead from '../components/SEOHead';
 
@@ -20,7 +19,6 @@ export default function LandingPage() {
       <FeaturesSection />
       <SocialProofSection />
       <PricingSection />
-      <EnterpriseSection />
       <CTASection />
     </div>
   );
