@@ -114,4 +114,14 @@ async def generate_script(
     # Increment quota after successful generation
     increment_quota(user["id"], "script")
 
+    # Log script_generate event
+    try:
+        _get_supabase().table("user_activity_logs").insert({
+            "user_id": user["id"],
+            "action": "script_generate",
+            "metadata": {"result_id": body.result_id},
+        }).execute()
+    except Exception:
+        pass
+
     return {"script": script_text}

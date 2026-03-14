@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Loader2, Sparkles, ArrowRight, Copy, Check, X, AlertTriangle } from 'lucide-react';
 import { getResult, generateScript } from '../lib/api';
+import { supabase } from '../lib/supabase';
 import type { RecipeJSON, EvalImprovement, SegmentEval } from '../types/recipe';
 
 /* ── Helpers ──────────────────────────────── */
@@ -102,7 +103,19 @@ export default function GuideReportPage() {
     if (!resultId) return;
     setLoading(true);
     getResult(resultId)
-      .then((data) => setRecipe(data.recipe))
+      .then((data) => {
+        setRecipe(data.recipe);
+        // Log guide_generate event
+        supabase.auth.getSession().then(({ data: s }) => {
+          const uid = s.session?.user?.id;
+          if (uid) {
+            supabase.from('user_activity_logs').insert({
+              user_id: uid, action: 'guide_generate',
+              metadata: { result_id: resultId },
+            }).then(() => {});
+          }
+        });
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [resultId]);

@@ -5,6 +5,7 @@ import LangSync from './components/LangSync';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/App/AppShell';
+import AdminLayout from './components/Admin/AdminLayout';
 import LandingPage from './pages/LandingPage';
 import AnalyzePage from './pages/AnalyzePage';
 import JobStatusPage from './pages/JobStatusPage';
@@ -15,6 +16,9 @@ import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import GuideReportPage from './pages/GuideReportPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminPipelinePage from './pages/admin/AdminPipelinePage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
 import ToastContainer from './components/Toast';
 
 function LandingRoutes() {
@@ -37,6 +41,10 @@ function LandingRoutes() {
       <Route path="app/jobs/:id" element={<ProtectedRoute><AppShell><JobStatusPage /></AppShell></ProtectedRoute>} />
       <Route path="app/results/:id" element={<ProtectedRoute><AppShell><ReportPage /></AppShell></ProtectedRoute>} />
       <Route path="dashboard" element={<ProtectedRoute><AppShell><DashboardPage /></AppShell></ProtectedRoute>} />
+      {/* Admin routes */}
+      <Route path="admin" element={<ProtectedRoute><AdminLayout><AdminDashboardPage /></AdminLayout></ProtectedRoute>} />
+      <Route path="admin/pipeline" element={<ProtectedRoute><AdminLayout><AdminPipelinePage /></AdminLayout></ProtectedRoute>} />
+      <Route path="admin/users" element={<ProtectedRoute><AdminLayout><AdminUsersPage /></AdminLayout></ProtectedRoute>} />
       {/* Legacy redirects */}
       <Route path="analyze" element={<Navigate to="/app/analyze" replace />} />
       <Route path="jobs/:id" element={<Navigate to="/app/jobs/:id" replace />} />

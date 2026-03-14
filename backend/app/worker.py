@@ -179,6 +179,19 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
                 import traceback
                 traceback.print_exc()
 
+        # Log analyze_complete event
+        try:
+            job_resp = _supabase().table("jobs").select("user_id").eq("id", job_id).limit(1).execute()
+            if job_resp.data and job_resp.data[0].get("user_id"):
+                _supabase().table("user_activity_logs").insert({
+                    "user_id": job_resp.data[0]["user_id"],
+                    "action": "analyze_complete",
+                    "result_id": result_id,
+                    "metadata": {"job_id": job_id},
+                }).execute()
+        except Exception as exc:
+            logger.warning("analyze_complete log failed: %s", exc)
+
         # Mark job completed
         _update_job(job_id, status="completed", completed_at=_now())
 

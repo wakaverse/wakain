@@ -79,6 +79,17 @@ def check_quota(user_id: str, feature: str) -> dict:
         return None  # 미정의 feature는 제한 없음
 
     if feat["used"] >= feat["limit"]:
+        # Log free_limit_reached event
+        try:
+            sb = _supabase()
+            sb.table("user_activity_logs").insert({
+                "user_id": user_id,
+                "action": "free_limit_reached",
+                "metadata": {"feature_name": feature, "plan": row["plan"]},
+            }).execute()
+        except Exception as exc:
+            logger.warning("free_limit_reached log failed: %s", exc)
+
         return {
             "error": "quota_exceeded",
             "feature": feature,
