@@ -339,6 +339,22 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         logger.warning("P3 실패 → P6 건너뜀")
         phase_results["P6_SCENE"] = None
 
+    # ── 순차 : P7.5(CLAIM GROUPING) ← P7 ──────────────────────────────────
+    p7_5_result = None
+    if p7_result:
+        p7_claims = p7_result.get("claims", []) if isinstance(p7_result, dict) else getattr(p7_result, "claims", [])
+        # Convert Pydantic models to dicts if needed
+        claims_list = [c if isinstance(c, dict) else c.model_dump() for c in p7_claims] if p7_claims else []
+        if claims_list:
+            from core.pipeline import p7_5_claim_grouping
+            p7_5_result = await _run_phase(
+                "P7_5_CLAIM_GROUPING",
+                p7_5_claim_grouping.run(claims_list, api_key=config.gemini_api_key),
+                phase_results, phase_times, phase_usages, job_id=jid,
+            )
+            if p7_5_result:
+                _save_phase_output(output_dir, "p7_5_claim_grouping.json", p7_5_result)
+
     # ── 순차 : P10(SCRIPT) ← P1 + P2 + P7 ─────────────────────────────────
     p10_result = await _run_phase(
         "P10_SCRIPT",
@@ -381,6 +397,17 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
         ),
         phase_results, phase_times, phase_usages, job_id=jid,
     )
+
+    # ── P7.5 결과를 recipe.product에 주입 ──────────────────────────────────
+    if recipe and p7_5_result:
+        try:
+            if hasattr(recipe, "product") and recipe.product:
+                recipe.product.claim_groups = p7_5_result.get("claim_groups", [])
+                recipe.product.purchase_reasons = p7_5_result.get("purchase_reasons", [])
+                recipe.product.core_selling_point = p7_5_result.get("core_selling_point", "")
+                logger.info("P7.5 결과 recipe.product에 주입 완료")
+        except Exception as exc:
+            logger.warning("P7.5 recipe 주입 실패: %s", exc)
 
     # ── 순차 : P13(EVALUATE) ← P12 ────────────────────────────────────────
     if recipe:

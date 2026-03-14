@@ -212,6 +212,16 @@ export interface RecipeJSON {
     multi_product: boolean;
     is_marketing_video: boolean;
     claims: ProductClaim[];
+    claim_groups?: Array<{
+      group_id: string;
+      theme: string;
+      core_message: string;
+      type: string;
+      claim_indices: number[];
+      mention_count: number;
+    }>;
+    purchase_reasons?: string[];
+    core_selling_point?: string;
   };
   script: {
     blocks: ScriptBlock[];

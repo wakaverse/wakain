@@ -192,8 +192,17 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
     ? [positioning.unique_angle, positioning.contrast?.contrarian_reality].filter(Boolean).join(' ')
     : null;
 
-  // ── 제품 구매이유: 유형별 대표 1개
+  // ── 제품 구매이유: claim_groups 우선, 없으면 유형별 대표
   const purchaseReasons = useMemo(() => {
+    // P7.5 그룹핑 결과가 있으면 우선 사용
+    if (product.purchase_reasons?.length) {
+      return product.purchase_reasons.map((reason, i) => ({
+        type: product.claim_groups?.[i]?.type || '',
+        label: CLAIM_TYPE_INFO[product.claim_groups?.[i]?.type || '']?.label || '',
+        claim: reason,
+      }));
+    }
+    // Fallback: 유형별 대표
     if (!claims.length) return [];
     const grouped: Record<string, string> = {};
     for (const c of claims) {
@@ -204,7 +213,7 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
       label: CLAIM_TYPE_INFO[type]?.label || type,
       claim,
     }));
-  }, [claims]);
+  }, [claims, product]);
 
   // ── 구조 흐름 (한국어) — flow_order 또는 blocks에서 추출
   const flowOrder = data.script?.flow_order || [];
@@ -291,9 +300,9 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
               </p>
             ))}
           </div>
-          {evaluation?.core_persuasion && (
+          {(product.core_selling_point || evaluation?.core_persuasion) && (
             <p className="text-sm text-indigo-600 font-medium mt-1">
-              → 핵심 설득: "{evaluation.core_persuasion}"
+              → 핵심 설득: "{product.core_selling_point || evaluation?.core_persuasion}"
             </p>
           )}
         </div>

@@ -104,23 +104,37 @@ export default function ProductClaimsCard({ data }: Props) {
         {interpretation}
       </p>
 
-      {/* 대표 소구 */}
+      {/* 대표 소구 — claim_groups 우선 */}
       <div className="mb-4 space-y-1">
         <p className="text-xs font-medium text-gray-500 mb-1.5">대표 소구:</p>
-        {sortedTypes.map(([type, items]) => {
-          const label = TYPE_LABELS[type] || type;
-          const representative = items[0];
-          return (
-            <div key={type} className="flex items-start gap-1.5 text-sm text-gray-600">
+        {data.product.claim_groups?.length ? (
+          data.product.claim_groups.map((g) => (
+            <div key={g.group_id} className="flex items-start gap-1.5 text-sm text-gray-600">
               <span className="shrink-0">•</span>
               <span>
-                <span className="font-medium text-gray-700">{label}</span>
+                <span className="font-medium text-gray-700">{TYPE_LABELS[g.type] || g.type}</span>
                 <span className="mx-1">—</span>
-                "{representative.claim}"
+                "{g.core_message}"
+                <span className="text-xs text-gray-400 ml-1">({g.mention_count}회)</span>
               </span>
             </div>
-          );
-        })}
+          ))
+        ) : (
+          sortedTypes.map(([type, items]) => {
+            const label = TYPE_LABELS[type] || type;
+            const representative = items[0];
+            return (
+              <div key={type} className="flex items-start gap-1.5 text-sm text-gray-600">
+                <span className="shrink-0">•</span>
+                <span>
+                  <span className="font-medium text-gray-700">{label}</span>
+                  <span className="mx-1">—</span>
+                  "{representative.claim}"
+                </span>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Grouped claims — 접기 */}

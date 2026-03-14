@@ -64,6 +64,10 @@ class RecipeProduct(BaseModel):
     multi_product: bool = Field(default=False, description="복수 제품 여부")
     is_marketing_video: bool = Field(default=True, description="마케팅 영상 여부")
     claims: list[RecipeClaim] = Field(default_factory=list, description="제품 특징 목록 (P7)")
+    # P7.5 소구 그룹핑 결과
+    claim_groups: list[dict] = Field(default_factory=list, description="소구 그룹 (P7.5)")
+    purchase_reasons: list[str] = Field(default_factory=list, description="제품 구매 이유 (P7.5)")
+    core_selling_point: str = Field(default="", description="핵심 셀링 포인트 (P7.5)")
 
 
 # ── Script (대본 축) ──────────────────────────────────────────────────────
