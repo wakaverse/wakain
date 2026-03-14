@@ -1,0 +1,66 @@
+# 풀 파이프라인 시나리오 정의
+# 실행: 수동 트리거 (실제 Gemini API 호출 포함)
+#
+# Usage:
+#   pytest tests/scenarios/ -m "pipeline" --run-pipeline
+
+name: full_pipeline_15s_beauty
+description: "15초 뷰티 영상 전체 파이프라인 테스트"
+
+prerequisites:
+  - GEMINI_API_KEY 환경변수 설정
+  - SUPABASE_URL, SUPABASE_SERVICE_KEY 설정
+  - R2 스토리지 접근 가능
+  - ffmpeg, ffprobe 설치
+
+steps:
+  - name: upload_video
+    action: POST /api/analyze
+    input:
+      file: tests/samples/sample_15s.mp4
+    expected:
+      status: 200
+      body:
+        job_id: "<uuid>"
+
+  - name: wait_for_completion
+    action: poll GET /api/jobs/{job_id}
+    timeout: 300s
+    interval: 5s
+    expected:
+      status: completed
+
+  - name: verify_results
+    action: GET /api/jobs/{job_id}
+    expected:
+      result:
+        recipe_json: not null
+        summary_json: not null
+        thumbnails_json: not null
+
+  - name: verify_content_dna
+    action: query content_dna WHERE job_id = {job_id}
+    expected:
+      rows: 1
+      fields:
+        - category: not null
+        - block_count: "> 0"
+        - hook_strength: not null
+
+  - name: verify_brand
+    action: query brands WHERE name = recipe_json.product.brand
+    expected:
+      rows: ">= 1"
+
+  - name: verify_normalized
+    action: query analysis_claims WHERE result_id = {result_id}
+    expected:
+      rows: ">= 1"
+
+  - name: generate_guide
+    action: POST /api/guide/generate
+    input:
+      result_id: "{result_id}"
+    expected:
+      status: 200
+      body: not empty

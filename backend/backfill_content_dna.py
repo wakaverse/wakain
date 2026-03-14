@@ -20,14 +20,10 @@ load_dotenv()
 from app.config import SUPABASE_URL, SUPABASE_SERVICE_KEY
 from supabase import create_client
 
-# worker 함수 재사용
-from app.worker import (
-    _build_content_dna,
-    _extract_channel_from_url,
-    _match_or_create_brand,
-    _resolve_category_id,
-    _upsert_channel,
-)
+# services 모듈에서 함수 재사용
+from app.services.content_dna import _build_content_dna
+from app.services.brand_channel import _extract_channel_from_url, _match_or_create_brand, _upsert_channel
+from app.services.category import _resolve_category_id
 
 
 def main():

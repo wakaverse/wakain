@@ -1,0 +1,57 @@
+{
+  "identity": {"category": "beauty", "category_ko": "뷰티", "platform": "instagram"},
+  "product": {
+    "name": "테스트 세럼",
+    "brand": "테스트브랜드",
+    "category": "beauty",
+    "claims": [
+      {"claim": "수분 충전", "type": "benefit", "layer": "emotional", "verifiable": false, "source": "verbal"},
+      {"claim": "피부 장벽 강화", "type": "functional", "layer": "rational", "verifiable": true, "source": "text"}
+    ]
+  },
+  "script": {
+    "blocks": [
+      {"block": "hook", "text": "이거 진짜 대박", "alpha": {"emotion": "excitement", "structure": "question", "connection": "direct"}, "time_range": [0, 3]},
+      {"block": "benefit", "text": "수분 충전 효과", "alpha": {"emotion": "trust"}, "product_claim_ref": "수분 충전", "time_range": [3, 8]},
+      {"block": "cta", "text": "링크 확인하세요", "alpha": {}, "time_range": [12, 15]}
+    ],
+    "flow_order": ["hook", "benefit", "cta"]
+  },
+  "visual": {
+    "scenes": [
+      {"scene_id": 1, "time_range": [0, 5], "style": "talking_head", "role": "hook", "visual_forms": ["person"], "block_refs": [0], "description": "인물 등장", "production": {"text_usage": "subtitle"}},
+      {"scene_id": 2, "time_range": [5, 12], "style": "product_shot", "role": "demo", "visual_forms": ["product"], "block_refs": [1], "description": "제품 클로즈업", "production": {"text_usage": "none"}}
+    ],
+    "rhythm": {
+      "total_cuts": 4,
+      "avg_cut_duration": 3.75,
+      "cut_rhythm": "moderate",
+      "attention_curve": {
+        "points": [
+          {"t": 1.0, "score": 8.0},
+          {"t": 2.0, "score": 7.5},
+          {"t": 3.0, "score": 6.0},
+          {"t": 5.0, "score": 7.0},
+          {"t": 10.0, "score": 5.0}
+        ]
+      }
+    },
+    "style_distribution": {"talking_head": 0.6, "product_shot": 0.4}
+  },
+  "style": {"primary": "talking_head", "secondary": "product_shot"},
+  "engagement": {
+    "retention_analysis": {
+      "hook_strength": "strong",
+      "hook_reason": "질문형 오프닝",
+      "hook_scan": {"hook_type": "question"}
+    },
+    "dropoff_analysis": {"risk_zones": []}
+  },
+  "summary": {"strategy": "benefit-led"},
+  "meta": {
+    "duration": 15.0,
+    "platform": "instagram",
+    "human_presence": {"type": "presenter", "face_exposure": "full"},
+    "audio": {"voice": {"type": "narration"}, "music": {"genre": "pop"}}
+  }
+}
