@@ -7,6 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithKakao: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   loading: true,
   signInWithGoogle: async () => {},
+  signInWithKakao: async () => {},
   signOut: async () => {},
 });
 
@@ -48,12 +50,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const signInWithKakao = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: { redirectTo: window.location.origin },
+    });
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signInWithGoogle, signInWithKakao, signOut }}>
       {children}
     </AuthContext.Provider>
   );
