@@ -11,3 +11,4 @@ analyzer/samples/
 analyzer/.env
 core/__pycache__/
 core/**/__pycache__/
+.github/workflows/ci.yml
