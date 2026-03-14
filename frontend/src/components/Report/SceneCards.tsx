@@ -145,7 +145,7 @@ function SceneCard({
   llmEval?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [claimsOpen, setClaimsOpen] = useState(false);
+  const [claimsOpen, setClaimsOpen] = useState(true);
 
   useEffect(() => {
     if (isActive && ref.current) {

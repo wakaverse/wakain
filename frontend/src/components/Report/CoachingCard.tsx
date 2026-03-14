@@ -121,7 +121,7 @@ function SegmentAccordion({ label, segment }: {
   label: string;
   segment: SegmentEval;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const hasContent = segment.strengths.length > 0 || segment.improvements.length > 0;
   if (!hasContent) return null;
 

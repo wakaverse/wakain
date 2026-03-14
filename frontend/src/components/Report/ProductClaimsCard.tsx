@@ -130,7 +130,7 @@ export default function ProductClaimsCard({ data }: Props) {
 }
 
 function ClaimDetailToggle({ sortedTypes }: { sortedTypes: [string, Array<{ claim: string; translation?: string; strategy?: string }>][] }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   return (
     <div>
@@ -152,7 +152,7 @@ function ClaimDetailToggle({ sortedTypes }: { sortedTypes: [string, Array<{ clai
 }
 
 function ClaimGroup({ type, items }: { type: string; items: Array<{ claim: string; translation?: string; strategy?: string }> }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const color = TYPE_COLORS[type] || '#6B7280';
   const label = TYPE_LABELS[type] || type;
 
