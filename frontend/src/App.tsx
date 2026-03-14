@@ -19,6 +19,7 @@ import GuideReportPage from './pages/GuideReportPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminPipelinePage from './pages/admin/AdminPipelinePage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AdminContentPage from './pages/admin/AdminContentPage';
 import ToastContainer from './components/Toast';
 
 function LandingRoutes() {
@@ -45,6 +46,7 @@ function LandingRoutes() {
       <Route path="ctrl-8k3x7" element={<ProtectedRoute><AdminLayout><AdminDashboardPage /></AdminLayout></ProtectedRoute>} />
       <Route path="ctrl-8k3x7/pipeline" element={<ProtectedRoute><AdminLayout><AdminPipelinePage /></AdminLayout></ProtectedRoute>} />
       <Route path="ctrl-8k3x7/users" element={<ProtectedRoute><AdminLayout><AdminUsersPage /></AdminLayout></ProtectedRoute>} />
+      <Route path="ctrl-8k3x7/content" element={<ProtectedRoute><AdminLayout><AdminContentPage /></AdminLayout></ProtectedRoute>} />
       {/* Legacy redirects */}
       <Route path="analyze" element={<Navigate to="/app/analyze" replace />} />
       <Route path="jobs/:id" element={<Navigate to="/app/jobs/:id" replace />} />

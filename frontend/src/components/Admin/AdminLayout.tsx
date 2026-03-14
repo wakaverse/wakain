@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import {
-  BarChart3, Settings, Users, LogOut, ChevronLeft, ChevronRight, Menu, FlaskConical,
+  BarChart3, Settings, Users, LogOut, ChevronLeft, ChevronRight, Menu, FlaskConical, FolderOpen,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { isAdmin } from '../../lib/admin';
@@ -17,6 +17,7 @@ const menuItems: AdminMenuItem[] = [
   { key: 'dashboard', label: '대시보드', icon: BarChart3, path: '/ctrl-8k3x7' },
   { key: 'pipeline', label: '파이프라인', icon: Settings, path: '/ctrl-8k3x7/pipeline' },
   { key: 'users', label: '사용자', icon: Users, path: '/ctrl-8k3x7/users' },
+  { key: 'content', label: '콘텐츠', icon: FolderOpen, path: '/ctrl-8k3x7/content' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -205,3 +205,85 @@ export async function updateUserQuota(
     .eq('user_id', userId);
   return res;
 }
+
+const PLAN_DEFAULTS: Record<string, Record<string, { limit: number; used: number }>> = {
+  free: {
+    analyze: { limit: 5, used: 0 },
+    compare: { limit: 2, used: 0 },
+    library: { limit: 20, used: 0 },
+    radar: { limit: 1, used: 0 },
+    guide: { limit: 3, used: 0 },
+    script: { limit: 1, used: 0 },
+  },
+  pro: {
+    analyze: { limit: 50, used: 0 },
+    compare: { limit: 20, used: 0 },
+    library: { limit: 200, used: 0 },
+    radar: { limit: 5, used: 0 },
+    guide: { limit: 30, used: 0 },
+    script: { limit: 10, used: 0 },
+  },
+};
+
+export function getPlanDefaults(plan: string) {
+  return PLAN_DEFAULTS[plan] ?? PLAN_DEFAULTS.free;
+}
+
+export async function updateUserPlan(userId: string, plan: string) {
+  const defaults = getPlanDefaults(plan);
+  // Preserve current used counts, only update limits
+  const quotaRes = await supabase
+    .from('user_quotas')
+    .select('quotas')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  const currentQuotas = quotaRes.data?.quotas as Record<string, { limit: number; used: number }> | null;
+  const newQuotas: Record<string, { limit: number; used: number }> = {};
+  for (const [feature, def] of Object.entries(defaults)) {
+    newQuotas[feature] = {
+      limit: def.limit,
+      used: currentQuotas?.[feature]?.used ?? 0,
+    };
+  }
+
+  const res = await supabase
+    .from('user_quotas')
+    .upsert({
+      user_id: userId,
+      plan,
+      quotas: newQuotas,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+  return { res, newQuotas };
+}
+
+// ─── Content Library ───
+
+export async function fetchContentLibrary(params: {
+  category?: string;
+  platform?: string;
+  userSearch?: string;
+  offset?: number;
+  limit?: number;
+}) {
+  const res = await supabase.rpc('admin_content_library', {
+    filter_category: params.category || '',
+    filter_platform: params.platform || '',
+    search_user: params.userSearch || '',
+    page_offset: params.offset ?? 0,
+    page_limit: params.limit ?? 50,
+  });
+  return res.data ?? [];
+}
+
+export async function fetchContentFilters() {
+  const [catRes, platRes] = await Promise.all([
+    supabase.rpc('admin_content_categories'),
+    supabase.rpc('admin_content_platforms'),
+  ]);
+  return {
+    categories: (catRes.data ?? []) as string[],
+    platforms: (platRes.data ?? []) as string[],
+  };
+}

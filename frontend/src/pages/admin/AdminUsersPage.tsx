@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Search, RefreshCw, X, ExternalLink, Save } from 'lucide-react';
-import { fetchUsers, fetchUserDetail, updateUserQuota } from '../../lib/admin';
+import { fetchUsers, fetchUserDetail, updateUserQuota, updateUserPlan, getPlanDefaults } from '../../lib/admin';
 
 interface UserRow {
   user_id: string;
@@ -53,6 +53,8 @@ export default function AdminUsersPage() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [results, setResults] = useState<UserResult[]>([]);
   const [saving, setSaving] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState('free');
+  const [planSaving, setPlanSaving] = useState(false);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -83,6 +85,7 @@ export default function AdminUsersPage() {
       const q = detail.quota?.quotas ?? null;
       setQuota(q);
       setEditedQuota(q ? JSON.parse(JSON.stringify(q)) : null);
+      setCurrentPlan(detail.quota?.plan || 'free');
       setLogs(detail.logs);
       setResults(detail.results);
     } catch (err) {
@@ -102,6 +105,26 @@ export default function AdminUsersPage() {
       console.error('Quota save error:', err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePlanChange = async (newPlan: string) => {
+    if (!selectedUser || newPlan === currentPlan) return;
+    setPlanSaving(true);
+    try {
+      const { newQuotas } = await updateUserPlan(selectedUser.user_id, newPlan);
+      setCurrentPlan(newPlan);
+      setQuota(JSON.parse(JSON.stringify(newQuotas)));
+      setEditedQuota(JSON.parse(JSON.stringify(newQuotas)));
+      // Update plan in table row
+      setUsers((prev) =>
+        prev.map((u) => (u.user_id === selectedUser.user_id ? { ...u, plan: newPlan } : u)),
+      );
+      setSelectedUser({ ...selectedUser, plan: newPlan });
+    } catch (err) {
+      console.error('Plan change error:', err);
+    } finally {
+      setPlanSaving(false);
     }
   };
 
@@ -229,7 +252,20 @@ export default function AdminUsersPage() {
                     <div className="text-gray-500">마지막 접속</div>
                     <div className="text-gray-900">{selectedUser.last_active ? new Date(selectedUser.last_active).toLocaleDateString('ko-KR') : '-'}</div>
                     <div className="text-gray-500">플랜</div>
-                    <div className="text-gray-900">{selectedUser.plan || 'free'}</div>
+                    <div>
+                      <select
+                        value={currentPlan}
+                        onChange={(e) => handlePlanChange(e.target.value)}
+                        disabled={planSaving}
+                        className={`text-sm border rounded px-2 py-0.5 focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                          currentPlan === 'pro' ? 'border-blue-300 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-900'
+                        } ${planSaving ? 'opacity-50' : ''}`}
+                      >
+                        <option value="free">Free</option>
+                        <option value="pro">Pro</option>
+                      </select>
+                      {planSaving && <span className="ml-2 text-xs text-gray-400">변경중...</span>}
+                    </div>
                     <div className="text-gray-500">분석</div>
                     <div className="text-gray-900">{selectedUser.analyze_count}건</div>
                   </div>
