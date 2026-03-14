@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Search, RefreshCw, X, ExternalLink, Save } from 'lucide-react';
-import { fetchUsers, fetchUserDetail, updateUserQuota, updateUserPlan, getPlanDefaults } from '../../lib/admin';
+import { fetchUsers, fetchUserDetail, updateUserQuota, updateUserPlan } from '../../lib/admin';
 
 interface UserRow {
   user_id: string;
