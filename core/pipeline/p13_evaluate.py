@@ -430,6 +430,15 @@ Example: "편안함 + 스타일 = 속옷 없이도 되는 브라탑"
 - benefit → "장점/매력"
 - authority → "전문가/권위"
 - 모든 블록 타입, 소구 유형, 전략명을 한국어로 번역하여 출력.
+- hook_strength → "훅 강도", retention_analysis → "시청 유지 분석"
+- experience_shift → "경험 전환", price_anchor → "가격 앵커링"
+- social_evidence → "사회적 증거", info_preempt → "정보 선점"
+- demo → "시연/사용법", promotion → "프로모션/할인"
+- experience → "경험", trust → "신뢰", spec → "성분/원료"
+- value → "가치", price → "가격/가치", emotion → "감성"
+- fomo → "FOMO(놓칠까 봐 두려운 심리)"
+- 작은따옴표로 감싼 영어 용어('benefit', 'hook' 등)도 절대 금지. 한국어로 번역.
+- 영어가 1개라도 포함되면 출력 실패로 간주.
 
 ## Coaching Rules (MANDATORY — follow strictly)
 1. 일반적인 숏폼 제작 조언은 절대 하지 마세요. 사용자는 이미 알고 있습니다.

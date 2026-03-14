@@ -436,8 +436,28 @@ def _build_meta(
     )
 
 
+_BLOCK_KO = {
+    "hook": "훅", "benefit": "장점", "demo": "시연", "cta": "행동유도",
+    "pain_point": "고민제기", "social_proof": "사회적증거", "differentiation": "차별점",
+    "authority": "전문가", "experience": "경험", "spec": "기능", "trust": "신뢰",
+    "value": "가치", "proof": "증거", "promotion": "할인/혜택",
+}
+
+_CLAIM_TYPE_KO = {
+    "composition": "성분/원료", "function": "기능/효과", "experience": "체험/후기",
+    "trust": "신뢰/권위", "value": "가격/가치", "comparison": "비교/차별",
+}
+
+_STYLE_KO = {
+    "demo": "데모", "review": "리뷰", "problem_solution": "문제해결",
+    "before_after": "전후비교", "story": "스토리", "listicle": "리스트",
+    "trend_ride": "트렌드", "promotion": "프로모션", "sensory": "감성",
+    "explanation": "설명", "visual": "시각적",
+}
+
+
 def _summarize_flow(flow_order: list) -> str:
-    """flow_order를 요약 (연속 동일 블록은 ×N)."""
+    """flow_order를 한국어 요약 (연속 동일 블록은 ×N)."""
     if not flow_order:
         return ""
     groups: list[tuple[str, int]] = []
@@ -449,10 +469,11 @@ def _summarize_flow(flow_order: list) -> str:
             groups.append((val, 1))
     parts = []
     for val, count in groups:
+        ko = _BLOCK_KO.get(val, val)
         if count > 1:
-            parts.append(f"{val}×{count}")
+            parts.append(f"{ko}×{count}")
         else:
-            parts.append(val)
+            parts.append(ko)
     return "→".join(parts)
 
 
@@ -498,38 +519,43 @@ def _build_strategy(
     p7_output: ProductOutput | None = None,
     p10_output: ScriptOutput | None = None,
 ) -> str:
-    """전략 요약 생성: "{claims_top_type} 중심 {style_primary}형. {flow_summary} 구조." """
-    # claims_top_type
-    claims_top_type: str | None = None
+    """전략 요약 생성 (한국어): "{소구유형} 중심 {스타일}형. {구조흐름} 구조." """
+    # claims_top_type → 한국어
+    claims_top_type_ko: str | None = None
     if p7_output and p7_output.claims:
         type_counter = Counter(c.type.value for c in p7_output.claims)
-        claims_top_type = type_counter.most_common(1)[0][0]
+        top_type = type_counter.most_common(1)[0][0]
+        claims_top_type_ko = _CLAIM_TYPE_KO.get(top_type, top_type)
 
-    # style_primary
-    style_primary = p11_output.style_primary if p11_output else None
+    # style_primary → 한국어
+    style_ko: str | None = None
+    if p11_output and p11_output.style_primary:
+        sp = p11_output.style_primary.value if hasattr(p11_output.style_primary, "value") else str(p11_output.style_primary)
+        style_ko = _STYLE_KO.get(sp, sp)
 
-    # flow_summary
+    # flow_summary (이미 한국어)
     flow_summary: str | None = None
     if p10_output and p10_output.flow_order:
         flow_summary = _summarize_flow(p10_output.flow_order)
 
-    # 개선된 포맷으로 조립
-    if claims_top_type and style_primary and flow_summary:
-        return f"{claims_top_type} 중심 {style_primary}형. {flow_summary} 구조."
+    # 조립
+    if claims_top_type_ko and style_ko and flow_summary:
+        return f"{claims_top_type_ko} 중심 {style_ko}형. {flow_summary} 구조."
 
-    # fallback: 있는 것만 조립
     parts = []
-    if claims_top_type:
-        parts.append(f"{claims_top_type} 중심")
-    if style_primary:
-        parts.append(f"{style_primary}형")
+    if claims_top_type_ko:
+        parts.append(f"{claims_top_type_ko} 중심")
+    if style_ko:
+        parts.append(f"{style_ko}형")
     if flow_summary:
         parts.append(f"{flow_summary} 구조")
     if p5_output:
-        parts.append(f"템포: {p5_output.tempo_level.value}")
+        tempo_ko = {"fast": "빠름", "medium": "보통", "slow": "느림"}.get(
+            p5_output.tempo_level.value if hasattr(p5_output.tempo_level, "value") else str(p5_output.tempo_level), "보통")
+        parts.append(f"템포: {tempo_ko}")
     if parts:
         return " / ".join(parts) + "."
-    return "분석 데이터 부족 — R2 Gemini Phase 필요"
+    return "분석 데이터 부족"
 
 
 async def run(
