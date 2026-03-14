@@ -46,7 +46,7 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   const prefix = langPrefix(lang);
-  const isLanding = location.pathname === '/' || location.pathname === `/${lang}`;
+  const isLanding = location.pathname === '/' || location.pathname === `/${lang}` || location.pathname.includes('/contact');
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-gray-900 flex flex-col">
@@ -101,7 +101,7 @@ export default function Layout({ children }: LayoutProps) {
 
             {!isLanding && (
               <Link
-                to={user ? '/app/contact' : `${prefix}/contact`}
+                to={`${prefix}/contact`}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
               >
                 <Mail className="w-3.5 h-3.5" />
