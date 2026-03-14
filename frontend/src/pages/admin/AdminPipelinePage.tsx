@@ -135,7 +135,7 @@ export default function AdminPipelinePage() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} />
               <YAxis type="category" dataKey="phase_name" tick={{ fontSize: 11 }} width={80} />
-              <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} />
+              <Tooltip formatter={(value: number | undefined) => value != null ? `${value.toFixed(1)}%` : ''} />
               <Bar dataKey="success_rate" name="성공률" radius={[0, 4, 4, 0]}>
                 {phases.map((entry, idx) => (
                   <Cell
@@ -160,7 +160,7 @@ export default function AdminPipelinePage() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="day" tick={{ fontSize: 11 }} tickFormatter={(v) => v.slice(5)} />
               <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`} />
-              <Tooltip formatter={(value: number) => `${Math.floor(value / 60)}분 ${value % 60}초`} />
+              <Tooltip formatter={(value: number | undefined) => value != null ? `${Math.floor(value / 60)}분 ${value % 60}초` : ''} />
               <ReferenceLine y={138} stroke="#3B82F6" strokeDasharray="5 5" label={{ value: '현재 평균 2:18', fontSize: 10, fill: '#3B82F6' }} />
               <ReferenceLine y={90} stroke="#10B981" strokeDasharray="5 5" label={{ value: '목표 1:30', fontSize: 10, fill: '#10B981' }} />
               <Line type="monotone" dataKey="avg_seconds" name="평균 시간" stroke="#6366F1" strokeWidth={2} dot={false} />

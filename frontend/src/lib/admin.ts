@@ -107,7 +107,7 @@ export async function fetchDailyActiveUsers(period: string) {
 
 // ─── Pipeline ───
 
-export async function fetchPipelineCosts(period: string) {
+export async function fetchPipelineCosts(_period: string) {
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
   const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
