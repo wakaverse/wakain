@@ -159,9 +159,9 @@ export default function Layout({ children }: LayoutProps) {
             </div>
             <div className="flex gap-8">
               <div className="flex flex-col gap-2">
-                <Link to={`${prefix}/contact`} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                <a href="#contact" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
                   {t('nav.contact')}
-                </Link>
+                </a>
                 <a href="mailto:contact@crabs.ai" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
                   contact@crabs.ai
                 </a>
