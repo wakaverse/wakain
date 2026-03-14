@@ -85,7 +85,7 @@ export default function ProductClaimsCard({ data }: Props) {
           return (
             <div key={type} className="flex items-center gap-2">
               <span className="text-xs font-medium text-gray-600 w-8 text-right">{label}</span>
-              <div className="flex-1 h-5 bg-gray-50 rounded-full overflow-hidden">
+              <div className="flex-1 h-6 bg-gray-50 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full flex items-center justify-end px-2"
                   style={{ width: `${Math.max(pct, 12)}%`, backgroundColor: color }}
@@ -105,11 +105,11 @@ export default function ProductClaimsCard({ data }: Props) {
       </p>
 
       {/* 대표 소구 — claim_groups 우선 */}
-      <div className="mb-4 space-y-1">
+      <div className="mb-4 space-y-1.5">
         <p className="text-xs font-medium text-gray-500 mb-1.5">대표 소구:</p>
         {data.product.claim_groups?.length ? (
           data.product.claim_groups.map((g) => (
-            <div key={g.group_id} className="flex items-start gap-1.5 text-sm text-gray-600">
+            <div key={g.group_id} className="flex items-start gap-1.5 text-sm text-gray-600 leading-relaxed">
               <span className="shrink-0">•</span>
               <span>
                 <span className="font-medium text-gray-700">{TYPE_LABELS[g.type] || g.type}</span>

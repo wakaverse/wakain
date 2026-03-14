@@ -7,9 +7,9 @@ interface Props {
 }
 
 const SEGMENT_LABELS: Record<string, string> = {
-  hook: 'Hook',
-  body: 'Body',
-  cta: 'CTA',
+  hook: '훅',
+  body: '본문',
+  cta: '행동유도',
 };
 
 export default function CoachingCard({ data }: Props) {
@@ -31,7 +31,7 @@ export default function CoachingCard({ data }: Props) {
               <div key={i} className="flex items-start gap-2">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-base text-gray-800 leading-loose">{translateFieldNames(s.fact)}</p>
+                  <p className="text-sm text-gray-800 leading-relaxed">{translateFieldNames(s.fact)}</p>
                   <p className="text-sm text-gray-500 leading-relaxed">{translateFieldNames(s.comment)}</p>
                 </div>
               </div>
@@ -66,9 +66,9 @@ export default function CoachingCard({ data }: Props) {
           {/* ❌ 현재 구조 — 연한 빨강 */}
           <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-2">
             <p className="text-[10px] text-red-500 mb-1">❌ 현재 구조</p>
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1">
               {recipe_eval.current.map((block, i) => (
-                <span key={i} className="flex items-center gap-1.5">
+                <span key={i} className="flex items-center gap-1">
                   <span
                     className="text-xs font-medium px-2 py-0.5 rounded-full"
                     style={{
@@ -128,9 +128,8 @@ function SegmentSection({ label, segment }: {
       <div className="px-3 py-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-800">{label}</span>
-            <span className="text-[10px] font-mono text-gray-400">
-              {formatTime(segment.time_range[0])}–{formatTime(segment.time_range[1])}
+            <span className="text-sm font-medium text-gray-800">
+              {label} <span className="text-xs font-normal text-gray-400">({formatTime(segment.time_range[0])}~{formatTime(segment.time_range[1])})</span>
             </span>
           </div>
           {segment.block_types.length > 0 && (

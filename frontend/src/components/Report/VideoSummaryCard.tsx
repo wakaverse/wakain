@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { Info } from 'lucide-react';
 import type { RecipeJSON } from '../../types/recipe';
 import { STYLE_LABELS, BLOCK_TYPE_KO, CLAIM_TYPE_INFO, getDynamicsLevel } from '../../lib/recipe-utils';
@@ -196,11 +196,14 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
   const purchaseReasons = useMemo(() => {
     // P7.5 그룹핑 결과가 있으면 우선 사용
     if (product.purchase_reasons?.length) {
-      return product.purchase_reasons.map((reason, i) => ({
-        type: product.claim_groups?.[i]?.type || '',
-        label: CLAIM_TYPE_INFO[product.claim_groups?.[i]?.type || '']?.label || '',
-        claim: reason,
-      }));
+      return product.purchase_reasons.map((reason, i) => {
+        const rawType = product.claim_groups?.[i]?.type || '';
+        return {
+          type: rawType,
+          label: CLAIM_TYPE_INFO[rawType]?.label || '',
+          claim: reason,
+        };
+      });
     }
     // Fallback: 유형별 대표
     if (!claims.length) return [];
@@ -220,9 +223,8 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
   const blockRoles = flowOrder.length > 0
     ? flowOrder
     : (data.script?.blocks || []).map((b) => b.block || '').filter(Boolean);
-  const structureFlow = blockRoles
-    .map((block: string) => BLOCK_TYPE_KO[block] || block)
-    .join(' → ');
+  const structureFlowItems = blockRoles
+    .map((block: string) => BLOCK_TYPE_KO[block] || block);
 
   // ── 기본 스펙
   const specs = [
@@ -262,7 +264,11 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
         <MetricCard
           label="소구 분포"
           value={claimTypeCounts.length > 0
-            ? claimTypeCounts.map(([t, c]) => `${CLAIM_TYPE_INFO[t]?.label || t} ${Math.round((c / claims.length) * 100)}%`).join(' / ')
+            ? (() => {
+                const top = claimTypeCounts.slice(0, 3).map(([t, c]) => `${CLAIM_TYPE_INFO[t]?.label || t} ${Math.round((c / claims.length) * 100)}%`);
+                const rest = claimTypeCounts.length - 3;
+                return rest > 0 ? `${top.join(' / ')} 외 ${rest}개` : top.join(' / ');
+              })()
             : '-'}
           color="gray"
           tooltipKey="claims" activeTooltip={activeTooltip} onTooltipToggle={handleTooltipToggle}
@@ -274,9 +280,9 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
       {/* Basic specs */}
       <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
         {specs.map((s) => (
-          <div key={s.label} className="flex items-center gap-1.5 text-sm text-gray-500">
-            <span className="text-gray-400">{s.label}</span>
-            <span className="font-medium text-gray-700">{s.value}</span>
+          <div key={s.label} className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-400">{s.label}</span>
+            <span className="text-sm font-medium text-gray-700">{s.value}</span>
           </div>
         ))}
       </div>
@@ -295,8 +301,8 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
           <p className="text-xs font-bold text-gray-700 mb-1.5 pb-1 border-b border-gray-100">🛒 제품을 사야 하는 이유</p>
           <div className="space-y-0.5">
             {purchaseReasons.map(({ type, label, claim }) => (
-              <p key={type} className="text-sm text-gray-600">
-                • {claim} <span className="text-gray-400">({label})</span>
+              <p key={type} className="text-sm text-gray-600 leading-relaxed">
+                • {claim}{label && <span className="text-gray-400"> ({label})</span>}
               </p>
             ))}
           </div>
@@ -309,10 +315,17 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
       )}
 
       {/* ── 구조 흐름 */}
-      {structureFlow && (
+      {structureFlowItems.length > 0 && (
         <div className="mb-4">
           <p className="text-xs font-bold text-gray-700 mb-1.5 pb-1 border-b border-gray-100">🔗 구조 흐름</p>
-          <p className="text-sm text-gray-600">{structureFlow}</p>
+          <div className="flex flex-wrap items-center gap-y-1 text-sm text-gray-600">
+            {structureFlowItems.map((item, i) => (
+              <span key={i} className="flex items-center">
+                {i > 0 && <span className="mx-1 text-gray-300">→</span>}
+                <span>{item}</span>
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
