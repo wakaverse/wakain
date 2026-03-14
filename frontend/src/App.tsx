@@ -22,6 +22,8 @@ import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminContentPage from './pages/admin/AdminContentPage';
 import AdminInquiriesPage from './pages/admin/AdminInquiriesPage';
 import ComparePage from './pages/ComparePage';
+import RadarPage from './pages/RadarPage';
+import LibraryPage from './pages/LibraryPage';
 import OnboardingPage from './pages/OnboardingPage';
 import ToastContainer from './components/Toast';
 
@@ -34,8 +36,8 @@ function LandingRoutes() {
       <Route path="demo" element={<DemoReportPage />} />
       <Route path="app" element={<ProtectedRoute><AppShell><Navigate to="/app/analyze" replace /></AppShell></ProtectedRoute>} />
       <Route path="app/analyze" element={<ProtectedRoute><AppShell><AnalyzePage /></AppShell></ProtectedRoute>} />
-      <Route path="app/library" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="library" /></AppShell></ProtectedRoute>} />
-      <Route path="app/radar" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="radar" /></AppShell></ProtectedRoute>} />
+      <Route path="app/library" element={<ProtectedRoute><AppShell><LibraryPage /></AppShell></ProtectedRoute>} />
+      <Route path="app/radar" element={<ProtectedRoute><AppShell><RadarPage /></AppShell></ProtectedRoute>} />
       <Route path="app/compare" element={<ProtectedRoute><AppShell><ComparePage /></AppShell></ProtectedRoute>} />
       <Route path="app/insights" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="insight" /></AppShell></ProtectedRoute>} />
       <Route path="app/guide" element={<ProtectedRoute><AppShell><ComingSoonPage menuKey="guide" /></AppShell></ProtectedRoute>} />

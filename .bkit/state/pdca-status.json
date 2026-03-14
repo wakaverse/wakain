@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-14T13:24:26.623Z",
+  "lastUpdated": "2026-03-14T13:42:07.016Z",
   "activeFeatures": [
     "backend",
     "frontend",
@@ -51,9 +51,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-08T11:24:02.541Z",
-        "lastUpdated": "2026-03-14T13:20:43.185Z"
+        "lastUpdated": "2026-03-14T13:38:45.105Z"
       },
-      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/frontend/src/pages/RadarPage.tsx"
+      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/frontend/src/types/recipe.ts"
     },
     "Report": {
       "phase": "do",
@@ -64,9 +64,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-08T11:24:47.747Z",
-        "lastUpdated": "2026-03-14T12:38:57.947Z"
+        "lastUpdated": "2026-03-14T13:42:07.016Z"
       },
-      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/frontend/src/components/Report/UnifiedTimeline.tsx"
+      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/frontend/src/components/Report/CoachingCard.tsx"
     },
     "App": {
       "phase": "do",
@@ -90,7 +90,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-09T14:18:29.892Z",
-        "lastUpdated": "2026-03-14T12:34:54.020Z"
+        "lastUpdated": "2026-03-14T13:38:37.786Z"
       },
       "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/core/pipeline/p13_evaluate.py"
     },
@@ -103,9 +103,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-09T14:18:34.780Z",
-        "lastUpdated": "2026-03-13T09:47:58.372Z"
+        "lastUpdated": "2026-03-14T13:38:20.475Z"
       },
-      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/core/schemas/recipe.py"
+      "lastFile": "/Users/tymini/.openclaw/workspace-coder/projects/wakain/core/schemas/evaluation.py"
     },
     "core": {
       "phase": "do",
@@ -350,7 +350,7 @@
   "session": {
     "startedAt": "2026-03-08T09:40:41.487Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-14T13:24:26.623Z"
+    "lastActivity": "2026-03-14T13:42:07.016Z"
   },
   "history": [
     {
@@ -2102,6 +2102,108 @@
     {
       "timestamp": "2026-03-14T13:24:26.623Z",
       "feature": "routes",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:35:17.919Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:35:24.728Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:35:33.585Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:36:13.213Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:36:19.859Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:37:24.226Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:37:38.811Z",
+      "feature": "pipeline",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:37:59.038Z",
+      "feature": "pipeline",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:38:04.187Z",
+      "feature": "pipeline",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:38:20.475Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:38:37.786Z",
+      "feature": "pipeline",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:38:45.105Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:38:57.392Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:39:05.945Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:39:58.937Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:41:13.922Z",
+      "feature": "Report",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-14T13:42:07.016Z",
+      "feature": "Report",
       "phase": "do",
       "action": "updated"
     }

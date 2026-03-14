@@ -17,8 +17,9 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { key: 'analyze', label: '분석', icon: Microscope, path: '/app/analyze' },
-  { key: 'radar', label: '레이더', icon: Radar, path: '/app/radar', comingSoon: true },
-  { key: 'library', label: '라이브러리', icon: BookOpen, path: '/app/library', comingSoon: true },
+  { key: 'radar', label: '레이더', icon: Radar, path: '/app/radar' },
+  { key: 'compare', label: '비교', icon: Radar, path: '/app/compare' },
+  { key: 'library', label: '라이브러리', icon: BookOpen, path: '/app/library' },
   { key: 'compare', label: '비교', icon: ArrowLeftRight, path: '/app/compare' },
   { key: 'insights', label: '인사이트', icon: BarChart3, path: '/app/insights', comingSoon: true },
   { key: 'guide', label: '제작가이드', icon: Pencil, path: '/app/guide', comingSoon: true },
