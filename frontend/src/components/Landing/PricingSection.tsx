@@ -12,12 +12,12 @@ interface PlanFeature {
 }
 
 const freePlan: PlanFeature[] = [
-  { text: '영상 분석 월 5회', included: true },
-  { text: '비교 분석 월 2회', included: true },
-  { text: '라이브러리 20개 저장', included: true },
-  { text: '레이더 채널 1개', included: true },
-  { text: '제작가이드 월 3회', included: true },
-  { text: '대본 생성 월 1회', included: true },
+  { text: '영상 분석 월 30회', included: true },
+  { text: '비교 분석 월 10회', included: true },
+  { text: '라이브러리 100개 저장', included: true },
+  { text: '레이더 채널 5개', included: true },
+  { text: '제작가이드 월 15회', included: true },
+  { text: '대본 생성 월 5회', included: true },
   { text: '리포트 내보내기', included: true, note: '워터마크 포함' },
 ];
 
