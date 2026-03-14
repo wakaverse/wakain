@@ -225,6 +225,57 @@ export function labelKo(key: string, map?: Record<string, string>): string {
   return key.replace(/_/g, ' ');
 }
 
+// ─── 내부 필드명 → 한국어 번역 (코칭 텍스트용) ───
+
+const FIELD_NAME_KO: Record<string, string> = {
+  product_exposure_pct: '제품 노출 비중',
+  script_alpha_summary: '스크립트 알파 요약',
+  checklist_results: '분석 결과',
+  hook_strength: '훅 강도',
+  retention_analysis: '시청 유지 분석',
+  attention_curve: '시각 변화량 곡선',
+  flow_order: '구조 흐름',
+  style_distribution: '스타일 분포',
+  cut_rhythm: '컷 리듬',
+  benefit: '장점/매력',
+  proof: '증거/근거',
+  authority: '전문가/권위',
+  social_proof: '사회적 증거',
+  differentiation: '차별점',
+  pain_point: '고민/문제 제기',
+  promotion: '프로모션/할인',
+  demo: '시연/사용법',
+  cta: '행동 유도',
+  hook: '훅',
+  experience: '경험',
+  trust: '신뢰',
+  spec: '성분/원료',
+  price: '가격/가치',
+  value: '가치',
+  emotion: '감성',
+  sensory: '감각적',
+  explanation: '설명형',
+  experience_shift: '경험 전환',
+  price_anchor: '가격 앵커링',
+  social_evidence: '사회적 증거',
+  info_preempt: '정보 선점',
+  fomo: 'FOMO(놓칠까 봐 두려운 심리)',
+};
+
+/** 코칭 텍스트에서 영어 내부 필드명을 한국어로 치환 */
+export function translateFieldNames(text: string): string {
+  let result = text;
+  // Sort by length desc to replace longer matches first
+  const sorted = Object.entries(FIELD_NAME_KO).sort((a, b) => b[0].length - a[0].length);
+  for (const [en, ko] of sorted) {
+    // Replace 'field_name' patterns (quoted or standalone)
+    result = result.replace(new RegExp(`'${en}'`, 'g'), `'${ko}'`);
+    result = result.replace(new RegExp(`"${en}"`, 'g'), `"${ko}"`);
+    result = result.replace(new RegExp(`\\b${en}\\b`, 'g'), ko);
+  }
+  return result;
+}
+
 // ─── Alpha colors ───
 
 export const ALPHA_COLORS: Record<string, { icon: string; bg: string; text: string }> = {
