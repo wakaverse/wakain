@@ -62,7 +62,7 @@ function MetricCard({ label, value, sub, color, children }: {
 /* ── Main ────────────────────────────────── */
 
 export default function VideoSummaryCard({ data, onTabChange }: Props) {
-  const { identity, product, meta, visual, summary, evaluation } = data;
+  const { identity, product, meta, visual, evaluation } = data;
   const stylePrimary = visual.style_primary;
 
   // ── 변화량 ⓘ 툴팁 상태
@@ -95,9 +95,7 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
     }
     return Object.entries(counts).sort((a, b) => b[1] - a[1]);
   }, [claims]);
-  const topClaimType = claimTypeCounts[0];
-  const topClaimLabel = topClaimType ? (CLAIM_TYPE_INFO[topClaimType[0]]?.label || topClaimType[0]) : '-';
-  const topClaimPct = topClaimType && claims.length > 0 ? Math.round((topClaimType[1] / claims.length) * 100) : 0;
+
 
   const blockCount = data.script?.blocks?.length || 0;
   const exposurePct = meta.product_exposure_pct;
@@ -127,13 +125,13 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
     }));
   }, [claims]);
 
-  // ── 구조 흐름 (한국어)
+  // ── 구조 흐름 (한국어) — flow_order 또는 blocks에서 추출
   const flowOrder = data.script?.flow_order || [];
-  const structureFlow = flowOrder
-    .map((block) => {
-      const key = typeof block === 'string' ? block : String(block);
-      return BLOCK_TYPE_KO[key] || key;
-    })
+  const blockRoles = flowOrder.length > 0
+    ? flowOrder
+    : (data.script?.blocks || []).map((b) => b.block || '').filter(Boolean);
+  const structureFlow = blockRoles
+    .map((block: string) => BLOCK_TYPE_KO[block] || block)
     .join(' → ');
 
   // ── 기본 스펙
@@ -167,15 +165,8 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
         )}
       </div>
 
-      {/* Strategy summary */}
-      {summary?.strategy && (
-        <p className="text-base text-gray-700 leading-loose mb-3">
-          {summary.strategy}
-        </p>
-      )}
-
       {/* ── 핵심 수치 카드 5개 */}
-      <div className="flex gap-2 mb-3 overflow-x-auto">
+      <div className="flex gap-2 mb-3 flex-wrap">
         <MetricCard label="훅 강도" value={hookLabel} color={hookColor} />
         <MetricCard label="변화량" value={String(dynamicsAvg)} sub={dynamicsInfo.label} color={dynamicsColor}>
           <button
@@ -189,8 +180,10 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
           )}
         </MetricCard>
         <MetricCard
-          label="소구 Top"
-          value={topClaimType ? `${topClaimLabel} ${topClaimPct}%` : '-'}
+          label="소구 분포"
+          value={claimTypeCounts.length > 0
+            ? claimTypeCounts.map(([t, c]) => `${CLAIM_TYPE_INFO[t]?.label || t} ${Math.round((c / claims.length) * 100)}%`).join(' / ')
+            : '-'}
           color="gray"
         />
         <MetricCard label="블록 수" value={`${blockCount}개`} color="gray" />
@@ -209,16 +202,16 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
 
       {/* ── 콘텐츠 포지셔닝 */}
       {positioningSummary && (
-        <div className="mb-3">
-          <p className="text-xs font-medium text-gray-500 mb-1">콘텐츠 포지셔닝</p>
+        <div className="mb-4">
+          <p className="text-xs font-bold text-gray-700 mb-1.5 pb-1 border-b border-gray-100">📌 콘텐츠 포지셔닝</p>
           <p className="text-sm text-gray-700 leading-relaxed">{positioningSummary}</p>
         </div>
       )}
 
       {/* ── 제품을 사야 하는 이유 */}
       {purchaseReasons.length > 0 && (
-        <div className="mb-3">
-          <p className="text-xs font-medium text-gray-500 mb-1">제품을 사야 하는 이유</p>
+        <div className="mb-4">
+          <p className="text-xs font-bold text-gray-700 mb-1.5 pb-1 border-b border-gray-100">🛒 제품을 사야 하는 이유</p>
           <div className="space-y-0.5">
             {purchaseReasons.map(({ type, label, claim }) => (
               <p key={type} className="text-sm text-gray-600">
@@ -236,8 +229,8 @@ export default function VideoSummaryCard({ data, onTabChange }: Props) {
 
       {/* ── 구조 흐름 */}
       {structureFlow && (
-        <div className="mb-3">
-          <p className="text-xs font-medium text-gray-500 mb-1">구조 흐름</p>
+        <div className="mb-4">
+          <p className="text-xs font-bold text-gray-700 mb-1.5 pb-1 border-b border-gray-100">🔗 구조 흐름</p>
           <p className="text-sm text-gray-600">{structureFlow}</p>
         </div>
       )}
