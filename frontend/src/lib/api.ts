@@ -34,7 +34,7 @@ export async function createJob(
   });
   if (!urlRes.ok) {
     const err = await urlRes.json().catch(() => ({ detail: '업로드 URL 발급에 실패했습니다' }));
-    throw new Error(err.detail || '업로드 URL 발급에 실패했습니다');
+    throw new Error((typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) || '업로드 URL 발급에 실패했습니다');
   }
   const { upload_url, r2_key } = await urlRes.json();
 
@@ -74,7 +74,7 @@ export async function createJob(
   });
   if (!analyzeRes.ok) {
     const err = await analyzeRes.json().catch(() => ({ detail: '분석 시작에 실패했습니다' }));
-    throw new Error(err.detail || '분석 시작에 실패했습니다');
+    throw new Error((typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) || '분석 시작에 실패했습니다');
   }
   const data = await analyzeRes.json();
   return { id: data.job_id };
@@ -112,7 +112,8 @@ export async function createJobFromUrl(
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'URL 분석 시작에 실패했습니다' }));
-    throw new Error(err.detail || 'URL 분석 시작에 실패했습니다');
+    const detail = typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail);
+    throw new Error(detail || 'URL 분석 시작에 실패했습니다');
   }
   const data = await res.json();
   return { id: data.job_id };
@@ -222,7 +223,7 @@ export async function generateScript(resultId: string): Promise<{ script: string
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: '대본 생성에 실패했습니다' }));
-    throw new Error(err.detail || '대본 생성에 실패했습니다');
+    throw new Error((typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) || '대본 생성에 실패했습니다');
   }
   return res.json();
 }
@@ -285,7 +286,7 @@ export async function addRadarChannel(
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: '채널 등록에 실패했습니다' }));
-    throw new Error(err.detail || '채널 등록에 실패했습니다');
+    throw new Error((typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) || '채널 등록에 실패했습니다');
   }
   return res.json();
 }
@@ -327,7 +328,7 @@ export async function analyzeRadarReel(reelId: string): Promise<{ job_id: string
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: '분석 시작에 실패했습니다' }));
-    throw new Error(err.detail || '분석 시작에 실패했습니다');
+    throw new Error((typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) || '분석 시작에 실패했습니다');
   }
   return res.json();
 }
@@ -376,7 +377,7 @@ export async function searchRadarReels(
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: '검색에 실패했습니다' }));
-    throw new Error(err.detail || '검색에 실패했습니다');
+    throw new Error((typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) || '검색에 실패했습니다');
   }
   return res.json();
 }
@@ -397,7 +398,7 @@ export async function getTrendingReels(
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: '트렌드 조회에 실패했습니다' }));
-    throw new Error(err.detail || '트렌드 조회에 실패했습니다');
+    throw new Error((typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) || '트렌드 조회에 실패했습니다');
   }
   return res.json();
 }
@@ -589,7 +590,7 @@ export async function compareVideos(body: CompareRequest): Promise<CompareRespon
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: '비교 분석에 실패했습니다' }));
-    throw new Error(err.detail || '비교 분석에 실패했습니다');
+    throw new Error((typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail)) || '비교 분석에 실패했습니다');
   }
   return res.json();
 }
