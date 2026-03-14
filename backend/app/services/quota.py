@@ -9,12 +9,13 @@ logger = logging.getLogger(__name__)
 
 # Free 기본값
 FREE_DEFAULTS: dict = {
-    "analyze": {"limit": 5, "used": 0},
-    "compare": {"limit": 2, "used": 0},
-    "library": {"limit": 20, "used": 0},
-    "radar": {"limit": 1, "used": 0},
-    "guide": {"limit": 3, "used": 0},
-    "script": {"limit": 1, "used": 0},
+    "analyze": {"limit": 30, "used": 0},
+    "compare": {"limit": 10, "used": 0},
+    "library": {"limit": 100, "used": 0},
+    "radar": {"limit": 5, "used": 0},
+    "guide": {"limit": 15, "used": 0},
+    "script": {"limit": 5, "used": 0},
+    "search": {"limit": 30, "used": 0},
 }
 
 
