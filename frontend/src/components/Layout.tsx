@@ -15,9 +15,9 @@ function langPrefix(lang: Lang): string {
 
 export default function Layout({ children }: LayoutProps) {
   const { t, i18n } = useTranslation();
-  const { user, signInWithGoogle, signOut } = useAuth();
-  const location = useLocation();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const lang = i18n.language as Lang;
 
   const [langOpen, setLangOpen] = useState(false);
@@ -128,13 +128,13 @@ export default function Layout({ children }: LayoutProps) {
             ) : (
               <>
                 <button
-                  onClick={signInWithGoogle}
+                  onClick={() => navigate('/login')}
                   className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium"
                 >
                   {t('nav.login')}
                 </button>
                 <button
-                  onClick={signInWithGoogle}
+                  onClick={() => navigate('/login')}
                   className="ml-1 px-4 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-full transition-colors"
                 >
                   {t('nav.free_start')}
