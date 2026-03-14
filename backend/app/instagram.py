@@ -103,6 +103,56 @@ class InstagramLooter:
             })
         return reels
 
+    async def search_reels(self, query: str, count: int = 20) -> list[dict]:
+        """해시태그/키워드 기반 릴 검색.
+
+        Instagram Looter2 API에는 공식 검색 엔드포인트가 없으므로
+        해시태그 기반 검색을 시도합니다.
+        TODO: RapidAPI에 검색 엔드포인트 추가 시 교체
+        """
+        # 해시태그로 변환 (공백 제거, 한글 유지)
+        hashtag = query.replace(" ", "").replace("#", "")
+        try:
+            data = await self._get("/hashtag", {"name": hashtag})
+            items = data.get("items", data.get("edge_hashtag_to_media", {}).get("edges", []))
+            reels = []
+            for item in items[:count]:
+                node = item.get("node", item) if isinstance(item, dict) else item
+                m = node.get("media", node) if isinstance(node, dict) else {}
+                thumb = ""
+                img = m.get("image_versions2", {})
+                if isinstance(img, dict):
+                    cands = img.get("candidates", [])
+                    if cands:
+                        thumb = cands[0].get("url", "")
+                if not thumb:
+                    thumb = m.get("thumbnail_url", m.get("display_url", ""))
+                video_url = ""
+                vv = m.get("video_versions", [])
+                if vv:
+                    video_url = vv[0].get("url", "")
+                cap = m.get("caption", m.get("edge_media_to_caption", {}).get("edges", [{}])[0].get("node", {}).get("text", ""))
+                if isinstance(cap, dict):
+                    cap = cap.get("text", "")
+                owner = m.get("owner", {})
+                reels.append({
+                    "ig_media_id": str(m.get("pk", m.get("id", ""))),
+                    "shortcode": m.get("code", m.get("shortcode", "")),
+                    "thumbnail_url": thumb,
+                    "video_url": video_url,
+                    "caption": cap if isinstance(cap, str) else "",
+                    "view_count": m.get("play_count", m.get("video_view_count", 0)),
+                    "like_count": m.get("like_count", m.get("edge_liked_by", {}).get("count", 0)),
+                    "comment_count": m.get("comment_count", m.get("edge_media_to_comment", {}).get("count", 0)),
+                    "posted_at": m.get("taken_at", m.get("taken_at_timestamp")),
+                    "channel_name": owner.get("username", ""),
+                    "channel_followers": owner.get("edge_followed_by", {}).get("count", 0),
+                })
+            return reels
+        except Exception:
+            # API 미지원 시 빈 결과 반환
+            return []
+
     @staticmethod
     def calc_spike(reel_views: int, avg_views: float) -> float:
         if avg_views <= 0:

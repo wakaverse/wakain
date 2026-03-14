@@ -340,6 +340,121 @@ export async function collectChannel(channelId: string): Promise<void> {
   if (!res.ok) throw new Error('수집에 실패했습니다');
 }
 
+// ─── Radar Search & Trending API ───
+
+export interface RadarSearchFilters {
+  query: string;
+  platform?: string;
+  period?: string;
+  sort?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface RadarTrendingFilters {
+  category?: string;
+  platform?: string;
+  period?: string;
+  sort?: string;
+  page?: number;
+  limit?: number;
+}
+
+export async function searchRadarReels(
+  filters: RadarSearchFilters,
+): Promise<{ reels: RadarReel[]; total: number }> {
+  const params = new URLSearchParams();
+  params.set('query', filters.query);
+  if (filters.platform) params.set('platform', filters.platform);
+  if (filters.period) params.set('period', filters.period);
+  if (filters.sort) params.set('sort', filters.sort);
+  if (filters.page) params.set('page', String(filters.page));
+  if (filters.limit) params.set('limit', String(filters.limit));
+
+  const res = await fetch(`${API_URL}/api/radar/search?${params}`, {
+    headers: await authHeaders(),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: '검색에 실패했습니다' }));
+    throw new Error(err.detail || '검색에 실패했습니다');
+  }
+  return res.json();
+}
+
+export async function getTrendingReels(
+  filters: RadarTrendingFilters,
+): Promise<{ reels: RadarReel[]; total: number }> {
+  const params = new URLSearchParams();
+  if (filters.category) params.set('category', filters.category);
+  if (filters.platform) params.set('platform', filters.platform);
+  if (filters.period) params.set('period', filters.period);
+  if (filters.sort) params.set('sort', filters.sort);
+  if (filters.page) params.set('page', String(filters.page));
+  if (filters.limit) params.set('limit', String(filters.limit));
+
+  const res = await fetch(`${API_URL}/api/radar/trending?${params}`, {
+    headers: await authHeaders(),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: '트렌드 조회에 실패했습니다' }));
+    throw new Error(err.detail || '트렌드 조회에 실패했습니다');
+  }
+  return res.json();
+}
+
+export async function refreshTrending(category?: string): Promise<{ ok: boolean; collected: number }> {
+  const res = await fetch(`${API_URL}/api/radar/trending/refresh`, {
+    method: 'POST',
+    headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ category }),
+  });
+  if (!res.ok) throw new Error('트렌드 새로고침에 실패했습니다');
+  return res.json();
+}
+
+export async function updateLastRadarVisit(): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  const userId = data.session?.user?.id;
+  if (!userId) return;
+  await supabase.from('user_profiles').update({ last_radar_visit: new Date().toISOString() }).eq('id', userId);
+}
+
+export async function getLastRadarVisit(): Promise<string | null> {
+  const { data } = await supabase.auth.getSession();
+  const userId = data.session?.user?.id;
+  if (!userId) return null;
+  const resp = await supabase.from('user_profiles').select('last_radar_visit').eq('id', userId).single();
+  return resp.data?.last_radar_visit || null;
+}
+
+export async function logRadarEvent(action: string, metadata: Record<string, unknown>): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  const userId = data.session?.user?.id;
+  if (!userId) return;
+  await supabase.from('user_activity_logs').insert({
+    user_id: userId,
+    action,
+    metadata,
+  });
+}
+
+export async function getRecentSearches(limit: number = 10): Promise<string[]> {
+  const { data } = await supabase.auth.getSession();
+  const userId = data.session?.user?.id;
+  if (!userId) return [];
+  const resp = await supabase
+    .from('user_activity_logs')
+    .select('metadata')
+    .eq('user_id', userId)
+    .eq('action', 'radar_search')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  const queries = (resp.data || [])
+    .map((r: { metadata: { query?: string } }) => r.metadata?.query)
+    .filter((q: string | undefined): q is string => !!q);
+  return [...new Set(queries)];
+}
+
 // ─── Library API ───
 
 import type { LibraryItem, LibraryFilters } from '../types';

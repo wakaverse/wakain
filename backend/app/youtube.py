@@ -135,6 +135,44 @@ class YouTubeLooter:
             "duration": int(data.get("lengthSeconds", 0)),
         }
 
+    async def search_shorts(self, query: str, count: int = 20, order: str = "viewCount") -> list[dict]:
+        """키워드 기반 쇼츠 검색.
+
+        yt-api의 /search 엔드포인트를 활용하여 영상을 검색합니다.
+        order: relevance, viewCount, date, rating
+        """
+        data = await self._get("/search", {
+            "query": query,
+            "type": "video",
+            "sort_by": order,
+        })
+        items = data.get("data", [])
+        shorts: list[dict] = []
+        for item in items[:count]:
+            if item.get("type") != "video":
+                continue
+            vid = item.get("videoId", "")
+            if not vid:
+                continue
+            thumbs = item.get("thumbnail", [])
+            thumb_url = thumbs[0]["url"] if thumbs else ""
+            view_text = item.get("viewCount", item.get("viewCountText", "0"))
+            view_count = view_text if isinstance(view_text, int) else _parse_view_count(str(view_text))
+            channel_thumb = item.get("channelThumbnail", [])
+            shorts.append({
+                "video_id": vid,
+                "title": item.get("title", ""),
+                "thumbnail_url": thumb_url,
+                "view_count": view_count,
+                "like_count": 0,
+                "comment_count": 0,
+                "published_at": item.get("publishedTimeText", item.get("publishDate", "")),
+                "channel_name": item.get("channelTitle", ""),
+                "channel_id": item.get("channelId", ""),
+                "channel_thumbnail": channel_thumb[0]["url"] if channel_thumb else "",
+            })
+        return shorts
+
     @staticmethod
     def calc_spike(views: int, avg_views: float) -> float:
         if avg_views <= 0:

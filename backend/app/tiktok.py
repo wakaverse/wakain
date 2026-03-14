@@ -82,6 +82,45 @@ class TikTokLooter:
             })
         return posts
 
+    async def search_videos(self, query: str, count: int = 20) -> list[dict]:
+        """키워드 기반 영상 검색.
+
+        tiktok-api23의 /api/search/video 엔드포인트를 활용합니다.
+        TODO: 엔드포인트 미지원 시 빈 결과 반환
+        """
+        try:
+            data = await self._get("/api/search/video", {
+                "query": query,
+                "count": str(count),
+                "cursor": "0",
+            })
+            items = data.get("data", {}).get("videos", data.get("data", {}).get("itemList", []))
+            if not items:
+                # 대체 응답 구조 시도
+                items = data.get("itemList", data.get("items", []))
+
+            posts: list[dict] = []
+            for item in items[:count]:
+                stats = item.get("stats", {})
+                video = item.get("video", {})
+                author = item.get("author", {})
+                posts.append({
+                    "video_id": str(item.get("id", "")),
+                    "caption": item.get("desc", ""),
+                    "thumbnail_url": video.get("cover", video.get("dynamicCover", "")),
+                    "view_count": stats.get("playCount", 0),
+                    "like_count": stats.get("diggCount", 0),
+                    "comment_count": stats.get("commentCount", 0),
+                    "share_count": stats.get("shareCount", 0),
+                    "posted_at": item.get("createTime"),
+                    "channel_name": author.get("uniqueId", ""),
+                    "channel_followers": author.get("fans", 0),
+                })
+            return posts
+        except Exception:
+            # API 미지원 시 빈 결과 반환
+            return []
+
     @staticmethod
     def calc_spike(views: int, avg_views: float) -> float:
         if avg_views <= 0:

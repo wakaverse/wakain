@@ -575,6 +575,11 @@ export interface RadarReel {
   posted_at: string;
   is_analyzed: boolean;
   job_id?: string;
+  source?: 'channel' | 'trending' | 'search';
+  category?: string;
+  channel_name?: string;
+  channel_followers?: number;
+  search_query?: string;
 }
 
 export interface RadarFilters {

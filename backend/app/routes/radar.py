@@ -1,13 +1,17 @@
-"""Radar feature — channel management, reel feed, and collection triggers."""
+"""Radar feature — channel management, reel feed, collection triggers, search, and trending."""
 
 from __future__ import annotations
 
+import asyncio
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from supabase import create_client
+
+logger = logging.getLogger(__name__)
 
 from app.auth import get_current_user
 from app.config import SUPABASE_URL, SUPABASE_SERVICE_KEY
@@ -345,19 +349,28 @@ async def analyze_reel(reel_id: str, user: dict = Depends(get_current_user)):
     from fastapi import BackgroundTasks, Request
     sb = get_supabase()
 
-    # Verify reel belongs to user's channel
-    reel_resp = (
-        sb.table("radar_reels")
-        .select("*, radar_channels!inner(user_id)")
-        .eq("id", reel_id)
-        .single()
-        .execute()
-    )
+    # Verify reel exists and user has access
+    source = None
+    try:
+        # First try: reel with channel (watch tab)
+        reel_resp = (
+            sb.table("radar_reels")
+            .select("*, radar_channels(user_id)")
+            .eq("id", reel_id)
+            .single()
+            .execute()
+        )
+    except Exception:
+        raise HTTPException(status_code=404, detail="릴을 찾을 수 없습니다")
     if not reel_resp.data:
         raise HTTPException(status_code=404, detail="릴을 찾을 수 없습니다")
     reel = reel_resp.data
-    if reel.get("radar_channels", {}).get("user_id") != user["id"]:
-        raise HTTPException(status_code=403, detail="권한이 없습니다")
+    source = reel.get("source", "channel")
+    # Channel reels: verify ownership. Trending/search reels: accessible to all authenticated users.
+    if source == "channel":
+        ch_data = reel.get("radar_channels")
+        if ch_data and ch_data.get("user_id") != user["id"]:
+            raise HTTPException(status_code=403, detail="권한이 없습니다")
 
     # If already analyzed, return existing job_id
     if reel.get("job_id"):
@@ -422,7 +435,7 @@ async def analyze_reel(reel_id: str, user: dict = Depends(get_current_user)):
         "video_url": r2_key,
         "title": (reel.get("caption") or "")[:80] or shortcode or "Untitled",
         "thumbnail_url": reel.get("thumbnail_url", ""),
-        "channel_name": reel.get("radar_channels", {}).get("ig_username", ""),
+        "channel_name": reel.get("channel_name") or (reel.get("radar_channels") or {}).get("ig_username", ""),
         "source_url": video_url,
         "posted_at": reel.get("posted_at"),
     }).execute()
@@ -648,3 +661,350 @@ async def _collect_tiktoks_for_channel(sb, channel: dict) -> int:
             continue
 
     return count
+
+
+# ─── Category Keywords (Trending) ───
+
+CATEGORY_KEYWORDS: dict[str, list[str]] = {
+    "food": ["먹방", "레시피", "맛집", "쿠킹", "food", "recipe", "mukbang"],
+    "beauty": ["뷰티", "메이크업", "스킨케어", "beauty", "makeup"],
+    "tech": ["테크", "리뷰", "언박싱", "tech", "review", "unboxing"],
+    "lifestyle": ["일상", "브이로그", "vlog", "daily", "routine"],
+    "education": ["공부", "강의", "팁", "study", "tips", "howto"],
+}
+
+
+# ─── Search API ───
+
+
+@router.get("/search")
+async def search_reels_endpoint(
+    query: str = Query(..., min_length=1),
+    platform: Optional[str] = Query(None),
+    period: str = Query("30d"),
+    sort: str = Query("views"),
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=50),
+    user: dict = Depends(get_current_user),
+):
+    """Search reels across platforms. Caches results in radar_reels (source='search') for 24h."""
+    sb = get_supabase()
+
+    # Check quota
+    _check_search_quota(sb, user["id"])
+
+    # Check 24h cache first
+    cache_cutoff = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    cache_query = (
+        sb.table("radar_reels")
+        .select("*", count="exact")
+        .eq("source", "search")
+        .eq("search_query", query)
+        .gte("collected_at", cache_cutoff)
+    )
+    if platform and platform != "all":
+        cache_query = cache_query.eq("platform", platform)
+
+    sort_col, sort_desc = SORT_MAP.get(sort, ("view_count", True))
+    cache_query = cache_query.order(sort_col, desc=sort_desc)
+    offset = (page - 1) * limit
+    cache_query = cache_query.range(offset, offset + limit - 1)
+    cache_resp = cache_query.execute()
+
+    if cache_resp.data and len(cache_resp.data) > 0:
+        return {"reels": cache_resp.data, "total": cache_resp.count or len(cache_resp.data)}
+
+    # No cache — run search across platforms
+    platforms_to_search = (
+        [platform] if platform and platform != "all"
+        else ["instagram", "youtube", "tiktok"]
+    )
+    collected = await _search_and_store(sb, query, platforms_to_search)
+
+    # Increment quota
+    _increment_search_quota(sb, user["id"])
+
+    # Log event
+    _log_event(sb, user["id"], "radar_search", {"query": query, "platform": platform or "all", "result_count": collected})
+
+    # Return from DB
+    result_query = (
+        sb.table("radar_reels")
+        .select("*", count="exact")
+        .eq("source", "search")
+        .eq("search_query", query)
+        .order(sort_col, desc=sort_desc)
+        .range(offset, offset + limit - 1)
+    )
+    if platform and platform != "all":
+        result_query = result_query.eq("platform", platform)
+    result_resp = result_query.execute()
+    return {"reels": result_resp.data or [], "total": result_resp.count or 0}
+
+
+async def _search_and_store(sb, query: str, platforms: list[str]) -> int:
+    """Run search across platforms and store results."""
+    tasks = []
+    if "instagram" in platforms:
+        tasks.append(_search_ig(query))
+    if "youtube" in platforms:
+        tasks.append(_search_yt(query))
+    if "tiktok" in platforms:
+        tasks.append(_search_tt(query))
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    count = 0
+    for result in results:
+        if isinstance(result, Exception):
+            logger.warning("Search error: %s", result)
+            continue
+        for reel_data in result:
+            try:
+                sb.table("radar_reels").upsert(reel_data, on_conflict="ig_media_id").execute()
+                count += 1
+            except Exception:
+                continue
+    return count
+
+
+async def _search_ig(query: str) -> list[dict]:
+    """Search Instagram reels by hashtag."""
+    try:
+        raw = await ig_looter.search_reels(query, count=20)
+    except Exception:
+        return []
+    rows = []
+    for r in raw:
+        posted_at = r.get("posted_at")
+        if isinstance(posted_at, (int, float)):
+            posted_at = datetime.fromtimestamp(posted_at, tz=timezone.utc).isoformat()
+        rows.append({
+            "ig_media_id": r.get("ig_media_id", ""),
+            "shortcode": r.get("shortcode", ""),
+            "thumbnail_url": r.get("thumbnail_url", ""),
+            "video_url": r.get("video_url", ""),
+            "caption": r.get("caption", ""),
+            "view_count": r.get("view_count", 0),
+            "like_count": r.get("like_count", 0),
+            "comment_count": r.get("comment_count", 0),
+            "engagement_rate": ig_looter.calc_engagement(r.get("like_count", 0), r.get("comment_count", 0), r.get("view_count", 0)),
+            "platform": "instagram",
+            "posted_at": posted_at,
+            "source": "search",
+            "search_query": query,
+            "channel_name": r.get("channel_name", ""),
+            "channel_followers": r.get("channel_followers", 0),
+            "collected_at": datetime.now(timezone.utc).isoformat(),
+        })
+    return rows
+
+
+async def _search_yt(query: str) -> list[dict]:
+    """Search YouTube shorts."""
+    try:
+        raw = await yt_looter.search_shorts(query, count=20)
+    except Exception:
+        return []
+    rows = []
+    for r in raw:
+        vid = r.get("video_id", "")
+        rows.append({
+            "ig_media_id": f"yt_{vid}",
+            "shortcode": vid,
+            "thumbnail_url": r.get("thumbnail_url", ""),
+            "video_url": f"https://www.youtube.com/shorts/{vid}",
+            "caption": r.get("title", ""),
+            "view_count": r.get("view_count", 0),
+            "like_count": r.get("like_count", 0),
+            "comment_count": r.get("comment_count", 0),
+            "engagement_rate": yt_looter.calc_engagement(r.get("like_count", 0), r.get("comment_count", 0), r.get("view_count", 0)),
+            "platform": "youtube",
+            "posted_at": r.get("published_at") or None,
+            "source": "search",
+            "search_query": query,
+            "channel_name": r.get("channel_name", ""),
+            "channel_followers": 0,
+            "collected_at": datetime.now(timezone.utc).isoformat(),
+        })
+    return rows
+
+
+async def _search_tt(query: str) -> list[dict]:
+    """Search TikTok videos."""
+    try:
+        raw = await tt_looter.search_videos(query, count=20)
+    except Exception:
+        return []
+    rows = []
+    for r in raw:
+        vid = r.get("video_id", "")
+        posted_at = r.get("posted_at")
+        if isinstance(posted_at, (int, float)):
+            posted_at = datetime.fromtimestamp(posted_at, tz=timezone.utc).isoformat()
+        rows.append({
+            "ig_media_id": f"tt_{vid}",
+            "shortcode": vid,
+            "thumbnail_url": r.get("thumbnail_url", ""),
+            "video_url": f"https://www.tiktok.com/video/{vid}",
+            "caption": r.get("caption", ""),
+            "view_count": r.get("view_count", 0),
+            "like_count": r.get("like_count", 0),
+            "comment_count": r.get("comment_count", 0),
+            "engagement_rate": tt_looter.calc_engagement(r.get("like_count", 0), r.get("comment_count", 0), r.get("view_count", 0)),
+            "platform": "tiktok",
+            "posted_at": posted_at,
+            "source": "search",
+            "search_query": query,
+            "channel_name": r.get("channel_name", ""),
+            "channel_followers": r.get("channel_followers", 0),
+            "collected_at": datetime.now(timezone.utc).isoformat(),
+        })
+    return rows
+
+
+# ─── Trending API ───
+
+
+@router.get("/trending")
+async def get_trending(
+    category: Optional[str] = Query(None),
+    platform: Optional[str] = Query(None),
+    period: str = Query("7d"),
+    sort: str = Query("views"),
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=50),
+    user: dict = Depends(get_current_user),
+):
+    """Get trending reels by category. Returns cached data if available."""
+    sb = get_supabase()
+
+    # Log event
+    _log_event(sb, user["id"], "radar_trending_view", {"category": category or "all", "platform": platform or "all"})
+
+    # Query cached trending data
+    query_builder = (
+        sb.table("radar_reels")
+        .select("*", count="exact")
+        .eq("source", "trending")
+    )
+    if category and category != "all":
+        query_builder = query_builder.eq("category", category)
+    if platform and platform != "all":
+        query_builder = query_builder.eq("platform", platform)
+
+    # Period filter on collected_at
+    delta = PERIOD_MAP.get(period, timedelta(days=7))
+    cutoff = (datetime.now(timezone.utc) - delta).isoformat()
+    query_builder = query_builder.gte("collected_at", cutoff)
+
+    sort_col, sort_desc = SORT_MAP.get(sort, ("view_count", True))
+    query_builder = query_builder.order(sort_col, desc=sort_desc)
+
+    offset = (page - 1) * limit
+    query_builder = query_builder.range(offset, offset + limit - 1)
+
+    resp = query_builder.execute()
+    return {"reels": resp.data or [], "total": resp.count or 0}
+
+
+class TrendingRefreshBody(BaseModel):
+    category: Optional[str] = None
+
+
+@router.post("/trending/refresh")
+async def refresh_trending(
+    body: TrendingRefreshBody = TrendingRefreshBody(),
+    user: dict = Depends(get_current_user),
+):
+    """Manually refresh trending data by crawling platforms with category keywords."""
+    sb = get_supabase()
+    _log_event(sb, user["id"], "radar_trending_refresh", {"category": body.category or "all"})
+
+    categories = (
+        [body.category] if body.category and body.category in CATEGORY_KEYWORDS
+        else list(CATEGORY_KEYWORDS.keys())
+    )
+
+    total_collected = 0
+    for cat in categories:
+        keywords = CATEGORY_KEYWORDS.get(cat, [])
+        if not keywords:
+            continue
+        # Use first 2 keywords per category for efficiency
+        for kw in keywords[:2]:
+            collected = await _search_and_store_trending(sb, kw, cat)
+            total_collected += collected
+
+    return {"ok": True, "collected": total_collected}
+
+
+async def _search_and_store_trending(sb, keyword: str, category: str) -> int:
+    """Search all platforms for trending keyword and store as source='trending'."""
+    tasks = [
+        _search_ig(keyword),
+        _search_yt(keyword),
+        _search_tt(keyword),
+    ]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    count = 0
+    for result in results:
+        if isinstance(result, Exception):
+            continue
+        for reel_data in result:
+            reel_data["source"] = "trending"
+            reel_data["category"] = category
+            reel_data.pop("search_query", None)
+            try:
+                sb.table("radar_reels").upsert(reel_data, on_conflict="ig_media_id").execute()
+                count += 1
+            except Exception:
+                continue
+    return count
+
+
+# ─── Quota Helpers ───
+
+
+def _check_search_quota(sb, user_id: str) -> None:
+    """Check if user has remaining search quota."""
+    try:
+        resp = sb.table("user_quotas").select("quotas, plan").eq("user_id", user_id).single().execute()
+    except Exception:
+        return  # No quota row = allow
+    if not resp.data:
+        return
+    quotas = resp.data.get("quotas", {})
+    search_quota = quotas.get("search", {})
+    if search_quota.get("used", 0) >= search_quota.get("limit", 10):
+        raise HTTPException(status_code=429, detail="검색 회수를 초과했습니다. Pro 플랜으로 업그레이드하세요.")
+
+
+def _increment_search_quota(sb, user_id: str) -> None:
+    """Increment search usage count."""
+    try:
+        resp = sb.table("user_quotas").select("quotas").eq("user_id", user_id).single().execute()
+        if resp.data:
+            quotas = resp.data["quotas"]
+            search_quota = quotas.get("search", {"limit": 10, "used": 0})
+            search_quota["used"] = search_quota.get("used", 0) + 1
+            quotas["search"] = search_quota
+            sb.table("user_quotas").update({"quotas": quotas}).eq("user_id", user_id).execute()
+    except Exception:
+        pass
+
+
+# ─── Event Logging ───
+
+
+def _log_event(sb, user_id: str, action: str, metadata: dict) -> None:
+    """Log user activity event."""
+    try:
+        sb.table("user_activity_logs").insert({
+            "user_id": user_id,
+            "action": action,
+            "metadata": metadata,
+        }).execute()
+    except Exception:
+        pass
