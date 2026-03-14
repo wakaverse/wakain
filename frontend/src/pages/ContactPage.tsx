@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Mail, Clock, Building2, Code2, CheckCircle2 } from 'lucide-react';
+import { Mail, Clock, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import SEOHead from '../components/SEOHead';
 
@@ -93,62 +93,19 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] py-16 px-4">
+    <div className="py-8 px-4">
       <SEOHead page="contact" />
-      <div className="max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">
-          {/* Left: Info */}
-          <div className="lg:col-span-2">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">문의하기</h1>
-            <p className="text-gray-500 text-sm leading-relaxed mb-10">
-              WakaLab 도입이나 API 연동에 대해
-              <br />
-              궁금한 점이 있으시면 편하게 문의주세요.
-            </p>
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">문의하기</h1>
+        <p className="text-gray-500 text-sm leading-relaxed mb-1">
+          WakaLab 도입이나 API 연동에 대해 궁금한 점이 있으시면 편하게 문의주세요.
+        </p>
+        <div className="flex items-center gap-4 text-xs text-gray-400 mb-8">
+          <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> contact@crabs.ai</span>
+          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> 평일 10:00-18:00 · 24시간 내 회신</span>
+        </div>
 
-            <div className="space-y-6">
-              <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">직접 연락</p>
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <Mail className="w-4 h-4 text-gray-400" />
-                  <a href="mailto:contact@crabs.ai" className="hover:text-gray-900 transition-colors">
-                    contact@crabs.ai
-                  </a>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-500 mt-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  <span>평일 10:00-18:00 (KST) · 24시간 내 회신</span>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">빠른 안내</p>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                      <Building2 className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">Enterprise</p>
-                      <p className="text-xs text-gray-400 mt-0.5">팀 규모/도입 일정에 맞춰 안내드립니다</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                      <Code2 className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">API</p>
-                      <p className="text-xs text-gray-400 mt-0.5">기술 문서와 샌드박스 제공 가능합니다</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Form */}
-          <div className="lg:col-span-3">
+        <div>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Interest type */}
               <fieldset>
@@ -256,14 +213,6 @@ export default function ContactPage() {
               </button>
             </form>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-gray-100 text-center">
-          <p className="text-xs text-gray-400">
-            (주)크랩스 | 대표 김태영 | 사업자등록번호 224-88-02602
-          </p>
-        </div>
       </div>
     </div>
   );

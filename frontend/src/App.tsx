@@ -13,6 +13,13 @@ import ReportPage from './pages/ReportPage';
 import DashboardPage from './pages/DashboardPage';
 import DemoReportPage from './pages/DemoReportPage';
 import ContactPage from './pages/ContactPage';
+import { useAuth } from './contexts/AuthContext';
+
+function ContactRedirectOrLayout() {
+  const { user } = useAuth();
+  if (user) return <Navigate to="/app/contact" replace />;
+  return <Layout><ContactPage /></Layout>;
+}
 import LoginPage from './pages/LoginPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import GuideReportPage from './pages/GuideReportPage';
@@ -31,7 +38,7 @@ function LandingRoutes() {
   return (
     <>
       <Route index element={<Layout><LandingPage /></Layout>} />
-      <Route path="contact" element={<Layout><ContactPage /></Layout>} />
+      <Route path="contact" element={<ContactRedirectOrLayout />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="demo" element={<DemoReportPage />} />
       <Route path="app" element={<ProtectedRoute><AppShell><Navigate to="/app/analyze" replace /></AppShell></ProtectedRoute>} />
