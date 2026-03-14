@@ -42,9 +42,9 @@ function LandingRoutes() {
       <Route path="app/results/:id" element={<ProtectedRoute><AppShell><ReportPage /></AppShell></ProtectedRoute>} />
       <Route path="dashboard" element={<ProtectedRoute><AppShell><DashboardPage /></AppShell></ProtectedRoute>} />
       {/* Admin routes */}
-      <Route path="admin" element={<ProtectedRoute><AdminLayout><AdminDashboardPage /></AdminLayout></ProtectedRoute>} />
-      <Route path="admin/pipeline" element={<ProtectedRoute><AdminLayout><AdminPipelinePage /></AdminLayout></ProtectedRoute>} />
-      <Route path="admin/users" element={<ProtectedRoute><AdminLayout><AdminUsersPage /></AdminLayout></ProtectedRoute>} />
+      <Route path="ctrl-8k3x7" element={<ProtectedRoute><AdminLayout><AdminDashboardPage /></AdminLayout></ProtectedRoute>} />
+      <Route path="ctrl-8k3x7/pipeline" element={<ProtectedRoute><AdminLayout><AdminPipelinePage /></AdminLayout></ProtectedRoute>} />
+      <Route path="ctrl-8k3x7/users" element={<ProtectedRoute><AdminLayout><AdminUsersPage /></AdminLayout></ProtectedRoute>} />
       {/* Legacy redirects */}
       <Route path="analyze" element={<Navigate to="/app/analyze" replace />} />
       <Route path="jobs/:id" element={<Navigate to="/app/jobs/:id" replace />} />

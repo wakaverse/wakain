@@ -14,9 +14,9 @@ interface AdminMenuItem {
 }
 
 const menuItems: AdminMenuItem[] = [
-  { key: 'dashboard', label: '대시보드', icon: BarChart3, path: '/admin' },
-  { key: 'pipeline', label: '파이프라인', icon: Settings, path: '/admin/pipeline' },
-  { key: 'users', label: '사용자', icon: Users, path: '/admin/users' },
+  { key: 'dashboard', label: '대시보드', icon: BarChart3, path: '/ctrl-8k3x7' },
+  { key: 'pipeline', label: '파이프라인', icon: Settings, path: '/ctrl-8k3x7/pipeline' },
+  { key: 'users', label: '사용자', icon: Users, path: '/ctrl-8k3x7/users' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -56,7 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0
       `}>
         <div className="h-12 flex items-center px-4 border-b border-gray-200/60 shrink-0">
-          <Link to="/admin" className="flex items-center gap-2">
+          <Link to="/ctrl-8k3x7" className="flex items-center gap-2">
             <FlaskConical className="w-5 h-5 text-gray-900 shrink-0" />
             {!collapsed && <span className="font-semibold text-sm text-gray-900">WakaLab Admin</span>}
           </Link>
@@ -65,7 +65,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
           {menuItems.map(({ key, label, icon: Icon, path }) => {
             const active = location.pathname === path || (path !== '/admin' && location.pathname.startsWith(path));
-            const isExactDashboard = key === 'dashboard' && location.pathname === '/admin';
+            const isExactDashboard = key === 'dashboard' && location.pathname === '/ctrl-8k3x7';
 
             return (
               <Link
