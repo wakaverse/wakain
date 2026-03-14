@@ -46,6 +46,7 @@ function LandingRoutes() {
       <Route path="app/hack" element={<Navigate to="/app/analyze" replace />} />
       <Route path="app/jobs/:id" element={<ProtectedRoute><AppShell><JobStatusPage /></AppShell></ProtectedRoute>} />
       <Route path="app/results/:id" element={<ProtectedRoute><AppShell><ReportPage /></AppShell></ProtectedRoute>} />
+      <Route path="app/contact" element={<ProtectedRoute><AppShell><ContactPage /></AppShell></ProtectedRoute>} />
       <Route path="dashboard" element={<ProtectedRoute><AppShell><DashboardPage /></AppShell></ProtectedRoute>} />
       {/* Admin routes */}
       <Route path="ctrl-8k3x7" element={<ProtectedRoute><AdminLayout><AdminDashboardPage /></AdminLayout></ProtectedRoute>} />
