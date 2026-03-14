@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import { listJobs, getQuota, compareVideos } from '../lib/api';
 import type { Job } from '../types';
 import type {
-  CompareResponse, StructureRow, MatchedGroup, ClaimMatch, CoachingItem,
+  CompareResponse, StructureRow, MatchedGroup, CoachingItem,
 } from '../lib/api';
 import { formatTime } from '../lib/recipe-utils';
 import { CLAIM_TYPE_INFO } from '../lib/recipe-utils';
@@ -46,7 +46,7 @@ export default function ComparePage() {
   const [slots, setSlots] = useState<VideoSlot[]>([]);
   const [baseJobId, setBaseJobId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [urlInput, setUrlInput] = useState('');
+  
   const [libraryJobs, setLibraryJobs] = useState<Job[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(false);
 
@@ -376,7 +376,7 @@ function CompareReport({ report, slots, onToGuide }: CompareReportProps) {
       <StructureTable structure={report.structure} labels={report.video_labels} slots={slots} />
 
       {/* Part 2: Claim matching */}
-      <ClaimMatchingSection matching={report.claim_matching} labels={report.video_labels} />
+      <ClaimMatchingSection matching={report.claim_matching} />
 
       {/* Part 3: AI Coaching */}
       <CoachingSection coaching={report.coaching} scenario={report.scenario} />
@@ -464,7 +464,7 @@ function formatValue(val: unknown, key: string): string {
 
 /* ── Part 2: Claim Matching ── */
 
-function ClaimMatchingSection({ matching, labels }: { matching: CompareResponse['claim_matching']; labels: string[] }) {
+function ClaimMatchingSection({ matching }: { matching: CompareResponse['claim_matching'] }) {
   const groups = matching?.matched_groups || [];
   const unique = matching?.unique_claims || [];
 
