@@ -19,6 +19,7 @@ from app.config import (
     R2_ENDPOINT,
 )
 from app.auth import get_current_user
+from app.services.quota import check_quota, increment_quota
 from app.worker import run_analysis
 
 router = APIRouter()
@@ -108,6 +109,11 @@ async def analyze_video(
     user: dict = Depends(get_current_user),
 ):
     """Start analysis for a video already uploaded to R2."""
+    # Quota check
+    exceeded = check_quota(user["id"], "analyze")
+    if exceeded:
+        raise HTTPException(status_code=403, detail=exceeded)
+
     suffix = Path(body.filename).suffix.lower()
     if suffix not in ALLOWED_EXTENSIONS:
         raise HTTPException(
@@ -117,6 +123,9 @@ async def analyze_video(
 
     if body.file_size_mb > MAX_FILE_SIZE / (1024 * 1024):
         raise HTTPException(status_code=413, detail="File too large. Max 200MB.")
+
+    # Increment quota after validation
+    increment_quota(user["id"], "analyze")
 
     job_id = str(uuid.uuid4())
 
@@ -149,6 +158,11 @@ async def analyze_video_url(
     user: dict = Depends(get_current_user),
 ):
     """Download video from URL, upload to R2, then start analysis."""
+    # Quota check
+    exceeded = check_quota(user["id"], "analyze")
+    if exceeded:
+        raise HTTPException(status_code=403, detail=exceeded)
+
     url = body.video_url.strip()
     if not url.startswith(("http://", "https://")):
         raise HTTPException(status_code=400, detail="유효한 URL을 입력해주세요.")
@@ -198,6 +212,9 @@ async def analyze_video_url(
         Body=video_bytes,
         ContentType=resp.headers.get("content-type", "video/mp4"),
     )
+
+    # Increment quota after successful download
+    increment_quota(user["id"], "analyze")
 
     # Create job
     job_id = str(uuid.uuid4())

@@ -229,6 +229,38 @@ export async function generateScript(resultId: string): Promise<{ script: string
 
 export { API_URL };
 
+// ─── Quota API ───
+
+export interface QuotaFeature {
+  limit: number;
+  used: number;
+}
+
+export interface QuotaResponse {
+  plan: string;
+  quotas: Record<string, QuotaFeature>;
+  reset_at: string;
+}
+
+export async function getQuota(): Promise<QuotaResponse> {
+  const res = await fetch(`${API_URL}/api/quota`, {
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error('quota 정보를 불러올 수 없습니다');
+  return res.json();
+}
+
+export async function logProInterest(feature: string, plan: string): Promise<void> {
+  const { data } = await supabase.auth.getSession();
+  const userId = data.session?.user?.id;
+  if (!userId) return;
+  await supabase.from('user_activity_logs').insert({
+    user_id: userId,
+    action: 'pro_interest',
+    metadata: { feature, plan },
+  });
+}
+
 // ─── Radar API ───
 
 import type { RadarChannel, RadarReel, RadarFilters } from '../types';

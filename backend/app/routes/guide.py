@@ -9,6 +9,7 @@ from supabase import create_client
 
 from app.config import SUPABASE_URL, SUPABASE_SERVICE_KEY, GEMINI_API_KEY, GEMINI_API_KEY_PRO
 from app.auth import get_current_user
+from app.services.quota import check_quota, increment_quota
 
 router = APIRouter()
 
@@ -34,6 +35,11 @@ async def generate_script(
     user: dict = Depends(get_current_user),
 ):
     """분석 결과 기반 대본 초안 생성 (Gemini 1콜)."""
+    # Quota check — script feature
+    exceeded = check_quota(user["id"], "script")
+    if exceeded:
+        raise HTTPException(status_code=403, detail=exceeded)
+
     supabase = _get_supabase()
 
     # 1. result에서 recipe_json 조회
@@ -104,5 +110,8 @@ async def generate_script(
         script_text = response.text or ""
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"대본 생성에 실패했습니다: {str(e)}")
+
+    # Increment quota after successful generation
+    increment_quota(user["id"], "script")
 
     return {"script": script_text}

@@ -3,11 +3,13 @@ import { useDropzone, type FileRejection } from 'react-dropzone';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FileVideo, AlertCircle, Link2, Loader2, Filter, ChevronRight, Upload, Trash2, CheckSquare, Square } from 'lucide-react';
-import { createJob, createJobFromUrl, listJobs, getJobStatus, deleteJob } from '../lib/api';
+import { createJob, createJobFromUrl, listJobs, getJobStatus, deleteJob, getQuota } from '../lib/api';
+import type { QuotaResponse } from '../lib/api';
 import { compressTo480p } from '../lib/videoCompress';
 import { showToast } from '../hooks/useToast';
 import type { Job } from '../types';
 import SEOHead from '../components/SEOHead';
+import ProUpgradeModal from '../components/quota/ProUpgradeModal';
 
 
 function truncateTitle(s: string, max = 40): string {
@@ -49,6 +51,10 @@ export default function AnalyzePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // Quota state
+  const [quota, setQuota] = useState<QuotaResponse | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Inline input state
   const [videoUrl, setVideoUrl] = useState('');
@@ -94,7 +100,11 @@ export default function AnalyzePage() {
     }
   }, []);
 
-  useEffect(() => { fetchJobs(); }, [fetchJobs]);
+  const fetchQuota = useCallback(async () => {
+    try { setQuota(await getQuota()); } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { fetchJobs(); fetchQuota(); }, [fetchJobs, fetchQuota]);
 
   const handleDelete = async (jobId: string) => {
     if (!window.confirm('이 프로젝트를 삭제하시겠습니까?')) return;
@@ -212,10 +222,14 @@ export default function AnalyzePage() {
       const { id } = await createJob(compressed, (percent) => { setProgress(percent); if (percent === 100) setPhase('starting'); });
       setPhase('idle');
       fetchJobs();
+      fetchQuota();
       navigate(`/app/jobs/${id}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : '';
-      if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) setError(t('analyze.error_network'));
+      if (msg.includes('quota_exceeded') || msg.includes('403')) {
+        setShowUpgradeModal(true);
+        fetchQuota();
+      } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) setError(t('analyze.error_network'));
       else if (msg.includes('401') || msg.includes('Unauthorized')) setError(t('analyze.error_auth'));
       else setError(msg || t('analyze.error_generic'));
       setPhase('idle');
@@ -234,10 +248,14 @@ export default function AnalyzePage() {
       setPhase('idle');
       setVideoUrl('');
       fetchJobs();
+      fetchQuota();
       navigate(`/app/jobs/${id}`);
     } catch (e) {
       const msg = e instanceof Error ? e.message : '';
-      if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) setError(t('analyze.error_network'));
+      if (msg.includes('quota_exceeded') || msg.includes('403')) {
+        setShowUpgradeModal(true);
+        fetchQuota();
+      } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) setError(t('analyze.error_network'));
       else if (msg.includes('401') || msg.includes('Unauthorized')) setError(t('analyze.error_auth'));
       else setError(msg || t('analyze.error_generic'));
       setPhase('idle');
@@ -264,11 +282,27 @@ export default function AnalyzePage() {
     <div className="max-w-4xl mx-auto overflow-hidden">
       <SEOHead page="analyze" />
 
+      {/* Upgrade modal */}
+      {showUpgradeModal && quota && (
+        <ProUpgradeModal
+          feature="analyze"
+          plan={quota.plan}
+          onClose={() => setShowUpgradeModal(false)}
+        />
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
         <h1 className="text-xl font-bold text-gray-900">{t('analyze.title')}</h1>
-        <p className="text-xs text-gray-400 mt-0.5">영상을 분석하고 프로젝트를 관리하세요</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <p className="text-xs text-gray-400">영상을 분석하고 프로젝트를 관리하세요</p>
+          {quota && (
+            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+              이번 달 {quota.quotas.analyze.used}/{quota.quotas.analyze.limit}회 사용
+            </span>
+          )}
+        </div>
         </div>
         {/* "+ 새 분석" button: mobile only */}
         <button
