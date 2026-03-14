@@ -1,16 +1,25 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, RefreshCw, Pencil } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 import { getResult, addLibraryItem } from '../lib/api';
+import { supabase } from '../lib/supabase';
 import type { RecipeJSON } from '../types/recipe';
 import type { LibraryItem } from '../types';
-import VideoSummaryCard from '../components/Report/VideoSummaryCard';
-import HookAnalysisCard from '../components/Report/HookAnalysisCard';
-import PositioningCard from '../components/Report/PositioningCard';
-import ProductClaimsCard from '../components/Report/ProductClaimsCard';
-import CoachingCard from '../components/Report/CoachingCard';
-import UnifiedTimeline from '../components/Report/UnifiedTimeline';
-import CollapsibleSection from '../components/Report/CollapsibleSection';
+import TabSummary from '../components/Report/tabs/TabSummary';
+import TabTimeline from '../components/Report/tabs/TabTimeline';
+import TabCoaching from '../components/Report/tabs/TabCoaching';
+import TabStructure from '../components/Report/tabs/TabStructure';
+
+/* ── Tab config ──────────────────────────── */
+
+const TABS = [
+  { key: 'summary', label: '요약' },
+  { key: 'timeline', label: '타임라인' },
+  { key: 'coaching', label: '코칭' },
+  { key: 'structure', label: '구조 분석' },
+] as const;
+
+type TabKey = (typeof TABS)[number]['key'];
 
 /* ── Main Component ───────────────────────── */
 
@@ -22,6 +31,7 @@ export default function ReportPage() {
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabKey>('summary');
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -56,6 +66,24 @@ export default function ReportPage() {
       videoRef.current.play();
     }
   }, []);
+
+  const handleTabChange = useCallback(
+    (tab: TabKey) => {
+      setActiveTab(tab);
+      // Log tab click to user_activity_logs
+      if (id) {
+        supabase
+          .from('user_activity_logs')
+          .insert({
+            action: 'tab_click',
+            metadata: { tab_name: tab },
+            result_id: id,
+          })
+          .then(() => {});
+      }
+    },
+    [id],
+  );
 
   if (loading) {
     return (
@@ -116,68 +144,32 @@ export default function ReportPage() {
           </div>
         </div>
 
-        {/* Right column: Cards in order */}
+        {/* Right column: Tabs */}
         <div className="flex-1 min-w-0">
-          <div className="space-y-3">
-            {/* 제작가이드 버튼 */}
-            <div className="flex justify-end">
+          {/* Tab bar */}
+          <div className="flex gap-1 mb-4 bg-gray-100 rounded-xl p-1">
+            {TABS.map((tab) => (
               <button
-                onClick={() => navigate(`/app/guide/${id}`)}
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+                key={tab.key}
+                onClick={() => handleTabChange(tab.key)}
+                className={`flex-1 text-sm font-medium py-2 rounded-lg transition-colors ${
+                  activeTab === tab.key
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
               >
-                <Pencil className="w-3.5 h-3.5" />
-                제작가이드
+                {tab.label}
               </button>
-            </div>
-
-            {/* 1. 영상 요약 — 항상 열림 */}
-            <VideoSummaryCard data={recipe} />
-
-            {/* 2. 콘텐츠 포지셔닝 */}
-            <CollapsibleSection
-              title="콘텐츠 포지셔닝"
-              summary={recipe.evaluation?.positioning?.unique_angle || ''}
-              defaultOpen={false}
-            >
-              <PositioningCard data={recipe} />
-            </CollapsibleSection>
-
-            {/* 3. 훅 분석 */}
-            <CollapsibleSection
-              title="훅 분석"
-              summary={`훅 강도: ${recipe.evaluation?.hook_analysis?.strength || '-'}`}
-              defaultOpen={false}
-            >
-              <HookAnalysisCard data={recipe} />
-            </CollapsibleSection>
-
-            {/* 4. 통합 타임라인 (설득 흐름 + 시각 변화량 + 씬 분석 병합) */}
-            <CollapsibleSection
-              title="통합 타임라인"
-              summary="설득 흐름 · 시각 변화량 · 씬 분석"
-              defaultOpen={false}
-            >
-              <UnifiedTimeline data={recipe} seekTo={seekTo} thumbnails={thumbnails} />
-            </CollapsibleSection>
-
-            {/* 7. 제품 소구 분석 */}
-            <CollapsibleSection
-              title="제품 소구 분석"
-              summary={`소구점 ${recipe.product?.claims?.length || 0}개`}
-              defaultOpen={false}
-            >
-              <ProductClaimsCard data={recipe} />
-            </CollapsibleSection>
-
-            {/* 8. 코칭 */}
-            <CollapsibleSection
-              title="코칭"
-              summary={recipe.evaluation?.summary ? recipe.evaluation.summary.slice(0, 50) + '...' : ''}
-              defaultOpen={false}
-            >
-              <CoachingCard data={recipe} />
-            </CollapsibleSection>
+            ))}
           </div>
+
+          {/* Tab content */}
+          {activeTab === 'summary' && <TabSummary data={recipe} />}
+          {activeTab === 'timeline' && (
+            <TabTimeline data={recipe} seekTo={seekTo} thumbnails={thumbnails} />
+          )}
+          {activeTab === 'coaching' && <TabCoaching data={recipe} />}
+          {activeTab === 'structure' && <TabStructure data={recipe} />}
         </div>
       </div>
     </div>

@@ -147,7 +147,51 @@ function AttentionCurve({ data, duration }: { data: RecipeJSON; duration: number
   );
 }
 
-/* ── Layer 3: 스크립트 블록 ──────────────────── */
+/* ── Layer 2.5: 씬 썸네일 행 ─────────────────── */
+
+function SceneThumbnails({ data, duration, seekTo, thumbnails }: {
+  data: RecipeJSON;
+  duration: number;
+  seekTo: (sec: number) => void;
+  thumbnails: Record<string, string>;
+}) {
+  const scenes = data.visual?.scenes || data.scenes;
+  if (!scenes?.length || duration <= 0) return null;
+
+  // Only show if we have at least one thumbnail
+  const hasThumbnails = scenes.some((s) => thumbnails[String(s.scene_id)]);
+  if (!hasThumbnails) return null;
+
+  return (
+    <div className="flex gap-px h-12">
+      {scenes.map((scene) => {
+        const sceneDur = scene.time_range[1] - scene.time_range[0];
+        const pct = (sceneDur / duration) * 100;
+        const thumb = thumbnails[String(scene.scene_id)];
+
+        return (
+          <button
+            key={scene.scene_id}
+            className="h-full rounded overflow-hidden bg-gray-100 hover:ring-2 hover:ring-indigo-300 hover:ring-offset-1 transition-all"
+            style={{ width: `${Math.max(pct, 3)}%` }}
+            onClick={() => seekTo(scene.time_range[0])}
+            title={`씬 ${scene.scene_id} ${formatTime(scene.time_range[0])}–${formatTime(scene.time_range[1])}`}
+          >
+            {thumb ? (
+              <img src={thumb} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <span className="flex items-center justify-center h-full text-[9px] text-gray-300 font-bold">
+                {String(scene.scene_id).padStart(2, '0')}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Layer 3: 블록 유형 라벨 ──────────────────── */
 
 function ScriptBlocks({ data, duration, seekTo, onBlockClick, selectedBlock }: {
   data: RecipeJSON;
@@ -160,31 +204,30 @@ function ScriptBlocks({ data, duration, seekTo, onBlockClick, selectedBlock }: {
   if (!blocks.length || duration <= 0) return null;
 
   return (
-    <div className="flex gap-px h-auto min-h-[32px]">
+    <div className="flex gap-px h-auto min-h-[28px]">
       {blocks.map((block, i) => {
         const blockDur = block.time_range[1] - block.time_range[0];
         const pct = (blockDur / duration) * 100;
         const color = BLOCK_EVAL_COLORS[block.block] || '#6B7280';
         const isSelected = selectedBlock === i;
-        // Truncate text to fit
-        const maxChars = Math.max(4, Math.floor(pct * 1.2));
-        const text = block.text.length > maxChars ? block.text.slice(0, maxChars) + '…' : block.text;
+        const label = BLOCK_LABELS[block.block] || block.block;
 
         return (
           <button
             key={i}
-            className={`px-1 py-1 text-[10px] leading-tight text-gray-600 rounded cursor-pointer transition-all overflow-hidden ${
+            className={`px-1 py-1 text-[10px] leading-tight rounded cursor-pointer transition-all overflow-hidden flex items-center justify-center ${
               isSelected ? 'ring-2 ring-offset-1' : 'hover:bg-gray-100'
             }`}
             style={{
               width: `${Math.max(pct, 3)}%`,
               borderBottom: `2px solid ${color}`,
+              color: color,
               '--tw-ring-color': color,
             } as React.CSSProperties}
             onClick={() => { seekTo(block.time_range[0]); onBlockClick(i); }}
             title={block.text}
           >
-            {text}
+            <span className="font-medium truncate">{label}</span>
           </button>
         );
       })}
@@ -256,6 +299,11 @@ export default function UnifiedTimeline({ data, seekTo, thumbnails }: Props) {
       {/* Layer 1: Persuasion color bar */}
       <div className="mb-1">
         <PersuasionBar data={data} seekTo={seekTo} duration={duration} onBlockClick={handleBlockClick} />
+      </div>
+
+      {/* Layer 1.5: Scene thumbnails */}
+      <div className="mb-1">
+        <SceneThumbnails data={data} duration={duration} seekTo={seekTo} thumbnails={thumbnails} />
       </div>
 
       {/* Layer 2: Attention curve */}

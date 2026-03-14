@@ -391,12 +391,23 @@ Provide coaching insights in **{output_language}** as JSON with this exact struc
   ]
 }}
 
+## Coaching Rules (MANDATORY — follow strictly)
+1. 일반적인 숏폼 제작 조언은 절대 하지 마세요. 사용자는 이미 알고 있습니다.
+2. 이 영상의 분석 데이터에서만 발견되는 구체적 사실만 코칭하세요.
+3. 모든 코칭 항목에 반드시 포함:
+   - 해당 구간 시간 (예: 0:05~0:12)
+   - 정량 수치 (예: 시각 변화량 38, 경험 소구 비율 58%)
+   - 비교 기준 (예: 영상 평균 대비, 카테고리 평균 대비)
+4. "~하는 것이 중요합니다", "~하면 좋습니다" 형태의 문장은 사용하지 마세요.
+5. 제안은 구체적 행동으로: "공감 장면 추가" (O), "공감대를 강화해 보세요" (X)
+6. 잘된 점은 3개 이내, 개선 포인트는 3개 이내. 양보다 질. 텍스트는 현재 대비 절반 이하로 짧게.
+
 ## Guidelines
 - Consider the product category when judging. What works for food differs from tech.
-- For strengths: explain WHY it's effective for THIS product.
-- For improvements: explain WHY it's needed and WHAT specifically to do.
-- Keep insights actionable and specific, not generic.
-- Each section should have 1-3 items.
+- For strengths: explain WHY it's effective for THIS product, with specific time ranges and data.
+- For improvements: explain WHY it's needed and WHAT specifically to do, with time ranges and metrics.
+- Keep insights actionable and specific, not generic. Every item must reference this video's data.
+- Each section should have 1-3 items maximum.
 - recipe_eval.current should reflect the actual flow_order.
 - For claim_translations: analyze how each product claim (spec/fact) was translated into
   consumer experience in the video. Strategies:
@@ -422,7 +433,7 @@ Provide coaching insights in **{output_language}** as JSON with this exact struc
   - "differentiation" → "차별점 강조"
   - "authority" → "전문가/신뢰 요소"
 - Write as if explaining to a creator who is smart but not a marketing professor.
-- Be specific and actionable: "~하면 좋습니다" not "~를 고려하세요".
+- Be specific and actionable. Use concrete action verbs, not vague suggestions.
 """
 
 
