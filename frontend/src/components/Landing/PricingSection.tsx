@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Minus } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { logProInterest } from '../../lib/api';
@@ -28,11 +28,11 @@ const proPlan: PlanFeature[] = [
   { text: '레이더 채널 5개', included: true },
   { text: '제작가이드 월 30회', included: true },
   { text: '대본 생성 월 10회', included: true },
-  { text: '리포트 내보내기', included: true, note: '워터마크 없음' },
+  { text: '리포트 내보내기', included: true, note: '워터마크 없음 + 템플릿' },
 ];
 
 export default function PricingSection() {
-  const { user, signInWithGoogle } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [proClicked, setProClicked] = useState(false);
   const { ref, visible } = useScrollReveal();
@@ -47,11 +47,7 @@ export default function PricingSection() {
   }
 
   function handleFreeStart() {
-    if (user) {
-      navigate('/app/analyze');
-    } else {
-      signInWithGoogle();
-    }
+    navigate(user ? '/app/analyze' : '/login');
   }
 
   return (
@@ -81,16 +77,12 @@ export default function PricingSection() {
             <div className="mt-3">
               <span className="text-3xl font-bold text-gray-900">₩0</span>
             </div>
-            <p className="mt-2 text-sm text-gray-500">와카랩의 핵심을 체험해보세요</p>
+            <p className="mt-2 text-sm text-gray-500">베타 기간 동안 무료로 시작하세요</p>
 
             <ul className="mt-8 space-y-3">
               {freePlan.map((f, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-sm text-gray-600">
-                  {f.included ? (
-                    <Check className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  ) : (
-                    <Minus className="w-4 h-4 text-gray-300 mt-0.5 flex-shrink-0" />
-                  )}
+                  <Check className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
                   <span>
                     {f.text}
                     {f.note && (
@@ -117,9 +109,9 @@ export default function PricingSection() {
 
             <h3 className="text-xl font-bold text-gray-900">Pro</h3>
             <div className="mt-3">
-              <span className="text-sm font-medium text-gray-500">베타 기간 무료</span>
+              <span className="text-sm font-medium text-gray-500">베타 특별가 준비 중</span>
             </div>
-            <p className="mt-2 text-sm text-gray-500">팀을 위한 본격 분석 도구</p>
+            <p className="mt-2 text-sm text-gray-500">더 많이 분석하고, 더 깊이 비교하세요</p>
 
             <ul className="mt-8 space-y-3">
               {proPlan.map((f, i) => (
@@ -137,14 +129,14 @@ export default function PricingSection() {
 
             {proClicked ? (
               <div className="mt-8 w-full py-3 bg-green-50 text-green-700 text-sm font-medium rounded-full text-center">
-                감사합니다! 정식 출시 시 우선 안내해드리겠습니다
+                감사합니다! 출시 시 우선 안내해드리겠습니다
               </div>
             ) : (
               <button
                 onClick={handleProInterest}
                 className="mt-8 w-full py-3 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors"
               >
-                관심 등록하기
+                출시 알림 받기
               </button>
             )}
           </div>

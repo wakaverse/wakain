@@ -1,23 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import {
-  BarChart3, Settings, Users, LogOut, ChevronLeft, ChevronRight, Menu, FlaskConical, FolderOpen,
+  BarChart3, Settings, Users, LogOut, ChevronLeft, ChevronRight, Menu, FlaskConical, FolderOpen, MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { isAdmin } from '../../lib/admin';
+import { supabase } from '../../lib/supabase';
 
 interface AdminMenuItem {
   key: string;
   label: string;
   icon: React.ElementType;
   path: string;
+  badge?: number;
 }
 
-const menuItems: AdminMenuItem[] = [
+const baseMenuItems: Omit<AdminMenuItem, 'badge'>[] = [
   { key: 'dashboard', label: '대시보드', icon: BarChart3, path: '/ctrl-8k3x7' },
   { key: 'pipeline', label: '파이프라인', icon: Settings, path: '/ctrl-8k3x7/pipeline' },
   { key: 'users', label: '사용자', icon: Users, path: '/ctrl-8k3x7/users' },
   { key: 'content', label: '콘텐츠', icon: FolderOpen, path: '/ctrl-8k3x7/content' },
+  { key: 'inquiries', label: '문의 관리', icon: MessageSquare, path: '/ctrl-8k3x7/inquiries' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +29,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [newInquiryCount, setNewInquiryCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchNewCount() {
+      const { count } = await supabase
+        .from('contact_inquiries')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'new');
+      setNewInquiryCount(count ?? 0);
+    }
+    fetchNewCount();
+    const interval = setInterval(fetchNewCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (
@@ -43,6 +60,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     await signOut();
     navigate('/');
   };
+
+  const menuItems: AdminMenuItem[] = baseMenuItems.map((item) => ({
+    ...item,
+    badge: item.key === 'inquiries' ? newInquiryCount : undefined,
+  }));
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex">
@@ -64,7 +86,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
-          {menuItems.map(({ key, label, icon: Icon, path }) => {
+          {menuItems.map(({ key, label, icon: Icon, path, badge }) => {
             const active = location.pathname === path || (path !== '/admin' && location.pathname.startsWith(path));
             const isExactDashboard = key === 'dashboard' && location.pathname === '/ctrl-8k3x7';
 
@@ -79,7 +101,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 `}
               >
                 <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={1.5} />
-                {!collapsed && <span className="flex-1 truncate">{label}</span>}
+                {!collapsed && (
+                  <>
+                    <span className="flex-1 truncate">{label}</span>
+                    {badge !== undefined && badge > 0 && (
+                      <span className="ml-auto w-5 h-5 flex items-center justify-center text-[10px] font-bold bg-red-500 text-white rounded-full">
+                        {badge > 99 ? '99+' : badge}
+                      </span>
+                    )}
+                  </>
+                )}
+                {collapsed && badge !== undefined && badge > 0 && (
+                  <span className="absolute right-1 top-1 w-2 h-2 bg-red-500 rounded-full" />
+                )}
               </Link>
             );
           })}

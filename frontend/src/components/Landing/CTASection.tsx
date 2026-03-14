@@ -1,8 +1,15 @@
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
-import UrlInput from './UrlInput';
 
 export default function CTASection() {
   const { ref, visible } = useScrollReveal();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  function handleCTA() {
+    navigate(user ? '/app/analyze' : '/login');
+  }
 
   return (
     <section className="py-20 sm:py-28">
@@ -17,13 +24,19 @@ export default function CTASection() {
 
           <div className="relative">
             <h2 className="text-2xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
-              지금 바로
-              <br />
-              경쟁사 영상을 분석해보세요
+              지금 바로 시작하세요
             </h2>
 
             <div className="mt-8">
-              <UrlInput source="bottom" />
+              <button
+                onClick={handleCTA}
+                className="px-8 py-3.5 bg-white hover:bg-gray-100 text-gray-900 text-base font-medium rounded-full transition-colors"
+              >
+                베타 무료 시작하기 →
+              </button>
+              <p className="mt-4 text-sm text-gray-400">
+                현재 베타 서비스 중 · 무료로 모든 기능을 체험해보세요
+              </p>
             </div>
           </div>
         </div>

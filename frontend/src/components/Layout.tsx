@@ -55,6 +55,7 @@ export default function Layout({ children }: LayoutProps) {
           <Link to={prefix || '/'} className="flex items-center gap-2 font-semibold text-base tracking-tight">
             <FlaskConical className="w-4 h-4 text-gray-900" />
             <span className="text-gray-900">WakaLab</span>
+            <span className="px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-blue-600 bg-blue-50 rounded-md leading-none">BETA</span>
           </Link>
 
           {isLanding && (
