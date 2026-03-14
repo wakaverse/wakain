@@ -64,6 +64,7 @@ class PipelineConfig:
     soniox_api_key: str | None = None
     output_language: str = "ko"
     job_id: str | None = None
+    source_type: str | None = None
 
 
 @dataclass
@@ -262,6 +263,10 @@ async def run_pipeline(config: PipelineConfig) -> PipelineResult:
             phase_results, phase_times, phase_usages, job_id=jid,
         ),
     )
+
+    # ── source_type == "upload" → platform 오버라이드 ──────────────────────
+    if config.source_type == "upload" and p2_result is not None:
+        p2_result.meta.platform = "upload"
 
     # ── 병렬② : P4 + P7 + P8 + P9 (P1,P3 완료 후) ─────────────────────────
     # P4: frames_dir + timestamps from P3

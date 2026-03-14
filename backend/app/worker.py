@@ -126,7 +126,52 @@ def _extract_thumbnails(video_path: str, scenes: list[dict], job_id: str) -> dic
 
     return thumb_map
 
-def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, product_category: str | None = None) -> None:
+def _generate_cover_thumbnail(video_path: str, job_id: str) -> None:
+    """Extract mid-point frame as cover thumbnail, upload to R2, update jobs.thumbnail_url."""
+    import tempfile
+
+    # Get video duration
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", video_path],
+        capture_output=True, text=True, timeout=10,
+    )
+    duration = float(result.stdout.strip())
+    mid_t = duration / 2
+
+    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+        tmp_path = tmp.name
+
+    try:
+        cmd = [
+            "ffmpeg", "-y",
+            "-ss", str(mid_t),
+            "-i", video_path,
+            "-frames:v", "1",
+            "-q:v", "5",
+            "-vf", "scale=480:-1",
+            tmp_path,
+        ]
+        subprocess.run(cmd, capture_output=True, timeout=10)
+
+        if Path(tmp_path).exists() and Path(tmp_path).stat().st_size > 0:
+            r2_key = f"thumbnails/{job_id}/cover.jpg"
+            _s3().upload_file(
+                tmp_path,
+                R2_BUCKET_NAME,
+                r2_key,
+                ExtraArgs={"ContentType": "image/jpeg"},
+            )
+            _update_job(job_id, thumbnail_url=r2_key)
+            print(f"[pipeline:{job_id[:8]}] Cover thumbnail uploaded: {r2_key}", flush=True)
+    finally:
+        try:
+            Path(tmp_path).unlink(missing_ok=True)
+        except Exception:
+            pass
+
+
+def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, product_category: str | None = None, source_type: str | None = None) -> None:
     """Download video from R2, run V2 pipeline, persist results, clean up."""
     output_dir = str(OUTPUT_DIR / job_id)
 
@@ -179,6 +224,7 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
             gemini_api_key_pro=os.environ.get("GEMINI_API_KEY_PRO"),
             soniox_api_key=os.environ.get("SONIOX_API_KEY"),
             job_id=job_id,
+            source_type=source_type,
         )
 
         pipeline_result = asyncio.run(run_pipeline(config))
@@ -215,6 +261,12 @@ def run_analysis(job_id: str, r2_key: str, product_name: str | None = None, prod
                     print(f"[pipeline:{job_id[:8]}] Extracted {len(thumb_map)} thumbnails", flush=True)
             except Exception as exc:
                 print(f"[pipeline:{job_id[:8]}] Thumbnail extraction failed: {exc}", flush=True)
+
+        # Extract cover thumbnail (mid-point frame) for project listing
+        try:
+            _generate_cover_thumbnail(str(video_path), job_id)
+        except Exception as exc:
+            print(f"[pipeline:{job_id[:8]}] Cover thumbnail failed: {exc}", flush=True)
 
         # Save to results table
         try:

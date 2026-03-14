@@ -134,7 +134,7 @@ async def analyze_video(
     }).execute()
 
     # Start background analysis (worker downloads from R2)
-    background_tasks.add_task(run_analysis, job_id, body.r2_key, body.product_name, body.product_category)
+    background_tasks.add_task(run_analysis, job_id, body.r2_key, body.product_name, body.product_category, source_type="upload")
 
     return {"job_id": job_id}
 
@@ -224,6 +224,6 @@ async def analyze_video_url(
         job_data["posted_at"] = body.posted_at
     supabase.table("jobs").insert(job_data).execute()
 
-    background_tasks.add_task(run_analysis, job_id, r2_key, body.product_name, body.product_category)
+    background_tasks.add_task(run_analysis, job_id, r2_key, body.product_name, body.product_category, source_type="url")
 
     return {"job_id": job_id, "filename": filename, "file_size_mb": round(file_size_mb, 2)}

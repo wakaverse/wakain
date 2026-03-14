@@ -429,6 +429,7 @@ class Platform(StrEnum):
     REELS = "reels"
     SHORTS = "shorts"
     AD = "ad"
+    UPLOAD = "upload"
 
 
 class AspectRatio(StrEnum):

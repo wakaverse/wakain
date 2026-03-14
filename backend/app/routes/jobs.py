@@ -49,7 +49,23 @@ async def list_jobs(user: dict = Depends(get_current_user)):
         .limit(50)
         .execute()
     )
-    return response.data
+    jobs = response.data
+    # Convert R2 keys to presigned URLs for thumbnails
+    s3 = None
+    for job in jobs:
+        thumb = job.get("thumbnail_url")
+        if thumb and thumb.startswith("thumbnails/"):
+            try:
+                if s3 is None:
+                    s3 = _s3()
+                job["thumbnail_url"] = s3.generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": R2_BUCKET_NAME, "Key": thumb},
+                    ExpiresIn=3600,
+                )
+            except Exception:
+                pass
+    return jobs
 
 
 @router.get("/jobs/{job_id}")
@@ -58,7 +74,19 @@ async def get_job(job_id: str, user: dict = Depends(get_current_user)):
     response = supabase.table("jobs").select("*").eq("id", job_id).single().execute()
     if not response.data:
         raise HTTPException(status_code=404, detail="Job not found")
-    return response.data
+    job = response.data
+    # Convert R2 key to presigned URL for thumbnail
+    thumb = job.get("thumbnail_url")
+    if thumb and thumb.startswith("thumbnails/"):
+        try:
+            job["thumbnail_url"] = _s3().generate_presigned_url(
+                "get_object",
+                Params={"Bucket": R2_BUCKET_NAME, "Key": thumb},
+                ExpiresIn=3600,
+            )
+        except Exception:
+            pass
+    return job
 
 
 @router.get("/results/{job_id}")
